@@ -42,6 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeAclWithParams:(CHIPReadParams * _Nullable)params
                  completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAclWithMinInterval:(NSNumber * _Nonnull)minInterval
                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -55,6 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeExtensionWithParams:(CHIPReadParams * _Nullable)params
                        completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeExtensionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -67,6 +75,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -82,6 +94,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -97,6 +113,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -111,6 +131,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -139,6 +163,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -154,6 +182,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -169,6 +201,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -183,6 +219,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -211,6 +251,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWindowStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWindowStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -225,6 +269,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAdminFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAdminFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -239,6 +287,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAdminVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAdminVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -253,6 +305,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -268,6 +324,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -283,6 +343,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -297,6 +361,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -319,6 +387,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -332,6 +404,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -344,6 +420,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeApplicationNameWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeApplicationNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -358,6 +438,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductIDWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -371,6 +455,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeApplicationWithCompletionHandler:(void (^)(
                                                           CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeApplicationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -386,6 +474,10 @@ NS_ASSUME_NONNULL_BEGIN
                                          NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -398,6 +490,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeApplicationVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -412,6 +508,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAllowedVendorListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -426,6 +526,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -441,6 +545,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -456,6 +564,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -470,6 +582,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -502,6 +618,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCatalogListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCatalogListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -517,6 +637,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSError * _Nullable error))completionHandler;
 - (void)writeAttributeCurrentAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nullable)value
                         completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentAppWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -531,6 +655,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -546,6 +674,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -561,6 +693,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -575,6 +711,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -602,6 +742,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOutputListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -614,6 +758,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentOutputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentOutputWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -628,6 +776,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -643,6 +795,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -658,6 +814,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -672,6 +832,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -698,6 +862,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierMovingStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBarrierMovingStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -712,6 +880,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierSafetyStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -727,6 +899,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -742,6 +918,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBarrierPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -756,6 +936,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -771,6 +955,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -786,6 +974,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -800,6 +992,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -822,6 +1018,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDataModelRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDataModelRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -836,6 +1036,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -849,6 +1053,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -861,6 +1069,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductNameWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -874,6 +1086,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductIDWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -887,6 +1103,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNodeLabelWithCompletionHandler:(void (^)(
                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -900,6 +1120,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLocationWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLocationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -912,6 +1136,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -926,6 +1154,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -941,6 +1173,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -955,6 +1191,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -970,6 +1210,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeManufacturingDateWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -984,6 +1228,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartNumberWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -997,6 +1245,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductURLWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1010,6 +1262,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductLabelWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1024,6 +1280,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSerialNumberWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1039,6 +1299,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLocalConfigDisabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -1054,6 +1318,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeReachableWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -1066,6 +1334,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUniqueIDWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUniqueIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -1078,6 +1350,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1093,6 +1369,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1108,6 +1388,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1122,6 +1406,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1145,6 +1433,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOutOfServiceWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOutOfServiceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1160,6 +1452,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributePresentValueWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePresentValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1174,6 +1470,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStatusFlagsWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStatusFlagsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -1187,6 +1487,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1202,6 +1506,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1217,6 +1525,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1231,6 +1543,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1254,6 +1570,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBindingWithParams:(CHIPReadParams * _Nullable)params
                      completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBindingWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBindingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -1266,6 +1586,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1281,6 +1605,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1296,6 +1624,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1310,6 +1642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1332,6 +1668,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStateValueWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStateValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1345,6 +1685,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1360,6 +1704,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1375,6 +1723,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1389,6 +1741,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1436,6 +1792,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActionListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActionListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1448,6 +1808,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEndpointListWithCompletionHandler:(void (^)(
                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEndpointListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1461,6 +1825,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSetupUrlWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSetupUrlWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -1473,6 +1841,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1488,6 +1860,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1503,6 +1879,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1517,6 +1897,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1539,6 +1923,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1552,6 +1940,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -1564,6 +1956,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductNameWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -1578,6 +1974,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNodeLabelWithCompletionHandler:(void (^)(
                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -1590,6 +1990,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1604,6 +2008,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -1619,6 +2027,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1633,6 +2045,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -1648,6 +2064,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeManufacturingDateWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -1662,6 +2082,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartNumberWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1675,6 +2099,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductURLWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1688,6 +2116,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductLabelWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1702,6 +2134,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSerialNumberWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -1716,6 +2152,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeReachableWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -1728,6 +2168,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUniqueIDWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUniqueIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -1740,6 +2184,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1755,6 +2203,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1770,6 +2222,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1784,6 +2240,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1813,6 +2273,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeChannelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -1826,6 +2290,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLineupWithCompletionHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -1840,6 +2308,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentChannelWithCompletionHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -1854,6 +2326,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1869,6 +2345,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1884,6 +2364,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1898,6 +2382,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1954,6 +2442,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHueWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -1967,6 +2459,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentSaturationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentSaturationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -1981,6 +2477,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -1995,6 +2495,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentXWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -2007,6 +2511,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentYWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -2019,6 +2527,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDriftCompensationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDriftCompensationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2033,6 +2545,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCompensationTextWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCompensationTextWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -2047,6 +2563,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -2061,6 +2581,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorModeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2074,6 +2598,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorControlOptionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorControlOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -2089,6 +2617,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPrimariesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2103,6 +2635,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary1XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary1XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2115,6 +2651,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary1YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary1YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2127,6 +2667,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary1IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary1IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2141,6 +2685,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary2XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary2XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2153,6 +2701,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary2YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary2YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2165,6 +2717,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary2IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary2IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2179,6 +2735,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary3XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary3XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2191,6 +2751,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary3YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary3YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2203,6 +2767,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary3IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary3IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2217,6 +2785,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary4XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary4XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2229,6 +2801,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary4YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary4YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2241,6 +2817,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary4IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary4IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2255,6 +2835,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary5XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary5XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2267,6 +2851,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary5YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary5YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2279,6 +2867,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary5IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary5IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2293,6 +2885,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary6XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary6XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2305,6 +2901,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary6YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary6YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2317,6 +2917,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePrimary6IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePrimary6IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2332,6 +2936,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeWhitePointXWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWhitePointXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -2346,6 +2954,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeWhitePointYWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWhitePointYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -2360,6 +2972,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointRXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointRXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2375,6 +2991,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointRYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointRYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2391,6 +3011,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointRIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -2407,6 +3031,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointGXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointGXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2422,6 +3050,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointGYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointGYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2438,6 +3070,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointGIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -2454,6 +3090,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointBXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointBXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2469,6 +3109,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointBYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointBYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2485,6 +3129,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorPointBIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -2500,6 +3148,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEnhancedCurrentHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -2514,6 +3166,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEnhancedColorModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnhancedColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2528,6 +3184,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopActiveWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorLoopActiveWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -2542,6 +3202,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopDirectionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorLoopDirectionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -2556,6 +3220,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorLoopTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -2570,6 +3238,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopStartEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2585,6 +3257,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2600,6 +3276,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -2614,6 +3294,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorTempPhysicalMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -2629,6 +3313,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorTempPhysicalMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -2644,6 +3332,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -2661,6 +3353,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -2676,6 +3372,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2691,6 +3391,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2706,6 +3410,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -2720,6 +3428,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -2749,6 +3461,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptHeaderWithCompletionHandler:(void (^)(
                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAcceptHeaderWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -2764,6 +3480,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -2779,6 +3499,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2794,6 +3518,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2809,6 +3537,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -2823,6 +3555,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -2845,6 +3581,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDeviceListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDeviceListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2857,6 +3597,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2869,6 +3613,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2881,6 +3629,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartsListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePartsListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -2893,6 +3645,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2908,6 +3664,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2923,6 +3683,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -2937,6 +3701,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -2963,6 +3731,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2978,6 +3750,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -2993,6 +3769,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3049,6 +3829,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLockStateWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLockStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -3061,6 +3845,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLockTypeWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLockTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -3073,6 +3861,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActuatorEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActuatorEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3087,6 +3879,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDoorStateWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDoorStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -3099,6 +3895,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfTotalUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -3114,6 +3914,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPINUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -3129,6 +3933,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3144,6 +3952,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -3160,6 +3972,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -3176,6 +3992,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -3190,6 +4010,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -3204,6 +4028,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -3218,6 +4046,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -3233,6 +4065,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLanguageWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLanguageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -3246,6 +4082,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeAutoRelockTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAutoRelockTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -3261,6 +4101,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSoundVolumeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSoundVolumeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -3275,6 +4119,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOperatingModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOperatingModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3289,6 +4137,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedOperatingModesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedOperatingModesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -3306,6 +4158,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -3323,6 +4179,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -3339,6 +4199,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeWrongCodeEntryLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -3354,6 +4218,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3369,6 +4237,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3384,6 +4256,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3398,6 +4274,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3420,6 +4300,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasurementTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasurementTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3434,6 +4318,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTotalActivePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTotalActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -3448,6 +4336,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsVoltageWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3461,6 +4353,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsVoltageMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsVoltageMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3475,6 +4371,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsVoltageMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3489,6 +4389,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsCurrentWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3502,6 +4406,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsCurrentMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsCurrentMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3516,6 +4424,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRmsCurrentMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3530,6 +4442,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActivePowerWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -3543,6 +4459,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActivePowerMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActivePowerMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -3557,6 +4477,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActivePowerMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActivePowerMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -3571,6 +4495,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3586,6 +4514,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3601,6 +4533,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3615,6 +4551,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3639,6 +4579,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePHYRateWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePHYRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -3651,6 +4595,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFullDuplexWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFullDuplexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3664,6 +4612,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3678,6 +4630,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3692,6 +4648,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrCountWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxErrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3705,6 +4665,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCollisionCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCollisionCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -3719,6 +4683,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -3733,6 +4701,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCarrierDetectWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCarrierDetectWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3747,6 +4719,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTimeSinceResetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTimeSinceResetWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -3761,6 +4737,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3776,6 +4756,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3791,6 +4775,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3805,6 +4793,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3818,6 +4810,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3841,6 +4837,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeFanModeWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFanModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -3854,6 +4854,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeFanModeSequenceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFanModeSequenceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFanModeSequenceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3868,6 +4872,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3883,6 +4891,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3898,6 +4910,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -3912,6 +4928,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3925,6 +4945,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -3947,6 +4971,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -3959,6 +4987,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3974,6 +5006,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -3989,6 +5025,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4003,6 +5043,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4025,6 +5069,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4039,6 +5087,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -4053,6 +5105,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -4067,6 +5123,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -4079,6 +5139,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4094,6 +5158,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4109,6 +5177,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4123,6 +5195,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4156,6 +5232,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBreadcrumbWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBreadcrumbWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4169,6 +5249,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBasicCommissioningInfoWithCompletionHandler:
     (void (^)(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)
     subscribeAttributeBasicCommissioningInfoWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
@@ -4186,6 +5270,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRegulatoryConfigWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -4200,6 +5288,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLocationCapabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -4214,6 +5306,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4229,6 +5325,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4244,6 +5344,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4258,6 +5362,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4280,6 +5388,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworkInterfacesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNetworkInterfacesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -4294,6 +5406,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRebootCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRebootCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -4306,6 +5422,10 @@ NS_ASSUME_NONNULL_BEGIN
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeUpTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUpTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -4318,6 +5438,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTotalOperationalHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -4333,6 +5457,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBootReasonsWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBootReasonsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -4346,6 +5474,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveHardwareFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveHardwareFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -4361,6 +5493,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveRadioFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveRadioFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -4375,6 +5511,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveNetworkFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -4390,6 +5530,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4405,6 +5549,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4420,6 +5568,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4434,6 +5586,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4468,6 +5624,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeGroupKeyMapWithParams:(CHIPReadParams * _Nullable)params
                          completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeGroupKeyMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -4481,6 +5641,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGroupTableWithParams:(CHIPReadParams * _Nullable)params
                         completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeGroupTableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4493,6 +5657,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxGroupsPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxGroupsPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -4507,6 +5675,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxGroupKeysPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -4522,6 +5694,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4537,6 +5713,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4552,6 +5732,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4566,6 +5750,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4604,6 +5792,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -4617,6 +5809,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4632,6 +5828,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4647,6 +5847,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4661,6 +5865,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4690,6 +5898,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeIdentifyTimeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeIdentifyTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -4704,6 +5916,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeIdentifyTypeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeIdentifyTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -4718,6 +5934,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4733,6 +5953,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4748,6 +5972,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4762,6 +5990,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4784,6 +6016,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4798,6 +6034,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -4812,6 +6052,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -4826,6 +6070,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -4838,6 +6086,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLightSensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLightSensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4852,6 +6104,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4867,6 +6123,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4882,6 +6142,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4896,6 +6160,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -4922,6 +6190,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4937,6 +6209,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -4952,6 +6228,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -4966,6 +6246,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5001,6 +6285,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentLevelWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5015,6 +6303,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5029,6 +6321,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinLevelWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -5041,6 +6337,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxLevelWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -5053,6 +6353,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentFrequencyWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -5067,6 +6371,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinFrequencyWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5081,6 +6389,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxFrequencyWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5096,6 +6408,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOptionsWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -5109,6 +6425,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOnOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -5125,6 +6445,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOnLevelWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -5138,6 +6462,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOnTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -5153,6 +6481,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -5168,6 +6500,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeDefaultMoveRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDefaultMoveRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5184,6 +6520,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -5199,6 +6539,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5214,6 +6558,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5229,6 +6577,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5243,6 +6595,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5256,6 +6612,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5279,6 +6639,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveLocaleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5293,6 +6657,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedLocalesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -5307,6 +6675,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5322,6 +6694,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5337,6 +6713,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5361,6 +6741,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5376,6 +6760,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5391,6 +6779,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5405,6 +6797,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5434,6 +6830,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInputListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -5446,6 +6846,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentInputWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentInputWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5460,6 +6864,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5475,6 +6883,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5490,6 +6902,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5504,6 +6920,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5552,6 +6972,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentStateWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5566,6 +6990,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartTimeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -5578,6 +7006,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDurationWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDurationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -5590,6 +7022,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSampledPositionWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSampledPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5604,6 +7040,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePlaybackSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5618,6 +7058,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSeekRangeEndWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -5632,6 +7076,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSeekRangeStartWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSeekRangeStartWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -5646,6 +7094,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5661,6 +7113,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5676,6 +7132,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5690,6 +7150,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5715,6 +7179,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -5728,6 +7196,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedModesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedModesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -5742,6 +7214,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -5754,6 +7230,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartUpModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -5767,6 +7247,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -5780,6 +7264,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5795,6 +7283,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5810,6 +7302,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5824,6 +7320,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -5865,6 +7365,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxNetworksWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -5878,6 +7382,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworksWithCompletionHandler:(void (^)(
                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -5890,6 +7398,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeScanMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeScanMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -5904,6 +7416,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeConnectMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeConnectMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -5920,6 +7436,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeInterfaceEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInterfaceEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -5934,6 +7454,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastNetworkingStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLastNetworkingStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -5949,6 +7473,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastNetworkIDWithCompletionHandler:(void (^)(
                                                             NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLastNetworkIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -5962,6 +7490,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastConnectErrorValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLastConnectErrorValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -5977,6 +7509,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -5992,6 +7528,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6007,6 +7547,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6020,6 +7564,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6051,6 +7599,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6065,6 +7617,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6092,6 +7648,10 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:
                                      (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -6107,6 +7667,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdatePossibleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUpdatePossibleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -6121,6 +7685,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdateStateWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUpdateStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -6134,6 +7702,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdateStateProgressWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUpdateStateProgressWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -6149,6 +7721,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6163,6 +7739,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6185,6 +7765,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOccupancyWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOccupancyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -6197,6 +7781,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOccupancySensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -6212,6 +7800,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOccupancySensorTypeBitmapWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -6227,6 +7819,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6242,6 +7838,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6257,6 +7857,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6271,6 +7875,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6300,6 +7908,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)toggleWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeOnOffWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -6312,6 +7924,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGlobalSceneControlWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeGlobalSceneControlWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -6326,6 +7942,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOnTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOnTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -6339,6 +7959,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOffWaitTimeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOffWaitTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -6353,6 +7977,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeStartUpOnOffWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartUpOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -6367,6 +7995,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6382,6 +8014,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6397,6 +8033,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6411,6 +8051,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6424,6 +8068,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6446,6 +8094,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSwitchTypeWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSwitchTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6460,6 +8112,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSwitchActionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSwitchActionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6474,6 +8130,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6489,6 +8149,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6504,6 +8168,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6518,6 +8186,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6567,6 +8239,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNOCsWithParams:(CHIPReadParams * _Nullable)params
                   completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNOCsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -6579,6 +8255,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFabricsWithParams:(CHIPReadParams * _Nullable)params
                      completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -6591,6 +8271,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -6605,6 +8289,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCommissionedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCommissionedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -6620,6 +8308,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTrustedRootCertificatesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTrustedRootCertificatesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -6635,6 +8327,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -6649,6 +8345,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6664,6 +8364,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6679,6 +8383,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6693,6 +8401,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6714,6 +8426,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerSource : CHIPCluster
 
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -6725,6 +8441,10 @@ NS_ASSUME_NONNULL_BEGIN
                             completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeOrderWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOrderWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -6737,6 +8457,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -6750,6 +8474,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBatteryVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -6764,6 +8492,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryPercentRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -6779,6 +8511,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryTimeRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -6794,6 +8530,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryChargeLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -6808,6 +8548,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveBatteryFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveBatteryFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -6823,6 +8567,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBatteryChargeStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -6837,6 +8585,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6852,6 +8604,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6867,6 +8623,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6881,6 +8641,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6894,6 +8658,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6915,6 +8683,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerSourceConfiguration : CHIPCluster
 
 - (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSourcesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -6927,6 +8699,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6942,6 +8718,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -6957,6 +8737,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -6971,6 +8755,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -6993,6 +8781,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7007,6 +8799,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7021,6 +8817,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7035,6 +8835,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7049,6 +8853,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7071,6 +8879,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxPressureWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -7084,6 +8896,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxSpeedWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -7096,6 +8912,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxFlowWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -7108,6 +8928,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7122,6 +8946,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7136,6 +8964,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7150,6 +8982,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7164,6 +9000,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7178,6 +9018,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7192,6 +9036,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinConstFlowWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7206,6 +9054,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxConstFlowWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7220,6 +9072,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinConstTempWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7234,6 +9090,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxConstTempWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7248,6 +9108,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePumpStatusWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePumpStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7261,6 +9125,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEffectiveOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -7276,6 +9144,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEffectiveControlModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEffectiveControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -7291,6 +9163,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCapacityWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -7302,6 +9178,10 @@ NS_ASSUME_NONNULL_BEGIN
                               completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -7316,6 +9196,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -7330,6 +9214,10 @@ NS_ASSUME_NONNULL_BEGIN
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -7344,6 +9232,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
                                     completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -7360,6 +9252,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7375,6 +9271,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeControlModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -7388,6 +9288,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAlarmMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -7400,6 +9304,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7415,6 +9323,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7430,6 +9342,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7444,6 +9360,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7457,6 +9377,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7479,6 +9403,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7493,6 +9421,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7507,6 +9439,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -7521,6 +9457,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -7533,6 +9473,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7548,6 +9492,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7563,6 +9511,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7577,6 +9529,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7619,6 +9575,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSceneCountWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSceneCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7632,6 +9592,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentSceneWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentSceneWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7646,6 +9610,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentGroupWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentGroupWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -7660,6 +9628,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSceneValidWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSceneValidWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7673,6 +9645,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -7686,6 +9662,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7701,6 +9681,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7716,6 +9700,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7730,6 +9718,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7754,6 +9746,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeThreadMetricsWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeThreadMetricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7768,6 +9764,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapFreeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7782,6 +9782,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapUsedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7796,6 +9800,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapHighWatermarkWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -7811,6 +9819,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7826,6 +9838,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7841,6 +9857,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7855,6 +9875,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7868,6 +9892,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7890,6 +9918,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPositionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfPositionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -7904,6 +9936,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -7918,6 +9954,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMultiPressMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMultiPressMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7932,6 +9972,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7947,6 +9991,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7962,6 +10010,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -7976,6 +10028,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -7989,6 +10045,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8015,6 +10075,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTargetListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -8027,6 +10091,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentTargetWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -8041,6 +10109,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -8056,6 +10128,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -8071,6 +10147,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -8085,6 +10165,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8107,6 +10191,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -8121,6 +10209,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8135,6 +10227,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8149,6 +10245,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -8161,6 +10261,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -8175,6 +10279,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8245,6 +10353,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBooleanWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -8258,6 +10370,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBitmap8WithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -8271,6 +10387,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBitmap16WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -8284,6 +10404,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBitmap32WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -8297,6 +10421,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBitmap64WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -8309,6 +10437,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8321,6 +10453,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8333,6 +10469,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt24uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8345,6 +10485,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8357,6 +10501,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt40uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8369,6 +10517,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt48uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8381,6 +10533,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt56uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8393,6 +10549,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8405,6 +10565,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8417,6 +10581,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8429,6 +10597,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt24sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8441,6 +10613,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8453,6 +10629,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt40sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8465,6 +10645,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt48sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8477,6 +10661,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt56sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8489,6 +10677,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8501,6 +10693,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8513,6 +10709,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8526,6 +10726,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeFloatSingleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -8540,6 +10744,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeFloatDoubleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -8554,6 +10762,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOctetStringWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -8567,6 +10779,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListInt8uWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -8580,6 +10796,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8596,6 +10816,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListStructOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8612,6 +10836,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8627,6 +10855,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCharStringWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -8641,6 +10873,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLongCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -8656,6 +10892,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeEpochUsWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEpochUsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -8668,6 +10908,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEpochSWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEpochSWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -8681,6 +10925,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -8695,6 +10943,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8711,6 +10963,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeEnumAttrWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnumAttrWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -8725,6 +10981,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStructAttrWithValue:(CHIPTestClusterClusterSimpleStruct * _Nonnull)value
                         completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStructAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -8741,6 +11001,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt8uWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -8758,6 +11022,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt8sWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -8775,6 +11043,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt16uWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8792,6 +11064,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt16sWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -8808,6 +11084,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListLongOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -8824,6 +11104,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListFabricScopedWithParams:(CHIPReadParams * _Nullable)params
                               completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8839,6 +11123,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTimedWriteBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -8854,6 +11142,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeGeneralErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeGeneralErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -8870,6 +11162,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeClusterErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -8886,6 +11182,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeUnsupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -8900,6 +11200,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8915,6 +11219,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -8930,6 +11238,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8945,6 +11257,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap32WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8960,6 +11276,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap64WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -8975,6 +11295,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -8990,6 +11314,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9005,6 +11333,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt24uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9020,6 +11352,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9035,6 +11371,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt40uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9050,6 +11390,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt48uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9065,6 +11409,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt56uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9080,6 +11428,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9095,6 +11447,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9110,6 +11466,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9125,6 +11485,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt24sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9140,6 +11504,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9155,6 +11523,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt40sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9170,6 +11542,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt48sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9185,6 +11561,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt56sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9200,6 +11580,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9215,6 +11599,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9230,6 +11618,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9246,6 +11638,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableFloatSingleWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -9263,6 +11659,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableFloatDoubleWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -9279,6 +11679,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -9295,6 +11699,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -9310,6 +11718,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnumAttrWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnumAttrWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -9326,6 +11738,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableStructWithValue:(CHIPTestClusterClusterSimpleStruct * _Nullable)value
                             completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableStructWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -9342,6 +11758,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSNumber * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -9359,6 +11779,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSNumber * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -9376,6 +11800,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9393,6 +11821,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9408,6 +11840,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9423,6 +11859,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9438,6 +11878,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9452,6 +11896,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -9485,6 +11933,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLocalTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLocalTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -9499,6 +11951,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9514,6 +11970,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9529,6 +11989,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9544,6 +12008,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9561,6 +12029,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9578,6 +12050,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9595,6 +12071,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -9612,6 +12092,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -9629,6 +12113,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -9646,6 +12134,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -9662,6 +12154,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeMinSetpointDeadBandWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -9679,6 +12175,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9695,6 +12195,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSystemModeWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSystemModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9708,6 +12212,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartOfWeekWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStartOfWeekWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -9721,6 +12229,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -9736,6 +12248,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfDailyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -9751,6 +12267,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9765,6 +12285,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9778,6 +12302,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -9802,6 +12330,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -9818,6 +12350,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeKeypadLockoutWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeKeypadLockoutWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9834,6 +12370,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9849,6 +12389,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9864,6 +12408,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -9879,6 +12427,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9893,6 +12445,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -9917,6 +12473,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -9929,6 +12489,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRoutingRoleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRoutingRoleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -9942,6 +12506,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworkNameWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNetworkNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -9954,6 +12522,10 @@ NS_ASSUME_NONNULL_BEGIN
                                      (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributePanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -9966,6 +12538,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeExtendedPanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeExtendedPanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -9980,6 +12556,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeshLocalPrefixWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -9994,6 +12574,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10008,6 +12592,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNeighborTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeNeighborTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10022,6 +12610,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRouteTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRouteTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10036,6 +12628,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartitionIdWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePartitionIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10049,6 +12645,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWeightingWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWeightingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -10061,6 +12661,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDataVersionWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10074,6 +12678,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStableDataVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeStableDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10088,6 +12696,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLeaderRouterIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLeaderRouterIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10102,6 +12714,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDetachedRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDetachedRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10116,6 +12732,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChildRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeChildRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10130,6 +12750,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRouterRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRouterRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10144,6 +12768,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLeaderRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLeaderRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10158,6 +12786,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -10172,6 +12804,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartitionIdChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -10187,6 +12823,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBetterPartitionAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10202,6 +12842,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeParentChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeParentChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10216,6 +12860,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxTotalCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10230,6 +12878,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10244,6 +12896,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -10258,6 +12914,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -10273,6 +12933,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxAckedCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxAckedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10287,6 +12951,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxNoAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -10302,6 +12970,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDataCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10315,6 +12987,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10329,6 +13005,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10343,6 +13023,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -10358,6 +13042,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxOtherCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10372,6 +13060,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxRetryCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxRetryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10386,6 +13078,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10401,6 +13097,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxIndirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10416,6 +13116,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrCcaCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxErrCcaCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10430,6 +13134,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrAbortCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxErrAbortCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10444,6 +13152,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrBusyChannelCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -10459,6 +13171,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxTotalCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10473,6 +13189,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10487,6 +13207,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -10501,6 +13225,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDataCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10514,6 +13242,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10528,6 +13260,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10542,6 +13278,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -10557,6 +13297,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxOtherCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10571,6 +13315,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxAddressFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -10586,6 +13334,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDestAddrFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -10601,6 +13353,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDuplicatedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10615,6 +13371,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrNoFrameCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -10629,6 +13389,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrUnknownNeighborCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -10644,6 +13408,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrInvalidSrcAddrCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -10659,6 +13427,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrSecCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrSecCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10673,6 +13445,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrFcsCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrFcsCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10687,6 +13463,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrOtherCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRxErrOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10701,6 +13481,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10715,6 +13499,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePendingTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePendingTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -10728,6 +13516,10 @@ NS_ASSUME_NONNULL_BEGIN
                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeDelayWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeDelayWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -10740,6 +13532,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSecurityPolicyWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSecurityPolicyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -10754,6 +13550,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeChannelMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -10766,6 +13566,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                            NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -10781,6 +13585,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveNetworkFaultsListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                                           params:(CHIPSubscribeParams * _Nullable)params
@@ -10796,6 +13604,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10811,6 +13623,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10826,6 +13642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -10840,6 +13660,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10853,6 +13677,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10876,6 +13704,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeHourFormatWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeHourFormatWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10890,6 +13722,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveCalendarTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeActiveCalendarTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                                      params:(CHIPSubscribeParams * _Nullable)params
@@ -10904,6 +13740,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedCalendarTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSupportedCalendarTypesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -10919,6 +13759,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10934,6 +13778,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -10949,6 +13797,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10972,6 +13824,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTemperatureUnitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTemperatureUnitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTemperatureUnitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -10986,6 +13842,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11000,6 +13860,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11013,6 +13877,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11036,6 +13904,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             params:(CHIPSubscribeParams * _Nullable)params
@@ -11048,6 +13920,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11063,6 +13939,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11078,6 +13958,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11100,6 +13984,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMACAddressWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeMACAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11113,6 +14001,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11128,6 +14020,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11143,6 +14039,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11157,6 +14057,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11180,6 +14084,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeBssidWithCompletionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBssidWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         params:(CHIPSubscribeParams * _Nullable)params
@@ -11192,6 +14100,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSecurityTypeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSecurityTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -11206,6 +14118,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiFiVersionWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeWiFiVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -11219,6 +14135,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelNumberWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeChannelNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11232,6 +14152,10 @@ NS_ASSUME_NONNULL_BEGIN
                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeRssiWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeRssiWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -11244,6 +14168,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBeaconLostCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBeaconLostCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11258,6 +14186,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBeaconRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeBeaconRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11272,6 +14204,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketMulticastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -11287,6 +14223,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketMulticastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -11302,6 +14242,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -11317,6 +14261,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -11332,6 +14280,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentMaxRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentMaxRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -11346,6 +14298,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -11360,6 +14316,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11375,6 +14335,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11390,6 +14354,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11404,6 +14372,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11417,6 +14389,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11450,6 +14426,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)upOrOpenWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -11462,6 +14442,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -11477,6 +14461,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(CHIPSubscribeParams * _Nullable)params
@@ -11492,6 +14480,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeConfigStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeConfigStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -11506,6 +14498,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionLiftPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11521,6 +14517,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11536,6 +14536,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOperationalStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeOperationalStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                                     params:(CHIPSubscribeParams * _Nullable)params
@@ -11550,6 +14554,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11565,6 +14573,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -11580,6 +14592,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEndProductTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeEndProductTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(CHIPSubscribeParams * _Nullable)params
@@ -11594,6 +14610,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -11609,6 +14629,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                    params:(CHIPSubscribeParams * _Nullable)params
@@ -11624,6 +14648,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledOpenLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -11639,6 +14667,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledClosedLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -11654,6 +14686,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledOpenLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                                          params:(CHIPSubscribeParams * _Nullable)params
@@ -11669,6 +14705,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledClosedLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                                            params:(CHIPSubscribeParams * _Nullable)params
@@ -11684,6 +14724,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        params:(CHIPSubscribeParams * _Nullable)params
@@ -11696,6 +14740,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSafetyStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(CHIPSubscribeParams * _Nullable)params
@@ -11710,6 +14758,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11725,6 +14777,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11740,6 +14796,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                                 params:(CHIPSubscribeParams * _Nullable)params
@@ -11754,6 +14814,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(CHIPSubscribeParams * _Nullable)params
@@ -11767,6 +14831,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(CHIPSubscribeParams * _Nullable)params

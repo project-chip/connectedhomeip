@@ -20,6 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class CHIPSubscribeParams;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^CHIPDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
@@ -65,13 +67,15 @@ extern NSString * const kCHIPStatusKey;
  *
  * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
- * to reportHandler.
+ * to reportHandler.  Note that if the CHIPSubscribeParams are set to
+ * automatically resubscribe this can end up being called more than once.
  *
  * TODO: The "all events" part does not work yet.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
