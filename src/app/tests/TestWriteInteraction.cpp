@@ -479,10 +479,14 @@ int Test_Setup(void * inContext)
 
     VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
 
-    constexpr chip::FabricIndex kFabricIndex1 = 1;
-    static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
+    TestContext & ctx = *static_cast<TestContext *>(inContext);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitProvider(), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(kFabricIndex1, chip::ByteSpan(kCompressedFabricId)), FAILURE);
+
+    chip::CompressedFabricId compressedFabricId = ctx.GetBobFabric()->GetCompressedId();
+    uint8_t buf[sizeof(compressedFabricId)];
+    chip::MutableByteSpan span(buf);
+    chip::Encoding::BigEndian::Put64(span.data(), span.size());
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(ctx.GetBobFabricIndex(), span), FAILURE);
 
     return SUCCESS;
 }

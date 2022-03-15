@@ -496,15 +496,11 @@ static nlTestSuite sSuite =
  */
 int TestSecurePairing_Setup(void * inContext)
 {
+    auto & ctx = *static_cast<TestContext *>(inContext);
+    ctx.ConfigInitializeNodes(false);
+
     // Initialize System memory and resources
     VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
-
-    auto & ctx = *static_cast<TestContext *>(inContext);
-    ctx.SetBobNodeId(kPlaceholderNodeId);
-    ctx.SetAliceNodeId(kPlaceholderNodeId);
-    ctx.SetBobKeyId(0);
-    ctx.SetAliceKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     return SUCCESS;
 }
