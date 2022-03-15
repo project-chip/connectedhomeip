@@ -59,6 +59,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
@@ -497,6 +498,29 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 
     addr.ToString(addrStr);
     return env->NewStringUTF(addrStr);
+}
+
+JNI_METHOD(jlong, generateCompressedFabricId)
+(JNIEnv * env, jobject self, jbyteArray rcac, jbyteArray noc)
+{
+    chip::DeviceLayer::StackLock lock;
+    CompressedFabricId compressedFabricId;
+    FabricId fabricId;
+    NodeId nodeId;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::JniByteArray jniRcac(env, rcac);
+    chip::JniByteArray jniNoc(env, noc);
+    err = ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(jniRcac.byteSpan(), jniNoc.byteSpan(), compressedFabricId, fabricId,
+                                                             nodeId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to extract compressed fabric ID.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return static_cast<jlong>(compressedFabricId);
 }
 
 JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
