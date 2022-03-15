@@ -133,4 +133,3 @@ tests:
       attribute: "CurrentMode"
       response:
           value: 7
-
