@@ -657,7 +657,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
     if (params.GetDeviceType().HasValue())
     {
-        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%d", params.GetDeviceType().Value());
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, params.GetDeviceType().Value());
         txtFields[numTxtFields++] = txtDeviceType;
     }
 
