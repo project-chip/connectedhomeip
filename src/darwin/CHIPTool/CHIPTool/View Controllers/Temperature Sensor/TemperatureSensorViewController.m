@@ -48,7 +48,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     [super viewDidAppear:animated];
 }
 
-+(nullable TemperatureSensorViewController *)currentController
++ (nullable TemperatureSensorViewController *)currentController
 {
     return sCurrentController;
 }

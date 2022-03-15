@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Return the current controller, if any.
  */
-+(nullable TemperatureSensorViewController *)currentController;
++ (nullable TemperatureSensorViewController *)currentController;
 
 @end
 
