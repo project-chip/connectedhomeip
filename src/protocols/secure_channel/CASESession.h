@@ -231,7 +231,7 @@ private:
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
-    Crypto::P256Keypair *mEphemeralKey;
+    Crypto::P256Keypair * mEphemeralKey;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::CertificateKeyId mTrustedRootId;
     Credentials::ValidationContext mValidContext;
