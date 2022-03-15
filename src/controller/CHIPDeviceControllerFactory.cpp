@@ -380,7 +380,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer           = nullptr;
+    mBleLayer = nullptr;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mMessageCounterManager != nullptr)
