@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 
+#include <fstream>
 #include <string.h>
 
 using chip::BitFlags;
@@ -51,6 +52,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kUriMaxLen          = 256;
+constexpr size_t kOtaHeaderMaxSize   = 128;
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
@@ -147,21 +149,60 @@ UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandH
     return subject;
 }
 
+bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader & header)
+{
+    OTAImageHeaderParser parser;
+    uint8_t otaFileContent[kOtaHeaderMaxSize];
+    ByteSpan buffer(otaFileContent);
+
+    std::ifstream otaFile(otaFilePath, std::ifstream::in);
+    if (!otaFile.is_open() || !otaFile.good())
+    {
+        ChipLogError(SoftwareUpdate, "Error opening OTA image file: %s", otaFilePath);
+        return false;
+    }
+
+    otaFile.read(reinterpret_cast<char *>(otaFileContent), kOtaHeaderMaxSize);
+    if (!otaFile.good() || otaFile.eof())
+    {
+        ChipLogError(SoftwareUpdate, "Error reading OTA image file: %s", otaFilePath);
+        return false;
+    }
+
+    parser.Init();
+    if (!parser.IsInitialized())
+    {
+        return false;
+    }
+
+    CHIP_ERROR error = parser.AccumulateAndDecode(buffer, header);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error parsing OTA image header: %" CHIP_ERROR_FORMAT, error.Format());
+        return false;
+    }
+
+    parser.Clear();
+
+    return true;
+}
+
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
     OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
-    uint32_t newSoftwareVersion           = commandData.softwareVersion + 1;
-    const char * newSoftwareVersionString = "Example-Image-V0.1";
-    const char * otaFilePath              = mOTAFilePath;
-    uint8_t updateToken[kUpdateTokenLen]  = { 0 };
-    char strBuf[kUpdateTokenStrLen]       = { 0 };
-    char uriBuf[kUriMaxLen]               = { 0 };
-    uint32_t delayedQueryActionTimeSec    = mDelayedQueryActionTimeSec;
-    bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
+    uint32_t newSoftwareVersion                       = 0;
+    char newSoftwareVersionString[SW_VER_STR_MAX_LEN] = { 0 };
+    const char * otaFilePath                          = mOTAFilePath;
+    uint8_t updateToken[kUpdateTokenLen]              = { 0 };
+    char strBuf[kUpdateTokenStrLen]                   = { 0 };
+    char uriBuf[kUriMaxLen]                           = { 0 };
+    uint32_t delayedQueryActionTimeSec                = mDelayedQueryActionTimeSec;
+    bool requestorCanConsent                          = commandData.requestorCanConsent.ValueOr(false);
     QueryImageResponse::Type response;
+    OTAImageHeader header;
 
     if (mIgnoreQueryImageCount > 0)
     {
@@ -172,24 +213,16 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     switch (mQueryImageBehavior)
     {
-    case kRespondWithUnknown:
+    case kRespondWithUnknown: {
         // This use-case is a subset of the ota-candidates-file option.
         // Can be removed once all other platforms start using the ota-candidates-file method.
         if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
-            // TODO: Following details shall be read from the OTA file
-
-            // If software version is provided using command line then use it
-            if (mSoftwareVersion.HasValue())
-            {
-                newSoftwareVersion = mSoftwareVersion.Value();
-            }
-
-            // If software version string is provided using command line then use it
-            if (mSoftwareVersionString)
-            {
-                newSoftwareVersionString = mSoftwareVersionString;
-            }
+            // Parse the header and set version info based on the header
+            VerifyOrDie(ParseOTAHeader(mOTAFilePath, header) == true);
+            VerifyOrDie(SW_VER_STR_MAX_LEN > header.mSoftwareVersionString.size());
+            newSoftwareVersion = header.mSoftwareVersion;
+            strncpy(newSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
 
             queryStatus = OTAQueryStatus::kUpdateAvailable;
         }
@@ -197,10 +230,20 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         {
             if (SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate))
             {
-                newSoftwareVersion       = candidate.softwareVersion;
-                newSoftwareVersionString = candidate.softwareVersionString;
-                otaFilePath              = candidate.otaURL;
-                queryStatus              = OTAQueryStatus::kUpdateAvailable;
+                // Parse the header and verify version info matches
+                VerifyOrDie(ParseOTAHeader(candidate.otaURL, header) == true);
+                VerifyOrDie(candidate.softwareVersion == header.mSoftwareVersion);
+                VerifyOrDie(strlen(candidate.softwareVersionString) == header.mSoftwareVersionString.size());
+                VerifyOrDie(memcmp(candidate.softwareVersionString, header.mSoftwareVersionString.data(),
+                                   header.mSoftwareVersionString.size()) == 0);
+                VerifyOrDie(SW_VER_STR_MAX_LEN > strlen(candidate.softwareVersionString));
+
+                // All verifications passed so set the verision info
+                newSoftwareVersion = header.mSoftwareVersion;
+                strncpy(newSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
+
+                otaFilePath = candidate.otaURL;
+                queryStatus = OTAQueryStatus::kUpdateAvailable;
             }
         }
 
@@ -229,6 +272,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             }
         }
         break;
+    }
 
     case kRespondWithUpdateAvailable:
         queryStatus = OTAQueryStatus::kUpdateAvailable;
@@ -246,9 +290,6 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         queryStatus = OTAQueryStatus::kNotAvailable;
         break;
     }
-
-    // Reset with default success behavior
-    mQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 
     if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
@@ -309,10 +350,11 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
 
-    // Reset delay back to 0 for subsequent uses
-    mDelayedQueryActionTimeSec = 0;
-
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+
+    // After the first response is sent back, default to these values
+    mQueryImageBehavior        = OTAProviderExample::kRespondWithUpdateAvailable;
+    mDelayedQueryActionTimeSec = 0;
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
