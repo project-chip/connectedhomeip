@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pty
 import subprocess
 import click
 import os
@@ -24,6 +25,8 @@ import threading
 import sys
 import time
 import datetime
+import shlex
+import logging
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -61,9 +64,11 @@ def RedirectQueueThread(fp, tag, queue):
     log_queue_thread.start()
 
 
-def DumpLogOutput(q):
+def DumpLogOutput(q: queue.Queue, timeout: int = 0):
+    deadline = time.time() + timeout
     while True:
-        line = q.get_nowait()
+        line = q.get((time.time() - deadline) > 0,
+                     max(deadline - time.time(), 0))
         sys.stdout.buffer.write(
             (f"[{line[2]}]").encode() + line[0] + line[1])
         sys.stdout.flush()
@@ -73,9 +78,10 @@ def DumpLogOutput(q):
 @click.option("--app", type=str, default=None, help='Local application to use, omit to use external apps.')
 @click.option("--factoryreset", is_flag=True, help='Remove /tmp/chip* before running the tests.')
 @click.option("--wait-before-test", type=int, default=3, help='Time for the device to start before running the tests.')
+@click.option("--app-params", type=str, default='', help='The extra parameters passed to the device.')
 @click.option("--script", type=click.Path(exists=True), default=FindBinaryPath("mobile-device-test.py"), help='Test script to use.')
 @click.argument("script-args", nargs=-1, type=str)
-def main(app: str, factoryreset: bool, wait_before_test: int, script: str, script_args: typing.List[str]):
+def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, script: str, script_args: typing.List[str]):
     if factoryreset:
         retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
         if retcode != 0:
@@ -88,22 +94,25 @@ def main(app: str, factoryreset: bool, wait_before_test: int, script: str, scrip
         app = FindBinaryPath(app)
         if app is None:
             raise FileNotFoundError(f"{app} not found")
+        app_args = [app] + shlex.split(app_params)
+        logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
-            [app], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         RedirectQueueThread(app_process.stdout,
                             b"[\33[34mAPP \33[0m][\33[33mSTDOUT\33[0m]", log_queue)
         RedirectQueueThread(app_process.stderr,
                             b"[\33[34mAPP \33[0m][\33[31mSTDERR\33[0m]", log_queue)
 
     try:
-        DumpLogOutput(log_queue)
+        DumpLogOutput(log_queue, wait_before_test)
     except queue.Empty:
         pass
 
-    time.sleep(wait_before_test)
-
+    script_command = ["/usr/bin/env", "python3", script,
+                      '--log-format', '%(message)s'] + [v for v in script_args]
+    logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
-        ["/usr/bin/env", "python3", script, '--log-format', '%(message)s'] + [v for v in script_args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     RedirectQueueThread(test_script_process.stdout,
                         b"[\33[32mTEST\33[0m][\33[33mSTDOUT\33[0m]", log_queue)
     RedirectQueueThread(test_script_process.stderr,

@@ -216,9 +216,12 @@ jobs:
         name: REPL Tests - Linux
         timeout-minutes: 120
 
+        strategy:
+            matrix:
+                build_variant: [no-ble-tsan]
+
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
-            CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
@@ -258,8 +261,12 @@ jobs:
               timeout-minutes: 50
               run: |
                     scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
-                    scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
-                    cp out/all_clusters_debug/chip-all-clusters-app objdir-clone/chip-all-clusters-app
+                    ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
             - name: Run Tests
               timeout-minutes: 30
               run: |
@@ -336,12 +343,16 @@ jobs:
               timeout-minutes: 50
               run: |
                     scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
-                    scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
-                    cp out/all_clusters_debug/chip-all-clusters-app objdir-clone/chip-all-clusters-app
+                    ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target darwin-x64-all-clusters-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
             - name: Run Tests
               timeout-minutes: 30
               run: |
-                    scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset -- -t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout'
+                    scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset --app-params "--discriminator 3840 --interface-id -1" -- -t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}

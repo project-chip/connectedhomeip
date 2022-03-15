@@ -1401,3 +1401,6 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+ClusterObjectTests
+TestTimedRequestTimeout
+datamodel

@@ -56,7 +56,7 @@ TEST_DEVICE_NODE_ID = 1
 ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
-def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, address_override, device_nodeid):
+def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
     address = test.TestDiscovery(discriminator=discriminator)
     FailIfNot(address, "Failed to discover any devices.")
@@ -66,9 +66,11 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, addre
 
     if address_override:
         address = address_override
+    else:
+        address = address.decode("utf-8")
 
     logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=address.decode("utf-8"),
+    FailIfNot(test.TestKeyExchange(ip=address,
                                    setuppin=setup_pin,
                                    nodeid=device_nodeid),
               "Failed to finish key exchange")
