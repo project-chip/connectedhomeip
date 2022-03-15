@@ -298,7 +298,7 @@ public:
             chip::Credentials::GroupDataProvider::EpochKey epoch_keys;
             epoch_keys.start_time = static_cast<uint64_t>(std::stoi(str.substr(0, 16).c_str(), 0, 16));
 
-            for (uint8_t i = 16; i < ((epochKeySize * 2)); i += 2)
+            for (uint32_t i = 16; i < ((epochKeySize * 2)); i += 2)
             {
                 epoch_keys.key[(i - 16) / 2] = static_cast<uint8_t>(std::stoi(str.substr(i, 2).c_str(), 0, 16));
             }

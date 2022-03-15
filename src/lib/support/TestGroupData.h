@@ -50,8 +50,7 @@ CHIP_ERROR InitProvider()
 
 CHIP_ERROR InitProvider(chip::PersistentStorageDelegate & storageDelegate)
 {
-    new (&sGroupsProvider) chip::Credentials::GroupDataProviderImpl(storageDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-
+    sGroupsProvider.SetStorageDelegate(&storageDelegate);
     ReturnErrorOnFailure(sGroupsProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
     return CHIP_NO_ERROR;
