@@ -733,8 +733,8 @@ function octetStringEscapedForCLiteral(value)
 {
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
-  var notASCII = [...value].some(char => 32 > char.charCodeAt(0) || char.charCodeAt(0) > 126 || char == "\"");
-  if (!notASCII){
+  var notASCII = [...value ].some(char => 32 > char.charCodeAt(0) || char.charCodeAt(0) > 126 || char == "\"");
+  if (!notASCII) {
     return value
   }
 
