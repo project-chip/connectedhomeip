@@ -218,7 +218,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan]
+                build_variant: [no-ble-no-wifi-tsan]
 
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -296,7 +296,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan, no-ble-asan]
+                build_variant: [no-ble-no-wifi-tsan]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"

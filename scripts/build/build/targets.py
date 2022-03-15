@@ -160,6 +160,7 @@ def HostTargets():
     variants = [
         HostBuildVariant(name="ipv6only", enable_ipv4=False),
         HostBuildVariant(name="no-ble", enable_ble=False),
+        HostBuildVariant(name="no-wifi", enable_wifi=False),
         HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
         HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
         HostBuildVariant(name="libfuzzer", use_libfuzzer=True, use_clang=True),
