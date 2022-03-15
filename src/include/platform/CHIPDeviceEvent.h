@@ -442,7 +442,6 @@ struct ChipDeviceEvent final
         struct
         {
             CHIP_ERROR Status;
-            uint64_t PeerNodeId;
             FabricIndex PeerFabricIndex;
         } CommissioningComplete;
 

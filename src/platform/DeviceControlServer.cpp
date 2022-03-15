@@ -39,7 +39,6 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricI
     VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
     event.Type                                  = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerNodeId      = peerNodeId;
     event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
     event.CommissioningComplete.Status          = CHIP_NO_ERROR;
     return PlatformMgr().PostEvent(&event);
