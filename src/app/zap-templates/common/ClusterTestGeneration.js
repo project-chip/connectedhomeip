@@ -734,15 +734,9 @@ function octetStringEscapedForCLiteral(value)
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
   return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
-    let code = ch.charCodeAt(0);
-    code     = code.toString(8);
-    if (code.length == 1) {
-      code = "00" + code;
-    }
-    if (code.length == 2) {
-      code = "0" + code;
-    }
-    return "\\" + code;
+    var code = ch.charCodeAt(0).toString(8)
+    return "\\" +
+        "0".repeat(3 - code.length) + code;
   });
 }
 
