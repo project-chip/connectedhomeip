@@ -471,6 +471,8 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
     ReturnErrorOnFailure(AllocateBuffer());
+
+    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
@@ -512,6 +514,7 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPath)
 {
     ReturnErrorOnFailure(AllocateBuffer());
+    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
@@ -540,13 +543,14 @@ CHIP_ERROR CommandHandler::FinishStatus()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::ResetResponse()
+CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand || mState == State::AddingCommand,
                         CHIP_ERROR_INCORRECT_STATE);
-    // Calling mCommandMessageWriter will release its underlying buffer, thus we can allocate another one when encode something.
-    mCommandMessageWriter.Reset();
-    mBufferAllocated = false;
+    mInvokeResponseBuilder.Rollback(mBackupWriter);
+    mInvokeResponseBuilder.ResetError();
+    // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
+    // supports of having multiple requests in the same transaction.
     MoveToState(State::Idle);
     return CHIP_NO_ERROR;
 }

@@ -163,13 +163,9 @@ public:
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
-     * API for resetting the internal response builder, useful when encoding the response manually.
-     * The TLVWriter got from GetCommandDataIBTLVWriter will be invalid after calling this.
-     *
-     * After calling this, users must call PrepareCommand or PrepareStatus before encoding something else. AddResponseData and
-     * AddStatus will handle this correctly.
+     * Rollback the state to before encoding the current ResponseData (before calling PrepareCommand / PrepareStatus)
      */
-    CHIP_ERROR ResetResponse();
+    CHIP_ERROR RollbackResponse();
 
     /**
      * API for adding a data response.  The template parameter T is generally
@@ -192,7 +188,7 @@ public:
         {
             // We have verified the state above, so this call must success since we must be one of the state required by
             // ResetResponse.
-            ResetResponse();
+            RollbackResponse();
         }
         return err;
     }
@@ -335,6 +331,7 @@ private:
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    TLV::TLVWriter mBackupWriter;
     bool mBufferAllocated = false;
 };
 
