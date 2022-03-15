@@ -112,7 +112,7 @@ class AcceptNameWithSubstrings:
         return False
 
 
-class HostBuildVariant:
+class BuildVariant:
     def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
         self.name = name
         self.validator = validator
@@ -120,11 +120,76 @@ class HostBuildVariant:
         self.buildargs = buildargs
 
 
-def HasConflicts(items: List[HostBuildVariant]) -> bool:
+def HasConflicts(items: List[BuildVariant]) -> bool:
     for a, b in combinations(items, 2):
         if (a.name in b.conflicts) or (b.name in a.conflicts):
             return True
     return False
+
+
+class VariantBuilder:
+    """Handles creating multiple build variants based on a starting target.
+    """
+
+    def __init__(self, targets: List[Target]):
+        self.targets = targets
+        self.variants = []
+        self.glob_whitelist = []
+
+    def WhitelistVariantNameForGlob(self, name):
+        """
+        Whitelist the specified variant to be allowed for globbing.
+
+        By default we do not want a 'build all' to select all variants, so
+        variants are generally glob-blacklisted.
+        """
+        self.glob_whitelist.append(name)
+
+    def AppendVariant(self, **args):
+        """
+        Add another variant to accepted variants. Arguments are construction
+        variants to BuildVariant.
+
+        Example usage:
+
+        builder.AppendVariant(name="ipv6only", enable_ipv4=False)
+        """
+        self.variants.append(BuildVariant(**args))
+
+
+    def AllVariants(self):
+        """
+        Yields a list of acceptable variants for the given targets.
+
+        Handles conflict resolution between build variants and globbing whiltelist
+        targets.
+        """
+        for target in self.targets:
+            yield target
+
+            # skip variants that do not work for  this target
+            ok_variants = [v for v in self.variants if v.validator.Accept(target.name)]
+
+            # Build every possible variant
+            for variant_count in range(1, len(ok_variants) + 1):
+                for subgroup in combinations(ok_variants, variant_count):
+                    if HasConflicts(subgroup):
+                      continue
+
+                    # Target ready to be created - no conflicts
+                    variant_target = target.Clone()
+                    for option in subgroup:
+                        variant_target = variant_target.Extend(
+                            option.name, **option.buildargs)
+
+                    # Only a few are whitelisted for globs
+                    if '-'.join([o.name for o in subgroup]) not in self.glob_whitelist:
+                        if not variant_target.glob_blacklist_reason:
+                            variant_target = variant_target.GlobBlacklist('Reduce default build variants')
+
+                    yield variant_target
+
+
 
 
 def HostTargets():
@@ -155,50 +220,31 @@ def HostTargets():
         app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
 
+
+    builder = VariantBuilder([])
+
     # Possible build variants. Note that number of potential
     # builds is exponential here
-    variants = [
-        HostBuildVariant(name="ipv6only", enable_ipv4=False),
-        HostBuildVariant(name="no-ble", enable_ble=False),
-        HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
-        HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
-        HostBuildVariant(name="libfuzzer", use_libfuzzer=True, use_clang=True),
-        HostBuildVariant(name="test-group",
-                         validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
-        HostBuildVariant(name="same-event-loop",
-                         validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
-    ]
+    builder.AppendVariant(name="ipv6only", enable_ipv4=False),
+    builder.AppendVariant(name="no-ble", enable_ble=False),
+    builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
+    builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
+    builder.AppendVariant(name="libfuzzer", use_libfuzzer=True, use_clang=True),
+    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
+    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
 
-    glob_whitelist = set(['ipv6only'])
+    builder.WhitelistVariantNameForGlob('ipv6only')
+
 
     for target in app_targets:
-        yield target
-
         if 'rpc-console' in target.name:
             # rpc console  has only one build variant right now
-            continue
+            yield target
+        else:
+            builder.targets.append(target)
 
-        # skip variants that do not work for  this target
-        ok_variants = [v for v in variants if v.validator.Accept(target.name)]
-
-        # Build every possible variant
-        for variant_count in range(1, len(ok_variants) + 1):
-            for subgroup in combinations(ok_variants, variant_count):
-                if HasConflicts(subgroup):
-                    continue
-
-                # Target ready to be created - no conflicts
-                variant_target = target.Clone()
-                for option in subgroup:
-                    variant_target = variant_target.Extend(
-                        option.name, **option.buildargs)
-
-                # Only a few are whitelisted for globs
-                if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
-                    variant_target = variant_target.GlobBlacklist(
-                        'Reduce default build variants')
-
-                yield variant_target
+    for target in builder.AllVariants():
+        yield target
 
     # Without extra build variants
     yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
@@ -257,20 +303,24 @@ def Efr32Targets():
             'only user requested')
     ]
 
+    builder = VariantBuilder([])
+
     for board_target in board_targets:
-        yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
-        yield board_target.Extend('switch', app=Efr32App.SWITCH)
-        yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
+        builder.targets.append(board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING))
+        builder.targets.append(board_target.Extend('switch', app=Efr32App.SWITCH))
+        builder.targets.append(board_target.Extend('unit-test', app=Efr32App.UNIT_TEST))
+        builder.targets.append(board_target.Extend('light', app=Efr32App.LIGHT))
+        builder.targets.append(board_target.Extend('lock', app=Efr32App.LOCK))
 
-        rpc_aware_targets = [
-            board_target.Extend('light', app=Efr32App.LIGHT),
-            board_target.Extend('lock', app=Efr32App.LOCK)
-        ]
+    # Possible build variants. Note that number of potential
+    # builds is exponential here
+    builder.AppendVariant(name="rpc", validator=AcceptNameWithSubstrings(['-light', '-lock']), enable_rpcs=True)
+    builder.AppendVariant(name="with-ota-requestor", enable_ota_requestor=True)
 
-        for target in rpc_aware_targets:
-            yield target
-            yield target.Extend('rpc', enable_rpcs=True)
+    builder.WhitelistVariantNameForGlob('rpc')
 
+    for target in builder.AllVariants():
+        yield target
 
 def NrfTargets():
     target = Target('nrf', NrfConnectBuilder)
