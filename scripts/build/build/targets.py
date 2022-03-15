@@ -218,6 +218,10 @@ def HostTargets():
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
         app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
+        app_targets.append(target.Extend(
+            'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
+        app_targets.append(target.Extend(
+            'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
 
     builder = VariantBuilder([])
 

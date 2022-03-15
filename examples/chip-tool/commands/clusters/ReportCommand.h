@@ -303,6 +303,13 @@ protected:
         return mReadClient->SendRequest(params);
     }
 
+    // Use a 3x-longer-than-default timeout because wildcard reads can take a
+    // while.
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return mTimeout.HasValue() ? chip::System::Clock::Seconds16(mTimeout.Value()) : (ModelCommand::GetWaitDuration() * 3);
+    }
+
     std::unique_ptr<chip::app::ReadClient> mReadClient;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
@@ -411,7 +418,7 @@ public:
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
     }
 
     void OnAttributeSubscription() override
@@ -525,7 +532,7 @@ public:
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
     }
 
     void OnEventSubscription() override

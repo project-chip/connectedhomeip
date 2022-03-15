@@ -95,24 +95,24 @@ NS_ASSUME_NONNULL_BEGIN
             completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
             return;
         }
-        [self.xpcConnection
-            getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, CHIPDeviceControllerXPCProxyHandle * _Nullable handle) {
-                if (handle) {
-                    [handle.proxy readAttributeCacheWithController:self.controllerId
-                                                            nodeId:nodeId
-                                                        endpointId:endpointId
-                                                         clusterId:clusterId
-                                                       attributeId:attributeId
-                                                        completion:^(id _Nullable values, NSError * _Nullable error) {
-                                                            completion(values, error);
-                                                            __auto_type handleRetainer = handle;
-                                                            (void) handleRetainer;
-                                                        }];
-                } else {
-                    CHIP_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
-                    completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
-                }
-            }];
+        [self.xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull queue, CHIPDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy readAttributeCacheWithController:self.controllerId
+                                                        nodeId:nodeId
+                                                    endpointId:endpointId
+                                                     clusterId:clusterId
+                                                   attributeId:attributeId
+                                                    completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                        completion([CHIPDeviceController decodeXPCResponseValues:values], error);
+                                                        __auto_type handleRetainer = handle;
+                                                        (void) handleRetainer;
+                                                    }];
+            } else {
+                CHIP_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
+                completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
+            }
+        }];
     });
 }
 

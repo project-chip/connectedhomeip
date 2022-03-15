@@ -203,6 +203,7 @@
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
                                    minInterval:minIntervalSeconds
                                    maxInterval:maxIntervalSeconds
+                                        params:nil
                                  reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
                                      if (error) {
                                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
