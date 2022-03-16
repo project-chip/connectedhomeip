@@ -47,15 +47,15 @@ public:
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
-    inline bool IsFailSafeArmed() { return mFailSafeArmed; }
+    inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
 
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex)
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
         VerifyOrDie(mFailSafeArmed);
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
+    inline bool NocCommandHasBeenInvoked() const { return mNocCommandHasBeenInvoked; }
 
     inline void SetNocCommandInvoked(FabricIndex nocFabricIndex)
     {
@@ -63,7 +63,7 @@ public:
         mFabricIndex              = nocFabricIndex;
     }
 
-    inline FabricIndex GetFabricIndex()
+    inline FabricIndex GetFabricIndex() const
     {
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;

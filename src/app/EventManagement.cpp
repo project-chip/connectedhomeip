@@ -872,7 +872,7 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     return CHIP_END_OF_TLV;
 }
 
-void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes)
+void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const
 {
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);

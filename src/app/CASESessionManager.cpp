@@ -77,12 +77,12 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
+void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId) const
 {
     mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
 }
 
-void CASESessionManager::ReleaseAllSessions()
+void CASESessionManager::ReleaseAllSessions() const
 {
     mConfig.devicePool->ReleaseAllDevices();
 }
@@ -109,17 +109,17 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
+OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
 {
     return mConfig.devicePool->FindDevice(session);
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId)
+OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
+void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session) const
 {
     if (session != nullptr)
     {

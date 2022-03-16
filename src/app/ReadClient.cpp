@@ -913,7 +913,7 @@ bool ReadClient::ResubscribeIfNeeded()
     return true;
 }
 
-void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath)
+void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath) const
 {
     for (size_t index = 0; index < mReadPrepareParams.mDataVersionFilterListSize; index++)
     {

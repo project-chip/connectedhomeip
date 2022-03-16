@@ -434,7 +434,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
 }
 
 CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                             MutableByteSpan & destinationId)
+                                             MutableByteSpan & destinationId) const
 {
     constexpr uint16_t kSigmaParamRandomNumberSize = 32;
     constexpr size_t kDestinationMessageLen =

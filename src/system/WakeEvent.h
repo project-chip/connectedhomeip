@@ -48,8 +48,8 @@ public:
     CHIP_ERROR Open(LayerSockets & systemLayer); /**< Initialize the pipeline */
     void Close(LayerSockets & systemLayer);      /**< Close both ends of the pipeline. */
 
-    CHIP_ERROR Notify(); /**< Set the event. */
-    void Confirm();      /**< Clear the event. */
+    CHIP_ERROR Notify() const; /**< Set the event. */
+    void Confirm() const;      /**< Clear the event. */
 
 private:
     friend class WakeEventTest;

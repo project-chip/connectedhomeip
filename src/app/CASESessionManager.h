@@ -75,13 +75,13 @@ public:
     CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId);
+    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
+    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId) const;
 
-    void ReleaseAllSessions();
+    void ReleaseAllSessions() const;
 
     /**
      * This API returns the address for the given node ID.
@@ -94,8 +94,8 @@ public:
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
 private:
-    OperationalDeviceProxy * FindSession(const SessionHandle & session);
-    void ReleaseSession(OperationalDeviceProxy * device);
+    OperationalDeviceProxy * FindSession(const SessionHandle & session) const;
+    void ReleaseSession(OperationalDeviceProxy * device) const;
 
     CASESessionManagerConfig mConfig;
 };

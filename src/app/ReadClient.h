@@ -309,7 +309,7 @@ private:
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
-    void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
+    void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath) const;
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*

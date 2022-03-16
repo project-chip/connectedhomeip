@@ -209,7 +209,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     return CommissioningStage::kError;
 }
 
-EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
+EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
 {
     switch (stage)
     {
@@ -249,7 +249,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     return CHIP_NO_ERROR;
 }
 
-Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
+Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage) const
 {
     // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout.
     // Network clusters can indicate the time required to connect, so if we are connecting, use that time as long as it is > 30s.
