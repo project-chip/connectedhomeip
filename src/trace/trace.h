@@ -40,7 +40,7 @@
 
 #else // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
-#define _MATTER_TRACE_EVENT_DISABLE(...)                                                                                             \
+#define _MATTER_TRACE_EVENT_DISABLE(...)                                                                                           \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (0)
