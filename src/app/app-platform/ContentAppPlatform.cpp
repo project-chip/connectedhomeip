@@ -393,6 +393,7 @@ constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
 constexpr ClusterId kNoClusterIdSpecified            = kInvalidClusterId;
+constexpr ClusterId kClusterIdDescriptor             = 0x001d;
 constexpr ClusterId kClusterIdOnOff                  = 0x0006;
 constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
 // constexpr ClusterId kClusterIdChannel             = 0x0504;
@@ -425,7 +426,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     /**
      * Here we are creating a single ACL entry containing:
-     * a) selection of clusters on video player endpoint (7 targets)
+     * a) selection of clusters on video player endpoint (8 targets)
      * b) speaker endpoint (1 target)
      * c) selection of content app endpoints (0 to many)
      * d) single subject which is the casting app
@@ -438,9 +439,9 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     ChipLogProgress(Controller, "Create video player endpoint ACL and binding");
     {
-        std::list<ClusterId> allowedClusterList = { kClusterIdOnOff,      kClusterIdWakeOnLAN,   kClusterIdMediaPlayback,
-                                                    kClusterIdLowPower,   kClusterIdKeypadInput, kClusterIdContentLauncher,
-                                                    kClusterIdAudioOutput };
+        std::list<ClusterId> allowedClusterList = { kClusterIdDescriptor,      kClusterIdOnOff,      kClusterIdWakeOnLAN,
+                                                    kClusterIdMediaPlayback,   kClusterIdLowPower,   kClusterIdKeypadInput,
+                                                    kClusterIdContentLauncher, kClusterIdAudioOutput };
 
         for (const auto & clusterId : allowedClusterList)
         {

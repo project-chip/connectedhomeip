@@ -205,6 +205,15 @@ public:
     CHIP_ERROR GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
+    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
+
 private:
     bool mInitialized                   = false;
     PlatformManagerDelegate * mDelegate = nullptr;
@@ -239,14 +248,6 @@ private:
     friend class Internal::GenericConfigurationManagerImpl;
     friend class System::PlatformEventing;
 
-    /*
-     * PostEvent can be called safely on any thread without locking the stack.
-     * When called from a thread that is not doing the stack work item
-     * processing, the event might get dispatched (on the work item processing
-     * thread) before PostEvent returns.
-     */
-    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
-    void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(System::Clock::Timeout duration);
 

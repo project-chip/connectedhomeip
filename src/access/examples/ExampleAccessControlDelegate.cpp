@@ -517,8 +517,6 @@ public:
     static constexpr uint8_t kTagPrivilege   = 4;
     static constexpr uint8_t kTagSubjects    = 5;
     static constexpr uint8_t kTagTargets     = 6;
-    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
-    static const size_t kStorageBufferSize = 192;
 
     CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
     {
@@ -601,6 +599,13 @@ public:
 public:
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+
+    static constexpr uint8_t kApproxSizeSubject = 9;
+    static constexpr uint8_t kApproxSizeTarget  = 8;
+    static constexpr uint8_t kApproxSizeEntry   = 4;
+    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
+    static const size_t kStorageBufferSize =
+        kEntriesPerFabric * (kApproxSizeEntry + kApproxSizeSubject * kMaxSubjects + kApproxSizeTarget * kMaxTargets);
 
     bool mInUse;
     FabricIndex mFabricIndex;

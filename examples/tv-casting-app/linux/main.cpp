@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "LinuxCommissionableDataProvider.h"
+#include "Options.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/OperationalDeviceProxy.h>
 #include <app/server/Dnssd.h>
@@ -25,11 +27,14 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
@@ -115,27 +120,12 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-static void OnBindingAdded(const EmberBindingTableEntry & binding)
-{
-    if (binding.type == EMBER_UNICAST_BINDING)
-    {
-        ChipLogProgress(NotSpecified,
-                        "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
-                        ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        // TODO read descriptor cluster for endpoint and use this to construct command options for GUI
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Non-unicast binding received");
-    }
-}
-
+void ReadServerClusters(EndpointId endpointId);
 CHIP_ERROR InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    ReturnErrorOnFailure(chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded));
     return CHIP_NO_ERROR;
 }
 
@@ -237,9 +227,266 @@ void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
     ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
+class TargetEndpointInfo
+{
+public:
+    void Initialize(EndpointId endpointId)
+    {
+        mEndpointId = endpointId;
+        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+        {
+            mClusters[i] = kInvalidClusterId;
+        }
+        mInitialized = true;
+    }
+
+    void Reset() { mInitialized = false; }
+
+    bool HasCluster(ClusterId clusterId)
+    {
+        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+        {
+            if (mClusters[i] == clusterId)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool AddCluster(ClusterId clusterId)
+    {
+        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+        {
+            if (mClusters[i] == clusterId)
+            {
+                return true;
+            }
+            if (mClusters[i] == kInvalidClusterId)
+            {
+                mClusters[i] = clusterId;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool IsInitialized() { return mInitialized; }
+
+    EndpointId GetEndpointId() { return mEndpointId; }
+
+    void PrintInfo()
+    {
+        ChipLogProgress(NotSpecified, "   endpoint=%d", mEndpointId);
+        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+        {
+            if (mClusters[i] != kInvalidClusterId)
+            {
+
+                ChipLogProgress(NotSpecified, "      cluster=" ChipLogFormatMEI, ChipLogValueMEI(mClusters[i]));
+            }
+        }
+    }
+
+private:
+    static constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
+    ClusterId mClusters[kMaxNumberOfClustersPerEndpoint]    = {};
+    EndpointId mEndpointId;
+    bool mInitialized = false;
+};
+
+class TargetVideoPlayerInfo
+{
+public:
+    bool IsInitialized() { return mInitialized; }
+
+    void Initialize(NodeId nodeId, chip::FabricIndex fabricIndex)
+    {
+        mNodeId      = nodeId;
+        mFabricIndex = fabricIndex;
+        for (auto & endpointInfo : mEndpoints)
+        {
+            endpointInfo.Reset();
+        }
+        mInitialized = true;
+    }
+
+    NodeId GetNodeId() { return mNodeId; }
+    chip::FabricIndex GetFabricIndex() { return mFabricIndex; }
+
+    TargetEndpointInfo * GetAddEndpoint(EndpointId endpointId)
+    {
+        if (!mInitialized)
+        {
+            return nullptr;
+        }
+        TargetEndpointInfo * endpoint = GetEndpoint(endpointId);
+        if (endpoint != nullptr)
+        {
+            return endpoint;
+        }
+        for (auto & endpointInfo : mEndpoints)
+        {
+            if (!endpointInfo.IsInitialized())
+            {
+                endpointInfo.Initialize(endpointId);
+                return &endpointInfo;
+            }
+        }
+        return nullptr;
+    }
+
+    TargetEndpointInfo * GetEndpoint(EndpointId endpointId)
+    {
+        if (!mInitialized)
+        {
+            return nullptr;
+        }
+        for (auto & endpointInfo : mEndpoints)
+        {
+            if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
+            {
+                return &endpointInfo;
+            }
+        }
+        return nullptr;
+    }
+
+    bool HasEndpoint(EndpointId endpointId)
+    {
+        if (!mInitialized)
+        {
+            return false;
+        }
+        for (auto & endpointInfo : mEndpoints)
+        {
+            if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void PrintInfo()
+    {
+        ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabric index=%d",
+                        ChipLogValueX64(mNodeId), mFabricIndex);
+        for (auto & endpointInfo : mEndpoints)
+        {
+            if (endpointInfo.IsInitialized())
+            {
+                endpointInfo.PrintInfo();
+            }
+        }
+    }
+
+private:
+    static constexpr size_t kMaxNumberOfEndpoints = 5;
+    TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
+    NodeId mNodeId;
+    chip::FabricIndex mFabricIndex;
+    bool mInitialized = false;
+};
+TargetVideoPlayerInfo gTargetVideoPlayerInfo;
+
+void OnDescriptorReadSuccessResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList)
+{
+    TargetEndpointInfo * endpointInfo = static_cast<TargetEndpointInfo *>(context);
+
+    ChipLogProgress(AppServer, "Descriptor: Default Success Response endpoint=%d", endpointInfo->GetEndpointId());
+
+    auto iter = responseList.begin();
+    while (iter.Next())
+    {
+        auto & clusterId = iter.GetValue();
+        endpointInfo->AddCluster(clusterId);
+    }
+    gTargetVideoPlayerInfo.PrintInfo();
+}
+
+void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error)
+{
+    ChipLogError(AppServer, "Descriptor: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
+}
+
+void ReadServerClusters(EndpointId endpointId)
+{
+    Server * server           = &(chip::Server::GetInstance());
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(gTargetVideoPlayerInfo.GetFabricIndex());
+    if (fabric == nullptr)
+    {
+        ChipLogError(AppServer, "Did not find fabric for index %d", gTargetVideoPlayerInfo.GetFabricIndex());
+        return;
+    }
+
+    chip::DeviceProxyInitParams initParams = {
+        .sessionManager = &(server->GetSecureSessionManager()),
+        .exchangeMgr    = &(server->GetExchangeManager()),
+        .idAllocator    = &(server->GetSessionIDAllocator()),
+        .fabricTable    = &(server->GetFabricTable()),
+        .clientPool     = &gCASEClientPool,
+    };
+
+    PeerId peerID                                         = fabric->GetPeerIdForNode(gTargetVideoPlayerInfo.GetNodeId());
+    chip::OperationalDeviceProxy * operationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+    if (operationalDeviceProxy == nullptr)
+    {
+        ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+        return;
+    }
+
+    SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(gTargetVideoPlayerInfo.GetNodeId());
+    operationalDeviceProxy->SetConnectedSession(handle);
+
+    chip::Controller::DescriptorCluster cluster;
+    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, endpointId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetAddEndpoint(endpointId);
+
+    if (cluster.ReadAttribute<app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
+            endpointInfo, OnDescriptorReadSuccessResponse, OnDescriptorReadFailureResponse) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Could not read Descriptor cluster ServerList");
+    }
+
+    ChipLogProgress(Controller, "Sent descriptor read for remote endpoint=%d", endpointId);
+}
+
+void ReadServerClustersForNode(NodeId nodeId)
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        if (nodeId == binding.nodeId)
+        {
+            if (!gTargetVideoPlayerInfo.HasEndpoint(binding.remote))
+            {
+                ReadServerClusters(binding.remote);
+            }
+        }
+    }
+}
+
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChanged)
+    {
+        if (gTargetVideoPlayerInfo.IsInitialized())
+        {
+            ReadServerClustersForNode(gTargetVideoPlayerInfo.GetNodeId());
+        }
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
         {
@@ -247,13 +494,13 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             return;
         }
 
-        chip::FabricIndex peerFabricIndex = event->CommissioningComplete.PeerFabricIndex;
+        gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex);
 
         Server * server           = &(chip::Server::GetInstance());
-        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
+        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(gTargetVideoPlayerInfo.GetFabricIndex());
         if (fabric == nullptr)
         {
-            ChipLogError(AppServer, "Did not find fabric for index %d", peerFabricIndex);
+            ChipLogError(AppServer, "Did not find fabric for index %d", gTargetVideoPlayerInfo.GetFabricIndex());
             return;
         }
 
@@ -293,12 +540,62 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
     }
 }
 
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
+{
+    chip::Optional<uint32_t> setupPasscode;
+
+    if (options.payload.setUpPINCode != 0)
+    {
+        setupPasscode.SetValue(options.payload.setUpPINCode);
+    }
+    else if (!options.spake2pVerifier.HasValue())
+    {
+        uint32_t defaultTestPasscode = 0;
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure onboarding credentials. ***",
+                     static_cast<unsigned>(defaultTestPasscode));
+        setupPasscode.SetValue(defaultTestPasscode);
+        options.payload.setUpPINCode = defaultTestPasscode;
+    }
+    else
+    {
+        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
+        // printed for debug will be invalid, but if the onboarding payload had been given
+        // properly to the commissioner later, PASE will succeed.
+    }
+
+    // Default to minimum PBKDF iterations
+    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    if (options.spake2pIterations != 0)
+    {
+        spake2pIterationCount = options.spake2pIterations;
+    }
+    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
+
+    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
+                         options.payload.discriminator);
+}
+
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SuccessOrExit(err = chip::Platform::MemoryInit());
     SuccessOrExit(err = chip::DeviceLayer::PlatformMgr().InitChipStack());
+
+    // Init the commissionable data provider based on command line options
+    // to handle custom verifiers, discriminators, etc.
+    err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+    DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

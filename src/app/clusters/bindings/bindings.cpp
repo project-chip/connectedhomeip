@@ -51,6 +51,8 @@ public:
 private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
+
+    CHIP_ERROR NotifyBindingsChanged();
 };
 
 BindingTableAccess gAttrAccess;
@@ -108,8 +110,6 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
         }
     }
     BindingTable::GetInstance().Add(bindingEntry);
-
-    BindingManager::GetInstance().NotifyBindingAdded(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -202,6 +202,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             AddBindingEntry(iter.GetValue(), path.mEndpointId);
         }
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -213,10 +214,19 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         AddBindingEntry(target, path.mEndpointId);
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
+
+CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
+{
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type = DeviceLayer::DeviceEventType::kBindingsChanged;
+    return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+}
+
 } // namespace
 
 void MatterBindingPluginServerInitCallback()
