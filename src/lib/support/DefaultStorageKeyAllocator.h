@@ -80,6 +80,8 @@ public:
     static const char * OTACurrentProvider() { return "o/cp"; }
     static const char * OTAUpdateToken() { return "o/ut"; }
 
+    static const char * DNSExtendedDiscoveryTimeout() { return "dns/edt"; }
+
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.

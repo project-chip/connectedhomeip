@@ -22,6 +22,7 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -87,24 +88,27 @@ constexpr const char kExtendedDiscoveryTimeoutKeypairStorage[] = "ExtDiscKey";
 
 void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int16_t secs)
 {
-    ChipLogDetail(Discovery, "SetExtendedDiscoveryTimeoutSecs %d", secs);
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
+    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId16 "s", secs);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
 }
 
 int16_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     int16_t secs;
+    CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
+        DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), &secs);
 
-    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to get extended timeout configuration err: %s", chip::ErrorStr(err));
-        secs = CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
+        return secs;
     }
 
-    ChipLogDetail(Discovery, "GetExtendedDiscoveryTimeoutSecs %d", secs);
-    return secs;
+    if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Discovery, "Failed to load extended discovery timeout: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
 }
 
 /// Callback from Extended Discovery Expiration timer
@@ -117,11 +121,11 @@ void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, vo
 {
     if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpiration))
     {
-        ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for cleared session");
+        ChipLogDetail(Discovery, "Extended discovery timeout cancelled");
         return;
     }
 
-    ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for valid session");
+    ChipLogDetail(Discovery, "Extended discovery timed out");
 
     mExtendedDiscoveryExpiration = kTimeoutCleared;
 }
@@ -219,7 +223,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling Discovery timeout in secs=%d", mDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling discovery timeout in %" PRId16 "s", mDiscoveryTimeoutSecs);
 
     mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
 
@@ -235,7 +239,7 @@ CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling Extended Discovery timeout in secs=%d", extendedDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId16 "s", extendedDiscoveryTimeoutSecs);
 
     mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(extendedDiscoveryTimeoutSecs);
 
