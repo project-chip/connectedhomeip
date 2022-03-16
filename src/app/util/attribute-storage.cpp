@@ -316,10 +316,10 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
                                            uint8_t clientServerMask)
 {
     const EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
-    if (cluster != NULL)
+    if (cluster != nullptr)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
-        if (f != NULL)
+        if (f != nullptr)
         {
             ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
         }
@@ -330,16 +330,16 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
 void emberAfClusterMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
                                        uint8_t * message, EmberStatus status)
 {
-    if (apsFrame != NULL && message != NULL && msgLen != 0)
+    if (apsFrame != nullptr && message != nullptr && msgLen != 0)
     {
         const EmberAfCluster * cluster = emberAfFindCluster(
             apsFrame->sourceEndpoint, apsFrame->clusterId,
             (((message[0] & ZCL_FRAME_CONTROL_DIRECTION_MASK) == ZCL_FRAME_CONTROL_SERVER_TO_CLIENT) ? CLUSTER_MASK_SERVER
                                                                                                      : CLUSTER_MASK_CLIENT));
-        if (cluster != NULL)
+        if (cluster != nullptr)
         {
             EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
-            if (f != NULL)
+            if (f != nullptr)
             {
                 ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
             }
@@ -351,10 +351,10 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
 {
     const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
-    if (cluster != NULL)
+    if (cluster != nullptr)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
-        if (f != NULL)
+        if (f != nullptr)
         {
             ((EmberAfClusterAttributeChangedCallback) f)(attributePath);
         }
@@ -366,7 +366,7 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
-    if (cluster == NULL)
+    if (cluster == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
@@ -377,7 +377,7 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
         // of the call on gcc-arm-none-eabi-9-2019-q4-major
         EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
             emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
-        if (f != NULL)
+        if (f != nullptr)
         {
             status = f(attributePath, attributeType, size, value);
         }
@@ -395,7 +395,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         EmberAfGenericClusterFunction f;
         emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_INIT_FUNCTION);
-        if (f != NULL)
+        if (f != nullptr)
         {
             ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
         }
@@ -419,14 +419,14 @@ void emAfCallInits(void)
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                                                 uint8_t mask)
 {
-    const EmberAfAttributeMetadata * metadata = NULL;
+    const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
     record.clusterId   = clusterId;
     record.clusterMask = mask;
     record.attributeId = attributeId;
     emAfReadOrWriteAttribute(&record, &metadata,
-                             NULL,   // buffer
+                             nullptr,   // buffer
                              0,      // buffer size
                              false); // write?
     return metadata;
@@ -493,7 +493,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
-        if (src == NULL)
+        if (src == nullptr)
         {
             memset(dest, 0, am->size);
         }
@@ -579,7 +579,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                         if (emAfMatchAttribute(cluster, am, attRecord))
                         { // Got the attribute
                             // If passed metadata location is not null, populate
-                            if (metadata != NULL)
+                            if (metadata != nullptr)
                             {
                                 *metadata = am;
                             }
@@ -601,7 +601,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 }
                                 else
                                 {
-                                    if (buffer == NULL)
+                                    if (buffer == nullptr)
                                     {
                                         return EMBER_ZCL_STATUS_SUCCESS;
                                     }
@@ -702,7 +702,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
@@ -715,7 +715,7 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
         {
             const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t index                            = 0xFF;
-            if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
+            if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != nullptr)
             {
                 return index;
             }
@@ -728,19 +728,19 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
 // cluster on it.
 bool emberAfContainsCluster(EndpointId endpoint, ClusterId clusterId)
 {
-    return (emberAfFindCluster(endpoint, clusterId, 0) != NULL);
+    return (emberAfFindCluster(endpoint, clusterId, 0) != nullptr);
 }
 
 // Returns whether the given endpoint has the server of the given cluster on it.
 bool emberAfContainsServer(EndpointId endpoint, ClusterId clusterId)
 {
-    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_SERVER) != NULL);
+    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_SERVER) != nullptr);
 }
 
 // Returns whether the given endpoint has the client of the given cluster on it.
 bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
 {
-    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_CLIENT) != NULL);
+    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_CLIENT) != nullptr);
 }
 
 // This will find the first server that has the clusterId given from the index of endpoint.
@@ -795,7 +795,7 @@ const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId cluster
     uint16_t ep = emberAfIndexFromEndpoint(endpoint);
     if (ep == 0xFFFF)
     {
-        return NULL;
+        return nullptr;
     }
     else
     {
@@ -812,7 +812,7 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
     {
         return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
     }
-    return NULL;
+    return nullptr;
 }
 
 // Server wrapper for findClusterEndpointIndex
@@ -832,7 +832,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 {
     uint16_t i, epi = 0;
 
-    if (emberAfFindCluster(endpoint, clusterId, mask) == NULL)
+    if (emberAfFindCluster(endpoint, clusterId, mask) == nullptr)
     {
         return 0xFFFF;
     }
@@ -844,7 +844,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
             break;
         }
         epi = static_cast<uint16_t>(
-            epi + ((emberAfFindClusterIncludingDisabledEndpoints(emAfEndpoints[i].endpoint, clusterId, mask) != NULL) ? 1 : 0));
+            epi + ((emberAfFindClusterIncludingDisabledEndpoints(emAfEndpoints[i].endpoint, clusterId, mask) != nullptr) ? 1 : 0));
     }
 
     return epi;
@@ -1010,7 +1010,7 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server)
 {
     const EmberAfDefinedEndpoint * de = &(emAfEndpoints[endpointIndex]);
-    if (de->endpointType == NULL)
+    if (de->endpointType == nullptr)
     {
         return 0;
     }
@@ -1062,13 +1062,13 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
 
     if (endpointIndex == 0xFFFF)
     {
-        return NULL;
+        return nullptr;
     }
     definedEndpoint = &(emAfEndpoints[endpointIndex]);
 
     if (clusterIndex >= definedEndpoint->endpointType->clusterCount)
     {
-        return NULL;
+        return nullptr;
     }
     return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
@@ -1094,7 +1094,7 @@ const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool
 
     if (index == 0xFFFF)
     {
-        return NULL;
+        return nullptr;
     }
     de = &(emAfEndpoints[index]);
 
@@ -1111,7 +1111,7 @@ const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool
             c++;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 // Returns the cluster id of Nth server or client cluster,
@@ -1141,7 +1141,7 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
     for (i = 0; i < clusterCount; i++)
     {
         cluster        = emberAfGetNthCluster(endpoint, i, server);
-        clusterList[i] = (cluster == NULL ? 0xFFFF : cluster->clusterId);
+        clusterList[i] = (cluster == nullptr ? 0xFFFF : cluster->clusterId);
     }
     return clusterCount;
 }
@@ -1275,7 +1275,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     }
 
                     emAfReadOrWriteAttribute(&record,
-                                             NULL, // metadata - unused
+                                             nullptr, // metadata - unused
                                              ptr,
                                              0,     // buffer size - unused
                                              true); // write?
@@ -1349,7 +1349,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
 
     if ((cluster->mask & functionMask) == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     while (mask < functionMask)

@@ -609,7 +609,7 @@ CHIP_ERROR PASESession::SendMsg1()
 
     constexpr uint8_t kPake1_pA = 1;
 
-    ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len));
+    ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len));
     VerifyOrReturnError(X_len == sizeof(X), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kPake1_pA), ByteSpan(X)));
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
