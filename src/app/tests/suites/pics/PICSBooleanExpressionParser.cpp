@@ -121,10 +121,9 @@ bool PICSBooleanExpressionParser::EvaluateExpression(std::vector<std::string> & 
         bool rightExpr = EvaluateExpression(tokens, PICS, index);
         return leftExpr || rightExpr;
     }
-    
-            ChipLogError(chipTool, "Unknown token: '%s'", token.c_str());
-        chipDie();
-   
+
+    ChipLogError(chipTool, "Unknown token: '%s'", token.c_str());
+    chipDie();
 }
 
 bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string> & tokens, std::map<std::string, bool> & PICS,
@@ -150,16 +149,15 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         bool expr = EvaluateSubExpression(tokens, PICS, index);
         return !expr;
     }
-    
-            index++;
 
-        if (PICS.find(token) == PICS.end())
-        {
-            // By default, let's consider that if a PICS item is not defined, it is |false|.
-            // It allows to create a file that only contains enabled features.
-            return false;
-        }
+    index++;
 
-        return PICS[token];
-   
+    if (PICS.find(token) == PICS.end())
+    {
+        // By default, let's consider that if a PICS item is not defined, it is |false|.
+        // It allows to create a file that only contains enabled features.
+        return false;
+    }
+
+    return PICS[token];
 }
