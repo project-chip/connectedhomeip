@@ -450,10 +450,9 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
     }
-    
-            ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
-        return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-   
+
+    ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
+    return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
