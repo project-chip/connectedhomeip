@@ -192,6 +192,19 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)
+{
+    VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
+    mActiveLookups.Remove(&handle);
+
+    if (cancel_method == FailureCallback::Call)
+    {
+        handle.GetListener()->OnNodeAddressResolutionFailed(handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 {
     mSystemLayer = systemLayer;

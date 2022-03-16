@@ -2418,6 +2418,15 @@ using CHIP_ERROR = ::chip::ChipError;
 
 
 /**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation has been cancelled, generally by calling a cancel/abort request.
+ */
+#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0xdd)
+
+
+/**
  *  @}
  */
 

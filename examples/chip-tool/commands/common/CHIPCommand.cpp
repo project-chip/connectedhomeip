@@ -79,12 +79,6 @@ CHIP_ERROR CHIPCommand::Run()
 
     Shutdown();
 
-    // Commissioners may have active lookups in case of timeouts shut down all active
-    // resolves before destroying commissioners.
-    //
-    // safe to call since chip thrad and event queue are stopped, preventing any thread races.
-    chip::AddressResolve::Resolver::Instance().Shutdown();
-
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
     // since the CHIP thread and event queue have been stopped, preventing any thread
