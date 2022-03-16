@@ -28,13 +28,13 @@ public final class AndroidChipPlatform {
       ChipMdnsCallback chipMdnsCallback,
       DiagnosticDataProvider dataProvider) {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
-    // BLEManager being set. setConfigurationManager() depends on the CHIP stack being initialized.
+    // BLEManager being set.
     setBLEManager(ble);
-    initChipStack();
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
     setServiceResolver(resolver, chipMdnsCallback);
     setDiagnosticDataProviderManager(dataProvider);
+    initChipStack();
   }
 
   // for BLEManager
