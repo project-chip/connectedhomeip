@@ -71,8 +71,6 @@
 #include <ble/BleLayer.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
-#include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 

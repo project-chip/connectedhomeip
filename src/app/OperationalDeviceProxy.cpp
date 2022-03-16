@@ -40,6 +40,9 @@
 #include <system/SystemLayer.h>
 
 using namespace chip::Callback;
+using chip::AddressResolve::NodeLookupRequest;
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 namespace chip {
 
@@ -309,6 +312,19 @@ CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 
 OperationalDeviceProxy::~OperationalDeviceProxy()
 {
+    if (mAddressLookupHandle.IsActive())
+    {
+        ChipLogProgress(Discovery, "Cancelling incomplete address resolution as device is being deleted.");
+
+        // Skip cancel callback since the destructor is being called, so we assume that this object is
+        // obviously not used anymore
+        CHIP_ERROR err = Resolver::Instance().CancelLookup(mAddressLookupHandle, Resolver::FailureCallback::Skip);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Lookup cancel failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     if (mCASEClient)
     {
         // Make sure we don't leak it.
@@ -318,18 +334,18 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
 
 CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
 {
-    if (mAddressLookupHandle.IsInList())
+    if (mAddressLookupHandle.IsActive())
     {
         ChipLogProgress(Discovery, "Operational node lookup already in progress. Will NOT start a new one.");
         return CHIP_NO_ERROR;
     }
 
-    AddressResolve::NodeLookupRequest request(mPeerId);
+    NodeLookupRequest request(mPeerId);
 
-    return AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+    return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
 
-void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
+void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
     UpdateDeviceData(result.address, result.mrpConfig);
 }
