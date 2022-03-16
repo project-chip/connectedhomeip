@@ -98,7 +98,7 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -116,7 +116,7 @@ Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }

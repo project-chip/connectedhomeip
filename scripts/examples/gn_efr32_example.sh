@@ -61,6 +61,10 @@ if [ "$#" == "0" ]; then
             Location for an alternate or modified efr32 SDK
         enable_heap_monitoring
             Monitor & log memory usage at runtime. (Default false)
+        enable_openthread_cli
+            Enables openthread cli without matter shell. (Default true)
+        show_qr_code
+            Enables QR code on LCD for devices with an LCD
         setupDiscriminator
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
@@ -78,7 +82,8 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         Presets
         --sed
-            enable sleepy end device and set thread mtd
+            enable sleepy end device, set thread mtd
+            For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
     "
