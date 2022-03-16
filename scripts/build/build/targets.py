@@ -113,7 +113,7 @@ class AcceptNameWithSubstrings:
 
 
 class BuildVariant:
-    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str]=[], requires: List[str]=[], **buildargs):
+    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], requires: List[str] = [], **buildargs):
         self.name = name
         self.validator = validator
         self.conflicts = conflicts
@@ -126,6 +126,7 @@ def HasConflicts(items: List[BuildVariant]) -> bool:
         if (a.name in b.conflicts) or (b.name in a.conflicts):
             return True
     return False
+
 
 def AllRequirementsMet(items: List[BuildVariant]) -> bool:
     """
@@ -146,7 +147,8 @@ class VariantBuilder:
     """
 
     def __init__(self, targets: List[Target] = []):
-        self.targets = targets[:] # note the clone in case the default arg is used
+        # note the clone in case the default arg is used
+        self.targets = targets[:]
         self.variants = []
         self.glob_whitelist = []
 
@@ -246,9 +248,12 @@ def HostTargets():
     # builds is exponential here
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
-    builder.AppendVariant(name="tsan", requires=["clang"], conflicts=['asan'], use_tsan=True),
-    builder.AppendVariant(name="asan", requires=["clang"], conflicts=['tsan'], use_asan=True),
-    builder.AppendVariant(name="libfuzzer", requires=["clang"], use_libfuzzer=True),
+    builder.AppendVariant(name="tsan", requires=["clang"], conflicts=[
+                          'asan'], use_tsan=True),
+    builder.AppendVariant(name="asan", requires=["clang"], conflicts=[
+                          'tsan'], use_asan=True),
+    builder.AppendVariant(name="libfuzzer", requires=[
+                          "clang"], use_libfuzzer=True),
     builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
         ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
