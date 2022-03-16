@@ -176,14 +176,30 @@ mobile-device-test.py provides the following options for running the tests:
 ```
   --controller-nodeid INTEGER     NodeId of the controller.
   --device-nodeid INTEGER         NodeId of the device.
-  -t, --timeout INTEGER           The program will return with timeout after specified seconds.
+  -a, --address TEXT              Skip commissionee discovery, commission the
+                                  device with the IP directly.
+
+  -t, --timeout INTEGER           The program will return with timeout after
+                                  specified seconds.
+
   --discriminator INTEGER         Discriminator of the device.
   --setup-pin INTEGER             Setup pincode of the device.
-  --enable-test TEXT              The tests to be executed.
-  --disable-test TEXT             The tests to be excluded.
+  --enable-test TEXT              The tests to be executed. By default, all
+                                  tests will be executed, use this option to
+                                  run a specific set of tests. Use --print-
+                                  test-list for a list of appliable tests.
+
+  --disable-test TEXT             The tests to be excluded from the set of
+                                  enabled tests. Use --print-test-list for a
+                                  list of appliable tests.
+
   --log-level [ERROR|WARN|INFO|DEBUG]
                                   The log level of the test.
   --log-format TEXT               Override logging format
+  --print-test-list               Print a list of test cases and test sets
+                                  that can be toggled via --enable-test and
+                                  --disable-test, then exit
+
   --help                          Show this message and exit.
 ```
 
@@ -208,13 +224,16 @@ example, you can run:
 It provides some extra options, for example:
 
 ```
-  --app TEXT                  Local application to use, omit to use external
-                              apps.
-  --factoryreset              Remove /tmp/chip* before running the tests.
-  --wait-before-test INTEGER  Time for the device to start before running the
-                              tests.
-  --script PATH               Test script to use.
-  --help                      Show this message and exit.
+  --app TEXT         Local application to use, omit to use external apps, use
+                     a path for a specific binary or use a filename to search
+                     under the current matter checkout.
+
+  --factoryreset     Remove app config and repl configs (/tmp/chip* and
+                     /tmp/repl*) before running the tests.
+
+  --app-params TEXT  The extra parameters passed to the device.
+  --script PATH      Test script to use.
+  --help             Show this message and exit.
 ```
 
 You can pass your own flags for mobile-device-test.py by appending them to the

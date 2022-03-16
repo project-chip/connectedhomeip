@@ -64,26 +64,31 @@ def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
     return log_queue_thread
 
 
-def DumpLogOutput(q: queue.Queue, timeout: int = 0):
-    deadline = time.time() + timeout
+def DumpLogOutput(q: queue.Queue):
+    # TODO: Due to the nature of os pipes, the order of the timestamp is not guaranteed, need to figure out a better output format.
     while True:
-        line = q.get((time.time() - deadline) > 0,
-                     max(deadline - time.time(), 0))
+        line = q.get_nowait()
         sys.stdout.buffer.write(
             (f"[{line[2]}]").encode() + line[0] + line[1])
         sys.stdout.flush()
 
 
+def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
+    thread_list.append(RedirectQueueThread(process.stdout,
+                                           (f"[{tag}][\33[33mSTDOUT\33[0m]").encode(), queue))
+    thread_list.append(RedirectQueueThread(process.stderr,
+                                           (f"[{tag}][\33[31mSTDERR\33[0m]").encode(), queue))
+
+
 @click.command()
-@click.option("--app", type=str, default=None, help='Local application to use, omit to use external apps.')
-@click.option("--factoryreset", is_flag=True, help='Remove /tmp/chip* before running the tests.')
-@click.option("--wait-before-test", type=int, default=3, help='Time for the device to start before running the tests.')
+@click.option("--app", type=str, default=None, help='Local application to use, omit to use external apps, use a path for a specific binary or use a filename to search under the current matter checkout.')
+@click.option("--factoryreset", is_flag=True, help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
 @click.option("--app-params", type=str, default='', help='The extra parameters passed to the device.')
 @click.option("--script", type=click.Path(exists=True), default=FindBinaryPath("mobile-device-test.py"), help='Test script to use.')
 @click.argument("script-args", nargs=-1, type=str)
-def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, script: str, script_args: typing.List[str]):
+def main(app: str, factoryreset: bool, app_params: str, script: str, script_args: typing.List[str]):
     if factoryreset:
-        retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
+        retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
@@ -92,32 +97,24 @@ def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, s
 
     app_process = None
     if app:
-        app = FindBinaryPath(app)
-        if app is None:
-            raise FileNotFoundError(f"{app} not found")
+        if not os.path.exists(app):
+            app = FindBinaryPath(app)
+            if app is None:
+                raise FileNotFoundError(f"{app} not found")
         app_args = [app] + shlex.split(app_params)
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
-        log_cooking_threads.append(RedirectQueueThread(app_process.stdout,
-                                                       b"[\33[34mAPP \33[0m][\33[33mSTDOUT\33[0m]", log_queue))
-        log_cooking_threads.append(RedirectQueueThread(app_process.stderr,
-                                                       b"[\33[34mAPP \33[0m][\33[31mSTDERR\33[0m]", log_queue))
-
-    try:
-        DumpLogOutput(log_queue, wait_before_test)
-    except queue.Empty:
-        pass
+        DumpProgramOutputToQueue(
+            log_cooking_threads, "\33[34mAPP \33[0m", test_script_process, log_queue)
 
     script_command = ["/usr/bin/env", "python3", script,
                       '--log-format', '%(message)s'] + [v for v in script_args]
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
         script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    log_cooking_threads.append(RedirectQueueThread(test_script_process.stdout,
-                                                   b"[\33[32mTEST\33[0m][\33[33mSTDOUT\33[0m]", log_queue))
-    log_cooking_threads.append(RedirectQueueThread(test_script_process.stderr,
-                                                   b"[\33[32mTEST\33[0m][\33[31mSTDERR\33[0m]", log_queue))
+    DumpProgramOutputToQueue(log_cooking_threads, "\33[32mTEST\33[0m",
+                             test_script_process, log_queue)
 
     test_script_exit_code = test_script_process.poll()
     while test_script_exit_code is None:
