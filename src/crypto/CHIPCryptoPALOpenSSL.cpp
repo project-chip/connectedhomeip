@@ -125,7 +125,7 @@ static const EVP_MD * _digestForType(DigestType digestType)
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     EVP_CIPHER_CTX * context = nullptr;
@@ -166,9 +166,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(CanCastTo<int>(iv_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(CanCastTo<int>(nonce_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -183,16 +183,16 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     result = EVP_EncryptInit_ex(context, type, nullptr, nullptr, nullptr);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    // Pass in IV length.  Cast is safe because we checked with CanCastTo.
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, static_cast<int>(iv_length), nullptr);
+    // Pass in nonce length.  Cast is safe because we checked with CanCastTo.
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, static_cast<int>(nonce_length), nullptr);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in tag length. Cast is safe because we checked _isValidTagLength.
     result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, static_cast<int>(tag_length), nullptr);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    // Pass in key + iv
-    result = EVP_EncryptInit_ex(context, nullptr, nullptr, Uint8::to_const_uchar(key), Uint8::to_const_uchar(iv));
+    // Pass in key + nonce
+    result = EVP_EncryptInit_ex(context, nullptr, nullptr, Uint8::to_const_uchar(key), Uint8::to_const_uchar(nonce));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in plain text length
@@ -237,8 +237,8 @@ exit:
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
-                           size_t iv_length, uint8_t * plaintext)
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           size_t nonce_length, uint8_t * plaintext)
 {
     EVP_CIPHER_CTX * context = nullptr;
     CHIP_ERROR error         = CHIP_NO_ERROR;
@@ -278,8 +278,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO: Remove support for AES-256 since not in 1.0
     // Determine crypto type by key length
@@ -292,9 +292,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     result = EVP_DecryptInit_ex(context, type, nullptr, nullptr, nullptr);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    // Pass in IV length
-    VerifyOrExit(CanCastTo<int>(iv_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, static_cast<int>(iv_length), nullptr);
+    // Pass in nonce length
+    VerifyOrExit(CanCastTo<int>(nonce_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, static_cast<int>(nonce_length), nullptr);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in expected tag
@@ -305,8 +305,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                                  const_cast<void *>(static_cast<const void *>(tag)));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    // Pass in key + iv
-    result = EVP_DecryptInit_ex(context, nullptr, nullptr, Uint8::to_const_uchar(key), Uint8::to_const_uchar(iv));
+    // Pass in key + nonce
+    result = EVP_DecryptInit_ex(context, nullptr, nullptr, Uint8::to_const_uchar(key), Uint8::to_const_uchar(nonce));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in cipher text length
