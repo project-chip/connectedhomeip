@@ -60,7 +60,7 @@ static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribu
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessWriteAttribute
 #else
-#error "Undefined generated access for read attribute"
+#error "Undefined generated access for write attribute"
 #endif
 
 #ifdef GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER
@@ -72,7 +72,7 @@ static_assert(ArraySize(kCluster) == ArraySize(kCommand) && ArraySize(kCommand) 
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessInvokeCommand
 #else
-#error "Undefined generated access for read attribute"
+#error "Undefined generated access for invoke command"
 #endif
 
 #ifdef GENERATED_ACCESS_READ_EVENT__CLUSTER
@@ -84,7 +84,7 @@ static_assert(ArraySize(kCluster) == ArraySize(kEvent) && ArraySize(kEvent) == A
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadEvent
 #else
-#error "Undefined generated access for read attribute"
+#error "Undefined generated access for read event"
 #endif
 
 } // anonymous namespace
