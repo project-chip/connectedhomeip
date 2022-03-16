@@ -145,7 +145,7 @@ public:
         return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
     }
 
-    // Admin subject id used for the case access control entry created if the AddNOC command succeds. In the AutoCommissioner, this
+    // Admin subject id used for the case access control entry created if the AddNOC command succeeds. In the AutoCommissioner, this
     // is set by by the kGenerateNOCChain stage through the OperationalCredentialsDelegate.
     // This must be set before calling PerformCommissioningStep for the kSendNOC step.
     const Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
