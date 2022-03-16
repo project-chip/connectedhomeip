@@ -88,19 +88,19 @@ limitations under the License.
     </attribute>
     <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" optional="false">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
-      <field id="0" name="AdminFabricIndex" type="fabric_idx"/>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
+      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
     </event>
     <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" optional="false">
       <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
-      <field id="0" name="AdminFabricIndex" type="fabric_idx"/>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
+      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
     </event>    
   </cluster>
 </configurator>
