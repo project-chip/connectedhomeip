@@ -84,7 +84,7 @@ const char * emAfEventStrings[] = {
     EMBER_AF_GENERATED_EVENT_STRINGS
 #endif
 
-        nullptr,
+    nullptr,
 };
 
 EmberEventData emAfEvents[] = {

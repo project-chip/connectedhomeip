@@ -306,9 +306,9 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     record.clusterMask = mask;
     record.attributeId = attributeID;
     emAfReadOrWriteAttribute(&record, &metadata,
-                             nullptr,   // buffer
-                             0,      // buffer size
-                             false); // write?
+                             nullptr, // buffer
+                             0,       // buffer size
+                             false);  // write?
 
     // if we dont support that attribute
     if (metadata == nullptr)

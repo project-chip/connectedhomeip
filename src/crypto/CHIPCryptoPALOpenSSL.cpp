@@ -1743,7 +1743,8 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     x509ReferenceCertificate = d2i_X509(nullptr, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
     VerifyOrExit(x509ReferenceCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    x509toBeEvaluatedCertificate = d2i_X509(nullptr, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
+    x509toBeEvaluatedCertificate =
+        d2i_X509(nullptr, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
     VerifyOrExit(x509toBeEvaluatedCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     refNotBeforeTime = X509_get_notBefore(x509ReferenceCertificate);
