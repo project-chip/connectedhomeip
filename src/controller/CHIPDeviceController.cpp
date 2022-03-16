@@ -903,8 +903,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
-    if (device == nullptr || device->GetDeviceId() != remoteDeviceId ||
-        (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
+    if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
     {
         ChipLogError(Controller, "Invalid device for commissioning " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
