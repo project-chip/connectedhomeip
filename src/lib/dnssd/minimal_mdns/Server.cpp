@@ -387,10 +387,11 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             else
             {
                 lastError = err;
-#if CHIP_DETAIL_LOGGING    
+#if CHIP_DETAIL_LOGGING
                 char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
                 err = info->mInterfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
-                if (err != CHIP_NO_ERROR) strcpy(ifaceName, "???");
+                if (err != CHIP_NO_ERROR)
+                    strcpy(ifaceName, "???");
                 ChipLogDetail(Discovery, "Warning: Attempt to mDNS broadcast failed on %s:  %s", ifaceName, lastError.AsString());
 #endif
             }
