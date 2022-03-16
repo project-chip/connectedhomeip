@@ -172,7 +172,7 @@ class Resolver
 {
 public:
     /// Enumeration defining how to handle cancel callbacks during operation
-    /// canceallation.
+    /// cancellation.
     enum class FailureCallback
     {
         Call, // Call the failure callback
@@ -204,7 +204,7 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
-    /// Stops an active resolve lookup request.
+    /// Stops an active lookup request.
     ///
     /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
     /// the `cancel_method` argument.
