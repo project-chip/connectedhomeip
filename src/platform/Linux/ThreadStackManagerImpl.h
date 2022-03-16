@@ -36,6 +36,12 @@ class ThreadStackManagerImpl : public ThreadStackManager
 public:
     ThreadStackManagerImpl();
 
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
+
     CHIP_ERROR _InitThreadStack();
     void _ProcessThreadActivity();
 
@@ -70,6 +76,8 @@ public:
     CHIP_ERROR _SetThreadEnabled(bool val);
 
     void _OnThreadAttachFinished(void);
+
+    void _UpdateNetworkStatus();
 
     static void _OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
@@ -144,6 +152,7 @@ private:
 
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
 };

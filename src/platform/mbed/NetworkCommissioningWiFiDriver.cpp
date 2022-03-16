@@ -34,7 +34,7 @@ constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 } // namespace
 
-CHIP_ERROR WiFiDriverImpl::Init()
+CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
