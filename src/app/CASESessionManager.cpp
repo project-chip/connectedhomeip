@@ -77,12 +77,12 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId) const
+void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
 {
     mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
 }
 
-void CASESessionManager::ReleaseAllSessions() const
+void CASESessionManager::ReleaseAllSessions()
 {
     mConfig.devicePool->ReleaseAllDevices();
 }

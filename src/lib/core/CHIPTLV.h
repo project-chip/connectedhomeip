@@ -938,11 +938,12 @@ protected:
     CHIP_ERROR SkipData();
     CHIP_ERROR SkipToEndOfContainer();
     CHIP_ERROR VerifyElement();
-    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p) const;
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
+
+    static Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p);
 };
 
 /*

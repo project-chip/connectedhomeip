@@ -138,7 +138,7 @@ private:
 
 struct HeapObjectListNode
 {
-    void Remove() const
+    void Remove()
     {
         mNext->mPrev = mPrev;
         mPrev->mNext = mNext;

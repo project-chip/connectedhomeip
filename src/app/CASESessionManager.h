@@ -79,9 +79,9 @@ public:
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId) const;
+    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
 
-    void ReleaseAllSessions() const;
+    void ReleaseAllSessions();
 
     /**
      * This API returns the address for the given node ID.
