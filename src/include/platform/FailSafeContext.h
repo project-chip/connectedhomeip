@@ -41,6 +41,8 @@ public:
      */
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
+    void SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
+    void SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
@@ -59,23 +61,13 @@ public:
     inline bool AddNocCommandHasBeenInvoked() { return mAddNocCommandHasBeenInvoked; }
     inline bool UpdateNocCommandHasBeenInvoked() { return mUpdateNocCommandHasBeenInvoked; }
 
-    inline void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
-    {
-        mAddNocCommandHasBeenInvoked = true;
-        mFabricIndex                 = nocFabricIndex;
-    }
-
-    inline void SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex)
-    {
-        mUpdateNocCommandHasBeenInvoked = true;
-        mFabricIndex                    = nocFabricIndex;
-    }
-
     inline FabricIndex GetFabricIndex() const
     {
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
     }
+
+    static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
 
 private:
     // ===== Private members reserved for use by this class only.
@@ -87,8 +79,16 @@ private:
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
+    static constexpr size_t FailSafeContextTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(bool));
+    }
+
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
+
     void FailSafeTimerExpired();
+    CHIP_ERROR CommitToStorage();
+    CHIP_ERROR DeleteFromStorage();
 };
 
 } // namespace DeviceLayer
