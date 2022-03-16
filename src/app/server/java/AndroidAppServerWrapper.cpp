@@ -69,6 +69,4 @@ void ChipAndroidAppShutdown(void)
 }
 
 // this is only for compile, the real impl of this function is in the example project.
-void __attribute__((weak)) ApplicationInit()
-{
-}
+void __attribute__((weak)) ApplicationInit() {}
