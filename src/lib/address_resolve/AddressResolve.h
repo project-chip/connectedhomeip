@@ -206,8 +206,11 @@ public:
 
     /// Stops an active resolve lookup request.
     ///
-    /// Caller controlls weather the `fail` callback of the handle is
-    /// invoked or not by using the `cancel_method` argument.
+    /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
+    /// the `cancel_method` argument.
+    ///
+    /// Note that there is no default cancel_method on purpose, so that the caller has to make
+    /// a clear decision if the callback should or should not be invoked.
     virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
 
     /// Shut down any active resolves
