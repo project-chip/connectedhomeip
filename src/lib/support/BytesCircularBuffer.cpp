@@ -80,10 +80,8 @@ size_t BytesCircularBuffer::StorageUsed() const
     {
         return mDataEnd - mDataStart;
     }
-    else
-    {
-        return mCapacity + mDataEnd - mDataStart;
-    }
+
+    return mCapacity + mDataEnd - mDataStart;
 }
 
 CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)

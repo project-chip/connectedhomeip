@@ -870,7 +870,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        else if (auto * storage = EntryStorage::Find(nullptr))
+        if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
