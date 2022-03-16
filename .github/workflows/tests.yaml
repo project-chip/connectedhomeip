@@ -84,6 +84,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT}-test-group \
+                        --target linux-x64-door-lock-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -97,6 +98,7 @@ jobs:
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}-test-group/chip-all-clusters-app \
+                     --door-lock-app ./out/linux-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Build and run OTA example
