@@ -290,6 +290,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     }
 
     {
+        // Just like what we do in BuildSingleReportDataAttributeReportIBs(), we need to reserve one byte for end of container tag
+        // when encoding events to ensure we can close the container successfully.
         const uint32_t kReservedSizeEndOfReportIBs = 1;
         EventReportIBs::Builder & eventReportIBs   = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
@@ -306,9 +308,13 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
         {
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
-            // However, we may have encoded some attributes befure, we don't skip it in that case.
-            if (eventCount == 0 && !aBufferIsUsed)
+            // However, we may have encoded some attributes befoure, we don't skip it in that case.
+            if (eventCount == 0)
             {
+                if (!aBufferIsUsed)
+                {
+                    eventMin++;
+                }
                 ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
                 err = CHIP_NO_ERROR;
             }
@@ -343,7 +349,7 @@ exit:
         *apHasEncodedData = !(eventCount == 0 || eventClean);
     }
 
-    // Maybe encoding the attributes have already used up all space.
+    // Maybe encoding the attributes has already used up all space.
     if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) &&
         (eventCount == 0 || eventClean))
     {

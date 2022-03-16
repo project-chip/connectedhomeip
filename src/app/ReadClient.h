@@ -339,8 +339,8 @@ private:
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
-    EventNumber mEventMin             = 0;
-    bool mIsAttributeReportIBsPresent = false;
+    EventNumber mEventMin                    = 0;
+    bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;

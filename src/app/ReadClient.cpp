@@ -493,7 +493,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     else if (err == CHIP_NO_ERROR)
     {
         TLV::TLVReader attributeReportIBsReader;
-        mIsAttributeReportIBsPresent = true;
+        mSawAttributeReportsInCurrentReport = true;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
         if (mIsInitialReport)
@@ -506,11 +506,11 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    if (mIsAttributeReportIBsPresent && !mPendingMoreChunks)
+    if (mSawAttributeReportsInCurrentReport && !mPendingMoreChunks)
     {
         mpCallback.OnReportEnd();
-        mIsInitialReport             = true;
-        mIsAttributeReportIBsPresent = false;
+        mIsInitialReport                    = true;
+        mSawAttributeReportsInCurrentReport = false;
     }
 
     SuccessOrExit(err = report.ExitContainer());
