@@ -735,7 +735,8 @@ function octetStringEscapedForCLiteral(value)
   // quotes (because that's our string terminator).
   return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
     var code = ch.charCodeAt(0).toString(8)
-    return "\\" + "0".repeat(3 - code.length) + code;
+    return "\\" +
+        "0".repeat(3 - code.length) + code;
   });
 }
 
