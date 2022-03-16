@@ -197,10 +197,20 @@ CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallba
     VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
     mActiveLookups.Remove(&handle);
 
+    // Adjust any timing updates.
+    ReArmTimer();
+
     if (cancel_method == FailureCallback::Call)
     {
         handle.GetListener()->OnNodeAddressResolutionFailed(handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
     }
+
+    // TODO: There should be some form of cancel into Dnssd::Resolver::Instance()
+    //       to stop any resolution mechanism if applicable.
+    //
+    // Current code just removes the internal list and any callbacks of resolution will
+    // be ignored. This works from the perspective of the caller of this method,
+    // but may be wasteful by letting dnssd still work in the background.
 
     return CHIP_NO_ERROR;
 }
