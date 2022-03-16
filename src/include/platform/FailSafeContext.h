@@ -73,7 +73,6 @@ public:
 
     inline FabricIndex GetFabricIndex()
     {
-        VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
     }
 

@@ -44,9 +44,7 @@ void FailSafeContext::CommissioningFailedTimerComplete()
     event.CommissioningComplete.Status          = CHIP_ERROR_TIMEOUT;
     CHIP_ERROR status                           = PlatformMgr().PostEvent(&event);
 
-    mFailSafeArmed                  = false;
-    mAddNocCommandHasBeenInvoked    = false;
-    mUpdateNocCommandHasBeenInvoked = false;
+    mFailSafeArmed = false;
 
     if (status != CHIP_NO_ERROR)
     {
