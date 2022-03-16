@@ -290,4 +290,3 @@ int mbedtls_internal_ecp_normalize_mxz( const mbedtls_ecp_group *grp,
 #endif /* MBEDTLS_ECP_INTERNAL_ALT */
 
 #endif /* ecp_internal_alt.h */
-
