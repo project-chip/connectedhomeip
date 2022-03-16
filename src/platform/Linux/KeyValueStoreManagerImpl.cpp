@@ -56,7 +56,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         return err;
     }
-    else if (offset_bytes > read_size)
+    if (offset_bytes > read_size)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

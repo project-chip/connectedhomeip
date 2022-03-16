@@ -121,11 +121,10 @@ bool PICSBooleanExpressionParser::EvaluateExpression(std::vector<std::string> & 
         bool rightExpr = EvaluateExpression(tokens, PICS, index);
         return leftExpr || rightExpr;
     }
-    else
-    {
-        ChipLogError(chipTool, "Unknown token: '%s'", token.c_str());
+    
+            ChipLogError(chipTool, "Unknown token: '%s'", token.c_str());
         chipDie();
-    }
+   
 }
 
 bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string> & tokens, std::map<std::string, bool> & PICS,
@@ -151,9 +150,8 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         bool expr = EvaluateSubExpression(tokens, PICS, index);
         return !expr;
     }
-    else
-    {
-        index++;
+    
+            index++;
 
         if (PICS.find(token) == PICS.end())
         {
@@ -163,5 +161,5 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         }
 
         return PICS[token];
-    }
+   
 }
