@@ -88,13 +88,12 @@ public:
     }
 
 protected:
-    Loop ForEachActiveObjectInner(void * context,
-                                          typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
+    Loop ForEachActiveObjectInner(void * context, typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
     {
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
     Loop ForEachActiveObjectInner(void * context,
-                                          typename PoolInterface<U, ConstructorArguments...>::LambdaConst lambda) const override
+                                  typename PoolInterface<U, ConstructorArguments...>::LambdaConst lambda) const override
     {
         return Impl().ForEachActiveObject([&](const T * target) { return lambda(context, static_cast<const U *>(target)); });
     }
