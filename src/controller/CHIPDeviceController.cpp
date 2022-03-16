@@ -1497,10 +1497,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
             commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
         }
     }
-    else
+    else if (commissioner->mPairingDelegate != nullptr)
     {
-        VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                       ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
         commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 
