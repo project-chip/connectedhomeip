@@ -26,6 +26,7 @@ import coloredlogs
 import chip.logging
 import logging
 from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger, TestIsEnabled, SetTestSet
+import base
 from cluster_objects import NODE_ID, ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 import asyncio
@@ -92,32 +93,10 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
     #           "Failed to close sessions")
 
 
-@click.command()
-@click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
-@click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
-@click.option("--address", "-a", default='', type=str, help="Skip commissionee discovery, commission the device with the IP directly.")
-@click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
-@click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
-@click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
-@click.option('--enable-test', default=['all'], multiple=True, help='The tests to be executed.')
-@click.option('--disable-test', default=[], multiple=True, help='The tests to be excluded.')
-@click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
-@click.option('--log-format', default=None, type=str, help="Override logging format")
-def main(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format):
-    coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
-    logger.info("Test Parameters:")
-    logger.info(f"\tController NodeId: {controller_nodeid}")
-    logger.info(f"\tDevice NodeId:     {device_nodeid}")
-    logger.info(f"\tTest Timeout:      {timeout}s")
-    logger.info(f"\tDiscriminator:     {discriminator}")
-    logger.info(f"\tEnabled Tests:     {enable_test}")
-    logger.info(f"\tDisabled Tests:    {disable_test}")
-    SetTestSet(enable_test, disable_test)
-    do_tests(controller_nodeid, device_nodeid, address, timeout,
-             discriminator, setup_pin)
+@base.test_case
+def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
+    logger.info("Testing datamodel functions")
 
-
-def test_datamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,
@@ -190,14 +169,10 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               "Failed to resolve nodeid")
 
     # Still test network commissioning
-    if TestIsEnabled('network_commissioning'):
-        logger.info("Testing network commissioning")
-        FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()),
-                  "Failed to finish network commissioning")
+    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()),
+              "Failed to finish network commissioning")
 
-    if TestIsEnabled('datamodel'):
-        logger.info("Testing datamodel functions")
-        test_datamodel(test, device_nodeid)
+    TestDatamodel(test, device_nodeid)
 
     logger.info("Testing non-controller APIs")
     FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
@@ -211,9 +186,45 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
     os._exit(0)
 
 
+@click.command()
+@click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
+@click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
+@click.option("--address", "-a", default='', type=str, help="Skip commissionee discovery, commission the device with the IP directly.")
+@click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
+@click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
+@click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
+@click.option('--enable-test', default=['all'], type=click.Choice(['all'] + base.configurable_tests() + base.configurable_test_cases()), multiple=True, help='The tests to be executed. By default, all tests will be executed, use this option to run a specific set of tests.')
+@click.option('--disable-test', default=[], type=click.Choice(base.configurable_tests() + base.configurable_test_cases()), multiple=True, help='The tests to be excluded from the set of enabled tests.')
+@click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
+@click.option('--log-format', default=None, type=str, help="Override logging format")
+@click.option('--print-test-list', is_flag=True, help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
+def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format, print_test_list):
+    coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
+
+    if print_test_list:
+        print("Test sets:")
+        for name in base.configurable_tests():
+            print(f"\t{name}")
+        print("Test cases:")
+        for name in base.configurable_test_cases():
+            print(f"\t{name}")
+        return
+
+    logger.info("Test Parameters:")
+    logger.info(f"\tController NodeId: {controller_nodeid}")
+    logger.info(f"\tDevice NodeId:     {device_nodeid}")
+    logger.info(f"\tTest Timeout:      {timeout}s")
+    logger.info(f"\tDiscriminator:     {discriminator}")
+    logger.info(f"\tEnabled Tests:     {enable_test}")
+    logger.info(f"\tDisabled Tests:    {disable_test}")
+    SetTestSet(enable_test, disable_test)
+    do_tests(controller_nodeid, device_nodeid, address, timeout,
+             discriminator, setup_pin)
+
+
 if __name__ == "__main__":
     try:
-        main()
+        run()
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

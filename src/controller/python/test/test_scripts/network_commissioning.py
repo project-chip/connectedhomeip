@@ -22,6 +22,8 @@ from chip.clusters.Types import NullValue
 import chip.interaction_model
 import asyncio
 
+import base
+
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
 
@@ -48,6 +50,7 @@ WIFI_NETWORK_FEATURE_MAP = 1
 THREAD_NETWORK_FEATURE_MAP = 2
 
 
+@base.test_set
 class NetworkCommissioningTests:
     def __init__(self, devCtrl, nodeid):
         self._devCtrl = devCtrl
@@ -293,7 +296,8 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"Unexpected result: network is not marked as connected")
 
-    async def run(self):
+    @base.test_case
+    async def Test(self):
         try:
             clusters = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
             if Clusters.NetworkCommissioning.id not in clusters[0][Clusters.Descriptor].serverList:
@@ -321,3 +325,6 @@ class NetworkCommissioningTests:
             logger.exception(ex)
             return False
         return True
+
+    async def run(self):
+        return await self.Test()

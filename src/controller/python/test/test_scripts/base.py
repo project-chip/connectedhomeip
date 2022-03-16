@@ -55,6 +55,8 @@ def FailIfNot(cond, message):
         TestFail(message)
 
 
+_configurable_tests = set()
+_configurable_test_sets = set()
 _enabled_tests = []
 _disabled_tests = []
 
@@ -82,6 +84,33 @@ def TestIsEnabled(test_name: str):
             disabled_len = len(test_item)
 
     return enabled_len > disabled_len
+
+
+def test_set(cls):
+    _configurable_test_sets.add(cls.__qualname__)
+    return cls
+
+
+def test_case(func):
+    test_name = func.__qualname__
+    _configurable_tests.add(test_name)
+
+    def CheckEnableBeforeRun(*args, **kwargs):
+        if TestIsEnabled(test_name=test_name):
+            func(*args, **kwargs)
+    return CheckEnableBeforeRun
+
+
+def configurable_tests():
+    res = [v for v in _configurable_test_sets]
+    res.sort()
+    return res
+
+
+def configurable_test_cases():
+    res = [v for v in _configurable_tests]
+    res.sort()
+    return res
 
 
 class TestTimeout(threading.Thread):
