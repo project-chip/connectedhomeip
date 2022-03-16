@@ -87,7 +87,10 @@ public:
         GroupId group_id = kUndefinedGroupId;
         // Set of group keys that generate operational group keys for use with this group
         KeysetId keyset_id = 0;
-        bool operator==(const GroupKey & other) const { return this->group_id == other.group_id && this->keyset_id == other.keyset_id; }
+        bool operator==(const GroupKey & other) const
+        {
+            return this->group_id == other.group_id && this->keyset_id == other.keyset_id;
+        }
     };
 
     struct GroupEndpoint
