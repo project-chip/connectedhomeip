@@ -85,9 +85,8 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 
         return IpScore::kOtherIpv6;
     }
-    
-            return IpScore::kIpv4;
-   
+
+    return IpScore::kIpv4;
 }
 
 } // namespace

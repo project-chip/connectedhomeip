@@ -34,9 +34,8 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
     {
         return static_cast<char>((x - 10) + (uppercase ? 'A' : 'a'));
     }
-    
-            return static_cast<char>(x + '0');
-   
+
+    return static_cast<char>(x + '0');
 }
 
 CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * val, BitFlags<HexFlags> flags)

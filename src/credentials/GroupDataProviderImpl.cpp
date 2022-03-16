@@ -929,12 +929,11 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
         group.SetName(info.name);
         return group.Save(mStorage);
     }
-    
-            // New group_id
-        group.group_id = info.group_id;
-        group.SetName(info.name);
-        return SetGroupInfoAt(fabric_index, fabric.group_count, group);
-   
+
+    // New group_id
+    group.group_id = info.group_id;
+    group.SetName(info.name);
+    return SetGroupInfoAt(fabric_index, fabric.group_count, group);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info)
@@ -1630,15 +1629,14 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
         // Update existing keyset info, keep next
         return keyset.Save(mStorage);
     }
-    
-            // New keyset, insert first
-        keyset.next = fabric.first_keyset;
-        ReturnErrorOnFailure(keyset.Save(mStorage));
-        // Update fabric
-        fabric.keyset_count++;
-        fabric.first_keyset = in_keyset.keyset_id;
-        return fabric.Save(mStorage);
-   
+
+    // New keyset, insert first
+    keyset.next = fabric.first_keyset;
+    ReturnErrorOnFailure(keyset.Save(mStorage));
+    // Update fabric
+    fabric.keyset_count++;
+    fabric.first_keyset = in_keyset.keyset_id;
+    return fabric.Save(mStorage);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint16_t target_id, KeySet & out_keyset)

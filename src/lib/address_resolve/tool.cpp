@@ -158,8 +158,7 @@ extern "C" int main(int argc, const char ** argv)
     {
         return Cmd_Node(argc - 2, argv + 2) ? 0 : 1;
     }
-    
-            ChipLogError(NotSpecified, "Unrecognized command: %s", argv[1]);
-        return 1;
-   
+
+    ChipLogError(NotSpecified, "Unrecognized command: %s", argv[1]);
+    return 1;
 }

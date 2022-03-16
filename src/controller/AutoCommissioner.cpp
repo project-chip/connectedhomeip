@@ -143,7 +143,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
                 return CommissioningStage::kWiFiNetworkSetup;
             }
             if (mParams.GetThreadOperationalDataset().HasValue() &&
-                     mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+                mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }

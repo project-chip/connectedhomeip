@@ -101,9 +101,8 @@ public:
         {
             return kUndefinedNodeId;
         }
-        
-                    return mEphemeralInitiatorNodeId;
-       
+
+        return mEphemeralInitiatorNodeId;
     }
 
     SessionRole GetSessionRole() const { return mSessionRole; }
@@ -157,9 +156,8 @@ public:
         {
             return MakeOptional<SessionHandle>(*result);
         }
-        
-                    return Optional<SessionHandle>::Missing();
-       
+
+        return Optional<SessionHandle>::Missing();
     }
 
     CHECK_RETURN_VALUE Optional<SessionHandle> FindInitiator(NodeId ephemeralInitiatorNodeID)
@@ -169,9 +167,8 @@ public:
         {
             return MakeOptional<SessionHandle>(*result);
         }
-        
-                    return Optional<SessionHandle>::Missing();
-       
+
+        return Optional<SessionHandle>::Missing();
     }
 
     CHECK_RETURN_VALUE Optional<SessionHandle> AllocInitiator(NodeId ephemeralInitiatorNodeID, const PeerAddress & peerAddress,
@@ -184,9 +181,8 @@ public:
             result->SetPeerAddress(peerAddress);
             return MakeOptional<SessionHandle>(*result);
         }
-        
-                    return Optional<SessionHandle>::Missing();
-       
+
+        return Optional<SessionHandle>::Missing();
     }
 
 private:

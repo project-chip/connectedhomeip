@@ -102,9 +102,8 @@ uint16_t * emberAfPutInt16uInResp(uint16_t value)
     {
         return (uint16_t *) low;
     }
-    
-            return NULL;
-   
+
+    return NULL;
 }
 
 uint32_t * emberAfPutInt32uInResp(uint32_t value)
@@ -118,9 +117,8 @@ uint32_t * emberAfPutInt32uInResp(uint32_t value)
     {
         return (uint32_t *) a;
     }
-    
-            return NULL;
-   
+
+    return NULL;
 }
 
 uint32_t * emberAfPutInt24uInResp(uint32_t value)
@@ -133,9 +131,8 @@ uint32_t * emberAfPutInt24uInResp(uint32_t value)
     {
         return (uint32_t *) a;
     }
-    
-            return NULL;
-   
+
+    return NULL;
 }
 
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
@@ -146,9 +143,8 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
         appResponseLength = static_cast<uint16_t>(appResponseLength + length);
         return &appResponseData[appResponseLength - length];
     }
-    
-            return NULL;
-   
+
+    return NULL;
 }
 
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
@@ -168,9 +164,8 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value)
     {
         return a;
     }
-    
-            return NULL;
-   
+
+    return NULL;
 }
 
 void emberAfPutInt16sInResp(int16_t value)

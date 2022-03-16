@@ -195,9 +195,8 @@ EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t 
     {
         return emberEventControlSetDelayMS(control, delayQs << 8);
     }
-    
-            return EMBER_BAD_ARGUMENT;
-   
+
+    return EMBER_BAD_ARGUMENT;
 }
 
 EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM)
@@ -206,9 +205,8 @@ EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint
     {
         return emberEventControlSetDelayMS(control, static_cast<uint32_t>(delayM) << 16);
     }
-    
-            return EMBER_BAD_ARGUMENT;
-   
+
+    return EMBER_BAD_ARGUMENT;
 }
 
 EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,

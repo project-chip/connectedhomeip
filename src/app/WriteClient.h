@@ -196,9 +196,8 @@ public:
                                           attributePath.mClusterId, attributePath.mAttributeId, aDataVersion),
                 value);
         }
-        
-                    return EncodeAttribute(attributePath, value.Value());
-       
+
+        return EncodeAttribute(attributePath, value.Value());
     }
 
     /**

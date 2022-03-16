@@ -372,9 +372,8 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     {
         return nullptr;
     }
-    
-            return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
-   
+
+    return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
 CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)

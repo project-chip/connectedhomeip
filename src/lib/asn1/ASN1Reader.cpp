@@ -342,7 +342,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
                     nestLevel--;
                     continue;
                 }
-                                    break;
+                break;
             }
             printf("ASN1Reader::Next() failed: %" CHIP_ERROR_FORMAT "\n", err.Format());
             return err;

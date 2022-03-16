@@ -192,9 +192,8 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::
     {
         return connection->mEndPoint->Send(std::move(msgBuf));
     }
-    
-            return SendAfterConnect(address, std::move(msgBuf));
-   
+
+    return SendAfterConnect(address, std::move(msgBuf));
 }
 
 CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle && msg)

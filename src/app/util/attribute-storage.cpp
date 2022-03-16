@@ -370,18 +370,17 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
-    
-            EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-        // Casting and calling a function pointer on the same line results in ignoring the return
-        // of the call on gcc-arm-none-eabi-9-2019-q4-major
-        EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-            emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
-        if (f != NULL)
-        {
-            status = f(attributePath, attributeType, size, value);
-        }
-        return status;
-   
+
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    // Casting and calling a function pointer on the same line results in ignoring the return
+    // of the call on gcc-arm-none-eabi-9-2019-q4-major
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
+        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    if (f != NULL)
+    {
+        status = f(attributePath, attributeType, size, value);
+    }
+    return status;
 }
 
 static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
@@ -622,17 +621,16 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                                   : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
                                                                                          am, buffer, emberAfAttributeSize(am)));
                                 }
-                                
-                                                                    // Internal storage is only supported for fixed endpoints
-                                    if (!isDynamicEndpoint)
-                                    {
-                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
-                                    }
-                                    else
-                                    {
-                                        return EMBER_ZCL_STATUS_FAILURE;
-                                    }
-                               
+
+                                // Internal storage is only supported for fixed endpoints
+                                if (!isDynamicEndpoint)
+                                {
+                                    return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
+                                }
+                                else
+                                {
+                                    return EMBER_ZCL_STATUS_FAILURE;
+                                }
                             }
                         }
                         else
@@ -748,9 +746,8 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
     {
         return false;
     }
-    
-            return emberAfFindClusterInType(emAfEndpoints[index].endpointType, clusterId, CLUSTER_MASK_SERVER);
-   
+
+    return emberAfFindClusterInType(emAfEndpoints[index].endpointType, clusterId, CLUSTER_MASK_SERVER);
 }
 
 namespace chip {
@@ -794,9 +791,8 @@ const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId cluster
     {
         return NULL;
     }
-    
-            return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
-   
+
+    return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
 }
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints

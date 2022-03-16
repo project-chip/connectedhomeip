@@ -142,10 +142,9 @@ CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, 
         ChipLogProgress(Inet, "Joining Multicast Group with address %s", addressStr);
         return mUDPEndPoint->JoinMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
     }
-    
-            ChipLogProgress(Inet, "Leaving Multicast Group with address %s", addressStr);
-        return mUDPEndPoint->LeaveMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
-   
+
+    ChipLogProgress(Inet, "Leaving Multicast Group with address %s", addressStr);
+    return mUDPEndPoint->LeaveMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
 }
 
 } // namespace Transport

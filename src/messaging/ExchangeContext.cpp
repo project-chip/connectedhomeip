@@ -490,11 +490,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     {
         return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
-    
-            DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
-                                 std::move(msgBuf));
-        return CHIP_NO_ERROR;
-   
+
+    DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
+                             std::move(msgBuf));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::MessageHandled()

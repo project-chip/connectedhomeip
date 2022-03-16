@@ -302,9 +302,8 @@ private:
         {
             return mGlobalEncryptedMessageCounter;
         }
-        
-                    return state.GetSessionMessageCounter().GetLocalMessageCounter();
-       
+
+        return state.GetSessionMessageCounter().GetLocalMessageCounter();
     }
 };
 

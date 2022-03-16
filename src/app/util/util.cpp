@@ -316,9 +316,8 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
     {
         return emberAfCurrentCommand()->mfgCode;
     }
-    
-            return EMBER_AF_NULL_MANUFACTURER_CODE;
-   
+
+    return EMBER_AF_NULL_MANUFACTURER_CODE;
 }
 
 uint8_t emberAfNextSequence(void)

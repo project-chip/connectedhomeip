@@ -501,11 +501,10 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
         {
             break;
         }
-        
-                    buffer = buffer->GetNextCircularEventBuffer();
-            assert(buffer != nullptr);
-            // code guarantees that every PriorityLevel has a buffer destination.
-       
+
+        buffer = buffer->GetNextCircularEventBuffer();
+        assert(buffer != nullptr);
+        // code guarantees that every PriorityLevel has a buffer destination.
     }
 
     mBytesWritten += writer.GetLengthWritten();
