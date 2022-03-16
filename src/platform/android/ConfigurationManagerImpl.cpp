@@ -58,11 +58,6 @@ void ConfigurationManagerImpl::InitializeWithObject(jobject managerObject)
     AndroidConfig::InitializeWithObject(managerObject);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::Init()
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

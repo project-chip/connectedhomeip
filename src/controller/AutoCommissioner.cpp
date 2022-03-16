@@ -201,9 +201,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
 
-    // Currently unimplemented.
-    case CommissioningStage::kConfigACL:
-        return CommissioningStage::kError;
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
     case CommissioningStage::kError:

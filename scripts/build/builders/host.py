@@ -102,11 +102,11 @@ class HostApp(Enum):
             yield 'chip-cert'
             yield 'chip-cert.map'
         elif self == HostApp.OTA_PROVIDER:
-            yield 'chip-ota-requestor-app'
-            yield 'chip-ota-requestor-app.map'
-        elif self == HostApp.OTA_REQUESTOR:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
+        elif self == HostApp.OTA_REQUESTOR:
+            yield 'chip-ota-requestor-app'
+            yield 'chip-ota-requestor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

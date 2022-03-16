@@ -79,8 +79,8 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -104,6 +104,7 @@ private:
     WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    Optional<Status> mScanStatus;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -127,8 +128,8 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -144,7 +145,7 @@ public:
 
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset) override;
-    void ScanNetworks(ScanCallback * callback) override;
+    void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);
