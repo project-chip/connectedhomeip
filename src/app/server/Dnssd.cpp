@@ -78,7 +78,6 @@ bool DnssdServer::HaveOperationalCredentials()
         }
     }
 
-    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
     return false;
 }
 
@@ -448,7 +447,7 @@ void DnssdServer::StartServer()
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
-    ChipLogDetail(Discovery, "DNS-SD StartServer mode=%d", static_cast<int>(mode));
+    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
 
     ClearTimeouts();
 
@@ -472,44 +471,35 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
     }
 
-    if (HaveOperationalCredentials())
-    {
-        ChipLogProgress(Discovery, "Have operational credentials");
-        if (mode != chip::Dnssd::CommissioningMode::kDisabled)
-        {
-            err = AdvertiseCommissionableNode(mode);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
-            }
-            // no need to set timeout because callers are currently doing that and their timeout might be longer than the default
-        }
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
-        {
-            err = AdvertiseCommissionableNode(mode);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
-            }
-            // set timeout
-            ScheduleExtendedDiscoveryExpiration();
-        }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    }
-    else
-    {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
-        ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
+    if (mode != chip::Dnssd::CommissioningMode::kDisabled)
+    {
         err = AdvertiseCommissionableNode(mode);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
+            ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
+        }
+
+        // If any fabrics exist, the commissioning window must have been opened by the administrator
+        // commissioning cluster commands which take care of the timeout.
+        if (!HaveOperationalCredentials())
+        {
+            ScheduleDiscoveryExpiration();
+        }
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
+    {
+        err = AdvertiseCommissionableNode(mode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
         }
         // set timeout
-        ScheduleDiscoveryExpiration();
-#endif
+        ScheduleExtendedDiscoveryExpiration();
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = AdvertiseCommissioner();
