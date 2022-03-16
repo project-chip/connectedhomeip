@@ -74,7 +74,7 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES                                            // defined in print-cluster.h
+    CLUSTER_IDS_TO_NAMES                                               // defined in print-cluster.h
     { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, nullptr }, // terminator
 };
 
