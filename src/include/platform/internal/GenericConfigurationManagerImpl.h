@@ -126,7 +126,7 @@ public:
 #endif
     void LogDeviceConfig() override;
 
-    virtual ~GenericConfigurationManagerImpl() = default;
+    ~GenericConfigurationManagerImpl() override = default;
 
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
