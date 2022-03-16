@@ -1030,10 +1030,8 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
         {
             return;
         }
-        else
-        {
-            err = CHIP_ERROR_POSIX(errno);
-        }
+
+        err = CHIP_ERROR_POSIX(errno);
     }
 
     // If there's no callback available, fail with an error.

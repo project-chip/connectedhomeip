@@ -335,6 +335,32 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
+void ConnectivityManagerImpl::UpdateNetworkStatus()
+{
+    Network configuredNetwork;
+
+    VerifyOrReturn(IsWiFiStationEnabled() && mpStatusChangeCallback != nullptr);
+
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    // If we have already connected to the WiFi AP, then return null to indicate a success state.
+    if (IsWiFiStationConnected())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        return;
+    }
+
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetDisconnectReason()));
+}
+
 void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
                                                       const gchar * const * invalidated_properties, gpointer user_data)
 {
@@ -400,6 +426,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         delegate->OnAssociationFailureDetected(associationFailureCause, status);
                     }
 
+                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+
                     mAssociattionStarted = false;
                 }
                 else if (g_strcmp0(value_str, "\'associated\'") == 0)
@@ -408,6 +436,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                     {
                         delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kNotConnected));
                     }
+
+                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
                 }
             }
 
@@ -1277,12 +1307,29 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetConnectedNetwork(NetworkCommissioning::Network & network)
+int32_t ConnectivityManagerImpl::GetDisconnectReason()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    std::unique_ptr<GError, GErrorDeleter> err;
+
+    gint errorValue = wpa_fi_w1_wpa_supplicant1_interface_get_disconnect_reason(mWpaSupplicant.iface);
+    // wpa_supplicant DBus API: DisconnectReason: The most recent IEEE 802.11 reason code for disconnect. Negative value
+    // indicates locally generated disconnection.
+    return errorValue;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::Network & network)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     std::unique_ptr<GError, GErrorDeleter> err;
 
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
+
+    // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
+    if (strcmp(networkPath, "/") == 0)
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
 
     std::unique_ptr<WpaFiW1Wpa_supplicant1Network, GObjectDeleter> networkInfo(
         wpa_fi_w1_wpa_supplicant1_network_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,

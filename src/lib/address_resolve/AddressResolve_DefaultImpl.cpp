@@ -63,7 +63,7 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
             {
                 return IpScore::kGlobalUnicastWithSharedPrefix;
             }
-            else if (ip.IsIPv6ULA())
+            if (ip.IsIPv6ULA())
             {
                 return IpScore::kUniqueLocalWithSharedPrefix;
             }
@@ -85,10 +85,8 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 
         return IpScore::kOtherIpv6;
     }
-    else
-    {
-        return IpScore::kIpv4;
-    }
+
+    return IpScore::kIpv4;
 }
 
 } // namespace
@@ -142,7 +140,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMinLookupTime() - elapsed;
     }
-    else if (elapsed < mRequest.GetMaxLookupTime())
+    if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
     }

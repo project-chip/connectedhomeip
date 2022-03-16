@@ -122,11 +122,9 @@ private:
                 {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                else
-                {
-                    // When size is zero, let's give a non-nullptr to the KVS backend
-                    buffer = &emptyPlaceholder;
-                }
+
+                // When size is zero, let's give a non-nullptr to the KVS backend
+                buffer = &emptyPlaceholder;
             }
 
             size_t bytesRead = 0;

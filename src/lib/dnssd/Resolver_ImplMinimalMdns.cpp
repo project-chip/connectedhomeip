@@ -338,7 +338,6 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     {
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
-        mNodeData.PrioritizeAddresses();
 
         //
         // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
