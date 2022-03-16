@@ -23,6 +23,7 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -406,22 +407,7 @@ void BindingWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
     EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
-
-    if (entry->type == EMBER_UNICAST_BINDING)
-    {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry->fabricIndex, entry->nodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
-            ChipLogProgress(NotSpecified,
-                            "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64
-                            ": %" CHIP_ERROR_FORMAT,
-                            ChipLogValueX64(entry->nodeId), err.Format());
-        }
-    }
-
-    BindingTable::GetInstance().Add(*entry);
-    BindingManager::GetInstance().NotifyBindingAdded(*entry);
+    SaveBindingEntry(*entry);
 
     Platform::Delete(entry);
 }

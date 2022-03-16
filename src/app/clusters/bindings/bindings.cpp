@@ -25,11 +25,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/bindings.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/binding-table.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -98,18 +96,9 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
     {
         bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
                                                        entry.cluster);
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
-        if (err != CHIP_NO_ERROR)
-        {
-            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
-            ChipLogProgress(
-                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                ChipLogValueX64(entry.node.Value()), err.Format());
-        }
     }
-    BindingTable::GetInstance().Add(bindingEntry);
 
-    BindingManager::GetInstance().NotifyBindingAdded(bindingEntry);
+    SaveBindingEntry(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -222,4 +211,22 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 void MatterBindingPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+}
+
+void SaveBindingEntry(EmberBindingTableEntry & entry)
+{
+    if (entry.type == EMBER_UNICAST_BINDING)
+    {
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogProgress(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.nodeId), err.Format());
+        }
+    }
+
+    BindingTable::GetInstance().Add(entry);
+    BindingManager::GetInstance().NotifyBindingAdded(entry);
 }
