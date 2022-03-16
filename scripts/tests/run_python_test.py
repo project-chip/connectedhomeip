@@ -106,7 +106,7 @@ def main(app: str, factoryreset: bool, app_params: str, script: str, script_args
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         DumpProgramOutputToQueue(
-            log_cooking_threads, "\33[34mAPP \33[0m", test_script_process, log_queue)
+            log_cooking_threads, "\33[34mAPP \33[0m", app_process, log_queue)
 
     script_command = ["/usr/bin/env", "python3", script,
                       '--log-format', '%(message)s'] + [v for v in script_args]

@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 from dataclasses import dataclass
 from inspect import Attribute
+import inspect
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -97,7 +99,10 @@ def test_case(func):
 
     def CheckEnableBeforeRun(*args, **kwargs):
         if TestIsEnabled(test_name=test_name):
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
+        elif inspect.iscoroutinefunction(func):
+            # noop, so users can use await as usual
+            return asyncio.sleep(0)
     return CheckEnableBeforeRun
 
 
