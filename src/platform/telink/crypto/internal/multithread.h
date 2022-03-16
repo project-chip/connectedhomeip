@@ -23,19 +23,16 @@
 #ifndef MBEDTLS_TEST_UTILS_H
 #define MBEDTLS_TEST_UTILS_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-void mbedtls_entropy_lock( void );
-void mbedtls_entropy_unlock( void );
-void mbedtls_ecp_lock( void );
-void mbedtls_ecp_unlock( void );
-void mbedtls_aes_lock( void );
-void mbedtls_aes_unlock( void );
-
+void mbedtls_entropy_lock(void);
+void mbedtls_entropy_unlock(void);
+void mbedtls_ecp_lock(void);
+void mbedtls_ecp_unlock(void);
+void mbedtls_aes_lock(void);
+void mbedtls_aes_unlock(void);
 
 #ifdef __cplusplus
 }

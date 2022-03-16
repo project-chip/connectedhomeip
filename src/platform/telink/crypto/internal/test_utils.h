@@ -25,15 +25,12 @@
 
 #include <stddef.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-void mbedtls_printbuf( const char *comment, const void *buf, size_t len );
-void mbedtls_printbuf_c( const char *comment, const void *buf, size_t len );
-
+void mbedtls_printbuf(const char * comment, const void * buf, size_t len);
+void mbedtls_printbuf_c(const char * comment, const void * buf, size_t len);
 
 #ifdef __cplusplus
 }

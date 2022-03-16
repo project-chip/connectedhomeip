@@ -32,8 +32,7 @@
 
 #if defined(MBEDTLS_TEST_HOOKS) && defined(MBEDTLS_ECP_C)
 
-#if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED) ||   \
-    defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED) ||   \
+#if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED) || defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED) ||                                      \
     defined(MBEDTLS_ECP_DP_SECP384R1_ENABLED)
 /* Preconditions:
  *   - bits is a multiple of 64 or is 224
@@ -44,7 +43,7 @@
  * Behavior:
  * Set N to c * 2^bits + old_value_of_N.
  */
-void mbedtls_ecp_fix_negative( mbedtls_mpi *N, signed char c, size_t bits );
+void mbedtls_ecp_fix_negative(mbedtls_mpi * N, signed char c, size_t bits);
 #endif
 
 #if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
@@ -69,10 +68,7 @@ void mbedtls_ecp_fix_negative( mbedtls_mpi *N, signed char c, size_t bits );
  * \return          \c 0 on success.
  * \return          \c MBEDTLS_ERR_ECP_xxx or MBEDTLS_ERR_MPI_xxx on failure.
  */
-int mbedtls_ecp_gen_privkey_mx( size_t n_bits,
-                                mbedtls_mpi *d,
-                                int (*f_rng)(void *, unsigned char *, size_t),
-                                void *p_rng );
+int mbedtls_ecp_gen_privkey_mx(size_t n_bits, mbedtls_mpi * d, int (*f_rng)(void *, unsigned char *, size_t), void * p_rng);
 
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
 

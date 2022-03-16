@@ -19,34 +19,33 @@
 
 #include "common.h"
 
-#if defined( MBEDTLS_ENTROPY_HARDWARE_ALT )
+#if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
 
-#include "trng.h"
 #include "multithread.h"
+#include "trng.h"
 #include <string.h>
 
-
-int mbedtls_hardware_poll( void *data, unsigned char *output, size_t len, size_t *olen )
+int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    ( void ) data;
+    (void) data;
 
-    if ( output != NULL && len != 0 && olen != NULL )
+    if (output != NULL && len != 0 && olen != NULL)
     {
         mbedtls_entropy_lock();
         *olen = 0;
         extern unsigned int g_rnd_m_w;
-        while ( len / sizeof( g_rnd_m_w ) != 0 )
+        while (len / sizeof(g_rnd_m_w) != 0)
         {
             trng_init();
-            *( ( unsigned int * )output ) = g_rnd_m_w;
-            output += sizeof( g_rnd_m_w );
-            len -= sizeof( g_rnd_m_w );
-            *olen += sizeof( g_rnd_m_w );
+            *((unsigned int *) output) = g_rnd_m_w;
+            output += sizeof(g_rnd_m_w);
+            len -= sizeof(g_rnd_m_w);
+            *olen += sizeof(g_rnd_m_w);
         }
-        if ( len != 0 )
+        if (len != 0)
         {
             trng_init();
-            memcpy( output, &g_rnd_m_w, len );
+            memcpy(output, &g_rnd_m_w, len);
             *olen += len;
         }
         mbedtls_entropy_unlock();

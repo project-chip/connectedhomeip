@@ -21,31 +21,30 @@
 #include "common.h"
 #include "mbedtls/platform.h"
 
-
-void mbedtls_printbuf( const char *comment, const void *buf, size_t len )
+void mbedtls_printbuf(const char * comment, const void * buf, size_t len)
 {
-    mbedtls_printf( "%s [%u]:", comment, ( unsigned int )len );
-    for ( size_t i = 0; i < len; i++ )
+    mbedtls_printf("%s [%u]:", comment, (unsigned int) len);
+    for (size_t i = 0; i < len; i++)
     {
-        mbedtls_printf( " %02x", ( ( unsigned char * )buf )[i] );
+        mbedtls_printf(" %02x", ((unsigned char *) buf)[i]);
     }
-    mbedtls_printf( "\n" );
+    mbedtls_printf("\n");
 }
 
-void mbedtls_printbuf_c( const char *comment, const void *buf, size_t len )
+void mbedtls_printbuf_c(const char * comment, const void * buf, size_t len)
 {
 
-    mbedtls_printf( "%s [%u]: ", comment, ( unsigned int )len );
-    for ( size_t i = 0; len && i < len - 1; i++ )
+    mbedtls_printf("%s [%u]: ", comment, (unsigned int) len);
+    for (size_t i = 0; len && i < len - 1; i++)
     {
-        mbedtls_printf( "0x%02x, ", ( ( unsigned char * )buf )[i] );
+        mbedtls_printf("0x%02x, ", ((unsigned char *) buf)[i]);
     }
-    if ( len )
+    if (len)
     {
-        mbedtls_printf( "0x%02x\n", ( ( unsigned char* )buf )[len - 1] );
+        mbedtls_printf("0x%02x\n", ((unsigned char *) buf)[len - 1]);
     }
     else
     {
-        mbedtls_printf( "\n" );
+        mbedtls_printf("\n");
     }
 }

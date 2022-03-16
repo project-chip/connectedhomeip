@@ -20,7 +20,6 @@
 #include "multithread.h"
 #include "common.h"
 
-
 /****************************************************************
  * If RTOS is used and cryptography stuffs are used
  * from more than one thread implement exclusive access
@@ -28,26 +27,14 @@
  * See documentation for your RTOS.
  ****************************************************************/
 
-void mbedtls_entropy_lock( void )
-{
-}
+void mbedtls_entropy_lock(void) {}
 
-void mbedtls_entropy_unlock( void )
-{
-}
+void mbedtls_entropy_unlock(void) {}
 
-void mbedtls_ecp_lock( void )
-{
-}
+void mbedtls_ecp_lock(void) {}
 
-void mbedtls_ecp_unlock( void )
-{
-}
+void mbedtls_ecp_unlock(void) {}
 
-void mbedtls_aes_lock( void )
-{
-}
+void mbedtls_aes_lock(void) {}
 
-void mbedtls_aes_unlock( void )
-{
-}
+void mbedtls_aes_unlock(void) {}
