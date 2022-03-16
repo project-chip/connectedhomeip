@@ -273,10 +273,8 @@ struct DiscoveryFilter
         {
             return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
         }
-        else
-        {
-            return code == other.code;
-        }
+
+        return code == other.code;
     }
 };
 enum class DiscoveryType

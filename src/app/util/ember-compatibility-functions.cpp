@@ -482,10 +482,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
-            }
+
+            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
         }
     }
 
@@ -969,10 +967,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
         return false;
     }
-    else
-    {
-        return (*(version)) == aRequiredVersion;
-    }
+
+    return (*(version)) == aRequiredVersion;
 }
 
 } // namespace app

@@ -219,7 +219,7 @@ CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * token
             // Duplicate registration is an error.
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else if ((w.mFD == kInvalidFd) && (watch == nullptr))
+        if ((w.mFD == kInvalidFd) && (watch == nullptr))
         {
             watch = &w;
         }

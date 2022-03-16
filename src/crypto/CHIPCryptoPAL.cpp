@@ -67,11 +67,9 @@ CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
         // We only support lengths of 0..255 over 2 bytes
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else
-    {
-        // Next byte has length 0..255.
-        return reader.Read8(&length).StatusCode();
-    }
+
+    // Next byte has length 0..255.
+    return reader.Read8(&length).StatusCode();
 }
 
 /**
