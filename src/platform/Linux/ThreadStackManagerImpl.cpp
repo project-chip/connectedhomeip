@@ -426,7 +426,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
         std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)

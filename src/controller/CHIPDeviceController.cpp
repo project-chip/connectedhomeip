@@ -1112,9 +1112,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
             commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED, report);
             return;
         }
-        else
-        {
-            ChipLogError(Controller,
+        
+                    ChipLogError(Controller,
                          "Failed in verifying 'Attestation Information' command received from the device: err %hu. Look at "
                          "AttestationVerificationResult enum to understand the errors",
                          static_cast<uint16_t>(result));
@@ -1122,7 +1121,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
             // understand the errors.
             commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
             return;
-        }
+       
     }
 
     ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");

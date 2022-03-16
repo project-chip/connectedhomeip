@@ -399,7 +399,7 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         // Does not go on the wire.
         return CHIP_NO_ERROR;
     }
-    else if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kSystemTimestamp))) && !(ctx->mpContext->mFirst))
+    if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kSystemTimestamp))) && !(ctx->mpContext->mFirst))
     {
         return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
@@ -501,12 +501,11 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
         {
             break;
         }
-        else
-        {
-            buffer = buffer->GetNextCircularEventBuffer();
+        
+                    buffer = buffer->GetNextCircularEventBuffer();
             assert(buffer != nullptr);
             // code guarantees that every PriorityLevel has a buffer destination.
-        }
+       
     }
 
     mBytesWritten += writer.GetLengthWritten();

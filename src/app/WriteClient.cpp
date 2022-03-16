@@ -322,10 +322,9 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
-    else // We are writing a non-list attribute, or we are writing a single element of a list.
-    {
-        return PutSinglePreencodedAttributeWritePayload(attributePath, data);
-    }
+    // We are writing a non-list attribute, or we are writing a single element of a list.
+            return PutSinglePreencodedAttributeWritePayload(attributePath, data);
+   
 }
 
 const char * WriteClient::GetStateStr() const

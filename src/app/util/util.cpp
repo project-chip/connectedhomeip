@@ -316,10 +316,9 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
     {
         return emberAfCurrentCommand()->mfgCode;
     }
-    else
-    {
-        return EMBER_AF_NULL_MANUFACTURER_CODE;
-    }
+    
+            return EMBER_AF_NULL_MANUFACTURER_CODE;
+   
 }
 
 uint8_t emberAfNextSequence(void)
@@ -365,7 +364,7 @@ void emAfApplyRetryOverride(EmberApsOption * options)
     {
         return;
     }
-    else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
+    if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
     {
         *options |= EMBER_APS_OPTION_RETRY;
     }
@@ -399,7 +398,7 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     {
         return;
     }
-    else if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
+    if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
     {
         emAfDisableDefaultResponse = emAfSavedDisableDefaultResponseVale;
         *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
@@ -551,7 +550,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             {
                 return 1;
             }
-            else if (accum1 < accum2)
+            if (accum1 < accum2)
             {
                 return -1;
             }
@@ -576,7 +575,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             {
                 return 1;
             }
-            else if (k > j)
+            if (k > j)
             {
                 return -1;
             }

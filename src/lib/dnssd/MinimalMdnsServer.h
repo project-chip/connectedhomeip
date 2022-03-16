@@ -84,10 +84,9 @@ public:
         {
             return *Instance().mReplacementServer;
         }
-        else
-        {
-            return Instance().mServer;
-        }
+        
+                    return Instance().mServer;
+       
     }
 
     /// Calls Server().Listen() on all available interfaces

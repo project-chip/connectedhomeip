@@ -134,10 +134,9 @@ public:
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return mStatus;
-            }
+            
+                            return mStatus;
+           
         }
 
     private:
@@ -194,10 +193,9 @@ public:
             *size = 0;
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            return mReader.CountRemainingInContainer(size);
-        }
+        
+                    return mReader.CountRemainingInContainer(size);
+       
     }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader)

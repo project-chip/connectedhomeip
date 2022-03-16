@@ -320,11 +320,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
         return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
     }
-    else
-    {
-        ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
+    
+            ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
         return CHIP_ERROR_INCORRECT_STATE;
-    }
+   
 }
 
 void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)

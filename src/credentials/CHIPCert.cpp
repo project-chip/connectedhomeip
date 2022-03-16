@@ -526,10 +526,9 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
     {
         return mChipVal == other.mChipVal;
     }
-    else
-    {
-        return mString.data_equal(other.mString);
-    }
+    
+            return mString.data_equal(other.mString);
+   
 }
 
 ChipDN::ChipDN() {}

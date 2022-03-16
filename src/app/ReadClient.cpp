@@ -904,12 +904,11 @@ bool ReadClient::ResubscribeIfNeeded()
         ChipLogProgress(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    else
-    {
-        ChipLogProgress(DataManagement,
+    
+            ChipLogProgress(DataManagement,
                         "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
                         mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
-    }
+   
     return true;
 }
 

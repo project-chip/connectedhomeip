@@ -115,7 +115,7 @@ bool PICSBooleanExpressionParser::EvaluateExpression(std::vector<std::string> & 
         bool rightExpr = EvaluateExpression(tokens, PICS, index);
         return leftExpr && rightExpr;
     }
-    else if (token == "||")
+    if (token == "||")
     {
         index++;
         bool rightExpr = EvaluateExpression(tokens, PICS, index);
@@ -145,7 +145,7 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         index++;
         return expr;
     }
-    else if (token == "!")
+    if (token == "!")
     {
         index++;
         bool expr = EvaluateSubExpression(tokens, PICS, index);
