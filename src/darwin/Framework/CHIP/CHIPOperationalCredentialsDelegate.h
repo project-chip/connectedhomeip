@@ -67,7 +67,7 @@ private:
     bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
-    uint32_t mIssuerId = 1234;
+    uint64_t mIssuerId = 1234;
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";
