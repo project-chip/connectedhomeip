@@ -79,6 +79,8 @@ public:
     static const char * OTADefaultProviders() { return "o/dp"; }
     static const char * OTACurrentProvider() { return "o/cp"; }
     static const char * OTAUpdateToken() { return "o/ut"; }
+    static const char * OTACurrentUpdateState() { return "o/us"; }
+    static const char * OTATargetVersion() { return "o/tv"; }
 
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
