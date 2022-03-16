@@ -65,7 +65,9 @@ public:
     CHIP_ERROR SetDeviceName(const char * deviceName);
     uint16_t NumConnections();
     void OnPlatformEvent(const ChipDeviceEvent * event);
+#if CONFIG_NETWORK_LAYER_BLE
     chip::Ble::BleLayer * GetBleLayer();
+#endif
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -119,7 +121,9 @@ inline CHIP_ERROR BLEManager::Init()
 
 inline CHIP_ERROR BLEManager::Shutdown()
 {
+#if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(GetBleLayer()->Shutdown());
+#endif
     return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
@@ -173,11 +177,12 @@ inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
     return static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
 }
 
+#if CONFIG_NETWORK_LAYER_BLE
 inline chip::Ble::BleLayer * BLEManager::GetBleLayer()
 {
     return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
-
+#endif
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

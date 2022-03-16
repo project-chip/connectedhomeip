@@ -52,7 +52,9 @@ class GenericConnectivityManagerImpl_NoBLE
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
+#if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * _GetBleLayer(void);
+#endif
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
@@ -68,11 +70,13 @@ private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
+#if CONFIG_NETWORK_LAYER_BLE
 template <class ImplClass>
 inline Ble::BleLayer * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBleLayer(void)
 {
     return nullptr;
 }
+#endif
 
 template <class ImplClass>
 inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetCHIPoBLEServiceMode(void)

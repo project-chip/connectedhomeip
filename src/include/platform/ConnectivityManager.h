@@ -35,10 +35,12 @@
 
 namespace chip {
 
+#if CONFIG_NETWORK_LAYER_BLE
 namespace Ble {
 class BleLayer;
 class BLEEndPoint;
 } // namespace Ble
+#endif
 
 namespace DeviceLayer {
 
@@ -216,7 +218,9 @@ public:
 #endif
 
     // CHIPoBLE service methods
+#if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * GetBleLayer();
+#endif
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled();
@@ -497,10 +501,12 @@ inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTl
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
+#if CONFIG_NETWORK_LAYER_BLE
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
     return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
+#endif
 
 inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode()
 {

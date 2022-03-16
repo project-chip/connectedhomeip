@@ -21,8 +21,9 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if !CHIP_DEVICE_LAYER_NONE
-
+#if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
+#endif // CONFIG_NETWORK_LAYER_BLE
 #include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>
