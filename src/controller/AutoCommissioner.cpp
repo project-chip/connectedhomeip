@@ -103,13 +103,13 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
-    auto nextStage = _GetNextCommissioningStage(currentStage, lastErr);
+    auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);
     ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' --> '%s'", StageToString(currentStage),
                     lastErr.AsString(), StageToString(nextStage));
     return nextStage;
 }
 
-CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
+CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     if (lastErr != CHIP_NO_ERROR)
     {
