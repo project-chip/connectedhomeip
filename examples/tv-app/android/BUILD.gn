@@ -55,6 +55,7 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/ApplicationInit.cpp",
   ]
 
   deps = [

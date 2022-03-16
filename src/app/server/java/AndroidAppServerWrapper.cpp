@@ -51,10 +51,7 @@ CHIP_ERROR ChipAndroidAppInit(void)
     err = chip::Server::GetInstance().Init(nullptr, CHIP_PORT, CHIP_UDC_PORT);
     SuccessOrExit(err);
 
-    if (!IsDeviceAttestationCredentialsProviderSet())
-    {
-        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    }
+    ApplicationInit();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -69,4 +66,9 @@ void ChipAndroidAppShutdown(void)
 {
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
+}
+
+// this is only for compile, the real impl of this function is in the example project.
+void __attribute__((weak)) ApplicationInit()
+{
 }
