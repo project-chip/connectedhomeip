@@ -784,7 +784,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     return CHIP_NO_ERROR;
 }
 
-Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
+Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p) const
 {
     uint16_t vendorId;
     uint16_t profileNum;
