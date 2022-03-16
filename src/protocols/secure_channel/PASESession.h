@@ -73,7 +73,7 @@ public:
     PASESession(PASESession &&)      = default;
     PASESession(const PASESession &) = delete;
 
-    virtual ~PASESession();
+    ~PASESession() override;
 
     // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
     // should not need to be told their peer node ID

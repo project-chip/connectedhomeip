@@ -113,7 +113,7 @@ public:
         mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder());
         mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder());
     }
-    ~AdvertiserMinMdns() {}
+    ~AdvertiserMinMdns() override {}
 
     // Service advertiser
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;

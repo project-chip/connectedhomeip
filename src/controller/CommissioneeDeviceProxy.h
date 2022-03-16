@@ -79,7 +79,7 @@ struct ControllerDeviceInitParams
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
 {
 public:
-    ~CommissioneeDeviceProxy();
+    ~CommissioneeDeviceProxy() override;
     CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 

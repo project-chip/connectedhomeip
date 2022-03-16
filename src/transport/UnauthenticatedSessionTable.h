@@ -56,7 +56,7 @@ public:
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
-    ~UnauthenticatedSession() { NotifySessionReleased(); }
+    ~UnauthenticatedSession() override { NotifySessionReleased(); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;

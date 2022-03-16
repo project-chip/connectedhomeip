@@ -234,7 +234,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~WriteClient() { Abort(); }
+    ~WriteClient() override { Abort(); }
 
 private:
     friend class TestWriteInteraction;
