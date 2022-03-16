@@ -138,9 +138,9 @@ To add a group
 
 To add a keyset
 
-    $ chip-tool groupsettings add-keyset 0xAAAA 0 000000000021dfe0d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+    $ chip-tool groupsettings add-keyset 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
 
-Take note that the epoch key must be in hex form without the '0x' prefix
+Take note that the epoch key must be in hex form with the 'hex:' prefix
 
 Finally to bind the keyset to the group
 

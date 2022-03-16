@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,8 @@
 
 #include "../common/CHIPCommand.h"
 #include "../common/Command.h"
+
+#include <lib/support/Span.h>
 
 class ShowControllerGroups : public CHIPCommand
 {
@@ -91,24 +93,22 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
         if (strlen(groupName) > CHIP_CONFIG_MAX_GROUP_NAME_LENGTH || groupId == chip::kUndefinedGroupId)
         {
-            err = CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            chip::FabricIndex fabricIndex;
-            CurrentCommissioner().GetFabricIndex(&fabricIndex);
-            chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-            chip::Credentials::GroupDataProvider::GroupInfo group;
 
-            group.SetName(groupName);
-            group.group_id = groupId;
-            err            = groupDataProvider->SetGroupInfo(fabricIndex, group);
-        }
-        SetCommandExitStatus(err);
-        return err;
+        chip::FabricIndex fabricIndex;
+        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+        chip::Credentials::GroupDataProvider::GroupInfo group;
+
+        group.SetName(groupName);
+        group.group_id = groupId;
+        ReturnErrorOnFailure(groupDataProvider->SetGroupInfo(fabricIndex, group));
+
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -127,19 +127,18 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
         if (groupId == chip::kUndefinedGroupId)
         {
             ChipLogError(chipTool, "Invalid group Id : 0x%x", groupId);
-            err = CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         chip::FabricIndex fabricIndex;
         CurrentCommissioner().GetFabricIndex(&fabricIndex);
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-        err                                                      = groupDataProvider->RemoveGroupInfo(fabricIndex, groupId);
-        SetCommandExitStatus(err);
-        return err;
+        ReturnErrorOnFailure(groupDataProvider->RemoveGroupInfo(fabricIndex, groupId));
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -161,7 +160,7 @@ public:
 
         fprintf(stderr, "\n");
         fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-        fprintf(stderr, "  | Available KeySet :                                                                  |\n");
+        fprintf(stderr, "  | Available KeySets :                                                                 |\n");
         fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
         fprintf(stderr, "  | KeySet Id   |   Key Policy                                                          |\n");
 
@@ -194,7 +193,6 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err       = CHIP_NO_ERROR;
         size_t current_count = 0;
         chip::FabricIndex fabricIndex;
         CurrentCommissioner().GetFabricIndex(&fabricIndex);
@@ -204,11 +202,11 @@ public:
         current_count = iter->Count();
         iter->Release();
 
-        err = groupDataProvider->SetGroupKeyAt(fabricIndex, current_count,
-                                               chip::Credentials::GroupDataProvider::GroupKey(groupId, keysetId));
+        ReturnErrorOnFailure(groupDataProvider->SetGroupKeyAt(fabricIndex, current_count,
+                                                              chip::Credentials::GroupDataProvider::GroupKey(groupId, keysetId)));
 
-        SetCommandExitStatus(err);
-        return err;
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -228,8 +226,7 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        size_t index   = 0;
+        size_t index = 0;
         chip::FabricIndex fabricIndex;
         CurrentCommissioner().GetFabricIndex(&fabricIndex);
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
@@ -247,15 +244,13 @@ public:
         iter->Release();
         if (index >= maxCount)
         {
-            err = CHIP_ERROR_INTERNAL;
-        }
-        else
-        {
-            err = groupDataProvider->RemoveGroupKeyAt(fabricIndex, index);
+            return CHIP_ERROR_INTERNAL;
         }
 
-        SetCommandExitStatus(err);
-        return err;
+        ReturnErrorOnFailure(groupDataProvider->RemoveGroupKeyAt(fabricIndex, index));
+
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -266,54 +261,47 @@ private:
 class AddKeySet : public CHIPCommand
 {
 public:
-    AddKeySet(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("add-keyset", credsIssuerConfig)
+    AddKeySet(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("add-keysets", credsIssuerConfig)
     {
         AddArgument("keysetId", 0, UINT16_MAX, &keysetId);
         AddArgument("keyPolicy", 0, UINT16_MAX, &keyPolicy);
+        AddArgument("validityTime", 0, UINT64_MAX, &validityTime);
         AddArgument("EpochKey", &epochKey);
     }
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(5); }
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
         chip::FabricIndex fabricIndex;
         CurrentCommissioner().GetFabricIndex(&fabricIndex);
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
         ReturnLogErrorOnFailure(CurrentCommissioner().GetFabricInfo()->GetCompressedId(compressed_fabric_id_span));
-        static const uint8_t epochKeySize = static_cast<uint8_t>(sizeof(chip::Credentials::GroupDataProvider::EpochKey));
+        // static const uint8_t epochKeySize = static_cast<uint8_t>(sizeof(chip::Credentials::GroupDataProvider::EpochKey));
 
         if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
              keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
-            (epochKey.size() / 2) != epochKeySize)
+            (epochKey.size()) != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
         {
-            err = CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        else
-        {
-            chip::Credentials::GroupDataProvider::KeySet keySet(keysetId, keyPolicy, 1);
-            std::string str = std::string(epochKey.begin(), epochKey.end());
-            chip::Credentials::GroupDataProvider::EpochKey epoch_keys;
-            epoch_keys.start_time = static_cast<uint64_t>(std::stoi(str.substr(0, 16).c_str(), 0, 16));
-
-            for (uint32_t i = 16; i < ((epochKeySize * 2)); i += 2)
-            {
-                epoch_keys.key[(i - 16) / 2] = static_cast<uint8_t>(std::stoi(str.substr(i, 2).c_str(), 0, 16));
-            }
-
-            memcpy(keySet.epoch_keys, &epoch_keys, sizeof(chip::Credentials::GroupDataProvider::EpochKey));
-            err = groupDataProvider->SetKeySet(fabricIndex, compressed_fabric_id_span, keySet);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        SetCommandExitStatus(err);
-        return err;
+        chip::Credentials::GroupDataProvider::KeySet keySet(keysetId, keyPolicy, 1);
+        chip::Credentials::GroupDataProvider::EpochKey epoch_keys;
+        epoch_keys.start_time = validityTime;
+
+        memcpy(keySet.epoch_keys, epochKey.data(), sizeof(chip::Credentials::GroupDataProvider::EpochKey));
+        ReturnErrorOnFailure(groupDataProvider->SetKeySet(fabricIndex, compressed_fabric_id_span, keySet));
+
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
     chip::KeysetId keysetId;
     chip::Credentials::GroupDataProvider::SecurityPolicy keyPolicy;
+    uint64_t validityTime;
     chip::ByteSpan epochKey;
 };
 
@@ -353,12 +341,12 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            // Remove keyset
-            err = groupDataProvider->RemoveKeySet(fabricIndex, keysetId);
+            return err;
         }
+        ReturnErrorOnFailure(groupDataProvider->RemoveKeySet(fabricIndex, keysetId));
 
-        SetCommandExitStatus(err);
-        return err;
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
 private:
