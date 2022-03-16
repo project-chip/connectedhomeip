@@ -20,7 +20,8 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
         'pull_request' && github.event.number) || (github.event_name ==
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
@@ -44,12 +45,13 @@ jobs:
 
         container:
             image: connectedhomeip/chip-build:0.5.56
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v2
               with:
                   action: actions/checkout@v3
                   with: |
@@ -70,7 +72,8 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -81,7 +84,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT}-test-group \
-                        --target linux-x64-door-lock-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -95,7 +97,6 @@ jobs:
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}-test-group/chip-all-clusters-app \
-                     --door-lock-app ./out/linux-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Build and run OTA example
