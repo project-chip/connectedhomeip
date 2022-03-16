@@ -21,7 +21,7 @@
 
 /**
  * @brief Saves binding in storage and notifies a new binding has been added
- * 
+ *
  * @param entry binding to save
  */
 void SaveBindingEntry(EmberBindingTableEntry & entry);
