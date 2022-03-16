@@ -104,7 +104,7 @@ public:
 
     // Nonce value sent to the node to use during the attestation request.
     // When using the AutoCommissioner, this value will fall back to random if not supplied.
-    // This value must be set before calling PerformCommissioningStep for the kSendAttestationRequest step.
+    // If a non-random value is to be used, the value must be set before calling PerformCommissioningStep for the kSendAttestationRequest step.
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
 
     // WiFi SSID and credentials to use when adding/updating and enabling WiFi on the node.
