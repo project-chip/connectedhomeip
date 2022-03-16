@@ -25,6 +25,7 @@ const queryEvents  = require(zapPath + 'db/query-event.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
 const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
+const accessHelper = require(zapPath + 'generator/helper-access.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');

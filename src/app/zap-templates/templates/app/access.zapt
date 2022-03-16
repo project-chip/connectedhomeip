@@ -1,0 +1,425 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
+#define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
+#define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
+#define GENERATED_ACCESS_PRIVILEGE__ADMINISTER (3)
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    GENERATED_ACCESS_PRIVILEGE__OPERATE, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
+    {{/first}}
+    {{#zcl_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_attributes}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
+    {{/first}}
+    {{#zcl_commands_source_client}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_commands_source_client}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
+    {{/first}}
+    {{#zcl_commands_source_client}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_commands_source_client}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
+    {{/first}}
+    {{#zcl_commands_source_client}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_commands_source_client}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_EVENT__EVENT { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+    {{#first}}
+// clang-format off
+#define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    GENERATED_ACCESS_PRIVILEGE__OPERATE, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+// clang-format on
+    {{/last}}
+{{/all_user_clusters}}
