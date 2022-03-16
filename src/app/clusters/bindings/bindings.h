@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <app/util/binding-table.h>
 #include <app/clusters/bindings/BindingManager.h>
+#include <app/util/binding-table.h>
 
 /**
  * @brief Saves binding in storage and notifies a new binding has been added
