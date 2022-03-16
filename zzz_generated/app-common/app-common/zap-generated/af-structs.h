@@ -44,7 +44,6 @@ typedef struct _SimpleStruct
 // Struct for TestFabricScoped
 typedef struct _TestFabricScoped
 {
-    chip::FabricIndex fabricIndex;
     uint8_t fabricSensitiveInt8u;
     uint8_t optionalFabricSensitiveInt8u;
     uint8_t nullableFabricSensitiveInt8u;
@@ -52,6 +51,7 @@ typedef struct _TestFabricScoped
     chip::CharSpan fabricSensitiveCharString;
     SimpleStruct fabricSensitiveStruct;
     /* TYPE WARNING: array array defaults to */ uint8_t * fabricSensitiveInt8uList;
+    chip::FabricIndex fabricIndex;
 } TestFabricScoped;
 
 // Struct for Dimension

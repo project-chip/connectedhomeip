@@ -448,7 +448,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTestClusterClusterTestFabricScoped : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricSensitiveInt8u;
 @property (strong, nonatomic) NSNumber * _Nullable optionalFabricSensitiveInt8u;
 @property (strong, nonatomic) NSNumber * _Nullable nullableFabricSensitiveInt8u;
@@ -456,6 +455,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull fabricSensitiveCharString;
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
 @property (strong, nonatomic) NSArray * _Nonnull fabricSensitiveInt8uList;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 

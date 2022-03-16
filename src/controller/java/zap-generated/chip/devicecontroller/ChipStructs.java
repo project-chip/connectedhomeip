@@ -1518,7 +1518,6 @@ public class ChipStructs {
   }
 
   public static class TestClusterClusterTestFabricScoped {
-    public Integer fabricIndex;
     public Integer fabricSensitiveInt8u;
     public Optional<Integer> optionalFabricSensitiveInt8u;
     public @Nullable Integer nullableFabricSensitiveInt8u;
@@ -1526,17 +1525,17 @@ public class ChipStructs {
     public String fabricSensitiveCharString;
     public ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct;
     public ArrayList<Object> fabricSensitiveInt8uList;
+    public Integer fabricIndex;
 
     public TestClusterClusterTestFabricScoped(
-        Integer fabricIndex,
         Integer fabricSensitiveInt8u,
         Optional<Integer> optionalFabricSensitiveInt8u,
         @Nullable Integer nullableFabricSensitiveInt8u,
         @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u,
         String fabricSensitiveCharString,
         ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct,
-        ArrayList<Object> fabricSensitiveInt8uList) {
-      this.fabricIndex = fabricIndex;
+        ArrayList<Object> fabricSensitiveInt8uList,
+        Integer fabricIndex) {
       this.fabricSensitiveInt8u = fabricSensitiveInt8u;
       this.optionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u;
       this.nullableFabricSensitiveInt8u = nullableFabricSensitiveInt8u;
@@ -1544,15 +1543,13 @@ public class ChipStructs {
       this.fabricSensitiveCharString = fabricSensitiveCharString;
       this.fabricSensitiveStruct = fabricSensitiveStruct;
       this.fabricSensitiveInt8uList = fabricSensitiveInt8uList;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("TestClusterClusterTestFabricScoped {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tfabricSensitiveInt8u: ");
       output.append(fabricSensitiveInt8u);
       output.append("\n");
@@ -1573,6 +1570,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tfabricSensitiveInt8uList: ");
       output.append(fabricSensitiveInt8uList);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

@@ -18128,12 +18128,6 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_fabricIndex;
-        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
         jobject newElement_0_fabricSensitiveInt8u;
         std::string newElement_0_fabricSensitiveInt8uClassName     = "java/lang/Integer";
         std::string newElement_0_fabricSensitiveInt8uCtorSignature = "(I)V";
@@ -18283,6 +18277,12 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
                 newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
             chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
         }
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
 
         jclass testFabricScopedStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18294,19 +18294,19 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
         }
         jmethodID testFabricScopedStructCtor = env->GetMethodID(
             testFabricScopedStructClass, "<init>",
-            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/"
-            "String;Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;)V");
+            "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/String;Lchip/"
+            "devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
         if (testFabricScopedStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestFabricScoped constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(testFabricScopedStructClass, testFabricScopedStructCtor, newElement_0_fabricIndex,
-                                      newElement_0_fabricSensitiveInt8u, newElement_0_optionalFabricSensitiveInt8u,
-                                      newElement_0_nullableFabricSensitiveInt8u, newElement_0_nullableOptionalFabricSensitiveInt8u,
-                                      newElement_0_fabricSensitiveCharString, newElement_0_fabricSensitiveStruct,
-                                      newElement_0_fabricSensitiveInt8uList);
+        newElement_0 =
+            env->NewObject(testFabricScopedStructClass, testFabricScopedStructCtor, newElement_0_fabricSensitiveInt8u,
+                           newElement_0_optionalFabricSensitiveInt8u, newElement_0_nullableFabricSensitiveInt8u,
+                           newElement_0_nullableOptionalFabricSensitiveInt8u, newElement_0_fabricSensitiveCharString,
+                           newElement_0_fabricSensitiveStruct, newElement_0_fabricSensitiveInt8uList, newElement_0_fabricIndex);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

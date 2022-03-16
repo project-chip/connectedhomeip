@@ -5904,18 +5904,18 @@ class AccessControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
                             ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]),
+                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=254, Type=uint),
                     ])
 
-            adminFabricIndex: 'uint' = 0
             adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
             adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
             latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]' = NullValue
+            adminFabricIndex: 'uint' = 0
 
         @dataclass
         class AccessControlExtensionChanged(ClusterEvent):
@@ -5931,18 +5931,18 @@ class AccessControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
                             ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]),
+                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=254, Type=uint),
                     ])
 
-            adminFabricIndex: 'uint' = 0
             adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
             adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
             latestValue: 'typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]' = NullValue
+            adminFabricIndex: 'uint' = 0
 
 
 @dataclass
@@ -34244,7 +34244,6 @@ class TestCluster(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="fabricSensitiveInt8u", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionalFabricSensitiveInt8u", Tag=2, Type=typing.Optional[uint]),
                             ClusterObjectFieldDescriptor(Label="nullableFabricSensitiveInt8u", Tag=3, Type=typing.Union[Nullable, uint]),
@@ -34252,9 +34251,9 @@ class TestCluster(Cluster):
                             ClusterObjectFieldDescriptor(Label="fabricSensitiveCharString", Tag=5, Type=str),
                             ClusterObjectFieldDescriptor(Label="fabricSensitiveStruct", Tag=6, Type=TestCluster.Structs.SimpleStruct),
                             ClusterObjectFieldDescriptor(Label="fabricSensitiveInt8uList", Tag=7, Type=typing.List[uint]),
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            fabricIndex: 'uint' = 0
             fabricSensitiveInt8u: 'uint' = 0
             optionalFabricSensitiveInt8u: 'typing.Optional[uint]' = None
             nullableFabricSensitiveInt8u: 'typing.Union[Nullable, uint]' = NullValue
@@ -34262,6 +34261,7 @@ class TestCluster(Cluster):
             fabricSensitiveCharString: 'str' = ""
             fabricSensitiveStruct: 'TestCluster.Structs.SimpleStruct' = field(default_factory=lambda: TestCluster.Structs.SimpleStruct())
             fabricSensitiveInt8uList: 'typing.List[uint]' = field(default_factory=lambda: [])
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class NullablesAndOptionalsStruct(ClusterObject):
@@ -36404,7 +36404,7 @@ class TestCluster(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="arg1", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="arg1", Tag=254, Type=uint),
                     ])
 
             arg1: 'uint' = 0

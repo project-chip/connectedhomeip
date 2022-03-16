@@ -925,8 +925,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _fabricSensitiveInt8u = @(0);
 
         _optionalFabricSensitiveInt8u = nil;
@@ -940,6 +938,8 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
 
         _fabricSensitiveInt8uList = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }

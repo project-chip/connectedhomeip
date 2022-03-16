@@ -4769,12 +4769,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4790,9 +4790,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
-            break;
         case to_underlying(Fields::kAdminNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
@@ -4804,6 +4801,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         default:
             break;
@@ -4820,12 +4820,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4841,9 +4841,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
-            break;
         case to_underlying(Fields::kAdminNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
@@ -4855,6 +4852,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         default:
             break;
@@ -22715,10 +22715,6 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
     bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    if (accessingFabricIndex.HasValue())
-    {
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
-    }
     if (includeSensitive)
     {
         ReturnErrorOnFailure(
@@ -22755,6 +22751,10 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
         ReturnErrorOnFailure(
             DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricSensitiveInt8uList)), fabricSensitiveInt8uList));
     }
+    if (accessingFabricIndex.HasValue())
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    }
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -22771,9 +22771,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kFabricSensitiveInt8u):
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8u));
             break;
@@ -22794,6 +22791,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kFabricSensitiveInt8uList):
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8uList));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;

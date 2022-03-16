@@ -9024,7 +9024,6 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(voi
             auto & entry_0 = iter_0.GetValue();
             CHIPTestClusterClusterTestFabricScoped * newElement_0;
             newElement_0 = [CHIPTestClusterClusterTestFabricScoped new];
-            newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
             if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
                 newElement_0.optionalFabricSensitiveInt8u =
@@ -9080,6 +9079,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(voi
                 }
                 newElement_0.fabricSensitiveInt8uList = array_2;
             }
+            newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();

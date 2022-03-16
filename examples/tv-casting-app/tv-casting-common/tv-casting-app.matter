@@ -47,19 +47,19 @@ server cluster AccessControl = 31 {
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -2600,7 +2600,7 @@ server cluster TestCluster = 1295 {
   }
 
   info event TestFabricScopedEvent = 2 {
-    fabric_idx arg1 = 1;
+    fabric_idx arg1 = 254;
   }
 
   attribute boolean boolean = 0;
