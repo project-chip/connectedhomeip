@@ -121,10 +121,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     SuccessOrExit(err);
 
-    // TODO Initialize the Software Update Manager object.
-
-    _ScheduleWork(HandleDeviceRebooted, 0);
-
 exit:
     return err;
 }
@@ -192,6 +188,40 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
         {
             eventHandlerIndirectPtr = &eventHandler->Next;
         }
+    }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
+{
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (platformManagerDelegate != nullptr)
+    {
+        uint32_t softwareVersion;
+
+        if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
+            platformManagerDelegate->OnStartUp(softwareVersion);
+    }
+
+    if (generalDiagnosticsDelegate != nullptr)
+    {
+        uint8_t bootReason;
+
+        if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+            generalDiagnosticsDelegate->OnDeviceRebooted(static_cast<BootReasonType>(bootReason));
+    }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
+{
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
+
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
     }
 }
 
@@ -287,30 +317,6 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
-    }
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
-{
-    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate != nullptr)
-    {
-        uint8_t bootReason;
-
-        if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
-            generalDiagnosticsDelegate->OnDeviceRebooted(static_cast<BootReasonType>(bootReason));
-    }
-
-    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
-    if (platformManagerDelegate != nullptr)
-    {
-        uint32_t softwareVersion;
-
-        if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
-            platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 

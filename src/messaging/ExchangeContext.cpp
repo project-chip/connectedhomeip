@@ -87,6 +87,14 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
 void ExchangeContext::UpdateSEDPollingMode()
 {
+    if (!HasSessionHandle())
+    {
+        // After the session has been deleted, no further communication can occur on the exchange,
+        // so withdraw a SED fast-polling mode request.
+        UpdateSEDPollingMode(false);
+        return;
+    }
+
     Transport::PeerAddress address;
 
     switch (GetSessionHandle()->GetSessionType())

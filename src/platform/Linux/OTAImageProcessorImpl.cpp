@@ -25,7 +25,7 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile.empty())
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -49,7 +49,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile.empty())
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -97,8 +97,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mOfs.open(imageProcessor->mParams.imageFile.data(),
-                              std::ofstream::out | std::ofstream::ate | std::ofstream::app);
+    imageProcessor->mOfs.open(imageProcessor->mImageFile.data(), std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
@@ -121,7 +120,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile.data());
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -135,8 +134,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        // TODO: Use software version from Configuration Manager
-        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
+        // TODO: Implement restarting into new image instead of changing the version
+        DeviceLayer::ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
+        requestor->NotifyUpdateApplied();
     }
 }
 
@@ -149,7 +149,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     imageProcessor->mOfs.close();
-    remove(imageProcessor->mParams.imageFile.data());
+    remove(imageProcessor->mImageFile.data());
     imageProcessor->ReleaseBlock();
 }
 

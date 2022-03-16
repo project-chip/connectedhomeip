@@ -101,10 +101,6 @@ const char * StageToString(CommissioningStage stage)
         return "Cleanup";
         break;
 
-    case kConfigACL:
-        return "ConfigACL";
-        break;
-
     default:
         return "???";
         break;

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
-#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <protocols/bdx/BdxMessages.h>
 
@@ -62,7 +61,7 @@ public:
     void ApplyUpdate() override;
 
     // Initiate the session to send NotifyUpdateApplied command
-    void NotifyUpdateApplied(uint32_t version) override;
+    void NotifyUpdateApplied() override;
 
     // Get image update progress in percents unit
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
@@ -80,17 +79,15 @@ public:
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override
     {
         mProviderLocation.SetValue(providerLocation);
     }
 
-    void ClearCurrentProviderLocation() override { mProviderLocation.ClearValue(); }
+    void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
 
     // Add a default OTA provider to the cached list
-    CHIP_ERROR AddDefaultOtaProvider(
-        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
@@ -99,6 +96,8 @@ public:
     void OnDownloadStateChanged(OTADownloader::State state,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override;
+
+    //////////// OTARequestor public APIs ///////////////
 
     /**
      * Called to perform some initialization including:
@@ -115,25 +114,29 @@ public:
         mOtaRequestorDriver = &driver;
         mBdxDownloader      = &downloader;
 
-        uint32_t version;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
-        mCurrentVersion = version;
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
         storage.LoadDefaultProviders(mDefaultOtaProviderList);
-        OtaRequestorServerSetUpdateState(mCurrentUpdateState);
-        OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 
-        // This results in the initial periodic timer kicking off
-        RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        ProviderLocationType providerLocation;
+        if (storage.LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
+        {
+            mProviderLocation.SetValue(providerLocation);
+        }
+
+        MutableByteSpan updateToken(mUpdateTokenBuffer);
+        if (storage.LoadUpdateToken(updateToken) == CHIP_NO_ERROR)
+        {
+            mUpdateToken = updateToken;
+        }
+
+
+        // Schedule the initializations that needs to be performed in the CHIP context
+        DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
 
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
     }
-
-    /**
-     * Called to set optional requestorCanConsent value provided by Requestor.
-     */
-    void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -207,9 +210,19 @@ private:
     };
 
     /**
+     * Callback to initialize states and server attributes in the CHIP context
+     */
+    static void InitState(intptr_t context);
+
+    /**
+     * Map a CHIP_ERROR to an IdleStateReason enum type
+     */
+    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
+
+    /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
-    void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason);
+    void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR);
 
     /**
      * Record the error update state by informing the driver of the error and calling `RecordNewUpdateState`
@@ -269,6 +282,11 @@ private:
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Store current update information to KVS
+     */
+    void StoreCurrentUpdateInfo();
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -314,9 +332,8 @@ private:
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
-    chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
+    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
 };
 
 } // namespace chip

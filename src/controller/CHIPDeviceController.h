@@ -170,9 +170,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
-                                    public AbstractDnssdDiscoveryController,
-                                    public Dnssd::OperationalResolveDelegate
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
@@ -211,26 +209,20 @@ public:
      *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
-    virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
     /**
-     * @brief
-     *   This function update the device informations asynchronously using dnssd.
+     * DEPRECATED - to be removed
      *
-     * @param[in] deviceId  Node ID for the CHIP device
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * Forces a DNSSD lookup for the specified device. It finds the corresponding session
+     * for the given nodeID and initiates a DNSSD lookup to find/update the node address
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId)
-    {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
-    }
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     /**
      * @brief
@@ -243,12 +235,11 @@ public:
      * @param[in] setupPincode    The desired PIN code to use
      * @param[in] salt            The 16-byte salt for verifier computation
      * @param[out] outVerifier    The Spake2pVerifier to be populated on success
-     * @param[out] outPasscodeId  The passcode ID to be populated on success
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, Spake2pVerifier & outVerifier,
-                                   PasscodeId & outPasscodeId);
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                   Spake2pVerifier & outVerifier);
 
     /**
      * @brief
@@ -336,6 +327,22 @@ public:
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
+    /**
+     * TEMPORARY - DO NOT USE or if you use please request review on why/how to
+     * officially support such an API.
+     *
+     * This was added to support the 'reuse session' logic in cirque integration
+     * tests however since that is the only client, the correct update is to
+     * use 'ConnectDevice' and wait for connect success/failure inside the CI
+     * logic. The current code does not do that because python was not set up
+     * to wait for timeouts on success/fail, hence this temporary method.
+     *
+     * TODO(andy31415): update cirque test and remove this method.
+     *
+     * Returns success if a session with the given peer does not exist yet.
+     */
+    CHIP_ERROR DisconnectDevice(NodeId nodeId);
+
 protected:
     enum class State
     {
@@ -376,12 +383,13 @@ protected:
 
     uint16_t mVendorId;
 
+    /// Fetches the session to use for the current device. Allows overriding
+    /// in case subclasses want to create the session if it does not yet exist
+    virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
+
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
-    //////////// OperationalResolveDelegate Implementation ///////////////
-    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
 private:
@@ -413,7 +421,6 @@ private:
     static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**
@@ -550,9 +557,6 @@ public:
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
-
     /**
      * @brief
      *   This function returns the attestation challenge for the secure session of the device being commissioned.
@@ -654,9 +658,6 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
-    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
      * @brief
@@ -691,16 +692,13 @@ public:
     // AttributeCache::Callback impl
     void OnDone() override;
 
+    // Commissioner will establish new device connections after PASE.
+    OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
-
-    /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
-       workaround-like flag and should be removed in the future.
-       When using IP rendezvous, we need to disable network provisioning. In the future, network
-       provisioning will no longer be a part of rendezvous procedure. */
-    bool mIsIPRendezvous;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to

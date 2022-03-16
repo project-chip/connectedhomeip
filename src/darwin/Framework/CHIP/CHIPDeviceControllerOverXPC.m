@@ -103,6 +103,12 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
+{
+    CHIP_LOG_ERROR("CHIPDevice doesn't support deviceBeingCommissionedOverBLE over XPC");
+    return NO;
+}
+
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
                      queue:(dispatch_queue_t)queue
          completionHandler:(CHIPDeviceConnectionCallback)completionHandler

@@ -297,7 +297,8 @@ public:
     uint64_t GetStartOffset() const { return mStartOffset; }
     uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
-    uint32_t GetNextBlockNum() { return mNextBlockNum; }
+    uint32_t GetNextBlockNum() const { return mNextBlockNum; }
+    uint32_t GetNextQueryNum() const { return mNextQueryNum; }
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
     const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
     {

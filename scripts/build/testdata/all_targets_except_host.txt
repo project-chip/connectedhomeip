@@ -16,7 +16,8 @@ android-x64-chip-tool
 android-x86-chip-tool
 cyw30739-cyw930739m2evb_01-light
 cyw30739-cyw930739m2evb_01-lock
-cyw30739-cyw930739m2evb_01-ota-requestor
+cyw30739-cyw930739m2evb_01-ota-requestor (NOGLOB: Running out of XIP flash space)
+cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
@@ -92,6 +93,7 @@ infineon-p6-light
 infineon-p6-lock
 k32w-light (NOGLOB: Debug builds broken due to LWIP_DEBUG redefition)
 k32w-light-release
+k32w-light-tokenizer-release (NOGLOB: Only on demand build)
 k32w-lock-low-power-release (NOGLOB: Only on demand build)
 k32w-lock-release
 k32w-shell-release

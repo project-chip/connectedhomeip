@@ -50,12 +50,9 @@ CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    const intptr_t version = static_cast<intptr_t>(strtoul(argv[0], nullptr, 10));
-
-    PlatformMgr().ScheduleWork([](intptr_t arg) { GetRequestorInstance()->NotifyUpdateApplied(static_cast<uint32_t>(arg)); },
-                               version);
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->NotifyUpdateApplied(); });
     return CHIP_NO_ERROR;
 }
 

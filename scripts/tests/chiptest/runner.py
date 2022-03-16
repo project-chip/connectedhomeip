@@ -18,11 +18,18 @@ import pty
 import queue
 import re
 import subprocess
-import sys
 import threading
 
 
 class LogPipe(threading.Thread):
+    """Create PTY-based PIPE for IPC.
+
+    Python provides a built-in mechanism for creating comunication PIPEs for
+    subprocesses spawned with Popen(). However, created PIPEs will most likely
+    enable IO buffering in the spawned process. In order to trick such process
+    to flush its streams immediately, we are going to create a PIPE based on
+    pseudoterminal (PTY).
+    """
 
     def __init__(self, level, capture_delegate=None, name=None):
         """
@@ -32,12 +39,8 @@ class LogPipe(threading.Thread):
 
         self.daemon = False
         self.level = level
-        if sys.platform == 'darwin':
-            self.fd_read, self.fd_write = pty.openpty()
-        else:
-            self.fd_read, self.fd_write = os.pipe()
-
-        self.pipeReader = os.fdopen(self.fd_read)
+        self.fd_read, self.fd_write = pty.openpty()
+        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')
         self.captured_logs = []
         self.capture_delegate = capture_delegate
         self.name = name
@@ -63,13 +66,20 @@ class LogPipe(threading.Thread):
 
     def run(self):
         """Run the thread, logging everything."""
-        for line in iter(self.pipeReader.readline, ''):
+        while True:
+            try:
+                line = self.reader.readline()
+                # It seems that Darwin platform returns empty string in case
+                # when writing side of PTY is closed (Linux raises OSError).
+                if line == '':
+                    break
+            except OSError:
+                break
             logging.log(self.level, line.strip('\n'))
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
-
-        self.pipeReader.close()
+        self.reader.close()
 
     def close(self):
         """Close the write end of the pipe."""

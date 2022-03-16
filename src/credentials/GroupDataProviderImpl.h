@@ -28,13 +28,19 @@ class GroupDataProviderImpl : public GroupDataProvider
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
 
-    GroupDataProviderImpl(chip::PersistentStorageDelegate & storage_delegate) : mStorage(storage_delegate) {}
-    GroupDataProviderImpl(chip::PersistentStorageDelegate & storage_delegate, uint16_t maxGroupsPerFabric,
-                          uint16_t maxGroupKeysPerFabric) :
-        GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric),
-        mStorage(storage_delegate)
+    GroupDataProviderImpl() = default;
+    GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
+        GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
     virtual ~GroupDataProviderImpl() {}
+
+    /**
+     * @brief Set the storage implementation used for non-volatile storage of configuration data.
+     *        This method MUST be called before Init().
+     *
+     * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
+     */
+    void SetStorageDelegate(PersistentStorageDelegate * storage);
 
     CHIP_ERROR Init() override;
     void Finish() override;
@@ -213,10 +219,10 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mKeyContext;
     };
+    bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
-    chip::PersistentStorageDelegate & mStorage;
-    bool mInitialized = false;
+    chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
     ObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
     ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;

@@ -19,7 +19,7 @@
 #import <CHIP/CHIPError_Internal.h>
 #import <Foundation/Foundation.h>
 
-#import "CHIP/zap-generated/CHIPCallbackBridge_internal.h"
+#import "CHIPCallbackBridge_internal.h"
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
@@ -5117,7 +5117,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = DoorLock::Attributes::SupportedOperatingModes::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

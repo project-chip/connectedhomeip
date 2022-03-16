@@ -112,6 +112,17 @@ public:
     /// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
     CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
 
+    /**
+     * @brief Overrides configuration so that commissionable advertisement will use an
+     *        ephemeral discriminator such as one set for ECM. If the Optional has no
+     *        value, the default basic discriminator is used as usual.
+     *
+     * @param[in] discriminator Ephemeral discriminator to override if it HasValue(), otherwise reverts
+     *                          to default.
+     * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT on invalid value
+     */
+    CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
+
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
     /// This method is used for both commissioner discovery and commissionable node discovery since
@@ -148,6 +159,9 @@ private:
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
     Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
+
+    // Ephemeral discriminator to use instead of the default if set
+    Optional<uint16_t> mEphemeralDiscriminator;
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();

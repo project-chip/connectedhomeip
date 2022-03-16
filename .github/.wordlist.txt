@@ -326,7 +326,8 @@ DefaultSuccess
 definedValue
 DehumidificationControl
 DelayedActionTime
-delayedActionTimeSec
+delayedApplyActionTimeSec
+delayedQueryActionTimeSec
 delayQuery
 demangle
 deployable
@@ -334,6 +335,8 @@ depottools
 deps
 desc
 descheduled
+detokenization
+detokenizer
 dev
 devcontainer
 devCtrl
@@ -696,6 +699,7 @@ LinkSoftwareAndDocumentationPack
 LinuxOTAImageProcessor
 LinuxOTARequestorDriver
 LocalConfigDisabled
+localedef
 localhost
 LocalizationConfiguration
 localstatedir
@@ -802,6 +806,8 @@ MX
 mydir
 MyPASSWORD
 MySSID
+NAMESERVER
+nameserver
 namespacing
 nano
 natively
@@ -822,6 +828,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+nmcli
 noc
 NodeId
 nongnu
@@ -1031,6 +1038,7 @@ RGB
 riscv
 rloc
 rmw
+rodata
 Rollershade
 rootfs
 RPC
@@ -1174,6 +1182,7 @@ TestCluster
 TestConstraints
 TestEmptyString
 TestGenExample
+TestGroupDemoConfig
 TestMultiRead
 TESTPASSWD
 TestPICS
@@ -1207,6 +1216,7 @@ tngvndl
 TODO
 toJson
 tokenized
+tokenizer
 toolchain
 toolchains
 topologies
@@ -1268,6 +1278,7 @@ USERINTERFACE
 UserLabel
 usermod
 usr
+UTF
 util
 utils
 UUID
@@ -1285,6 +1296,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vn
 vnc
 vous
 VPN

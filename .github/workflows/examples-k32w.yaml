@@ -71,6 +71,7 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target k32w-light-release \
+                      --target k32w-light-tokenizer-release \
                       --target k32w-lock-low-power-release \
                       --target k32w-shell-release \
                       build \

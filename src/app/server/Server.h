@@ -104,8 +104,6 @@ public:
 
     void ScheduleFactoryReset();
 
-    static void FactoryReset(intptr_t arg);
-
     static Server & GetInstance() { return sServer; }
 
 private:
@@ -117,19 +115,51 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
+            uint8_t emptyPlaceholder = 0;
+            if (buffer == nullptr)
+            {
+                if (size != 0)
+                {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                else
+                {
+                    // When size is zero, let's give a non-nullptr to the KVS backend
+                    buffer = &emptyPlaceholder;
+                }
+            }
+
             size_t bytesRead = 0;
             CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+            // Update size only if it made sense
+            if ((CHIP_ERROR_BUFFER_TOO_SMALL == err) || (CHIP_NO_ERROR == err))
+            {
+                size = CanCastTo<uint16_t>(bytesRead) ? static_cast<uint16_t>(bytesRead) : 0;
+            }
 
             if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             }
-            size = static_cast<uint16_t>(bytesRead);
+
             return err;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
+            uint8_t placeholderForEmpty = 0;
+            if (value == nullptr)
+            {
+                if (size == 0)
+                {
+                    value = &placeholderForEmpty;
+                }
+                else
+                {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+            }
             return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
         }
 

@@ -154,6 +154,10 @@ def HostTargets():
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
         app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
+        app_targets.append(target.Extend(
+            'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
+        app_targets.append(target.Extend(
+            'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
@@ -368,6 +372,7 @@ def K32WTargets():
     yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
 
     yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
+    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT, tokenizer=True, release=True).GlobBlacklist("Only on demand build")
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
@@ -376,7 +381,8 @@ def K32WTargets():
 def Cyw30739Targets():
     yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
     yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
-    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR)
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist("Running out of XIP flash space")
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
 
 
 def QorvoTargets():
