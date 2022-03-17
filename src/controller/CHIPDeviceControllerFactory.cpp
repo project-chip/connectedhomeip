@@ -175,7 +175,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.transportMgr,
 #if CONFIG_NETWORK_LAYER_BLE
- nullptr, 
+ nullptr,
 #endif
             stateParams.sessionMgr, stateParams.fabricTable));
 
