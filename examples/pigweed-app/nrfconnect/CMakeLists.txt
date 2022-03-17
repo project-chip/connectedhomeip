@@ -39,6 +39,9 @@ include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
 target_compile_options(app PRIVATE -Werror)
 
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 
@@ -81,7 +84,5 @@ target_link_libraries(app PUBLIC
   pw_rpc.nanopb.echo_service
   pw_rpc.server
 )
-
-target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
