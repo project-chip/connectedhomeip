@@ -436,7 +436,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .payloadOffset = HDR_LEN,
         .appPayloadOffset = PRO_LEN,
         .msgLength = HDR_LEN + PRO_LEN + APP_LEN,
-        .msg = 
+        .msg =
             "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
             "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
@@ -495,7 +495,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .payloadOffset = HDR_LEN,
         .appPayloadOffset = PRO_LEN + SX_LEN,
         .msgLength = HDR_LEN + PRO_LEN + SX_LEN + APP_LEN,
-        .msg = 
+        .msg =
             "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
             "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
