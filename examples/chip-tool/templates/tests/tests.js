@@ -147,7 +147,6 @@ function getManualTests()
   const MultipleFabrics = [
     'Test_TC_MF_1_1',
     'Test_TC_MF_1_2',
-    'Test_TC_MF_1_3',
     'Test_TC_MF_1_4',
     'Test_TC_MF_1_5',
     'Test_TC_MF_1_6',

@@ -18,23 +18,24 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-
+    
 tests:
-    - label: "Commission DUT to TH"
-      verification: ""
-      disabled: true
+  - label: "Commission DUT to TH"
+    verification: |
 
-    - label: "TH sends chip-tool command to DUT"
-      verification:
-          "chip-tool wifinetworkdiagnostics read-event disconnection 1 0"
-      disabled: true
+    disabled: true
 
-    - label: "TH sends chip-tool command to DUT"
-      verification:
-          "chip-tool wifinetworkdiagnostics read-event association-failure 1 0"
-      disabled: true
+  - label: "TH sends chip-tool command to DUT"
+    verification: |
+        chip-tool wifinetworkdiagnostics read-event disconnection 1 0
+    disabled: true
 
-    - label: "TH sends chip-tool command to DUT"
-      verification:
-          "chip-tool wifinetworkdiagnostics read-event connection-status 1 0"
-      disabled: true
+  - label: "TH sends chip-tool command to DUT"
+    verification: |
+        chip-tool wifinetworkdiagnostics read-event association-failure 1 0
+    disabled: true
+
+  - label: "TH sends chip-tool command to DUT"
+    verification: |
+        chip-tool wifinetworkdiagnostics read-event connection-status 1 0
+    disabled: true
