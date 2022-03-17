@@ -18,6 +18,13 @@ Example run:
 
 ./scripts/run-clang-tidy-on-compile-commands.py check
 
+# Run and output a fix yaml
+
+./scripts/run-clang-tidy-on-compile-commands.py --export-fixes out/fixes.yaml check
+
+# Apply the fixes
+clang-apply-replacements out/fixes.yaml
+
 """
 
 import build
@@ -28,13 +35,15 @@ import json
 import logging
 import multiprocessing
 import os
+import queue
 import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import threading
 import traceback
-import queue
+import yaml
 
 
 class TidyResult:
@@ -75,10 +84,9 @@ class ClangTidyEntry:
 
         if command.startswith("clang++ ") or command.startswith("clang "):
             self.valid = True
-            self.clang_arguments = shlex.split(command[command.find(" "):])
+            self.clang_arguments = shlex.split(command[command.find(" ") :])
         else:
-            logging.warning(
-                "Cannot tidy %s - not a clang compile command", self.file)
+            logging.warning("Cannot tidy %s - not a clang compile command", self.file)
             return
 
     @property
@@ -93,7 +101,10 @@ class ClangTidyEntry:
         logging.debug("Running tidy on %s from %s", self.file, self.directory)
         try:
             proc = subprocess.Popen(
-                ["clang-tidy", self.file, "--"] + self.clang_arguments,
+                ["clang-tidy", self.file]
+                + self.tidy_arguments
+                + ["--"]
+                + self.clang_arguments,
                 cwd=self.directory,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -148,6 +159,8 @@ class ClangTidyRunner:
 
         self.entries = []
         self.state = TidyState()
+        self.fixes_file = None
+        self.fixes_temporary_file_dir = None
 
         for entry in database:
             item = ClangTidyEntry(entry)
@@ -156,11 +169,46 @@ class ClangTidyRunner:
 
             self.entries.append(item)
 
+    def Cleanup(self):
+        if self.fixes_temporary_file_dir:
+            all_diagnostics = []
+            for name in glob.iglob(
+                os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")
+            ):
+                content = yaml.safe_load(open(name, "r"))
+                if not content:
+                    continue
+                all_diagnostics.extend(content.get("Diagnostics", []))
+
+            if all_diagnostics:
+                with open(self.fixes_file, "w") as out:
+                    yaml.safe_dump(
+                        {"MainSourceFile": "", "Diagnostics:": all_diagnostics}, out
+                    )
+            else:
+                open(self.fixes_file, "w").close()
+
+            logging.info(
+                "Cleaning up directory: %r", self.fixes_temporary_file_dir.name
+            )
+            self.fixes_temporary_file_dir.cleanup()
+
     def ExportFixesTo(self, f):
         # use absolute path since running things will change working directories
-        f = os.path.abspath(f)
-        for e in self.entries:
-            e.ExportFixesTo(f)
+        self.fixes_file = os.path.abspath(f)
+        self.fixes_temporary_file_dir = tempfile.TemporaryDirectory(
+            prefix="tidy-", suffix="-fixes"
+        )
+
+        logging.info(
+            "Storing temporary fix files into %s", self.fixes_temporary_file_dir.name
+        )
+        for idx, e in enumerate(self.entries):
+            e.ExportFixesTo(
+                os.path.join(
+                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (idx + 1,)
+                )
+            )
 
     def FilterEntries(self, f):
         for e in self.entries:
@@ -199,7 +247,7 @@ class ClangTidyRunner:
             for name in self.state.failed_files:
                 logging.warning("Failure reported for %s", name)
 
-            sys.exit(1)
+        return self.state.failures == 0
 
 
 # Supported log levels, mapping string values required for argument
@@ -274,18 +322,22 @@ def main(
             raise Exception("Could not find `compile_commands.json` in ./out")
         logging.info("Will use %s for compile", compile_database)
 
-    context.obj = ClangTidyRunner(compile_database)
+    context.obj = runner = ClangTidyRunner(compile_database)
+
+    @context.call_on_close
+    def cleanup():
+        runner.Cleanup()
 
     if file_include_regex:
         r = re.compile(file_include_regex)
-        context.obj.FilterEntries(lambda e: r.search(e.file))
+        runner.FilterEntries(lambda e: r.search(e.file))
 
     if file_exclude_regex:
         r = re.compile(file_exclude_regex)
-        context.obj.FilterEntries(lambda e: not r.search(e.file))
+        runner.FilterEntries(lambda e: not r.search(e.file))
 
     if export_fixes:
-        context.obj.ExportFixesTo(export_fixes)
+        runner.ExportFixesTo(export_fixes)
 
     for e in context.obj.entries:
         logging.info("Will tidy %s", e.full_path)
@@ -294,7 +346,25 @@ def main(
 @main.command("check", help="Run clang-tidy check")
 @click.pass_context
 def cmd_check(context):
-    context.obj.Check()
+    if not context.obj.Check():
+        sys.exit(1)
+
+
+@main.command("check", help="Run check followd by fix")
+@click.pass_context
+def cmd_fix(context):
+    runner = context.obj
+    with tempfile.TemporaryDirectory(prefix="tidy-apply-fixes") as tmpdir:
+        if not runner.fixes_file:
+            runner.ExportFixesTo(os.path.join(tmpdir, "fixes.tmp"))
+
+        runner.Check()
+
+        if runner.state.failures:
+            fixes_yaml = os.path.join(tmpdir, "fixes.yaml")
+            with open(fixes_yaml, "w") as out:
+                out.write(open(runner.fixes_file, "r").read())
+            subprocess.check_call(["clang-apply-replacements", tmpdir])
 
 
 if __name__ == "__main__":
