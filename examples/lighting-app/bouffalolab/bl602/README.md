@@ -10,7 +10,7 @@
 
 *   Build the example application:
 
-          $ ./scripts/examples/gn_bl602_example.sh ./examples/lighting-app/bouffalolab/bl602 out/lighting_app_bl602
+          - $ ./scripts/examples/gn_bl602_example.sh ./examples/lighting-app/bouffalolab/bl602 out/lighting_app_bl602
 
 Generated files
 
@@ -23,7 +23,7 @@ Generated files
 
 ## Flash
 
-`use BLDevCube tool`
+- use BLDevCube tool
 
 ### Setting up Python Controller
 
