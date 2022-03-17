@@ -29,8 +29,8 @@ shift
 OUTPUT_DIR=out/example_app
 BL602_BOARD=BL-HWC-G1
 MATTER_BL_ROOT=$PWD
-export BL602_SDK_ROOT=$MATTER_BL_ROOT/third_party/bouffalolab/bl602_sdk/repo
-export PATH=${BL602_SDK_ROOT}/toolchain/riscv/Linux/bin:$PATH
+export BL602_SDK_ROOT="$MATTER_BL_ROOT"/third_party/bouffalolab/bl602_sdk/repo
+export PATH="$BL602_SDK_ROOT/toolchain/riscv/Linux/bin:$PATH"
 
 if [[ ! -z "$1" ]]; then
     OUTPUT_DIR=$1
@@ -59,5 +59,5 @@ for arg; do
 done
 
 gn clean out/lighting_app_bl602
-gn gen "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="bl602_sdk_root=\"${BL602_SDK_ROOT}\" bl602_board=\"${BL602_BOARD}\" ${GN_ARGS[*]}"
+gn gen "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="bl602_sdk_root=\"$BL602_SDK_ROOT\" bl602_board=\"$BL602_BOARD\" ${GN_ARGS[*]}"
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
