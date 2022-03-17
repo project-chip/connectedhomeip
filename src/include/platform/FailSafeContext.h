@@ -71,10 +71,7 @@ public:
         mFabricIndex                    = nocFabricIndex;
     }
 
-    inline FabricIndex GetFabricIndex()
-    {
-        return mFabricIndex;
-    }
+    inline FabricIndex GetFabricIndex() { return mFabricIndex; }
 
 private:
     // ===== Private members reserved for use by this class only.
