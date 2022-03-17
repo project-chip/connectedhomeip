@@ -19,7 +19,7 @@ class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 {
 public:
     {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
-    ~{{asUpperCamelCase name}}Cluster() {}
+    ~{{asUpperCamelCase name}}Cluster() override {}
 };
 
 {{/chip_client_clusters}}
