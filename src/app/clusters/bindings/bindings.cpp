@@ -132,22 +132,22 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
             if (entry.local == endpoint && entry.type == EMBER_UNICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
-                    .fabricIndex = entry.fabricIndex,
                     .node        = MakeOptional(entry.nodeId),
                     .group       = NullOptional,
                     .endpoint    = MakeOptional(entry.remote),
                     .cluster     = entry.clusterId,
+                    .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }
             else if (entry.local == endpoint && entry.type == EMBER_MULTICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
-                    .fabricIndex = entry.fabricIndex,
                     .node        = NullOptional,
                     .group       = MakeOptional(entry.groupId),
                     .endpoint    = NullOptional,
                     .cluster     = entry.clusterId,
+                    .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }

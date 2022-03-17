@@ -45,7 +45,7 @@ class TransferFacilitator : public Messaging::ExchangeDelegate
 {
 public:
     TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
-    ~TransferFacilitator() = default;
+    ~TransferFacilitator() override = default;
 
 private:
     // Inherited from ExchangeContext

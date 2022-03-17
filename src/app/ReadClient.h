@@ -202,7 +202,7 @@ public:
      *
      * OnDone() will not be called.
      */
-    virtual ~ReadClient();
+    ~ReadClient() override;
 
     /*
      * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
