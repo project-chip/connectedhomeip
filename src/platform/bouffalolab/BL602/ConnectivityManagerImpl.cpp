@@ -39,8 +39,6 @@
 
 #include <wifi_mgmr_ext.h>
 
-#include <lib/dnssd/platform/Dnssd.h>
-
 #include <FreeRTOS.h>
 #include <task.h>
 

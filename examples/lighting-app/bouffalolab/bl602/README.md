@@ -1,3 +1,4 @@
+#CHIP BL602 Lighting Example
 ## Build
 
 -   Install some additional tools(likely already present for CHIP developers):
@@ -6,18 +7,17 @@
 
     #Mac OS X \$ brew install ninja
 
-use GN/Ninja directly
+*   Build the example application:
 
-          $ cd connectedhomeip/examples/lighting-app/bouffalolab/bl602
-          $ ./go
+          $ ./scripts/examples/gn_bl602_example.sh ./examples/lighting-app/bouffalolab/bl602 out/lighting_app_bl602
 
 Generated files
 
-         matter_bl/connectedhomeip/examples/lighting-app/bouffalolab/bl602/out/debug/chip-bl602-lighting-example.bin
+         connectedhomeip/out/lighting_app_bl602/chip-bl602-lighting-example.bin
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/bl602
+          $ cd ~/connectedhomeip/
           $ rm -rf out/
 
 ## Flash
