@@ -154,7 +154,11 @@ else
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
     # Generate bootloader file
-    BUILD_DIR_TRIMMED="${BUILD_DIR#*/}"
+    if [ {"$BUILD_DIR:2" == "./"}; then
+        BUILD_DIR_TRIMMED="${BUILD_DIR:2}" 
+    else
+        BUILD_DIR_TRIMMED="${BUILD_DIR#*/}"
+    fi
     S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
     if [ -z "$S37_PATH" ]; then
         echo "Bootloader could not be built"
