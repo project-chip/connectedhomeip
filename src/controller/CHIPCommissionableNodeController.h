@@ -37,7 +37,7 @@ class DLL_EXPORT CommissionableNodeController : public AbstractDnssdDiscoveryCon
 {
 public:
     CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : mResolver(resolver) {}
-    virtual ~CommissionableNodeController() {}
+    ~CommissionableNodeController() override {}
 
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
 

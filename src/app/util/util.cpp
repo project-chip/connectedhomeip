@@ -74,8 +74,8 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES                                            // defined in print-cluster.h
-    { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, NULL }, // terminator
+    CLUSTER_IDS_TO_NAMES                                               // defined in print-cluster.h
+    { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, nullptr }, // terminator
 };
 
 // A pointer to the current command being processed
@@ -312,7 +312,7 @@ void emberAfDecodeAndPrintCluster(ClusterId cluster)
 // for references to the standard library.
 uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
 {
-    if (emberAfCurrentCommand() != NULL)
+    if (emberAfCurrentCommand() != nullptr)
     {
         return emberAfCurrentCommand()->mfgCode;
     }
@@ -359,7 +359,7 @@ EmberAfRetryOverride emberAfGetRetryOverride(void)
 
 void emAfApplyRetryOverride(EmberApsOption * options)
 {
-    if (options == NULL)
+    if (options == nullptr)
     {
         return;
     }
@@ -393,7 +393,7 @@ EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void)
 
 void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
 {
-    if (frame_control == NULL)
+    if (frame_control == nullptr)
     {
         return;
     }
@@ -457,7 +457,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
-    if (src == NULL)
+    if (src == nullptr)
     {
         dest[0] = 0; // Zero out the length of string
     }
@@ -480,7 +480,7 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 {
-    if (src == NULL)
+    if (src == nullptr)
     {
         dest[0] = dest[1] = 0; // Zero out the length of string
     }
@@ -525,7 +525,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 
             for (i = 0; i < len; i++)
             {
-                j = (val1 == NULL ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
                 accum1 |= j << (8 * (len - 1 - i));
 
                 k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
@@ -567,7 +567,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     { // regular unsigned number comparison
         for (i = 0; i < len; i++)
         {
-            j = (val1 == NULL ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+            j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
             k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
             if (j > k)
@@ -638,7 +638,7 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     uint8_t curLen;
     uint8_t charsToWrite;
 
-    if ((zclString == NULL) || (zclStringMaxLen == 0) || (appendingChars == NULL) || (appendingCharsLen == 0))
+    if ((zclString == nullptr) || (zclStringMaxLen == 0) || (appendingChars == nullptr) || (appendingCharsLen == 0))
     {
         return 0;
     }

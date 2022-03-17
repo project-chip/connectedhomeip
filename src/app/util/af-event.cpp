@@ -84,7 +84,7 @@ const char * emAfEventStrings[] = {
     EMBER_AF_GENERATED_EVENT_STRINGS
 #endif
 
-        NULL,
+    nullptr,
 };
 
 EmberEventData emAfEvents[] = {
@@ -93,7 +93,7 @@ EmberEventData emAfEvents[] = {
     EMBER_AF_GENERATED_EVENTS
 #endif
 
-    { NULL, NULL }
+    { nullptr, nullptr }
 };
 
 void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
@@ -103,7 +103,7 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
     {
         control->status = EMBER_EVENT_INACTIVE;
 
-        if (control->callback != NULL)
+        if (control->callback != nullptr)
         {
             (control->callback)(control->endpoint);
             return;
@@ -146,7 +146,7 @@ static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clu
         }
     }
 #endif // EMBER_AF_GENERATED_EVENT_CONTEXT
-    return NULL;
+    return nullptr;
 }
 
 EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
@@ -218,7 +218,7 @@ EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId
     // simulation.
     EMBER_TEST_ASSERT(emberAfEndpointIsEnabled(endpoint));
 
-    if (context != NULL && emberAfEndpointIsEnabled(endpoint) &&
+    if (context != nullptr && emberAfEndpointIsEnabled(endpoint) &&
         (emberEventControlSetDelayMS(context->eventControl, delayMs) == EMBER_SUCCESS))
     {
         context->pollControl  = pollControl;
@@ -261,7 +261,7 @@ EmberStatus emberAfScheduleServerTick(EndpointId endpoint, ClusterId clusterId, 
 EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
     EmberAfEventContext * context = findEventContext(endpoint, clusterId, isClient);
-    if (context != NULL)
+    if (context != nullptr)
     {
         emberEventControlSetInactive(context->eventControl);
         return EMBER_SUCCESS;

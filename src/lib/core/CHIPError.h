@@ -1466,8 +1466,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TOO_MANY_CONNECTIONS                        CHIP_CORE_ERROR(0x72)
 
-// unused                                                      CHIP_CORE_ERROR(0x73)
-// unused                                                      CHIP_CORE_ERROR(0x74)
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation cancelled because a shut down was initiated
+ */
+#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation has been cancelled, generally by calling a cancel/abort request.
+ */
+#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
 
 /**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
@@ -2407,7 +2420,6 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The Resource is busy and cannot process the request. Trying again might work.
  */
 #define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
-
 
 /**
  *  @}
