@@ -10,7 +10,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
@@ -42,9 +42,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
@@ -76,9 +76,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
@@ -110,11 +110,11 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
@@ -146,9 +146,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
@@ -180,9 +180,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
@@ -214,11 +214,11 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
@@ -250,9 +250,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
@@ -284,9 +284,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
@@ -318,11 +318,11 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
@@ -354,9 +354,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
@@ -388,9 +388,9 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
 
-{{#all_user_clusters}}
+{{#chip_server_clusters}}
     {{#first}}
 // clang-format off
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
@@ -422,4 +422,4 @@
 }
 // clang-format on
     {{/last}}
-{{/all_user_clusters}}
+{{/chip_server_clusters}}
