@@ -47,8 +47,6 @@ constexpr uint8_t kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadAttribute
-#else
-#error "Undefined generated access for read attribute"
 #endif
 
 #ifdef GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER
@@ -59,8 +57,6 @@ constexpr uint8_t kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessWriteAttribute
-#else
-#error "Undefined generated access for write attribute"
 #endif
 
 #ifdef GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER
@@ -71,8 +67,6 @@ constexpr uint8_t kPrivilege[] = GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kCommand) && ArraySize(kCommand) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessInvokeCommand
-#else
-#error "Undefined generated access for invoke command"
 #endif
 
 #ifdef GENERATED_ACCESS_READ_EVENT__CLUSTER
@@ -83,14 +77,13 @@ constexpr uint8_t kPrivilege[] = GENERATED_ACCESS_READ_EVENT__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kEvent) && ArraySize(kEvent) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadEvent
-#else
-#error "Undefined generated access for read event"
 #endif
 
 } // anonymous namespace
 
 int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
 {
+#ifdef GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER
     using namespace GeneratedAccessReadAttribute;
     for (size_t i = 0; i < ArraySize(kCluster); ++i)
     {
@@ -99,11 +92,13 @@ int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attr
             return kPrivilege[i];
         }
     }
+#endif
     return GENERATED_ACCESS_PRIVILEGE__VIEW;
 }
 
 int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
 {
+#ifdef GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER
     using namespace GeneratedAccessWriteAttribute;
     for (size_t i = 0; i < ArraySize(kCluster); ++i)
     {
@@ -112,11 +107,13 @@ int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId att
             return kPrivilege[i];
         }
     }
+#endif
     return GENERATED_ACCESS_PRIVILEGE__OPERATE;
 }
 
 int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
 {
+#ifdef GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER
     using namespace GeneratedAccessInvokeCommand;
     for (size_t i = 0; i < ArraySize(kCluster); ++i)
     {
@@ -125,11 +122,13 @@ int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId comman
             return kPrivilege[i];
         }
     }
+#endif
     return GENERATED_ACCESS_PRIVILEGE__OPERATE;
 }
 
 int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
 {
+#ifdef GENERATED_ACCESS_READ_EVENT__CLUSTER
     using namespace GeneratedAccessReadEvent;
     for (size_t i = 0; i < ArraySize(kCluster); ++i)
     {
@@ -138,5 +137,6 @@ int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
             return kPrivilege[i];
         }
     }
+#endif
     return GENERATED_ACCESS_PRIVILEGE__VIEW;
 }
