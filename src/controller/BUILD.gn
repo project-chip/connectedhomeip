@@ -67,8 +67,8 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/trace",
     "${chip_root}/src/transport",
-    "${chip_root}/src/trace"
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
