@@ -42,7 +42,7 @@ public:
     {
         Init(std::move(buffer), useChainedBuffers);
     }
-    virtual ~TLVPacketBufferBackingStore() {}
+    ~TLVPacketBufferBackingStore() override {}
 
     /**
      * Take ownership of a backing packet buffer.
