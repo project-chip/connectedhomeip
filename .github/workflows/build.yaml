@@ -160,7 +160,7 @@ jobs:
                   for BUILD_TYPE  in gcc_release clang; do
                       case $BUILD_TYPE in
                           "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
+                          "clang") GN_ARGS='is_clang=true';;
                       esac
 
                       scripts/build/gn_gen.sh --args="$GN_ARGS"
@@ -195,7 +195,15 @@ jobs:
                        --target linux-x64-rpc-console \
                        build \
                     "
-
+            - name: Clang-tidy validation
+              timeout-minutes: 20
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/linux-x64-chip-tool-ipv6only/compile_commands.json \
+                       check \
+                    "
             - name: Run fake linux tests with build_examples
               timeout-minutes: 15
               run: |
