@@ -22,6 +22,8 @@
  *      the Message Header class within the transport layer
  *
  */
+
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -304,9 +306,10 @@ void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext
     }
 }
 
+#define MAX_FIXED_HEADER_SIZE (8 + 8 + 8)
 struct SpecComplianceTestVector
 {
-    uint8_t encoded[8 + 8 + 8]; // Fixed header + max source id + max dest id
+    uint8_t encoded[MAX_FIXED_HEADER_SIZE]; // Fixed header + max source id + max dest id
     uint8_t messageFlags;
     uint16_t sessionId;
     uint8_t sessionType;
@@ -363,12 +366,10 @@ struct SpecComplianceTestVector theSpecComplianceTestVector[] = {
 
 const unsigned theSpecComplianceTestVectorLength = sizeof(theSpecComplianceTestVector) / sizeof(struct SpecComplianceTestVector);
 
-#define MAX_HEADER_SIZE (8 + 8 + 8)
-
 void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
 {
     struct SpecComplianceTestVector * testEntry;
-    uint8_t buffer[MAX_HEADER_SIZE];
+    uint8_t buffer[MAX_FIXED_HEADER_SIZE];
     uint16_t encodeSize;
 
     for (unsigned i = 0; i < theSpecComplianceTestVectorLength; i++)
@@ -412,6 +413,105 @@ void TestSpecComplianceDecode(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+struct TestVectorMsgExtensions
+{
+    uint16_t mxLength;
+    uint16_t sxLength;
+    uint8_t payloadOffset;
+    uint16_t msgLength;
+    const char *msg;
+};
+
+struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
+    {
+        // SRC=none, DST=none, MX=0
+        .mxLength = 0,
+        .sxLength = 0,
+        .payloadOffset = 8,
+        .msgLength = 8,
+        .msg = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC",
+    },
+    {
+        // SRC=none, DST=none, MX=1
+        .mxLength = 4,
+        .sxLength = 0,
+        .payloadOffset = 8 + 6,
+        .msgLength = 16,
+        .msg = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+    },
+    {
+        // SRC=1, DST=none, MX=1
+        .mxLength = 4,
+        .sxLength = 0,
+        .payloadOffset = 8 + 8 + 6,
+        .msgLength = 16 + 8,
+        .msg = "\x04\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+    },
+    {
+        // SRC=none, DST=1, MX=1
+        .mxLength = 4,
+        .sxLength = 0,
+        .payloadOffset = 8 + 8 + 6,
+        .msgLength = 16 + 8,
+        .msg = "\x01\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+    },
+    {
+        // SRC=none, DST=group, MX=1
+        .mxLength = 4,
+        .sxLength = 0,
+        .payloadOffset = 8 + 2 + 6,
+        .msgLength = 16 + 2,
+        .msg = "\x02\x00\x00\x21\xCC\xCC\xCC\xCC\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+    },
+    {
+        // SRC=1, DST=group, MX=1
+        .mxLength = 4,
+        .sxLength = 0,
+        .payloadOffset = 8 + 8 + 2 + 6,
+        .msgLength = 16 + 8 + 2,
+        .msg = "\x06\x00\x00\x21\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+    },
+
+/*
+    // SX test vectors
+    {
+        .mxLength = 0,
+        .sxLength = 4,
+        .payloadOffset = 8 + 6,
+        .msgLength = 20,
+        .msg = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1",
+    },
+    {
+        .mxLength = 4,
+        .sxLength = 4,
+        .payloadOffset = 8 + 6 + 6,
+        .msgLength = 26,
+        .msg = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1",
+    },
+*/
+};
+
+const unsigned theTestVectorMsgExtensionsLength = sizeof(theTestVectorMsgExtensions) / sizeof(struct TestVectorMsgExtensions);
+
+void TestMsgExtensionsDecode(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestVectorMsgExtensions * testEntry;
+    PacketHeader packetHeader;
+    uint16_t decodeSize;
+
+    NL_TEST_ASSERT(inSuite, chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+
+    for (unsigned i = 0; i < theTestVectorMsgExtensionsLength; i++)
+    {
+        testEntry = &theTestVectorMsgExtensions[i];
+
+        System::PacketBufferHandle msg = System::PacketBufferHandle::NewWithData(testEntry->msg, testEntry->msgLength);
+
+        NL_TEST_ASSERT(inSuite, packetHeader.Decode(msg->Start(), msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, decodeSize == testEntry->payloadOffset);
+    }
+}
+
 } // namespace
 
 // clang-format off
@@ -425,6 +525,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("PayloadEncodeDecodeBounds", TestPayloadHeaderEncodeDecodeBounds),
     NL_TEST_DEF("SpecComplianceEncode", TestSpecComplianceEncode),
     NL_TEST_DEF("SpecComplianceDecode", TestSpecComplianceDecode),
+    NL_TEST_DEF("TestMsgExtensionsDecode", TestMsgExtensionsDecode),
     NL_TEST_SENTINEL()
 };
 // clang-format on
