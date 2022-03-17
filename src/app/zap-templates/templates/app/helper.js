@@ -438,13 +438,13 @@ function asLowerCamelCase(label)
       && label.toUpperCase() != label) {
     str = str[0].toUpperCase() + str.substring(1);
   }
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asUpperCamelCase(label)
 {
   let str = string.toCamelCase(label, false);
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asMEI(prefix, suffix)
