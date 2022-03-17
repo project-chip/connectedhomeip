@@ -147,11 +147,14 @@ CHIP_ERROR CC13X2_26X2Config::ReadConfigValue(Key key, uint64_t & val)
 CHIP_ERROR CC13X2_26X2Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = ReadConfigValueBin(key, (uint8_t *) buf, bufSize, outLen);
+    VerifyOrExit(bufSize > outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
     if (err == CHIP_NO_ERROR)
     {
         buf[outLen] = 0; // since null termination is not stored in NV
     }
 
+exit:
     return err;
 }
 
