@@ -291,7 +291,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Remove the fabric from the fabrics' linked list
-    CHIP_ERROR Unregister(PersistentStorageDelegate * storage)
+    CHIP_ERROR Unregister(PersistentStorageDelegate * storage) const
     {
         FabricList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
@@ -334,7 +334,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Check the fabric is registered in the fabrics' linked list
-    CHIP_ERROR Validate(PersistentStorageDelegate * storage)
+    CHIP_ERROR Validate(PersistentStorageDelegate * storage) const
     {
         FabricList fabric_list;
         ReturnErrorOnFailure(fabric_list.Load(storage));

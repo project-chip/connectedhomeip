@@ -938,7 +938,7 @@ protected:
     CHIP_ERROR SkipData();
     CHIP_ERROR SkipToEndOfContainer();
     CHIP_ERROR VerifyElement();
-    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p);
+    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p) const;
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
@@ -2370,7 +2370,7 @@ public:
      *                          implicit form.
      */
     void SetImplicitProfileId(uint32_t profileId);
-    uint32_t GetImplicitProfileId() { return mUpdaterReader.ImplicitProfileId; }
+    uint32_t GetImplicitProfileId() const { return mUpdaterReader.ImplicitProfileId; }
 
     /**
      * Copies the current element from input TLV to output TLV.
@@ -2610,7 +2610,7 @@ public:
     }
     CHIP_ERROR EndContainer(TLVType outerContainerType) { return mUpdaterWriter.EndContainer(outerContainerType); }
     uint32_t GetLengthWritten() { return mUpdaterWriter.GetLengthWritten(); }
-    uint32_t GetRemainingFreeLength() { return mUpdaterWriter.mRemainingLen; }
+    uint32_t GetRemainingFreeLength() const { return mUpdaterWriter.mRemainingLen; }
 
 private:
     void AdjustInternalWriterFreeSpace();

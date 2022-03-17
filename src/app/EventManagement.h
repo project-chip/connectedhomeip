@@ -98,7 +98,7 @@ public:
     CircularEventBuffer * GetNextCircularEventBuffer() { return mpNext; }
 
     void SetRequiredSpaceforEvicted(size_t aRequiredSpace) { mRequiredSpaceForEvicted = aRequiredSpace; }
-    size_t GetRequiredSpaceforEvicted() { return mRequiredSpaceForEvicted; }
+    size_t GetRequiredSpaceforEvicted() const { return mRequiredSpaceForEvicted; }
 
     ~CircularEventBuffer() override = default;
 
@@ -349,7 +349,7 @@ public:
      *
      * @return EventNumber most recently vended event Number for that event priority
      */
-    EventNumber GetLastEventNumber() { return mLastEventNumber; }
+    EventNumber GetLastEventNumber() const { return mLastEventNumber; }
 
     /**
      * @brief
@@ -360,7 +360,7 @@ public:
     /**
      *  Logger would save last logged event number and initial written event bytes number into schedule event number array
      */
-    void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
+    void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const;
 
 private:
     /**
