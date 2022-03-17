@@ -200,3 +200,7 @@
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
 	branch = main
+[submodule "third_party/bouffalolab/bl602"]
+	path = third_party/bouffalolab/bl602_sdk/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
+	branch = gebx/rebase-to-ee7682d5
