@@ -306,7 +306,18 @@ void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext
     }
 }
 
-#define MAX_FIXED_HEADER_SIZE (8 + 8 + 8)
+constexpr size_t HDR_LEN = 8; ///< Message header length
+constexpr size_t SRC_LEN = 8; ///< Source Node ID length
+constexpr size_t DST_LEN = 8; ///< Destination Node ID length
+constexpr size_t GID_LEN = 2; ///< Group ID length
+constexpr size_t MX_LEN = 6;  ///< Message Exchange block length
+constexpr size_t SX_LEN = 6;  ///< Security Exchange block length
+constexpr size_t PRO_LEN = 6; ///< Protocol header length
+constexpr size_t APP_LEN = 2; ///< App payload length
+
+/// Size of fixed portion of message header + max source node id + max destination node id.
+constexpr size_t MAX_FIXED_HEADER_SIZE = (HDR_LEN + SRC_LEN + DST_LEN);
+
 struct SpecComplianceTestVector
 {
     uint8_t encoded[MAX_FIXED_HEADER_SIZE]; // Fixed header + max source id + max dest id
@@ -420,15 +431,6 @@ struct TestVectorMsgExtensions
     uint16_t msgLength;
     const char * msg;
 };
-
-#define HDR_LEN 8 ///< Message header length
-#define SRC_LEN 8 ///< Source Node ID length
-#define DST_LEN 8 ///< Destination Node ID length
-#define GID_LEN 2 ///< Group ID length
-#define MX_LEN 6  ///< Message Exchange block length
-#define SX_LEN 6  ///< Security Exchange block length
-#define PRO_LEN 6 ///< Protocol header length
-#define APP_LEN 2 ///< App payload length
 
 struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
     {
