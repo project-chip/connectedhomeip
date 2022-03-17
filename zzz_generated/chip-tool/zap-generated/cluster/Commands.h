@@ -8767,7 +8767,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8928,7 +8928,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
 };
 
 class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
@@ -8955,7 +8955,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
@@ -8982,7 +8982,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
 };
 
 class WriteDoorLockManualOperationEventMask : public WriteAttribute
@@ -9009,7 +9009,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
 };
 
 class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
@@ -9036,7 +9036,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
 };
 
 class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
@@ -9063,7 +9063,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
@@ -9090,7 +9090,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
 };
 
 class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
@@ -9117,7 +9117,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
 };
 
 /*----------------------------------------------------------------------------*\

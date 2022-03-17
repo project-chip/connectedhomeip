@@ -48,7 +48,7 @@ template <size_t N>
 class OperationalDeviceProxyPool : public OperationalDeviceProxyPoolDelegate
 {
 public:
-    ~OperationalDeviceProxyPool() { mDevicePool.ReleaseAll(); }
+    ~OperationalDeviceProxyPool() override { mDevicePool.ReleaseAll(); }
 
     OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) override
     {

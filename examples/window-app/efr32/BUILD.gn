@@ -50,9 +50,10 @@ declare_args() {
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-}
 
-show_qr_code = true
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
+}
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
@@ -137,12 +138,15 @@ efr32_executable("window_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "${project_dir}/common/src/WindowApp.cpp",
     "${project_dir}/common/src/ZclCallbacks.cpp",
     "src/WindowAppImpl.cpp",
     "src/main.cpp",
   ]
+
+  if (chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
 
   if (chip_enable_ota_requestor) {
     defines += [ "EFR32_OTA_ENABLED" ]

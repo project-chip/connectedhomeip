@@ -1188,6 +1188,14 @@ enum class DlAlarmMask : uint16_t
     kForcedDoorOpenUnderDoorLockedCondition = 0x40,
 };
 
+// Bitmap for DlCredentialRuleMask
+enum class DlCredentialRuleMask : uint8_t
+{
+    kSingle = 0x1,
+    kDual   = 0x2,
+    kTri    = 0x4,
+};
+
 // Bitmap for DlCredentialRulesSupport
 enum class DlCredentialRulesSupport : uint8_t
 {

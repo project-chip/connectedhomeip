@@ -52,7 +52,7 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
-    CHIP_ERROR Init() override;
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     // WirelessDriver
