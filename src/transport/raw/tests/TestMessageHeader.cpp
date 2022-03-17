@@ -310,8 +310,8 @@ constexpr size_t HDR_LEN = 8; ///< Message header length
 constexpr size_t SRC_LEN = 8; ///< Source Node ID length
 constexpr size_t DST_LEN = 8; ///< Destination Node ID length
 constexpr size_t GID_LEN = 2; ///< Group ID length
-constexpr size_t MX_LEN = 6;  ///< Message Exchange block length
-constexpr size_t SX_LEN = 6;  ///< Security Exchange block length
+constexpr size_t MX_LEN  = 6; ///< Message Exchange block length
+constexpr size_t SX_LEN  = 6; ///< Security Exchange block length
 constexpr size_t PRO_LEN = 6; ///< Protocol header length
 constexpr size_t APP_LEN = 2; ///< App payload length
 
