@@ -39,6 +39,7 @@ public:
 
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+    CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     void ReleaseDAC();
     void ReleasePAI();
 

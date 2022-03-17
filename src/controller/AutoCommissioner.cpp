@@ -103,6 +103,14 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);
+    ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' --> '%s'", StageToString(currentStage),
+                    lastErr.AsString(), StageToString(nextStage));
+    return nextStage;
+}
+
+CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
+{
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
@@ -320,6 +328,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
     else
     {
+        ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
+                        err.AsString());
+
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadCommissioningInfo:

@@ -38,9 +38,15 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
         false;
 #endif
 
+    ChipLogDetail(CASESessionManager,
+                  "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64 ", NodeIdWasResolved = %d",
+                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), nodeIDWasResolved);
+
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
+
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
         if (nodeIDWasResolved)
         {
