@@ -283,7 +283,7 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
-CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
 {
     VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -754,7 +754,7 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
 }
 
-CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
 {
     VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -995,7 +995,7 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
-CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
 {
     VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

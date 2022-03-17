@@ -343,7 +343,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
 
-bool ThreadStackManagerImpl::_IsThreadAttached()
+bool ThreadStackManagerImpl::_IsThreadAttached() const
 {
     return mAttached;
 }
