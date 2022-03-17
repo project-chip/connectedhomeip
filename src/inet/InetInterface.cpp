@@ -995,7 +995,7 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
-CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
 {
     VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
