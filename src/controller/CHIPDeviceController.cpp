@@ -73,6 +73,7 @@
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <trace/trace.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
@@ -714,6 +715,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const SessionHandle & session)
 {
+    MATTER_TRACE_EVENT_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
         if (deviceProxy->MatchesSession(session))
@@ -729,6 +731,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Sessi
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 {
+    MATTER_TRACE_EVENT_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
         if (deviceProxy->GetDeviceId() == id)
@@ -766,17 +769,20 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
 {
+    MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
     ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
 {
+    MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
+    MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
     ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, params));
     return Commission(remoteDeviceId);
 }
@@ -784,17 +790,20 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                                           CommissioningParameters & commissioningParams)
 {
+    MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
     ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     return Commission(remoteDeviceId, commissioningParams);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode)
 {
+    MATTER_TRACE_EVENT_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
+    MATTER_TRACE_EVENT_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
@@ -906,6 +915,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
+    MATTER_TRACE_EVENT_SCOPE("Commission", "DeviceCommissioner");
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
@@ -1034,6 +1044,7 @@ void DeviceCommissioner::OnSessionEstablished()
 CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * device,
                                                                   Credentials::CertificateType certificateType)
 {
+    MATTER_TRACE_EVENT_SCOPE("SendCertificateChainRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending Certificate Chain request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1047,6 +1058,7 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
 
 void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_ERROR error)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnCertificateChainFailureResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device failed to receive the Certificate Chain request Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
@@ -1055,6 +1067,7 @@ void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_
 void DeviceCommissioner::OnCertificateChainResponse(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnCertificateChainResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Received certificate chain from the device");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
@@ -1066,6 +1079,7 @@ void DeviceCommissioner::OnCertificateChainResponse(
 
 CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce)
 {
+    MATTER_TRACE_EVENT_SCOPE("SendAttestationRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1080,6 +1094,7 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
 
 void DeviceCommissioner::OnAttestationFailureResponse(void * context, CHIP_ERROR error)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnAttestationFailureResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device failed to receive the Attestation Information Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
@@ -1088,6 +1103,7 @@ void DeviceCommissioner::OnAttestationFailureResponse(void * context, CHIP_ERROR
 void DeviceCommissioner::OnAttestationResponse(void * context,
                                                const OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnAttestationResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Received Attestation Information from the device");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
@@ -1098,6 +1114,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context,
 
 void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * context, AttestationVerificationResult result)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnDeviceAttestationInformationVerification", "DeviceCommissioner");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
     if (result != AttestationVerificationResult::kSuccess)
@@ -1129,6 +1146,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info)
 {
+    MATTER_TRACE_EVENT_SCOPE("ValidateAttestationInfo", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
@@ -1142,6 +1160,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::Device
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
 {
+    MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificateSigningRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending CSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1156,6 +1175,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
 
 void DeviceCommissioner::OnCSRFailureResponse(void * context, CHIP_ERROR error)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnCSRFailureResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device failed to receive the CSR request Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
@@ -1164,6 +1184,7 @@ void DeviceCommissioner::OnCSRFailureResponse(void * context, CHIP_ERROR error)
 void DeviceCommissioner::OnOperationalCertificateSigningRequest(
     void * context, const OperationalCredentials::Commands::CSRResponse::DecodableType & data)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnOperationalCertificateSigningRequest", "DeviceCommissioner");
     ChipLogProgress(Controller, "Received certificate signing request from the device");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
@@ -1176,6 +1197,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
                                                     const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
                                                     Optional<NodeId> adminSubject)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     // TODO(#13825): If not passed by the signer, the commissioner should
@@ -1203,6 +1225,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
                                           const ByteSpan & AttestationSignature, ByteSpan dac, ByteSpan csrNonce)
 {
+    MATTER_TRACE_EVENT_SCOPE("ProcessOpCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
@@ -1235,6 +1258,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
                                                           const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
                                                           const NodeId adminSubject)
 {
+    MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::AddNOC::Type request;
@@ -1282,6 +1306,7 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
 
 void DeviceCommissioner::OnAddNOCFailureResponse(void * context, CHIP_ERROR error)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnAddNOCFailureResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
@@ -1290,6 +1315,7 @@ void DeviceCommissioner::OnAddNOCFailureResponse(void * context, CHIP_ERROR erro
 void DeviceCommissioner::OnOperationalCertificateAddResponse(
     void * context, const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnOperationalCertificateAddResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", to_underlying(data.statusCode));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
@@ -1317,6 +1343,7 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac)
 {
+    MATTER_TRACE_EVENT_SCOPE("SendTrustedRootCertificate", "DeviceCommissioner");
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
@@ -1333,6 +1360,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
 
 void DeviceCommissioner::OnRootCertSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnRootCertSuccessResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device confirmed that it has received the root certificate");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
@@ -1340,6 +1368,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context, const chip::a
 
 void DeviceCommissioner::OnRootCertFailureResponse(void * context, CHIP_ERROR error)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnRootCertFailureResponse", "DeviceCommissioner");
     ChipLogProgress(Controller, "Device failed to receive the root certificate Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
@@ -1347,6 +1376,7 @@ void DeviceCommissioner::OnRootCertFailureResponse(void * context, CHIP_ERROR er
 
 CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device)
 {
+    MATTER_TRACE_EVENT_SCOPE("OnOperationalCredentialsProvisioningCompletion", "DeviceCommissioner");
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1457,6 +1487,7 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
     if (mCommissioningDelegate == nullptr)
     {
         return;

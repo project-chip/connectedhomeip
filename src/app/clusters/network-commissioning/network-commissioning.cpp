@@ -27,6 +27,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <trace/trace.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -269,7 +270,7 @@ void Instance::OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Statu
 
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-
+    MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
         mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
@@ -288,6 +289,7 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
 
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials));
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
@@ -295,6 +297,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset));
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
@@ -302,6 +305,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID));
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
@@ -309,6 +313,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
@@ -324,6 +329,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex));
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
