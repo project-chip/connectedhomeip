@@ -84,9 +84,10 @@ class ClangTidyEntry:
 
         if command.startswith("clang++ ") or command.startswith("clang "):
             self.valid = True
-            self.clang_arguments = shlex.split(command[command.find(" ") :])
+            self.clang_arguments = shlex.split(command[command.find(" "):])
         else:
-            logging.warning("Cannot tidy %s - not a clang compile command", self.file)
+            logging.warning(
+                "Cannot tidy %s - not a clang compile command", self.file)
             return
 
     @property
@@ -207,7 +208,8 @@ class ClangTidyRunner:
         for idx, e in enumerate(self.entries):
             e.ExportFixesTo(
                 os.path.join(
-                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (idx + 1,)
+                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (
+                        idx + 1,)
                 )
             )
 
@@ -370,8 +372,7 @@ def cmd_fix(context):
             logging.info("Applying fixes in %s", tmpdir)
             subprocess.check_call(["clang-apply-replacements", tmpdir])
         else:
-          logging.info("No failures detected, no fixes to apply.")
-
+            logging.info("No failures detected, no fixes to apply.")
 
 
 if __name__ == "__main__":
