@@ -28,10 +28,13 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
+#include "esp_bt.h"
 #include "esp_check.h"
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_nimble_hci.h"
+#include "nimble/nimble_port.h"
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -116,6 +119,18 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kCommissioningComplete:
         ESP_LOGI(TAG, "Commissioning complete");
+#if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
+        ESP_LOGI(TAG, "Free heap: %d", esp_get_free_heap_size());
+        int ret = nimble_port_stop();
+        if (ret == 0)
+        {
+            nimble_port_deinit();
+            esp_nimble_hci_and_controller_deinit();
+            esp_bt_mem_release(ESP_BT_MODE_BLE);
+        }
+        vTaskDelay(100);
+        ESP_LOGI(TAG, "Free heap after BLE deinit: %d", esp_get_free_heap_size());
+#endif
         break;
 
     case DeviceEventType::kInterfaceIpAddressChanged:
