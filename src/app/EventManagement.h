@@ -100,7 +100,7 @@ public:
     void SetRequiredSpaceforEvicted(size_t aRequiredSpace) { mRequiredSpaceForEvicted = aRequiredSpace; }
     size_t GetRequiredSpaceforEvicted() const { return mRequiredSpaceForEvicted; }
 
-    virtual ~CircularEventBuffer() = default;
+    ~CircularEventBuffer() override = default;
 
 private:
     CircularEventBuffer * mpPrev = nullptr; ///< A pointer CircularEventBuffer storing events less important events

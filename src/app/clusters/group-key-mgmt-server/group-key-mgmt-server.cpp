@@ -166,9 +166,11 @@ private:
             GroupDataProvider::GroupKey mapping;
             while (iter->Next(mapping))
             {
-                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = { .fabricIndex   = fabric_index,
-                                                                             .groupId       = mapping.group_id,
-                                                                             .groupKeySetID = mapping.keyset_id };
+                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
+                    .groupId       = mapping.group_id,
+                    .groupKeySetID = mapping.keyset_id,
+                    .fabricIndex   = fabric_index,
+                };
                 encoder.Encode(key);
             }
             iter->Release();

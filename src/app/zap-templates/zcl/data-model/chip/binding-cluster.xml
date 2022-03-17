@@ -19,11 +19,11 @@ limitations under the License.
 
   <struct name="TargetStruct">
     <cluster code="0x001e"/>
-    <item name="FabricIndex" type="FABRIC_IDX"/>
-    <item name="Node" type="NODE_ID" optional="true"/>
-    <item name="Group" type="GROUP_ID" optional="true"/>
-    <item name="Endpoint" type="ENDPOINT_NO" optional="true"/>
-    <item name="Cluster" type="CLUSTER_ID" optional="true"/>
+    <item fieldId="1" name="Node" type="NODE_ID" optional="true"/>
+    <item fieldId="2" name="Group" type="GROUP_ID" optional="true"/>
+    <item fieldId="3" name="Endpoint" type="ENDPOINT_NO" optional="true"/>
+    <item fieldId="4" name="Cluster" type="CLUSTER_ID" optional="true"/>
+    <item fieldId="0xFE" name="FabricIndex" type="FABRIC_IDX"/>
   </struct>
 
   <cluster>

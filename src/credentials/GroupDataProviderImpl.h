@@ -32,7 +32,7 @@ public:
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
-    virtual ~GroupDataProviderImpl() {}
+    ~GroupDataProviderImpl() override {}
 
     /**
      * @brief Set the storage implementation used for non-volatile storage of configuration data.

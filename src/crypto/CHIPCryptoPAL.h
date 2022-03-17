@@ -362,7 +362,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    virtual ~P256Keypair();
+    ~P256Keypair() override;
 
     /**
      * @brief Initialize the keypair.

@@ -62,7 +62,7 @@ public:
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
-        ~WiFiNetworkIterator() = default;
+        ~WiFiNetworkIterator() override = default;
 
     private:
         LinuxWiFiDriver * driver;
@@ -119,7 +119,7 @@ public:
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
-        ~ThreadNetworkIterator() = default;
+        ~ThreadNetworkIterator() override = default;
 
     private:
         LinuxThreadDriver * driver;

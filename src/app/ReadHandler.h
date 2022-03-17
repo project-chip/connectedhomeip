@@ -98,7 +98,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    ~ReadHandler();
+    ~ReadHandler() override;
 
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler

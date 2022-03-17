@@ -41,7 +41,7 @@ namespace System {
 TimerList::Node * TimerList::Add(TimerList::Node * add)
 {
     VerifyOrDie(add != mEarliestTimer);
-    if (mEarliestTimer == NULL || (add->AwakenTime() < mEarliestTimer->AwakenTime()))
+    if (mEarliestTimer == nullptr || (add->AwakenTime() < mEarliestTimer->AwakenTime()))
     {
         add->mNextTimer = mEarliestTimer;
         mEarliestTimer  = add;
