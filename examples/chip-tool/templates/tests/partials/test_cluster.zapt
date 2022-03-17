@@ -17,7 +17,7 @@ class {{filename}}Suite: public TestCommand
         {{/chip_tests_config}}
     }
 
-    ~{{filename}}Suite()
+    ~{{filename}}Suite() override
     {
         {{>teardownSaveAs}}
     }

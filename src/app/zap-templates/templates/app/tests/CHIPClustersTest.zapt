@@ -13,7 +13,7 @@ class DLL_EXPORT {{asUpperCamelCase name}}ClusterTest : public {{asUpperCamelCas
 {
 public:
     {{asUpperCamelCase name}}ClusterTest() : {{asUpperCamelCase name}}Cluster() {}
-    ~{{asUpperCamelCase name}}ClusterTest() {}
+    ~{{asUpperCamelCase name}}ClusterTest() override {}
 };
 
 {{/chip_client_clusters}}

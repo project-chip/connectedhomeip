@@ -81,7 +81,7 @@ public:
         WriteAttribute::AddArguments();
     }
 
-    ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}() {}
+    ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
