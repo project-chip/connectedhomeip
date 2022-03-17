@@ -1,15 +1,17 @@
 # Matter tracing
 
 Matter tracing provides a tool for applications to trace information about the
-execution of the application. It depends on [pw_trace module](https://pigweed.dev/pw_trace/).
+execution of the application. It depends on
+[pw_trace module](https://pigweed.dev/pw_trace/).
 
 ## How to add trace events
 
 1. Include "trace/trace.h" in the source file.
-2. Add "${chip_root}/src/trace" as deps in BUILD.gn.
-3. Add MATTER_TRACE_EVENT_* in functions to be traced.
+2. Add "\${chip_root}/src/trace" as deps in BUILD.gn.
+3. Add MATTER*TRACE_EVENT*\* in functions to be traced.
 
 ## Example
+
 ```
 #include "pw_trace/trace.h"
 
