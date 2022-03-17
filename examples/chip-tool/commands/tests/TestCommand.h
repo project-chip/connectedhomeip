@@ -51,7 +51,7 @@ public:
         AddArgument("PICS", &mPICSFilePath);
     }
 
-    ~TestCommand(){};
+    ~TestCommand() override override{};
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;

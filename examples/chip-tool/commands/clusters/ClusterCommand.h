@@ -53,7 +53,7 @@ public:
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
-    ~ClusterCommand() {}
+    ~ClusterCommand() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -66,7 +66,7 @@ public:
     }
 
     /////////// CommandSender Callback Interface /////////
-    virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+    void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                             const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
         CHIP_ERROR error = status.ToChipError();
@@ -89,13 +89,13 @@ public:
         }
     }
 
-    virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
+    void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
         mError = error;
     }
 
-    virtual void OnDone(chip::app::CommandSender * client) override
+    void OnDone(chip::app::CommandSender * client) override
     {
         mCommandSender.reset();
         SetCommandExitStatus(mError);

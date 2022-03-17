@@ -352,7 +352,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    ~ReadAttribute() {}
+    ~ReadAttribute() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -407,7 +407,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    ~SubscribeAttribute() {}
+    ~SubscribeAttribute() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -474,7 +474,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    ~ReadEvent() {}
+    ~ReadEvent() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -522,7 +522,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    ~SubscribeEvent() {}
+    ~SubscribeEvent() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {

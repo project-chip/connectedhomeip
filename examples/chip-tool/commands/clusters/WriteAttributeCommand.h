@@ -56,7 +56,7 @@ public:
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
-    ~WriteAttribute() {}
+    ~WriteAttribute() override {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {

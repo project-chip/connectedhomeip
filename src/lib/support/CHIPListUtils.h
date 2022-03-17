@@ -45,7 +45,7 @@ template <typename T>
 struct ListHolder : ListHolderBase
 {
     ListHolder(size_t N) { mList = new T[N]; }
-    ~ListHolder() { delete[] mList; }
+    ~ListHolder() override { delete[] mList; }
     T * mList;
 };
 

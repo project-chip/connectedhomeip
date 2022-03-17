@@ -60,7 +60,7 @@ class TraceStreamFile : public TraceStream
 {
 public:
     TraceStreamFile(const char * fileName) { mFile.open(fileName); }
-    ~TraceStreamFile() { mFile.close(); }
+    ~TraceStreamFile() override { mFile.close(); }
 
     void AddField(const std::string & tag, const std::string & data) override
     {

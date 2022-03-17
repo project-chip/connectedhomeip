@@ -28,448 +28,448 @@ class DLL_EXPORT AccessControlClusterTest : public AccessControlCluster
 {
 public:
     AccessControlClusterTest() : AccessControlCluster() {}
-    ~AccessControlClusterTest() {}
+    ~AccessControlClusterTest() override {}
 };
 
 class DLL_EXPORT AccountLoginClusterTest : public AccountLoginCluster
 {
 public:
     AccountLoginClusterTest() : AccountLoginCluster() {}
-    ~AccountLoginClusterTest() {}
+    ~AccountLoginClusterTest() override {}
 };
 
 class DLL_EXPORT AdministratorCommissioningClusterTest : public AdministratorCommissioningCluster
 {
 public:
     AdministratorCommissioningClusterTest() : AdministratorCommissioningCluster() {}
-    ~AdministratorCommissioningClusterTest() {}
+    ~AdministratorCommissioningClusterTest() override {}
 };
 
 class DLL_EXPORT ApplicationBasicClusterTest : public ApplicationBasicCluster
 {
 public:
     ApplicationBasicClusterTest() : ApplicationBasicCluster() {}
-    ~ApplicationBasicClusterTest() {}
+    ~ApplicationBasicClusterTest() override {}
 };
 
 class DLL_EXPORT ApplicationLauncherClusterTest : public ApplicationLauncherCluster
 {
 public:
     ApplicationLauncherClusterTest() : ApplicationLauncherCluster() {}
-    ~ApplicationLauncherClusterTest() {}
+    ~ApplicationLauncherClusterTest() override {}
 };
 
 class DLL_EXPORT AudioOutputClusterTest : public AudioOutputCluster
 {
 public:
     AudioOutputClusterTest() : AudioOutputCluster() {}
-    ~AudioOutputClusterTest() {}
+    ~AudioOutputClusterTest() override {}
 };
 
 class DLL_EXPORT BarrierControlClusterTest : public BarrierControlCluster
 {
 public:
     BarrierControlClusterTest() : BarrierControlCluster() {}
-    ~BarrierControlClusterTest() {}
+    ~BarrierControlClusterTest() override {}
 };
 
 class DLL_EXPORT BasicClusterTest : public BasicCluster
 {
 public:
     BasicClusterTest() : BasicCluster() {}
-    ~BasicClusterTest() {}
+    ~BasicClusterTest() override {}
 };
 
 class DLL_EXPORT BinaryInputBasicClusterTest : public BinaryInputBasicCluster
 {
 public:
     BinaryInputBasicClusterTest() : BinaryInputBasicCluster() {}
-    ~BinaryInputBasicClusterTest() {}
+    ~BinaryInputBasicClusterTest() override {}
 };
 
 class DLL_EXPORT BindingClusterTest : public BindingCluster
 {
 public:
     BindingClusterTest() : BindingCluster() {}
-    ~BindingClusterTest() {}
+    ~BindingClusterTest() override {}
 };
 
 class DLL_EXPORT BooleanStateClusterTest : public BooleanStateCluster
 {
 public:
     BooleanStateClusterTest() : BooleanStateCluster() {}
-    ~BooleanStateClusterTest() {}
+    ~BooleanStateClusterTest() override {}
 };
 
 class DLL_EXPORT BridgedActionsClusterTest : public BridgedActionsCluster
 {
 public:
     BridgedActionsClusterTest() : BridgedActionsCluster() {}
-    ~BridgedActionsClusterTest() {}
+    ~BridgedActionsClusterTest() override {}
 };
 
 class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluster
 {
 public:
     BridgedDeviceBasicClusterTest() : BridgedDeviceBasicCluster() {}
-    ~BridgedDeviceBasicClusterTest() {}
+    ~BridgedDeviceBasicClusterTest() override {}
 };
 
 class DLL_EXPORT ChannelClusterTest : public ChannelCluster
 {
 public:
     ChannelClusterTest() : ChannelCluster() {}
-    ~ChannelClusterTest() {}
+    ~ChannelClusterTest() override {}
 };
 
 class DLL_EXPORT ColorControlClusterTest : public ColorControlCluster
 {
 public:
     ColorControlClusterTest() : ColorControlCluster() {}
-    ~ColorControlClusterTest() {}
+    ~ColorControlClusterTest() override {}
 };
 
 class DLL_EXPORT ContentLauncherClusterTest : public ContentLauncherCluster
 {
 public:
     ContentLauncherClusterTest() : ContentLauncherCluster() {}
-    ~ContentLauncherClusterTest() {}
+    ~ContentLauncherClusterTest() override {}
 };
 
 class DLL_EXPORT DescriptorClusterTest : public DescriptorCluster
 {
 public:
     DescriptorClusterTest() : DescriptorCluster() {}
-    ~DescriptorClusterTest() {}
+    ~DescriptorClusterTest() override {}
 };
 
 class DLL_EXPORT DiagnosticLogsClusterTest : public DiagnosticLogsCluster
 {
 public:
     DiagnosticLogsClusterTest() : DiagnosticLogsCluster() {}
-    ~DiagnosticLogsClusterTest() {}
+    ~DiagnosticLogsClusterTest() override {}
 };
 
 class DLL_EXPORT DoorLockClusterTest : public DoorLockCluster
 {
 public:
     DoorLockClusterTest() : DoorLockCluster() {}
-    ~DoorLockClusterTest() {}
+    ~DoorLockClusterTest() override {}
 };
 
 class DLL_EXPORT ElectricalMeasurementClusterTest : public ElectricalMeasurementCluster
 {
 public:
     ElectricalMeasurementClusterTest() : ElectricalMeasurementCluster() {}
-    ~ElectricalMeasurementClusterTest() {}
+    ~ElectricalMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT EthernetNetworkDiagnosticsClusterTest : public EthernetNetworkDiagnosticsCluster
 {
 public:
     EthernetNetworkDiagnosticsClusterTest() : EthernetNetworkDiagnosticsCluster() {}
-    ~EthernetNetworkDiagnosticsClusterTest() {}
+    ~EthernetNetworkDiagnosticsClusterTest() override {}
 };
 
 class DLL_EXPORT FanControlClusterTest : public FanControlCluster
 {
 public:
     FanControlClusterTest() : FanControlCluster() {}
-    ~FanControlClusterTest() {}
+    ~FanControlClusterTest() override {}
 };
 
 class DLL_EXPORT FixedLabelClusterTest : public FixedLabelCluster
 {
 public:
     FixedLabelClusterTest() : FixedLabelCluster() {}
-    ~FixedLabelClusterTest() {}
+    ~FixedLabelClusterTest() override {}
 };
 
 class DLL_EXPORT FlowMeasurementClusterTest : public FlowMeasurementCluster
 {
 public:
     FlowMeasurementClusterTest() : FlowMeasurementCluster() {}
-    ~FlowMeasurementClusterTest() {}
+    ~FlowMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT GeneralCommissioningClusterTest : public GeneralCommissioningCluster
 {
 public:
     GeneralCommissioningClusterTest() : GeneralCommissioningCluster() {}
-    ~GeneralCommissioningClusterTest() {}
+    ~GeneralCommissioningClusterTest() override {}
 };
 
 class DLL_EXPORT GeneralDiagnosticsClusterTest : public GeneralDiagnosticsCluster
 {
 public:
     GeneralDiagnosticsClusterTest() : GeneralDiagnosticsCluster() {}
-    ~GeneralDiagnosticsClusterTest() {}
+    ~GeneralDiagnosticsClusterTest() override {}
 };
 
 class DLL_EXPORT GroupKeyManagementClusterTest : public GroupKeyManagementCluster
 {
 public:
     GroupKeyManagementClusterTest() : GroupKeyManagementCluster() {}
-    ~GroupKeyManagementClusterTest() {}
+    ~GroupKeyManagementClusterTest() override {}
 };
 
 class DLL_EXPORT GroupsClusterTest : public GroupsCluster
 {
 public:
     GroupsClusterTest() : GroupsCluster() {}
-    ~GroupsClusterTest() {}
+    ~GroupsClusterTest() override {}
 };
 
 class DLL_EXPORT IdentifyClusterTest : public IdentifyCluster
 {
 public:
     IdentifyClusterTest() : IdentifyCluster() {}
-    ~IdentifyClusterTest() {}
+    ~IdentifyClusterTest() override {}
 };
 
 class DLL_EXPORT IlluminanceMeasurementClusterTest : public IlluminanceMeasurementCluster
 {
 public:
     IlluminanceMeasurementClusterTest() : IlluminanceMeasurementCluster() {}
-    ~IlluminanceMeasurementClusterTest() {}
+    ~IlluminanceMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT KeypadInputClusterTest : public KeypadInputCluster
 {
 public:
     KeypadInputClusterTest() : KeypadInputCluster() {}
-    ~KeypadInputClusterTest() {}
+    ~KeypadInputClusterTest() override {}
 };
 
 class DLL_EXPORT LevelControlClusterTest : public LevelControlCluster
 {
 public:
     LevelControlClusterTest() : LevelControlCluster() {}
-    ~LevelControlClusterTest() {}
+    ~LevelControlClusterTest() override {}
 };
 
 class DLL_EXPORT LocalizationConfigurationClusterTest : public LocalizationConfigurationCluster
 {
 public:
     LocalizationConfigurationClusterTest() : LocalizationConfigurationCluster() {}
-    ~LocalizationConfigurationClusterTest() {}
+    ~LocalizationConfigurationClusterTest() override {}
 };
 
 class DLL_EXPORT LowPowerClusterTest : public LowPowerCluster
 {
 public:
     LowPowerClusterTest() : LowPowerCluster() {}
-    ~LowPowerClusterTest() {}
+    ~LowPowerClusterTest() override {}
 };
 
 class DLL_EXPORT MediaInputClusterTest : public MediaInputCluster
 {
 public:
     MediaInputClusterTest() : MediaInputCluster() {}
-    ~MediaInputClusterTest() {}
+    ~MediaInputClusterTest() override {}
 };
 
 class DLL_EXPORT MediaPlaybackClusterTest : public MediaPlaybackCluster
 {
 public:
     MediaPlaybackClusterTest() : MediaPlaybackCluster() {}
-    ~MediaPlaybackClusterTest() {}
+    ~MediaPlaybackClusterTest() override {}
 };
 
 class DLL_EXPORT ModeSelectClusterTest : public ModeSelectCluster
 {
 public:
     ModeSelectClusterTest() : ModeSelectCluster() {}
-    ~ModeSelectClusterTest() {}
+    ~ModeSelectClusterTest() override {}
 };
 
 class DLL_EXPORT NetworkCommissioningClusterTest : public NetworkCommissioningCluster
 {
 public:
     NetworkCommissioningClusterTest() : NetworkCommissioningCluster() {}
-    ~NetworkCommissioningClusterTest() {}
+    ~NetworkCommissioningClusterTest() override {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderClusterTest : public OtaSoftwareUpdateProviderCluster
 {
 public:
     OtaSoftwareUpdateProviderClusterTest() : OtaSoftwareUpdateProviderCluster() {}
-    ~OtaSoftwareUpdateProviderClusterTest() {}
+    ~OtaSoftwareUpdateProviderClusterTest() override {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateRequestorClusterTest : public OtaSoftwareUpdateRequestorCluster
 {
 public:
     OtaSoftwareUpdateRequestorClusterTest() : OtaSoftwareUpdateRequestorCluster() {}
-    ~OtaSoftwareUpdateRequestorClusterTest() {}
+    ~OtaSoftwareUpdateRequestorClusterTest() override {}
 };
 
 class DLL_EXPORT OccupancySensingClusterTest : public OccupancySensingCluster
 {
 public:
     OccupancySensingClusterTest() : OccupancySensingCluster() {}
-    ~OccupancySensingClusterTest() {}
+    ~OccupancySensingClusterTest() override {}
 };
 
 class DLL_EXPORT OnOffClusterTest : public OnOffCluster
 {
 public:
     OnOffClusterTest() : OnOffCluster() {}
-    ~OnOffClusterTest() {}
+    ~OnOffClusterTest() override {}
 };
 
 class DLL_EXPORT OnOffSwitchConfigurationClusterTest : public OnOffSwitchConfigurationCluster
 {
 public:
     OnOffSwitchConfigurationClusterTest() : OnOffSwitchConfigurationCluster() {}
-    ~OnOffSwitchConfigurationClusterTest() {}
+    ~OnOffSwitchConfigurationClusterTest() override {}
 };
 
 class DLL_EXPORT OperationalCredentialsClusterTest : public OperationalCredentialsCluster
 {
 public:
     OperationalCredentialsClusterTest() : OperationalCredentialsCluster() {}
-    ~OperationalCredentialsClusterTest() {}
+    ~OperationalCredentialsClusterTest() override {}
 };
 
 class DLL_EXPORT PowerSourceClusterTest : public PowerSourceCluster
 {
 public:
     PowerSourceClusterTest() : PowerSourceCluster() {}
-    ~PowerSourceClusterTest() {}
+    ~PowerSourceClusterTest() override {}
 };
 
 class DLL_EXPORT PowerSourceConfigurationClusterTest : public PowerSourceConfigurationCluster
 {
 public:
     PowerSourceConfigurationClusterTest() : PowerSourceConfigurationCluster() {}
-    ~PowerSourceConfigurationClusterTest() {}
+    ~PowerSourceConfigurationClusterTest() override {}
 };
 
 class DLL_EXPORT PressureMeasurementClusterTest : public PressureMeasurementCluster
 {
 public:
     PressureMeasurementClusterTest() : PressureMeasurementCluster() {}
-    ~PressureMeasurementClusterTest() {}
+    ~PressureMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT PumpConfigurationAndControlClusterTest : public PumpConfigurationAndControlCluster
 {
 public:
     PumpConfigurationAndControlClusterTest() : PumpConfigurationAndControlCluster() {}
-    ~PumpConfigurationAndControlClusterTest() {}
+    ~PumpConfigurationAndControlClusterTest() override {}
 };
 
 class DLL_EXPORT RelativeHumidityMeasurementClusterTest : public RelativeHumidityMeasurementCluster
 {
 public:
     RelativeHumidityMeasurementClusterTest() : RelativeHumidityMeasurementCluster() {}
-    ~RelativeHumidityMeasurementClusterTest() {}
+    ~RelativeHumidityMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT ScenesClusterTest : public ScenesCluster
 {
 public:
     ScenesClusterTest() : ScenesCluster() {}
-    ~ScenesClusterTest() {}
+    ~ScenesClusterTest() override {}
 };
 
 class DLL_EXPORT SoftwareDiagnosticsClusterTest : public SoftwareDiagnosticsCluster
 {
 public:
     SoftwareDiagnosticsClusterTest() : SoftwareDiagnosticsCluster() {}
-    ~SoftwareDiagnosticsClusterTest() {}
+    ~SoftwareDiagnosticsClusterTest() override {}
 };
 
 class DLL_EXPORT SwitchClusterTest : public SwitchCluster
 {
 public:
     SwitchClusterTest() : SwitchCluster() {}
-    ~SwitchClusterTest() {}
+    ~SwitchClusterTest() override {}
 };
 
 class DLL_EXPORT TargetNavigatorClusterTest : public TargetNavigatorCluster
 {
 public:
     TargetNavigatorClusterTest() : TargetNavigatorCluster() {}
-    ~TargetNavigatorClusterTest() {}
+    ~TargetNavigatorClusterTest() override {}
 };
 
 class DLL_EXPORT TemperatureMeasurementClusterTest : public TemperatureMeasurementCluster
 {
 public:
     TemperatureMeasurementClusterTest() : TemperatureMeasurementCluster() {}
-    ~TemperatureMeasurementClusterTest() {}
+    ~TemperatureMeasurementClusterTest() override {}
 };
 
 class DLL_EXPORT TestClusterClusterTest : public TestClusterCluster
 {
 public:
     TestClusterClusterTest() : TestClusterCluster() {}
-    ~TestClusterClusterTest() {}
+    ~TestClusterClusterTest() override {}
 };
 
 class DLL_EXPORT ThermostatClusterTest : public ThermostatCluster
 {
 public:
     ThermostatClusterTest() : ThermostatCluster() {}
-    ~ThermostatClusterTest() {}
+    ~ThermostatClusterTest() override {}
 };
 
 class DLL_EXPORT ThermostatUserInterfaceConfigurationClusterTest : public ThermostatUserInterfaceConfigurationCluster
 {
 public:
     ThermostatUserInterfaceConfigurationClusterTest() : ThermostatUserInterfaceConfigurationCluster() {}
-    ~ThermostatUserInterfaceConfigurationClusterTest() {}
+    ~ThermostatUserInterfaceConfigurationClusterTest() override {}
 };
 
 class DLL_EXPORT ThreadNetworkDiagnosticsClusterTest : public ThreadNetworkDiagnosticsCluster
 {
 public:
     ThreadNetworkDiagnosticsClusterTest() : ThreadNetworkDiagnosticsCluster() {}
-    ~ThreadNetworkDiagnosticsClusterTest() {}
+    ~ThreadNetworkDiagnosticsClusterTest() override {}
 };
 
 class DLL_EXPORT TimeFormatLocalizationClusterTest : public TimeFormatLocalizationCluster
 {
 public:
     TimeFormatLocalizationClusterTest() : TimeFormatLocalizationCluster() {}
-    ~TimeFormatLocalizationClusterTest() {}
+    ~TimeFormatLocalizationClusterTest() override {}
 };
 
 class DLL_EXPORT UnitLocalizationClusterTest : public UnitLocalizationCluster
 {
 public:
     UnitLocalizationClusterTest() : UnitLocalizationCluster() {}
-    ~UnitLocalizationClusterTest() {}
+    ~UnitLocalizationClusterTest() override {}
 };
 
 class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster
 {
 public:
     UserLabelClusterTest() : UserLabelCluster() {}
-    ~UserLabelClusterTest() {}
+    ~UserLabelClusterTest() override {}
 };
 
 class DLL_EXPORT WakeOnLanClusterTest : public WakeOnLanCluster
 {
 public:
     WakeOnLanClusterTest() : WakeOnLanCluster() {}
-    ~WakeOnLanClusterTest() {}
+    ~WakeOnLanClusterTest() override {}
 };
 
 class DLL_EXPORT WiFiNetworkDiagnosticsClusterTest : public WiFiNetworkDiagnosticsCluster
 {
 public:
     WiFiNetworkDiagnosticsClusterTest() : WiFiNetworkDiagnosticsCluster() {}
-    ~WiFiNetworkDiagnosticsClusterTest() {}
+    ~WiFiNetworkDiagnosticsClusterTest() override {}
 };
 
 class DLL_EXPORT WindowCoveringClusterTest : public WindowCoveringCluster
 {
 public:
     WindowCoveringClusterTest() : WindowCoveringCluster() {}
-    ~WindowCoveringClusterTest() {}
+    ~WindowCoveringClusterTest() override {}
 };
 
 } // namespace Controller

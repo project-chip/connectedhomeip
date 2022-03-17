@@ -279,9 +279,9 @@ class TypedComplexArgument : public ComplexArgument
 {
 public:
     TypedComplexArgument(T * request) : mRequest(request) {}
-    ~TypedComplexArgument() { ComplexArgumentParser::Finalize(*mRequest); }
+    ~TypedComplexArgument() override { ComplexArgumentParser::Finalize(*mRequest); }
 
-    CHIP_ERROR Parse(const char * label, const char * json)
+    CHIP_ERROR Parse(const char * label, const char * json) override
     {
         Json::Value value;
         Json::Reader reader;

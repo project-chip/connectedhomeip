@@ -36,7 +36,7 @@ public:
     using FailureCallback = void (*)(void * context, CHIP_ERROR err);
     using DoneCallback    = void (*)(void * context);
 
-    virtual ~ResponseReceiver() {}
+    ~ResponseReceiver() override {}
 
 protected:
     ResponseReceiver(void * aContext, SuccessCallback aOnSuccess, FailureCallback aOnError, DoneCallback aOnDone) :
