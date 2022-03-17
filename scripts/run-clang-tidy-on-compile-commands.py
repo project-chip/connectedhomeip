@@ -183,7 +183,7 @@ class ClangTidyRunner:
             if all_diagnostics:
                 with open(self.fixes_file, "w") as out:
                     yaml.safe_dump(
-                        {"MainSourceFile": "", "Diagnostics:": all_diagnostics}, out
+                        {"MainSourceFile": "", "Diagnostics": all_diagnostics}, out
                     )
             else:
                 open(self.fixes_file, "w").close()
@@ -366,7 +366,12 @@ def cmd_fix(context):
             fixes_yaml = os.path.join(tmpdir, "fixes.yaml")
             with open(fixes_yaml, "w") as out:
                 out.write(open(runner.fixes_file, "r").read())
+
+            logging.info("Applying fixes in %s", tmpdir)
             subprocess.check_call(["clang-apply-replacements", tmpdir])
+        else:
+          logging.info("No failures detected, no fixes to apply.")
+
 
 
 if __name__ == "__main__":
