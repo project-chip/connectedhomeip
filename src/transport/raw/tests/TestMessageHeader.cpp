@@ -418,102 +418,102 @@ struct TestVectorMsgExtensions
     uint8_t payloadOffset;
     uint8_t appPayloadOffset;
     uint16_t msgLength;
-    const char *msg;
+    const char * msg;
 };
 
-#define HDR_LEN 8   ///< Message header length
-#define SRC_LEN 8   ///< Source Node ID length
-#define DST_LEN 8   ///< Destination Node ID length
-#define GID_LEN 2   ///< Group ID length
-#define MX_LEN 6    ///< Message Exchange block length
-#define SX_LEN 6    ///< Security Exchange block length
-#define PRO_LEN 6   ///< Protocol header length
-#define APP_LEN 2   ///< App payload length
+#define HDR_LEN 8 ///< Message header length
+#define SRC_LEN 8 ///< Source Node ID length
+#define DST_LEN 8 ///< Destination Node ID length
+#define GID_LEN 2 ///< Group ID length
+#define MX_LEN 6  ///< Message Exchange block length
+#define SX_LEN 6  ///< Security Exchange block length
+#define PRO_LEN 6 ///< Protocol header length
+#define APP_LEN 2 ///< App payload length
 
 struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
     {
         // SRC=none, DST=none, MX=0, SX=0
-        .payloadOffset = HDR_LEN,
+        .payloadOffset    = HDR_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + PRO_LEN + APP_LEN,
-        .msg =
-            "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test MX ==================
     {
         // SRC=none, DST=none, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=none, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN + SRC_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + SRC_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + SRC_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x04\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x04\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=none, DST=1, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN + DST_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + DST_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + DST_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x01\x00\x00\x20\xCC\xCC\xCC\xCC\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + DST_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x01\x00\x00\x20\xCC\xCC\xCC\xCC\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x05\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN + PRO_LEN + APP_LEN,
+        .msg = "\x05\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3"
+               "\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=none, DST=group, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN + GID_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + GID_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + GID_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x02\x00\x00\x21\xCC\xCC\xCC\xCC\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + GID_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x02\x00\x00\x21\xCC\xCC\xCC\xCC\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=group, MX=1, SX=0
-        .payloadOffset = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN,
         .appPayloadOffset = PRO_LEN,
-        .msgLength = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN + PRO_LEN + APP_LEN,
-        .msg = "\x06\x00\x00\x21\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN + PRO_LEN + APP_LEN,
+        .msg              = "\x06\x00\x00\x21\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
+               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test SX ==================
     {
         // SRC=none, DST=none, MX=0, SX=1
-        .payloadOffset = HDR_LEN,
+        .payloadOffset    = HDR_LEN,
         .appPayloadOffset = PRO_LEN + SX_LEN,
-        .msgLength = HDR_LEN + PRO_LEN + SX_LEN + APP_LEN,
-        .msg =
-            "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+        .msgLength        = HDR_LEN + PRO_LEN + SX_LEN + APP_LEN,
+        .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
+               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=none, DST=none, MX=1, SX=1
-        .payloadOffset = HDR_LEN + MX_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN,
         .appPayloadOffset = PRO_LEN + SX_LEN,
-        .msgLength = HDR_LEN + MX_LEN + PRO_LEN + SX_LEN + APP_LEN,
-        .msg = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + SX_LEN + APP_LEN,
+        .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
+               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=1
-        .payloadOffset = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN,
+        .payloadOffset    = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN,
         .appPayloadOffset = PRO_LEN + SX_LEN,
-        .msgLength = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN + PRO_LEN + SX_LEN + APP_LEN,
-        .msg = "\x05\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-            "\x09\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+        .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + DST_LEN + PRO_LEN + SX_LEN + APP_LEN,
+        .msg = "\x05\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3"
+               "\xE2\xE1"
+               "\x09\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
 };
 
@@ -537,7 +537,7 @@ void TestMsgExtensionsDecode(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, packetHeader.Decode(msg->Start(), msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, decodeSize == testEntry->payloadOffset);
 
-        NL_TEST_ASSERT(inSuite, payloadHeader.Decode(msg->Start()+decodeSize, msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, payloadHeader.Decode(msg->Start() + decodeSize, msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, decodeSize == testEntry->appPayloadOffset);
     }
 }
