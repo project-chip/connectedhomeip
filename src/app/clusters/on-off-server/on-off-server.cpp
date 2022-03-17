@@ -254,7 +254,6 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
                     case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE:
                         updatedOnOff = !updatedOnOff;
                         break;
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_PREVIOUS:
                     default:
                         // All other values 0x03- 0xFE are reserved - no action.
                         // When value is 0xFF - update with last value - that is as good as
