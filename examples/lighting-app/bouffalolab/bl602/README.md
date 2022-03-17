@@ -22,6 +22,7 @@ Generated files
           $ rm -rf out/
 
 ## Flash
+
 -   Use BLDevCube tool.
 
 ### Setting up Python Controller
