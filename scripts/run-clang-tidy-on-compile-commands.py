@@ -192,6 +192,7 @@ class ClangTidyRunner:
                 "Cleaning up directory: %r", self.fixes_temporary_file_dir.name
             )
             self.fixes_temporary_file_dir.cleanup()
+            self.fixes_temporary_file_dir = None
 
     def ExportFixesTo(self, f):
         # use absolute path since running things will change working directories
@@ -359,6 +360,7 @@ def cmd_fix(context):
             runner.ExportFixesTo(os.path.join(tmpdir, "fixes.tmp"))
 
         runner.Check()
+        runner.Cleanup()
 
         if runner.state.failures:
             fixes_yaml = os.path.join(tmpdir, "fixes.yaml")
