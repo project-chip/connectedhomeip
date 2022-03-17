@@ -70,6 +70,12 @@ static CHIPDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
+#ifdef DEBUG
+@interface CHIPDevice (Test)
+- (void)failSubscribers:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+@end
+#endif
+
 @interface CHIPDeviceTestPairingDelegate : NSObject <CHIPDevicePairingDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @end
@@ -214,9 +220,9 @@ static CHIPDevice * GetConnectedDevice(void)
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 29);
-                                         XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
-                                         XCTAssertTrue([result[@"endpointId"] isKindOfClass:[NSNumber class]]);
+                                         CHIPAttributePath * path = result[@"attributePath"];
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 29);
+                                         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
                                          XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                          XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Array"]);
                                      }
@@ -256,10 +262,11 @@ static CHIPDevice * GetConnectedDevice(void)
                                       XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                       NSArray * resultArray = values;
                                       for (NSDictionary * result in resultArray) {
-                                          XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                          XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 8);
-                                          XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 17);
-                                          XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                          CHIPAttributePath * path = result[@"attributePath"];
+                                          XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                          XCTAssertEqual([path.cluster unsignedIntegerValue], 8);
+                                          XCTAssertEqual([path.attribute unsignedIntegerValue], 17);
+                                          XCTAssertNil(result[@"error"]);
                                       }
                                       XCTAssertEqual([resultArray count], 1);
                                   }
@@ -281,18 +288,13 @@ static CHIPDevice * GetConnectedDevice(void)
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    NSDictionary * fields = [NSDictionary
-        dictionaryWithObjectsAndKeys:@"Structure", @"type",
-        [NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], @"tag",
-                                                [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                                              [NSNumber numberWithUnsignedInteger:0], @"value", nil],
-                                                @"value", nil],
-                 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"tag",
-                               [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                             [NSNumber numberWithUnsignedInteger:10], @"value", nil],
-                               @"value", nil],
-                 nil],
-        @"value", nil];
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[
+            @{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
+            @{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
+        ]
+    };
     [device invokeCommandWithEndpointId:1
                               clusterId:8
                               commandId:4
@@ -307,10 +309,11 @@ static CHIPDevice * GetConnectedDevice(void)
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 8);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 4);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 8);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 4);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -397,14 +400,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
     globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
-        XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-        NSDictionary * result = value;
-        XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-        XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-        XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
-        XCTAssertTrue([result[@"value"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"value"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"value"][@"value"] boolValue] == YES) {
+        XCTAssertTrue([value isKindOfClass:[NSArray class]]);
+        NSDictionary * result = value[0];
+        CHIPAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+        if ([result[@"data"][@"value"] boolValue] == YES) {
             [reportExpectation fulfill];
             globalReportHandler = nil;
         }
@@ -412,7 +416,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Send commands to trigger attribute change
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
-    NSDictionary * fields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", [NSArray array], @"value", nil];
+    NSDictionary * fields = @{ @"type" : @"Structure", @"value" : [NSArray array] };
     [device invokeCommandWithEndpointId:1
                               clusterId:6
                               commandId:1
@@ -427,10 +431,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -445,14 +450,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
-        XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-        NSDictionary * result = value;
-        XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-        XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-        XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
-        XCTAssertTrue([result[@"value"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"value"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"value"][@"value"] boolValue] == NO) {
+        XCTAssertTrue([value isKindOfClass:[NSArray class]]);
+        NSDictionary * result = value[0];
+        CHIPAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+        if ([result[@"data"][@"value"] boolValue] == NO) {
             [reportExpectation fulfill];
             globalReportHandler = nil;
         }
@@ -474,10 +480,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 0);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -485,6 +492,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    expectation = [self expectationWithDescription:@"Report handler deregistered"];
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             [expectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 #endif
 
@@ -664,8 +678,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 29);
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
+                                         CHIPAttributePath * path = result[@"attributePath"];
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 29);
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
                                          XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                      }
                                      XCTAssertTrue([resultArray count] > 0);
@@ -807,10 +822,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
                              XCTAssertEqual([values count], 1);
-                             XCTAssertEqual([values[0][@"endpointId"] unsignedShortValue], 1);
-                             XCTAssertEqual([values[0][@"clusterId"] unsignedLongValue], 6);
-                             XCTAssertEqual([values[0][@"attributeId"] unsignedLongValue], 0);
-                             XCTAssertEqual([values[0][@"status"] intValue], 0);
+                             CHIPAttributePath * path = values[0][@"attributePath"];
+                             XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                             XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                             XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                             XCTAssertNil(values[0][@"error"]);
                              XCTAssertTrue([values[0][@"data"][@"type"] isEqualToString:@"Boolean"]);
                              XCTAssertEqual([values[0][@"data"][@"value"] boolValue], NO);
                              [cacheExpectation fulfill];
@@ -830,9 +846,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
                              XCTAssertTrue([values count] > 0);
                              for (NSDictionary<NSString *, id> * value in values) {
-                                 XCTAssertEqual([value[@"clusterId"] unsignedLongValue], 6);
-                                 XCTAssertEqual([value[@"attributeId"] unsignedLongValue], 0);
-                                 XCTAssertEqual([value[@"status"] intValue], 0);
+                                 CHIPAttributePath * path = value[@"attributePath"];
+                                 XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                                 XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                                 XCTAssertNil(value[@"error"]);
                              }
                              [cacheExpectation fulfill];
                          }];
@@ -851,8 +868,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
                              XCTAssertTrue([values count] > 0);
                              for (NSDictionary<NSString *, id> * value in values) {
-                                 XCTAssertEqual([value[@"endpointId"] unsignedShortValue], 1);
-                                 XCTAssertEqual([value[@"attributeId"] unsignedLongValue], 0);
+                                 CHIPAttributePath * path = value[@"attributePath"];
+                                 XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                                 XCTAssertEqual([path.attribute unsignedLongValue], 0);
                              }
                              [cacheExpectation fulfill];
                          }];
@@ -871,9 +889,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
                              XCTAssertTrue([values count] > 0);
                              for (NSDictionary<NSString *, id> * value in values) {
-                                 XCTAssertEqual([value[@"endpointId"] unsignedShortValue], 1);
-                                 XCTAssertEqual([value[@"clusterId"] unsignedLongValue], 6);
-                                 XCTAssertEqual([value[@"status"] intValue], 0);
+                                 CHIPAttributePath * path = value[@"attributePath"];
+                                 XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                                 XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                                 XCTAssertNil(value[@"error"]);
                              }
                              [cacheExpectation fulfill];
                          }];
@@ -895,9 +914,114 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// Report behavior is erratic on the accessory side at the moment.
-// Hence this test is enabled only for individual manual test.
+#ifdef DEBUG
+// Test an error to subscription
+- (void)test012_SubscriptionError
+{
 #if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    XCTestExpectation * deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             [deregisterExpectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
+
+    // Subscribe
+    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
+    [device subscribeAttributeWithEndpointId:1
+        clusterId:6
+        attributeId:0
+        minInterval:1
+        maxInterval:10
+        clientQueue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
+
+            if (globalReportHandler) {
+                __auto_type callback = globalReportHandler;
+                callback(values, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"subscribe attribute: OnOff established");
+            [expectation fulfill];
+        }];
+
+    // Wait till establishment
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
+
+    // Set up expectation for report
+    XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
+    globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([value isKindOfClass:[NSArray class]]);
+        NSDictionary * result = value[0];
+        CHIPAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+        if ([result[@"data"][@"value"] boolValue] == YES) {
+            [reportExpectation fulfill];
+            globalReportHandler = nil;
+        }
+    };
+
+    // Send commands to trigger attribute change
+    XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
+    NSDictionary * fields = @{ @"type" : @"Structure", @"value" : [NSArray array] };
+    [device invokeCommandWithEndpointId:1
+                              clusterId:6
+                              commandId:1
+                          commandFields:fields
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoke command: On values: %@, error: %@", values, error);
+
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertNil(result[@"error"]);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+                                 [commandExpectation fulfill];
+                             }];
+    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
+
+    // Wait for report
+    [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Trigger reader failure
+    XCTestExpectation * failureExpectation = [self expectationWithDescription:@"failed on purpose"];
+    [device failSubscribers:queue
+                 completion:^{
+                     [failureExpectation fulfill];
+                 }];
+    [self waitForExpectations:@[ failureExpectation ] timeout:kTimeoutInSeconds];
+
+    deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             [deregisterExpectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
+}
+#endif
+
 - (void)test900_SubscribeAllAttributes
 {
 #if MANUAL_INDIVIDUAL_TEST
@@ -906,6 +1030,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
+    XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
+    NSLog(@"Deregistering report handlers...");
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             NSLog(@"Report handlers deregistered");
+                                             [cleanSubscriptionExpectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
@@ -935,69 +1067,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Set up expectation for report
     __auto_type reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
-    reportHandler = ^(id _Nullable value, NSError * _Nullable error) {
+    reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
-        XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-        NSDictionary * result = value;
-        XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-        XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-        XCTAssertTrue([result[@"value"] isKindOfClass:[NSDictionary class]]);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+        NSDictionary * result = values[0];
+        CHIPAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
 
-        if ([result[@"attributeId"] unsignedIntegerValue] == 0 && [result[@"value"][@"value"] boolValue] == YES) {
+        if ([path.attribute unsignedIntegerValue] == 0 && [result[@"data"][@"value"] boolValue] == YES) {
             [reportExpectation fulfill];
             reportHandler = nil;
         }
     };
 
-    // Send commands to trigger attribute change
+    // Send commands to set attribute state to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
-    NSDictionary * fields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", [NSArray array], @"value", nil];
-    [device invokeCommandWithEndpointId:1
-                              clusterId:6
-                              commandId:1
-                          commandFields:fields
-                            clientQueue:queue
-                             completion:^(id _Nullable values, NSError * _Nullable error) {
-                                 NSLog(@"invoke command: On values: %@, error: %@", values, error);
-
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
-
-                                 {
-                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-                                     NSArray * resultArray = values;
-                                     for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
-                                     }
-                                     XCTAssertEqual([resultArray count], 1);
-                                 }
-                                 [commandExpectation fulfill];
-                             }];
-    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
-
-    // Wait for report
-    [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
-
-    // Set up expectation for 2nd report
-    reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
-    reportHandler = ^(id _Nullable value, NSError * _Nullable error) {
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
-        XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-        NSDictionary * result = value;
-        XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-        XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-        XCTAssertTrue([result[@"value"] isKindOfClass:[NSDictionary class]]);
-        if ([result[@"attributeId"] unsignedIntegerValue] == 0 && [result[@"value"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            reportHandler = nil;
-        }
-    };
-
-    // Send command to trigger attribute change
-    commandExpectation = [self expectationWithDescription:@"command responded"];
-    fields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", [NSArray array], @"value", nil];
+    NSDictionary * fields = @{ @"type" : @"Structure", @"value" : @[] };
     [device invokeCommandWithEndpointId:1
                               clusterId:6
                               commandId:0
@@ -1012,10 +1099,88 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 0);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertNil(result[@"error"]);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+                                 [commandExpectation fulfill];
+                             }];
+    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
+
+    // Send commands to trigger attribute change
+    commandExpectation = [self expectationWithDescription:@"command responded"];
+    fields = @{ @"type" : @"Structure", @"value" : @[] };
+    [device invokeCommandWithEndpointId:1
+                              clusterId:6
+                              commandId:1
+                          commandFields:fields
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoke command: On values: %@, error: %@", values, error);
+
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertNil(result[@"error"]);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+                                 [commandExpectation fulfill];
+                             }];
+    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
+
+    // Wait for report
+    [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Set up expectation for 2nd report
+    reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
+    reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+        NSDictionary * result = values[0];
+        CHIPAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+        if ([path.attribute unsignedIntegerValue] == 0 && [result[@"data"][@"value"] boolValue] == NO) {
+            [reportExpectation fulfill];
+            reportHandler = nil;
+        }
+    };
+
+    // Send command to trigger attribute change
+    commandExpectation = [self expectationWithDescription:@"command responded"];
+    fields = @{ @"type" : @"Structure", @"value" : @[] };
+    [device invokeCommandWithEndpointId:1
+                              clusterId:6
+                              commandId:0
+                          commandFields:fields
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoke command: On values: %@, error: %@", values, error);
+
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -1026,7 +1191,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 }
-#endif
 
 #if !MANUAL_INDIVIDUAL_TEST
 - (void)test999_TearDown
@@ -1058,10 +1222,32 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue([output isEqualTo:input]);
 }
 
+- (void)testSignedInteger64Bits
+{
+    NSDictionary * input = [NSDictionary
+        dictionaryWithObjectsAndKeys:@"SignedInteger", @"type", [NSNumber numberWithInteger:-0x7000111122223333ll], @"value", nil];
+    id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:input];
+    NSLog(@"Conversion input: %@\nOutput: %@", input, output);
+    XCTAssertNotNil(output);
+    XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
+    XCTAssertTrue([output isEqualTo:input]);
+}
+
 - (void)testUnsignedInteger
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:1025], @"value", nil];
+    id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:input];
+    NSLog(@"Conversion input: %@\nOutput: %@", input, output);
+    XCTAssertNotNil(output);
+    XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
+    XCTAssertTrue([output isEqualTo:input]);
+}
+
+- (void)testUnsignedInteger64Bits
+{
+    NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
+                                         [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
     id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
@@ -1110,9 +1296,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    // Note that conversion doesn't guarantee back to Float.
-    XCTAssertTrue([output[@"type"] isEqualToString:@"Float"] || [output[@"type"] isEqualToString:@"Double"]);
-    XCTAssertTrue(([output[@"value"] doubleValue] - [input[@"value"] doubleValue]) < 0.0001);
+    XCTAssertTrue([output[@"type"] isEqualToString:@"Float"]);
+    XCTAssertTrue(([output[@"value"] floatValue] - [input[@"value"] floatValue]) < 0.0001);
 }
 
 - (void)testDouble
@@ -1123,8 +1308,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    // Note that conversion doesn't guarantee back to Double.
-    XCTAssertTrue([output[@"type"] isEqualToString:@"Float"] || [output[@"type"] isEqualToString:@"Double"]);
+    XCTAssertTrue([output[@"type"] isEqualToString:@"Double"]);
     XCTAssertTrue(([output[@"value"] doubleValue] - [input[@"value"] doubleValue]) < 0.0001);
 }
 
@@ -1140,98 +1324,38 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)testStructure
 {
-    NSArray * inputFields = [NSArray
-        arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"tag",
-                                       [NSDictionary dictionaryWithObjectsAndKeys:@"Boolean", @"type", [NSNumber numberWithBool:NO],
-                                                     @"value", nil],
-                                       @"value", nil],
-        [NSDictionary
-            dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:2], @"tag",
-            [NSDictionary dictionaryWithObjectsAndKeys:@"SignedInteger", @"type", [NSNumber numberWithInteger:5], @"value", nil],
-            @"value", nil],
-        nil];
-    NSDictionary * inputValue = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", inputFields, @"value", nil];
-
-    // Output will have context tags and hence build object with context tags for comparison
-    NSMutableArray * contextTaggedInputFields = [NSMutableArray arrayWithCapacity:[inputFields count]];
-    for (NSDictionary * field in inputFields) {
-        [contextTaggedInputFields
-            addObject:[NSDictionary
-                          dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:([field[@"tag"] unsignedIntegerValue]
-                                                                                               | 0xffffffff00000000ull)],
-                          @"tag", field[@"value"], @"value", nil]];
-    }
+    NSArray * inputFields = @[
+        @{
+            @"contextTag" : @1,
+            @"data" : @ { @"type" : @"Boolean", @"value" : @NO },
+        },
+        @{
+            @"contextTag" : @2,
+            @"data" : @ { @"type" : @"SignedInteger", @"value" : @5 },
+        }
+    ];
+    NSDictionary * inputValue = @{ @"type" : @"Structure", @"value" : inputFields };
 
     id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:inputValue];
     NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
 
-    NSDictionary * compare =
-        [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", contextTaggedInputFields, @"value", nil];
-    XCTAssertTrue([output isEqualTo:compare]);
+    XCTAssertTrue([output isEqualTo:inputValue]);
 }
 
 - (void)testArray
 {
-    NSArray * inputFields = [NSArray
-        arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:@"Boolean", @"type",
-                                                                                  [NSNumber numberWithBool:NO], @"value", nil],
-                                       @"value", nil],
-        [NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:@"SignedInteger", @"type",
-                                                                 [NSNumber numberWithInteger:5], @"value", nil],
-                      @"value", nil],
-        nil];
-    NSDictionary * inputValue = [NSDictionary dictionaryWithObjectsAndKeys:@"Array", @"type", inputFields, @"value", nil];
-
-    // Output will have anonymous tags and hence build object with context tags for comparison
-    NSMutableArray * contextTaggedInputFields = [NSMutableArray arrayWithCapacity:[inputFields count]];
-    for (NSDictionary * field in inputFields) {
-        [contextTaggedInputFields
-            addObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0xffffffffffffffffull], @"tag",
-                                    field[@"value"], @"value", nil]];
-    }
+    NSArray * inputFields = @[
+        @{ @"data" : @ { @"type" : @"Boolean", @"value" : @NO } }, @{ @"data" : @ { @"type" : @"SignedInteger", @"value" : @5 } }
+    ];
+    NSDictionary * inputValue = @{ @"type" : @"Array", @"value" : inputFields };
 
     id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:inputValue];
     NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-
-    NSDictionary * compare = [NSDictionary dictionaryWithObjectsAndKeys:@"Array", @"type", contextTaggedInputFields, @"value", nil];
-    XCTAssertTrue([output isEqualTo:compare]);
-}
-
-- (void)testList
-{
-    NSArray * inputFields = [NSArray
-        arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"tag",
-                                       [NSDictionary dictionaryWithObjectsAndKeys:@"Boolean", @"type", [NSNumber numberWithBool:NO],
-                                                     @"value", nil],
-                                       @"value", nil],
-        [NSDictionary
-            dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:2], @"tag",
-            [NSDictionary dictionaryWithObjectsAndKeys:@"SignedInteger", @"type", [NSNumber numberWithInteger:5], @"value", nil],
-            @"value", nil],
-        nil];
-    NSDictionary * inputValue = [NSDictionary dictionaryWithObjectsAndKeys:@"List", @"type", inputFields, @"value", nil];
-
-    // Output will have context tags and hence build object with context tags for comparison
-    NSMutableArray * contextTaggedInputFields = [NSMutableArray arrayWithCapacity:[inputFields count]];
-    for (NSDictionary * field in inputFields) {
-        [contextTaggedInputFields
-            addObject:[NSDictionary
-                          dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:([field[@"tag"] unsignedIntegerValue]
-                                                                                               | 0xffffffff00000000ull)],
-                          @"tag", field[@"value"], @"value", nil]];
-    }
-
-    id output = [CHIPDevice CHIPEncodeAndDecodeNSObject:inputValue];
-    NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
-    XCTAssertNotNil(output);
-    XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-
-    NSDictionary * compare = [NSDictionary dictionaryWithObjectsAndKeys:@"List", @"type", contextTaggedInputFields, @"value", nil];
-    XCTAssertTrue([output isEqualTo:compare]);
+    XCTAssertTrue([output isEqualTo:inputValue]);
 }
 
 @end

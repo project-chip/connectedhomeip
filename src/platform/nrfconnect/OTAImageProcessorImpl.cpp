@@ -24,6 +24,7 @@
 
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
+#include <dfu/mcuboot.h>
 #include <sys/reboot.h>
 
 namespace chip {
@@ -98,6 +99,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
             mDownloader->EndDownload(error);
         }
     });
+}
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    return mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    return System::MapErrorZephyr(boot_write_img_confirmed());
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)

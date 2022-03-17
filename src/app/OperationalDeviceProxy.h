@@ -88,7 +88,7 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
                                           public AddressResolve::NodeListener
 {
 public:
-    virtual ~OperationalDeviceProxy();
+    ~OperationalDeviceProxy() override;
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);

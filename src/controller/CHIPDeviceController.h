@@ -71,8 +71,6 @@
 #include <ble/BleLayer.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
-#include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -174,7 +172,7 @@ class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public Abstr
 {
 public:
     DeviceController();
-    virtual ~DeviceController() {}
+    ~DeviceController() override {}
 
     enum class CommissioningWindowOption : uint8_t
     {
@@ -438,7 +436,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() {}
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**

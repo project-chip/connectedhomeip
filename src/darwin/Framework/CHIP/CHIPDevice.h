@@ -20,30 +20,76 @@
 
 #import <Foundation/Foundation.h>
 
+@class CHIPSubscribeParams;
+
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Handler for read attribute response, write attribute response, invoke command response and reports.
+ *
+ * Handler will receive either values or error. Either one of the parameters will be nil.
+ *
+ * @param values  Received values are an NSArray object with response-value element as described below.
+ *
+ *                A response-value is an NSDictionary object with the following key values:
+ *
+ *                kCHIPAttributePathKey : CHIPAttributePath object. Included for attribute value.
+ *                kCHIPCommandPathKey : CHIPCommandPath object. Included for command response.
+ *                kCHIPErrorKey : NSError object. Included to indicate an error.
+ *                kCHIPDataKey: Data-value NSDictionary object.
+ *                              Included when there is data and when there is no error.
+ *                              The data-value is described below.
+ *
+ *                A data-value is an NSDictionary object with the following key values:
+ *
+ *                kCHIPTypeKey : data type. kCHIPSignedIntegerValueType, kCHIPUnsignedIntegerValueType, kCHIPBooleanValueType,
+ *                               kCHIPUTF8StringValueType, kCHIPOctetStringValueType, kCHIPFloatValueType, kCHIPDoubleValueType,
+ *                               kCHIPNullValueType, kCHIPStructureValueType or kCHIPArrayValueType.
+ *
+ *                kCHIPValueKey : data value. Per each data type, data value shall be the following object:
+ *
+ *                          kCHIPSignedIntegerValueType: NSNumber object.
+ *                          kCHIPUnsignedIntegerValueType: NSNumber object.
+ *                          kCHIPBooleanValueType: NSNumber object.
+ *                          kCHIPUTF8StringValueType: NSString object.
+ *                          kCHIPOctetStringValueType: NSData object.
+ *                          kCHIPFloatValueType: NSNumber object.
+ *                          kCHIPDoubleValueType: NSNumber object.
+ *                          kCHIPNullValueType: "value" key will not be included.
+ *                          kCHIPStructureValueType: structure-value NSArray object.
+ *                                                   See below for the definition of structure-value.
+ *                          kCHIPArrayValueType: Array-value NSArray object. See below for the definition of array-value.
+ *
+ *                A structure-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
+ *                contain the following key values.
+ *
+ *                kCHIPContextTagKey : NSNumber object as context tag.
+ *                kCHIPDataKey : Data-value NSDictionary object.
+ *
+ *                An array-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
+ *                contain the following key values.
+ *
+ *                kCHIPDataKey : Data-value NSDictionary object.
+ */
 typedef void (^CHIPDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
 
+extern NSString * const kCHIPAttributePathKey;
+extern NSString * const kCHIPCommandPathKey;
+extern NSString * const kCHIPDataKey;
+extern NSString * const kCHIPErrorKey;
 extern NSString * const kCHIPTypeKey;
 extern NSString * const kCHIPValueKey;
-extern NSString * const kCHIPTagKey;
-extern NSString * const kCHIPSignedIntegerValueTypeKey;
-extern NSString * const kCHIPUnsignedIntegerValueTypeKey;
-extern NSString * const kCHIPBooleanValueTypeKey;
-extern NSString * const kCHIPUTF8StringValueTypeKey;
-extern NSString * const kCHIPOctetStringValueTypeKey;
-extern NSString * const kCHIPFloatValueTypeKey;
-extern NSString * const kCHIPDoubleValueTypeKey;
-extern NSString * const kCHIPNullValueTypeKey;
-extern NSString * const kCHIPStructureValueTypeKey;
-extern NSString * const kCHIPArrayValueTypeKey;
-extern NSString * const kCHIPListValueTypeKey;
-extern NSString * const kCHIPEndpointIdKey;
-extern NSString * const kCHIPClusterIdKey;
-extern NSString * const kCHIPAttributeIdKey;
-extern NSString * const kCHIPCommandIdKey;
-extern NSString * const kCHIPDataKey;
-extern NSString * const kCHIPStatusKey;
+extern NSString * const kCHIPContextTagKey;
+extern NSString * const kCHIPSignedIntegerValueType;
+extern NSString * const kCHIPUnsignedIntegerValueType;
+extern NSString * const kCHIPBooleanValueType;
+extern NSString * const kCHIPUTF8StringValueType;
+extern NSString * const kCHIPOctetStringValueType;
+extern NSString * const kCHIPFloatValueType;
+extern NSString * const kCHIPDoubleValueType;
+extern NSString * const kCHIPNullValueType;
+extern NSString * const kCHIPStructureValueType;
+extern NSString * const kCHIPArrayValueType;
 
 @interface CHIPDevice : NSObject
 
@@ -65,29 +111,20 @@ extern NSString * const kCHIPStatusKey;
  *
  * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
- * to reportHandler.
+ * to reportHandler.  Note that if the CHIPSubscribeParams are set to
+ * automatically resubscribe this can end up being called more than once.
  *
  * TODO: The "all events" part does not work yet.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
  * Read attribute in a designated attribute path
- *
- * @param completion  response handler will receive either value or error. value will be an NSArray object with NSDictionary
- * elements. Each NSDictionary will have "endpointId", "clusterId", "attributeId", "status" and "data" keys. "endpointId",
- * "clusterId", "attributeId" and "status" will be mapped to NSNumber objects. "status" with 0 value indicates success and non-zero
- * value indicates failure. "data" key is present only when "status" value is 0. "data" key will be mapped to an NSDictionary
- * object, representing attribute value of the path. NSDictionary representing attribute value will contain "type" and "value" keys.
- *                        "type" will be mapped to "SignedInteger", "UnsignedInteger", "UTF8String", "OctetString", "Float",
- * "Double", "Boolean", "Null", "Structure", "Array" or "List. "value" will be mapped to an NSNumber, NSString, nil or NSArray
- * instance. When "type" is "OctetStriing", "value" will be an NSData object. When "type" is "Structure", "Array" or "List", "value"
- * will be NSArray with NSDictionary elements. Each NSDictionary element will have "tag" and "value" keys. "tag" will be mapped to
- * an NSNumber value. "value" will be mapped to an NSDictionary instance representing any attribute value recursively.
  */
 - (void)readAttributeWithEndpointId:(NSUInteger)endpointId
                           clusterId:(NSUInteger)clusterId
@@ -98,10 +135,8 @@ extern NSString * const kCHIPStatusKey;
 /**
  * Write to attribute in a designated attribute path
  *
- * @param completion  response handler will receive either value or error. value will be an NSArray object with NSDictionary
- * elements. Each NSDictionary will have "endpointId", "clusterId", "attributeId" and "status" keys. "endpointId", "clusterId",
- * "attributeId" and "status" will be mapped to NSNumber objects. "status" with 0 value indicates success and non-zero value
- * indicates failure.
+ * @param value       A data-value NSDictionary object as described in
+ *                    CHIPDeviceResponseHandler.
  */
 - (void)writeAttributeWithEndpointId:(NSUInteger)endpointId
                            clusterId:(NSUInteger)clusterId
@@ -113,16 +148,10 @@ extern NSString * const kCHIPStatusKey;
 /**
  * Invoke a command with a designated command path
  *
- * @param commandFields   command fields object. The object must be an NSDictionary object representing attribute value
- *                      as described in the readAttributeWithEndpointId:clusterId:attributeId:clientQueue:responseHandler: method.
- *                      The attribute must be a Structure, i.e., the NSDictionary "type" key must have the value "Structure".
- *
- * @param completion  response handler will receive either value or error. value will be an NSArray object with NSDictionary
- * elements. Each NSDictionary will have "endpointId", "clusterId", "commandId", "status" and "responseData" keys. "endpointId",
- * "clusterId", "attributeId" and "status" will be mapped to NSNumber objects. "status" with 0 value indicates success and non-zero
- * value indicates failure. "responseData" key will be included only when "status" key has 0 value and there is response data for
- * the command. "responseData" key value will be an NSDictionary object representing attribute value as described in the
- * readAttributeWithEndpointId:clusterId:attributeId:clientQueue:responseHandler: method.
+ * @param commandFields   command fields object. The object must be a data-value NSDictionary object
+ *                      as described in the CHIPDeviceResponseHandler.
+ *                      The attribute must be a Structure, i.e.,
+ *                      the NSDictionary kCHIPTypeKey key must have the value kCHIPStructureValueType.
  */
 - (void)invokeCommandWithEndpointId:(NSUInteger)endpointId
                           clusterId:(NSUInteger)clusterId
@@ -133,12 +162,6 @@ extern NSString * const kCHIPStatusKey;
 
 /**
  * Subscribe an attribute in a designated attribute path
- *
- * @param reportHandler   handler for the reports. Note that only the report handler by the last call to this method per the same
- * attribute path will receive reports. Report handler will receive either value or error. value will be an NSDictionary object. The
- * NSDictionary object will have "endpointId", "clusterId", "attributeId" and "value" keys. "endpointId", "clusterId" and
- * "attributeId" will be mapped to NSNumber objects. "value" key value will be an NSDictionary object representing attribute value
- *                      as described in the readAttributeWithEndpointId:clusterId:attributeId:clientQueue:responseHandler: method.
  */
 - (void)subscribeAttributeWithEndpointId:(NSUInteger)endpointId
                                clusterId:(NSUInteger)clusterId
@@ -146,8 +169,7 @@ extern NSString * const kCHIPStatusKey;
                              minInterval:(NSUInteger)minInterval
                              maxInterval:(NSUInteger)maxInterval
                              clientQueue:(dispatch_queue_t)clientQueue
-                           reportHandler:(void (^)(NSDictionary<NSString *, id> * _Nullable value,
-                                             NSError * _Nullable error))reportHandler
+                           reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
@@ -165,6 +187,21 @@ extern NSString * const kCHIPStatusKey;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
+
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
+                                  clusterId:(NSNumber *)clusterId
+                                attributeId:(NSNumber *)attributeId;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface CHIPCommandPath : NSObject
+@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * command;
+
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

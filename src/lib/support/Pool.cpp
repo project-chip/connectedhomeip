@@ -50,10 +50,8 @@ void * StaticAllocatorBitmap::Allocate()
                     IncreaseUsage();
                     return At(word * kBitChunkSize + offset);
                 }
-                else
-                {
-                    value = usage.load(std::memory_order_relaxed); // if there is a race, update new usage
-                }
+
+                value = usage.load(std::memory_order_relaxed); // if there is a race, update new usage
             }
         }
     }

@@ -61,10 +61,10 @@ public:
         mConfig = params;
     }
 
-    virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+    virtual ~CASESessionManager() {}
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
-    void Shutdown() { mDNSResolver.Shutdown(); }
+    void Shutdown() {}
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -98,7 +98,6 @@ private:
     void ReleaseSession(OperationalDeviceProxy * device);
 
     CASESessionManagerConfig mConfig;
-    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace chip

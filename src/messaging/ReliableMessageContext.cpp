@@ -156,24 +156,22 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         return err;
     }
     // Otherwise, the message IS NOT a duplicate.
-    else
-    {
-        if (IsAckPending())
-        {
-            ChipLogDetail(ExchangeManager,
-                          "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
-                          " on exchange " ChipLogFormatExchange,
-                          mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-            // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
-            ReturnErrorOnFailure(SendStandaloneAckMessage());
-        }
 
-        // Replace the Pending ack message counter.
-        SetPendingPeerAckMessageCounter(messageCounter);
-        using namespace System::Clock::Literals;
-        mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
-        return CHIP_NO_ERROR;
+    if (IsAckPending())
+    {
+        ChipLogDetail(ExchangeManager,
+                      "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchange,
+                      mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
+        // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
+        ReturnErrorOnFailure(SendStandaloneAckMessage());
     }
+
+    // Replace the Pending ack message counter.
+    SetPendingPeerAckMessageCounter(messageCounter);
+    using namespace System::Clock::Literals;
+    mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()

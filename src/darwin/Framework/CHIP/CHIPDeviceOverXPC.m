@@ -22,6 +22,8 @@
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPDeviceOverXPC ()
 
 @property (nonatomic, strong, readonly) id<NSCopying> controller;
@@ -73,7 +75,7 @@
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
                                                    dispatch_async(clientQueue, ^{
                                                        CHIP_LOG_DEBUG("Attribute read");
-                                                       completion(values, error);
+                                                       completion([CHIPDeviceController decodeXPCResponseValues:values], error);
                                                        // The following captures the proxy handle in the closure so that the
                                                        // handle won't be released prior to block call.
                                                        __auto_type handleRetainer = handle;
@@ -109,7 +111,7 @@
                                                 completion:^(id _Nullable values, NSError * _Nullable error) {
                                                     dispatch_async(clientQueue, ^{
                                                         CHIP_LOG_DEBUG("Attribute written");
-                                                        completion(values, error);
+                                                        completion([CHIPDeviceController decodeXPCResponseValues:values], error);
                                                         // The following captures the proxy handle in the closure so that the
                                                         // handle won't be released prior to block call.
                                                         __auto_type handleRetainer = handle;
@@ -145,7 +147,7 @@
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
                                                    dispatch_async(clientQueue, ^{
                                                        CHIP_LOG_DEBUG("Command invoked");
-                                                       completion(values, error);
+                                                       completion([CHIPDeviceController decodeXPCResponseValues:values], error);
                                                        // The following captures the proxy handle in the closure so that the
                                                        // handle won't be released prior to block call.
                                                        __auto_type handleRetainer = handle;
@@ -167,8 +169,7 @@
                              minInterval:(NSUInteger)minInterval
                              maxInterval:(NSUInteger)maxInterval
                              clientQueue:(dispatch_queue_t)clientQueue
-                           reportHandler:(void (^)(NSDictionary<NSString *, id> * _Nullable value,
-                                             NSError * _Nullable error))reportHandler
+                           reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
 {
     CHIP_LOG_DEBUG("Subscribing attribute ...");
@@ -179,21 +180,36 @@
             [self.xpcConnection
                 registerReportHandlerWithController:self.controller
                                              nodeId:self.nodeId
-                                            handler:^(id _Nullable value, NSError * _Nullable error) {
-                                                if (value && ![value isKindOfClass:[NSDictionary class]]) {
+                                            handler:^(id _Nullable values, NSError * _Nullable error) {
+                                                if (values && ![values isKindOfClass:[NSArray class]]) {
                                                     CHIP_LOG_ERROR("Unsupported report format");
                                                     return;
                                                 }
-                                                NSUInteger receivedEndpointId = [value[kCHIPEndpointIdKey] unsignedIntegerValue];
-                                                NSUInteger receivedClusterId = [value[kCHIPClusterIdKey] unsignedIntegerValue];
-                                                NSUInteger receivedAttributeId = [value[kCHIPAttributeIdKey] unsignedIntegerValue];
-                                                if (error
-                                                    || ((receivedEndpointId == endpointId || endpointId == 0xffff)
-                                                        && (receivedClusterId == clusterId || clusterId == 0xffffffff)
-                                                        && (receivedAttributeId == attributeId || attributeId == 0xffffffff))) {
+                                                if (!values) {
+                                                    CHIP_LOG_DEBUG("Error report received");
+                                                    dispatch_async(clientQueue, ^{
+                                                        reportHandler(values, error);
+                                                    });
+                                                    return;
+                                                }
+                                                __auto_type decodedValues = [CHIPDeviceController decodeXPCResponseValues:values];
+                                                NSMutableArray<NSDictionary<NSString *, id> *> * filteredValues =
+                                                    [NSMutableArray arrayWithCapacity:[decodedValues count]];
+                                                for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
+                                                    CHIPAttributePath * attributePath = decodedValue[kCHIPAttributePathKey];
+                                                    if (([attributePath.endpoint unsignedIntegerValue] == endpointId
+                                                            || endpointId == 0xffff)
+                                                        && ([attributePath.cluster unsignedIntegerValue] == clusterId
+                                                            || clusterId == 0xffffffff)
+                                                        && ([attributePath.attribute unsignedIntegerValue] == attributeId
+                                                            || attributeId == 0xffffffff)) {
+                                                        [filteredValues addObject:decodedValue];
+                                                    }
+                                                }
+                                                if ([filteredValues count] > 0) {
                                                     CHIP_LOG_DEBUG("Report received");
                                                     dispatch_async(clientQueue, ^{
-                                                        reportHandler(value, error);
+                                                        reportHandler(filteredValues, error);
                                                     });
                                                 }
                                             }];
@@ -235,3 +251,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

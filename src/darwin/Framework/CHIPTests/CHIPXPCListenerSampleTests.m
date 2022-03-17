@@ -162,20 +162,24 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
     (void) controller;
     __auto_type sharedController = [CHIPDeviceController sharedController];
     if (sharedController) {
-        [sharedController getConnectedDevice:nodeId
-                                       queue:dispatch_get_main_queue()
-                           completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                               if (error) {
-                                   NSLog(@"Failed to get connected device");
-                                   completion(nil, error);
-                               } else {
-                                   [device readAttributeWithEndpointId:endpointId
-                                                             clusterId:clusterId
-                                                           attributeId:attributeId
-                                                           clientQueue:dispatch_get_main_queue()
-                                                            completion:completion];
-                               }
-                           }];
+        [sharedController
+            getConnectedDevice:nodeId
+                         queue:dispatch_get_main_queue()
+             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                 if (error) {
+                     NSLog(@"Failed to get connected device");
+                     completion(nil, error);
+                 } else {
+                     [device readAttributeWithEndpointId:endpointId
+                                               clusterId:clusterId
+                                             attributeId:attributeId
+                                             clientQueue:dispatch_get_main_queue()
+                                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                  NSError * _Nullable error) {
+                                                  completion([CHIPDeviceController encodeXPCResponseValues:values], error);
+                                              }];
+                 }
+             }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
@@ -193,21 +197,25 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
     (void) controller;
     __auto_type sharedController = [CHIPDeviceController sharedController];
     if (sharedController) {
-        [sharedController getConnectedDevice:nodeId
-                                       queue:dispatch_get_main_queue()
-                           completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                               if (error) {
-                                   NSLog(@"Failed to get connected device");
-                                   completion(nil, error);
-                               } else {
-                                   [device writeAttributeWithEndpointId:endpointId
-                                                              clusterId:clusterId
-                                                            attributeId:attributeId
-                                                                  value:value
-                                                            clientQueue:dispatch_get_main_queue()
-                                                             completion:completion];
-                               }
-                           }];
+        [sharedController
+            getConnectedDevice:nodeId
+                         queue:dispatch_get_main_queue()
+             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                 if (error) {
+                     NSLog(@"Failed to get connected device");
+                     completion(nil, error);
+                 } else {
+                     [device writeAttributeWithEndpointId:endpointId
+                                                clusterId:clusterId
+                                              attributeId:attributeId
+                                                    value:value
+                                              clientQueue:dispatch_get_main_queue()
+                                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                   NSError * _Nullable error) {
+                                                   completion([CHIPDeviceController encodeXPCResponseValues:values], error);
+                                               }];
+                 }
+             }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
@@ -225,21 +233,25 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
     (void) controller;
     __auto_type sharedController = [CHIPDeviceController sharedController];
     if (sharedController) {
-        [sharedController getConnectedDevice:nodeId
-                                       queue:dispatch_get_main_queue()
-                           completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                               if (error) {
-                                   NSLog(@"Failed to get connected device");
-                                   completion(nil, error);
-                               } else {
-                                   [device invokeCommandWithEndpointId:endpointId
-                                                             clusterId:clusterId
-                                                             commandId:commandId
-                                                         commandFields:fields
-                                                           clientQueue:dispatch_get_main_queue()
-                                                            completion:completion];
-                               }
-                           }];
+        [sharedController
+            getConnectedDevice:nodeId
+                         queue:dispatch_get_main_queue()
+             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                 if (error) {
+                     NSLog(@"Failed to get connected device");
+                     completion(nil, error);
+                 } else {
+                     [device invokeCommandWithEndpointId:endpointId
+                                               clusterId:clusterId
+                                               commandId:commandId
+                                           commandFields:fields
+                                             clientQueue:dispatch_get_main_queue()
+                                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                  NSError * _Nullable error) {
+                                                  completion([CHIPDeviceController encodeXPCResponseValues:values], error);
+                                              }];
+                 }
+             }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
@@ -257,43 +269,45 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
 {
     __auto_type sharedController = [CHIPDeviceController sharedController];
     if (sharedController) {
-        [sharedController getConnectedDevice:nodeId
-                                       queue:dispatch_get_main_queue()
-                           completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                               if (error) {
-                                   NSLog(@"Failed to get connected device");
-                                   establishedHandler();
-                                   // Send an error report so that the client knows of the failure
-                                   [self.clientProxy handleReportWithController:controller
-                                                                         nodeId:nodeId
-                                                                          value:nil
-                                                                          error:[NSError errorWithDomain:CHIPErrorDomain
-                                                                                                    code:CHIPErrorCodeGeneralError
-                                                                                                userInfo:nil]];
-                               } else {
-                                   [device subscribeAttributeWithEndpointId:endpointId
-                                                                  clusterId:clusterId
-                                                                attributeId:attributeId
-                                                                minInterval:minInterval
-                                                                maxInterval:maxInterval
-                                                                clientQueue:dispatch_get_main_queue()
-                                                              reportHandler:^(NSDictionary<NSString *, id> * _Nullable value,
-                                                                  NSError * _Nullable error) {
-                                                                  [self.clientProxy handleReportWithController:controller
-                                                                                                        nodeId:nodeId
-                                                                                                         value:value
-                                                                                                         error:error];
-                                                              }
-                                                    subscriptionEstablished:establishedHandler];
-                               }
-                           }];
+        [sharedController
+            getConnectedDevice:nodeId
+                         queue:dispatch_get_main_queue()
+             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                 if (error) {
+                     NSLog(@"Failed to get connected device");
+                     establishedHandler();
+                     // Send an error report so that the client knows of the failure
+                     [self.clientProxy handleReportWithController:controller
+                                                           nodeId:nodeId
+                                                           values:nil
+                                                            error:[NSError errorWithDomain:CHIPErrorDomain
+                                                                                      code:CHIPErrorCodeGeneralError
+                                                                                  userInfo:nil]];
+                 } else {
+                     [device subscribeAttributeWithEndpointId:endpointId
+                                                    clusterId:clusterId
+                                                  attributeId:attributeId
+                                                  minInterval:minInterval
+                                                  maxInterval:maxInterval
+                                                  clientQueue:dispatch_get_main_queue()
+                                                reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                    NSError * _Nullable error) {
+                                                    [self.clientProxy handleReportWithController:controller
+                                                                                          nodeId:nodeId
+                                                                                          values:[CHIPDeviceController
+                                                                                                     encodeXPCResponseValues:values]
+                                                                                           error:error];
+                                                }
+                                      subscriptionEstablished:establishedHandler];
+                 }
+             }];
     } else {
         NSLog(@"Failed to get shared controller");
         establishedHandler();
         // Send an error report so that the client knows of the failure
         [self.clientProxy handleReportWithController:controller
                                               nodeId:nodeId
-                                               value:nil
+                                              values:nil
                                                error:[NSError errorWithDomain:CHIPErrorDomain
                                                                          code:CHIPErrorCodeGeneralError
                                                                      userInfo:nil]];
@@ -337,11 +351,14 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
 {
     CHIPAttributeCacheContainer * attributeCacheContainer = _attributeCacheDictionary[[NSNumber numberWithUnsignedLongLong:nodeId]];
     if (attributeCacheContainer) {
-        [attributeCacheContainer readAttributeWithEndpointId:endpointId
-                                                   clusterId:clusterId
-                                                 attributeId:attributeId
-                                                 clientQueue:dispatch_get_main_queue()
-                                                  completion:completion];
+        [attributeCacheContainer
+            readAttributeWithEndpointId:endpointId
+                              clusterId:clusterId
+                            attributeId:attributeId
+                            clientQueue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 completion([CHIPDeviceController encodeXPCResponseValues:values], error);
+                             }];
     } else {
         NSLog(@"Attribute cache for node ID %llu was not setup", nodeId);
         completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
@@ -547,9 +564,9 @@ static CHIPDeviceController * GetDeviceController(void)
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 29);
-                                         XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
-                                         XCTAssertTrue([result[@"endpointId"] isKindOfClass:[NSNumber class]]);
+                                         CHIPAttributePath * path = result[@"attributePath"];
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 29);
+                                         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
                                          XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                          XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Array"]);
                                      }
@@ -589,10 +606,11 @@ static CHIPDeviceController * GetDeviceController(void)
                                       XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                       NSArray * resultArray = values;
                                       for (NSDictionary * result in resultArray) {
-                                          XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                          XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 8);
-                                          XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 17);
-                                          XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                          CHIPAttributePath * path = result[@"attributePath"];
+                                          XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                          XCTAssertEqual([path.cluster unsignedIntegerValue], 8);
+                                          XCTAssertEqual([path.attribute unsignedIntegerValue], 17);
+                                          XCTAssertNil(result[@"error"]);
                                       }
                                       XCTAssertEqual([resultArray count], 1);
                                   }
@@ -614,18 +632,13 @@ static CHIPDeviceController * GetDeviceController(void)
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    NSDictionary * fields = [NSDictionary
-        dictionaryWithObjectsAndKeys:@"Structure", @"type",
-        [NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], @"tag",
-                                                [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                                              [NSNumber numberWithUnsignedInteger:0], @"value", nil],
-                                                @"value", nil],
-                 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"tag",
-                               [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                             [NSNumber numberWithUnsignedInteger:10], @"value", nil],
-                               @"value", nil],
-                 nil],
-        @"value", nil];
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[
+            @{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
+            @{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
+        ]
+    };
     [device invokeCommandWithEndpointId:1
                               clusterId:8
                               commandId:4
@@ -640,10 +653,11 @@ static CHIPDeviceController * GetDeviceController(void)
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 8);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 4);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 8);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 4);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -692,18 +706,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Set up expectation for report
     expectation = [self expectationWithDescription:@"receive OnOff attribute report"];
-    globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
+    globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
-        {
-            XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-            NSDictionary * result = value;
-            XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-            XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-            XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
-            XCTAssertTrue([result[@"value"] isKindOfClass:[NSDictionary class]]);
-            XCTAssertTrue([result[@"value"][@"type"] isEqualToString:@"Boolean"]);
-            XCTAssertEqual([result[@"value"][@"value"] boolValue], YES);
+        for (NSDictionary * result in values) {
+            CHIPAttributePath * path = result[@"attributePath"];
+            XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+            XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+            XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
         }
         [expectation fulfill];
     };
@@ -724,10 +738,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -851,8 +866,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Set up expectation for report
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
-    globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
-        XCTAssertNil(value);
+    globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(values);
         // Error is copied over XPC and hence cannot use CHIPErrorTestUtils utility which checks against a local domain string
         // object.
         XCTAssertTrue([error.domain isEqualToString:MatterInteractionErrorDomain]);
@@ -934,10 +949,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
-                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 1);
-                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                         CHIPCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -960,9 +976,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              for (NSDictionary<NSString *, id> * value in values) {
                                  XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
                                  NSDictionary * result = value;
-                                 XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
-                                 XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
-                                 XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
+                                 CHIPAttributePath * path = result[@"attributePath"];
+                                 XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                 XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                 XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
                                  XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                  XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
                                  XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);

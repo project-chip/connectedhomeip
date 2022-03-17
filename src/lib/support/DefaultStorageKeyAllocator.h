@@ -18,6 +18,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <string.h>
@@ -80,8 +81,6 @@ public:
     static const char * OTAUpdateToken() { return "o/ut"; }
 
 private:
-    static const size_t kKeyLengthMax = 32;
-
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.
     const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
@@ -93,7 +92,7 @@ private:
         return mKeyName;
     }
 
-    char mKeyName[kKeyLengthMax + 1] = { 0 };
+    char mKeyName[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
 };
 
 } // namespace chip

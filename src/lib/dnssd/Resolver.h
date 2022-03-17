@@ -40,32 +40,6 @@ struct ResolvedNodeData
     // TODO: use pool to allow dynamic
     static constexpr unsigned kMaxIPAddresses = 5;
 
-    static bool IsIpLess(const Inet::IPAddress & a, const Inet::IPAddress & b)
-    {
-        // Link-local last
-        if (a.IsIPv6LinkLocal() && !b.IsIPv6LinkLocal())
-        {
-            return false;
-        }
-        if (!a.IsIPv6LinkLocal() && b.IsIPv6LinkLocal())
-        {
-            return true;
-        }
-
-        // IPv6 before IPv4
-        if (a.IsIPv6() && !b.IsIPv6())
-        {
-            return false;
-        }
-        if (!a.IsIPv6() && b.IsIPv6())
-        {
-            return true;
-        }
-
-        // no ordering, do not care
-        return false;
-    }
-
     void LogNodeIdResolved() const
     {
 #if CHIP_PROGRESS_LOGGING
@@ -80,25 +54,6 @@ struct ResolvedNodeData
             ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
-    }
-
-    /// Sorts IP addresses in a consistent order. Specifically places
-    /// Link-local IPv6 addresses at the end (e.g. mDNS reflector services in Unify will
-    /// return link-local addresses that will not work) and prioritizes global IPv6 addresses
-    /// before IPv4 ones.
-    void PrioritizeAddresses()
-    {
-        // Slow sort, however we have maximum kMaxIPAddreses, so this is good enough for now
-        for (unsigned i = 0; i + 1 < mNumIPs; i++)
-        {
-            for (unsigned j = i + 1; i < mNumIPs; i++)
-            {
-                if (IsIpLess(mAddress[j], mAddress[i]))
-                {
-                    std::swap(mAddress[i], mAddress[j]);
-                }
-            }
-        }
     }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
@@ -318,10 +273,8 @@ struct DiscoveryFilter
         {
             return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
         }
-        else
-        {
-            return code == other.code;
-        }
+
+        return code == other.code;
     }
 };
 enum class DiscoveryType

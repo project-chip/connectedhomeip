@@ -76,7 +76,8 @@ public:
     {
         mUpdateAction = action;
     }
-    void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+    void SetDelayedQueryActionTimeSec(uint32_t time) { mDelayedQueryActionTimeSec = time; }
+    void SetDelayedApplyActionTimeSec(uint32_t time) { mDelayedApplyActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
     void SetSoftwareVersionString(const char * versionString) { mSoftwareVersionString = versionString; }
@@ -91,7 +92,8 @@ private:
     uint32_t mIgnoreQueryImageCount  = 0;
     uint32_t mIgnoreApplyUpdateCount = 0;
     chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
-    uint32_t mDelayedActionTimeSec;
+    uint32_t mDelayedApplyActionTimeSec = 0;
+    uint32_t mDelayedQueryActionTimeSec = 0;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);

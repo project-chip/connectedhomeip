@@ -36,11 +36,12 @@ public:
     {
         AddArgument("node-id/group-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(10)); }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endPointIds) = 0;
 
@@ -54,6 +55,9 @@ public:
         mOnDeviceConnectedCallback.Cancel();
         mOnDeviceConnectionFailureCallback.Cancel();
     }
+
+protected:
+    chip::Optional<uint16_t> mTimeout;
 
 private:
     chip::NodeId mNodeId;

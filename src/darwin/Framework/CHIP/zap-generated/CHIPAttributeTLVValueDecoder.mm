@@ -52,7 +52,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPAccessControlClusterAccessControlEntry * newElement_0;
                     newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
                     newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
                     if (entry_0.subjects.IsNull()) {
@@ -110,6 +109,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                             newElement_0.targets = array_3;
                         }
                     }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -136,8 +136,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPAccessControlClusterExtensionEntry * newElement_0;
                     newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -1565,7 +1565,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPBindingClusterTargetStruct * newElement_0;
                     newElement_0 = [CHIPBindingClusterTargetStruct new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     if (entry_0.node.HasValue()) {
                         newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node.Value()];
                     } else {
@@ -1586,6 +1585,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     } else {
                         newElement_0.cluster = nil;
                     }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -3776,7 +3776,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::EnableOneTouchLocking::Id: {
@@ -5219,9 +5219,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
                     newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                     newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5248,7 +5248,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
                     newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                     { // Scope for our temporary variables
                         auto * array_2 = [NSMutableArray new];
@@ -5273,6 +5272,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     } else {
                         newElement_0.groupName = nil;
                     }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -7697,13 +7697,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPOperationalCredentialsClusterNOCStruct * newElement_0;
                     newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
                     if (entry_0.icac.IsNull()) {
                         newElement_0.icac = nil;
                     } else {
                         newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
                     }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -7730,7 +7730,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPOperationalCredentialsClusterFabricDescriptor * newElement_0;
                     newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
                                                                 length:entry_0.rootPublicKey.size()];
                     newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
@@ -7739,6 +7738,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                                   length:entry_0.label.size()
                                                                 encoding:NSUTF8StringEncoding];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -10325,7 +10325,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPTestClusterClusterTestFabricScoped * newElement_0;
                     newElement_0 = [CHIPTestClusterClusterTestFabricScoped new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
                     if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
                         newElement_0.optionalFabricSensitiveInt8u =
@@ -10382,6 +10381,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                         }
                         newElement_0.fabricSensitiveInt8uList = array_2;
                     }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

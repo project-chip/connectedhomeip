@@ -158,7 +158,7 @@ public:
         LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder()));
         LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder()));
     }
-    ~AdvertiserMinMdns() {}
+    ~AdvertiserMinMdns() override {}
 
     // Service advertiser
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
@@ -695,10 +695,8 @@ FullQName AdvertiserMinMdns::GetOperationalTxtEntries(OperationalQueryAllocator:
     {
         return allocator->AllocateQNameFromArray(mEmptyTextEntries, 1);
     }
-    else
-    {
-        return allocator->AllocateQNameFromArray(txtFields, numTxtFields);
-    }
+
+    return allocator->AllocateQNameFromArray(txtFields, numTxtFields);
 }
 
 FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertisingParameters & params)
@@ -725,7 +723,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
     if (params.GetDeviceType().HasValue())
     {
-        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%d", params.GetDeviceType().Value());
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, params.GetDeviceType().Value());
         txtFields[numTxtFields++] = txtDeviceType;
     }
 
@@ -775,10 +773,8 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     {
         return allocator->AllocateQNameFromArray(mEmptyTextEntries, 1);
     }
-    else
-    {
-        return allocator->AllocateQNameFromArray(txtFields, numTxtFields);
-    }
+
+    return allocator->AllocateQNameFromArray(txtFields, numTxtFields);
 }
 
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)

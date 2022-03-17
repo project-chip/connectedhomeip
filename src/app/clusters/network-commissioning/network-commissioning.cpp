@@ -86,7 +86,7 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(
         DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(mpBaseDriver->Init());
+    ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
@@ -239,6 +239,34 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
+void Instance::OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError,
+                                        Optional<ByteSpan> aNetworkId, Optional<int32_t> aConnectStatus)
+{
+    if (aNetworkId.HasValue() && aNetworkId.Value().size() > kMaxNetworkIDLen)
+    {
+        ChipLogError(DeviceLayer, "Invalid network id received when calling OnNetworkingStatusChange");
+        return;
+    }
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(aCommissioningError));
+    if (aNetworkId.HasValue())
+    {
+        memcpy(mLastNetworkID, aNetworkId.Value().data(), aNetworkId.Value().size());
+        mLastNetworkIDLen = static_cast<uint8_t>(aNetworkId.Value().size());
+    }
+    else
+    {
+        mLastNetworkIDLen = 0;
+    }
+    if (aConnectStatus.HasValue())
+    {
+        mLastConnectErrorValue.SetNonNull(aConnectStatus.Value());
+    }
+    else
+    {
+        mLastConnectErrorValue.SetNull();
+    }
+}
+
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
 
@@ -321,7 +349,15 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
-    mLastConnectErrorValue.SetNonNull(interfaceStatus);
+
+    if (commissioningError == Status::kSuccess)
+    {
+        mLastConnectErrorValue.SetNull();
+    }
+    else
+    {
+        mLastConnectErrorValue.SetNonNull(interfaceStatus);
+    }
 
     if (commissioningError == Status::kSuccess)
     {

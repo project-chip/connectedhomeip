@@ -35,8 +35,19 @@ NS_ASSUME_NONNULL_BEGIN
 + (CHIPDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
                                  xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
 
-@end
+/**
+ * Returns an encoded values object to send over XPC for read, write and command interactions
+ */
++ (NSArray<NSDictionary<NSString *, id> *> * _Nullable)encodeXPCResponseValues:
+    (NSArray<NSDictionary<NSString *, id> *> * _Nullable)values;
 
+/**
+ * Returns a decoded values object from a values object received from XPC for read, write and command interactions
+ */
++ (NSArray<NSDictionary<NSString *, id> *> * _Nullable)decodeXPCResponseValues:
+    (NSArray<NSDictionary<NSString *, id> *> * _Nullable)values;
+
+@end
 /**
  * Protocol that remote object must support over XPC
  */
@@ -126,7 +137,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)handleReportWithController:(id _Nullable)controller
                             nodeId:(uint64_t)nodeId
-                             value:(id _Nullable)value
+                            values:(id _Nullable)values
                              error:(NSError * _Nullable)error;
 
 @end

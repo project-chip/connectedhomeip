@@ -112,5 +112,10 @@ DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider()
  */
 void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider);
 
+/**
+ * Check if Instance is prepared
+ */
+bool IsDeviceAttestationCredentialsProviderSet();
+
 } // namespace Credentials
 } // namespace chip
