@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <BL602Config.h>
 #include <aos/yloop.h>
 #include <hal_wifi.h>
 #include <lib/support/CodeUtils.h>
