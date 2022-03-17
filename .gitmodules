@@ -193,3 +193,7 @@
 [submodule "p6/serial-flash"]
 	path = third_party/p6/p6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
+[submodule "third_party/bouffalolab/bl602"]
+	path = third_party/bouffalolab/bl602_sdk/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
+	branch = gebx/rebase-to-ee7682d5
