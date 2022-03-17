@@ -213,7 +213,6 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     }
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
-    // VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 
 exit:
@@ -279,7 +278,6 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     }
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
-    // VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 
 exit:
