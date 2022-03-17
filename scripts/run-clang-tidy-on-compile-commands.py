@@ -143,11 +143,12 @@ class TidyState:
 class ClangTidyRunner:
     """Handles running clang-tidy"""
 
-    def __init__(self, compile_commands_json):
-        database = json.load(open(compile_commands_json))
-
+    def __init__(self):
         self.entries = []
         self.state = TidyState()
+
+    def AddDatabase(self, compile_commands_json):
+        database = json.load(open(compile_commands_json))
 
         for entry in database:
             item = ClangTidyEntry(entry)
@@ -215,7 +216,8 @@ __LOG_LEVELS__ = {
 @click.group(chain=True)
 @click.option(
     "--compile-database",
-    default=None,
+    default=[],
+    multiple=True,
     help="Path to `compile_commands.json` to use for executing clang-tidy.",
 )
 @click.option(
@@ -263,7 +265,7 @@ def main(
         log_fmt = "%(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if compile_database is None:
+    if not compile_database:
         logging.warning(
             "Compilation database file not provided. Searching for first item in ./out"
         )
@@ -274,7 +276,10 @@ def main(
             raise Exception("Could not find `compile_commands.json` in ./out")
         logging.info("Will use %s for compile", compile_database)
 
-    context.obj = ClangTidyRunner(compile_database)
+    context.obj = ClangTidyRunner()
+
+    for name in compile_database:
+      context.obj.AddDatabase(name)
 
     if file_include_regex:
         r = re.compile(file_include_regex)

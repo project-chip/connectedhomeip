@@ -189,9 +189,9 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps \
-                       --target linux-x64-all-clusters-ipv6only \
-                       --target linux-x64-chip-tool-ipv6only \
-                       --target linux-x64-minmdns-ipv6only \
+                       --target linux-x64-all-clusters-ipv6only-clang \
+                       --target linux-x64-chip-tool-ipv6only-clang \
+                       --target linux-x64-minmdns-ipv6only-clang \
                        --target linux-x64-rpc-console \
                        build \
                     "
@@ -201,7 +201,8 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --no-log-timestamps \
-                       --compile-database out/linux-x64-chip-tool-ipv6only/compile_commands.json \
+                       --compile-database out/linux-x64-chip-tool-ipv6only-clang/compile_commands.json \
+                       --compile-database out/linux-x64-all-clusters-ipv6only-clang/compile_commands.json \
                        check \
                     "
             - name: Run fake linux tests with build_examples
