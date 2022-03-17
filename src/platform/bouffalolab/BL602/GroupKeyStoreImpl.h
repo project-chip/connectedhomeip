@@ -23,8 +23,8 @@
  */
 
 #include <Core/CHIPKeyIds.h>
-#include <platform/bouffalolab/BL602/BL602Config.h>
 #include <platform/Profiles/security/ChipApplicationKeys.h>
+#include <platform/bouffalolab/BL602/BL602Config.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {

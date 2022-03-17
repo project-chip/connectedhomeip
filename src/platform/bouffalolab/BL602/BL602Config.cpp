@@ -43,15 +43,15 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-const BL602Config::Key BL602Config::kConfigKey_SerialNum           = { "serial-num" };
-const BL602Config::Key BL602Config::kConfigKey_MfrDeviceId         = { "device-id" };
-const BL602Config::Key BL602Config::kConfigKey_MfrDeviceCert       = { "device-cert" };
-const BL602Config::Key BL602Config::kConfigKey_MfrDeviceICACerts   = { "device-ca-certs" };
-const BL602Config::Key BL602Config::kConfigKey_MfrDevicePrivateKey = { "device-key" };
-const BL602Config::Key BL602Config::kConfigKey_HardwareVersion     = { "hardware-ver" };
-const BL602Config::Key BL602Config::kConfigKey_ManufacturingDate   = { "mfg-date" };
-const BL602Config::Key BL602Config::kConfigKey_SetupPinCode        = { "pin-code" };
-const BL602Config::Key BL602Config::kConfigKey_SetupDiscriminator  = { "discriminator" };
+const BL602Config::Key BL602Config::kConfigKey_SerialNum             = { "serial-num" };
+const BL602Config::Key BL602Config::kConfigKey_MfrDeviceId           = { "device-id" };
+const BL602Config::Key BL602Config::kConfigKey_MfrDeviceCert         = { "device-cert" };
+const BL602Config::Key BL602Config::kConfigKey_MfrDeviceICACerts     = { "device-ca-certs" };
+const BL602Config::Key BL602Config::kConfigKey_MfrDevicePrivateKey   = { "device-key" };
+const BL602Config::Key BL602Config::kConfigKey_HardwareVersion       = { "hardware-ver" };
+const BL602Config::Key BL602Config::kConfigKey_ManufacturingDate     = { "mfg-date" };
+const BL602Config::Key BL602Config::kConfigKey_SetupPinCode          = { "pin-code" };
+const BL602Config::Key BL602Config::kConfigKey_SetupDiscriminator    = { "discriminator" };
 const BL602Config::Key BL602Config::kConfigKey_Spake2pIterationCount = { "iteration-count" };
 const BL602Config::Key BL602Config::kConfigKey_Spake2pSalt           = { "salt" };
 const BL602Config::Key BL602Config::kConfigKey_Spake2pVerifier       = { "verifier" };
@@ -195,7 +195,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, bool val)
     }
     SuccessOrExit(err);
 
-    //ChipLogProgress(DeviceLayer, "Easyflash set: %s = %s", key.name, val ? "true" : "false");
+    // ChipLogProgress(DeviceLayer, "Easyflash set: %s = %s", key.name, val ? "true" : "false");
 exit:
     return err;
 }
@@ -211,7 +211,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, uint32_t val)
     }
     SuccessOrExit(err);
 
-    //ChipLogProgress(DeviceLayer, "Easyflash set: %s = %" PRIu32 " (0x%" PRIX32 ")", key.name, val, val);
+    // ChipLogProgress(DeviceLayer, "Easyflash set: %s = %" PRIu32 " (0x%" PRIX32 ")", key.name, val, val);
 
 exit:
     return err;
@@ -229,7 +229,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, uint64_t val)
     }
     SuccessOrExit(err);
 
-    //ChipLogProgress(DeviceLayer, "Easyflash set: %s = %" PRIu64 " (0x%" PRIX64 ")", key.name, val, val);
+    // ChipLogProgress(DeviceLayer, "Easyflash set: %s = %" PRIu64 " (0x%" PRIX64 ")", key.name, val, val);
 
 exit:
     return err;
@@ -248,7 +248,7 @@ CHIP_ERROR BL602Config::WriteConfigValueStr(Key key, const char * str)
         }
         SuccessOrExit(err);
 
-        //ChipLogProgress(DeviceLayer, "Easyflash set: %s = \"%s\"", key.name, str);
+        // ChipLogProgress(DeviceLayer, "Easyflash set: %s = \"%s\"", key.name, str);
     }
     else
     {
@@ -290,7 +290,7 @@ CHIP_ERROR BL602Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         }
         SuccessOrExit(err);
 
-        //ChipLogProgress(DeviceLayer, "Easyflash set: /%s = (blob length %" PRId32 ")", key.name, (unsigned long )dataLen);
+        // ChipLogProgress(DeviceLayer, "Easyflash set: /%s = (blob length %" PRId32 ")", key.name, (unsigned long )dataLen);
     }
     else
     {
@@ -302,7 +302,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BL602Config::WriteWifiInfo(const char *ssid, const char * passwd)
+CHIP_ERROR BL602Config::WriteWifiInfo(const char * ssid, const char * passwd)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

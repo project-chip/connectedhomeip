@@ -76,7 +76,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     {
         // If rendezvous is bypassed, enable SoftAP so that the device can still
         // be communicated with via its SoftAP as needed.
-        //ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
+        // ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
         ConnectivityMgr().IsWiFiStationEnabled();
     }
 

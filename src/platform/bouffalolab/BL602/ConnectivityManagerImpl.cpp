@@ -18,11 +18,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
+#include <NetworkCommissioningDriver.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <NetworkCommissioningDriver.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
 
 #include <hal_wifi.h>
 #include <wifi_mgmr_ext.h>
@@ -44,17 +44,16 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include <wifi_mgmr_ext.h>
-#include <mdns_server.h>
 #include <lwip/netifapi.h>
+#include <mdns_server.h>
+#include <wifi_mgmr_ext.h>
 
-#include <string.h>
-#include <stdio.h>
 #include <FreeRTOS.h>
+#include <stdio.h>
+#include <string.h>
 #include <task.h>
 
 #define zero(S) memset(&S, 0, sizeof(S))
-
 
 using namespace ::chip;
 using namespace ::chip::Dnssd;
@@ -67,14 +66,16 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-static  ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_NotConnected;
+static ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState =
+    ConnectivityManager::kWiFiStationState_NotConnected;
 
 void ConnectivityManagerImpl::WifiStationStateChange(void)
 {
     ChipDeviceEvent event;
 
-    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected) {
-        event.Type = DeviceEventType::kWiFiConnectivityChange;    
+    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
+    {
+        event.Type                          = DeviceEventType::kWiFiConnectivityChange;
         event.WiFiConnectivityChange.Result = kConnectivity_Established;
         PlatformMgr().PostEventOrDie(&event);
     }

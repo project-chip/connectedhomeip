@@ -27,6 +27,7 @@
 #include "CHIPDeviceManager.h"
 #include "LEDWidget.h"
 #include <AppTask.h>
+#include <NetworkCommissioningDriver.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/CommandHandler.h>
@@ -35,7 +36,6 @@
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
-#include <NetworkCommissioningDriver.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -74,7 +74,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kWiFiConnectivityChange:
         log_info("Got ip, start advertise\r\n");
-        //chip::app::DnssdServer::Instance().AdvertiseOperational();
+        // chip::app::DnssdServer::Instance().AdvertiseOperational();
         chip::app::DnssdServer::Instance().StartServer();
         GetAppTask().OtaTask();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
@@ -166,7 +166,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
 
     // At this point we can assume that value points to a bool value.
     mEndpointOnOffState[endpointId - 1] = *value;
-    statusLED1.Set(*value) ;
+    statusLED1.Set(*value);
 
 exit:
     return;

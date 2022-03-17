@@ -28,6 +28,8 @@ extern "C" {
 #include <portmacro.h>
 #include <task.h>
 
+#include <aos/kernel.h>
+#include <aos/yloop.h>
 #include <bl_dma.h>
 #include <bl_irq.h>
 #include <bl_rtc.h>
@@ -36,15 +38,13 @@ extern "C" {
 #include <bl_uart.h>
 #include <blog.h>
 #include <easyflash.h>
+#include <event_device.h>
 #include <hal_board.h>
 #include <hal_boot2.h>
-#include <wifi_mgmr_ext.h>    
-#include <aos/kernel.h>
-#include <aos/yloop.h>
-#include <event_device.h>
-#include <hal_gpio.h>
 #include <hal_button.h>
+#include <hal_gpio.h>
 #include <hal_sys.h>
+#include <wifi_mgmr_ext.h>
 
 void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
 void vAssertCalled(void)
@@ -166,9 +166,10 @@ void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackTy
     *pulIdleTaskStackSize = 512; // size 512 words is For ble pds mode, otherwise stack overflow of idle task will happen.
 }
 
-static void event_cb_key_event(input_event_t *event, void *private_data)
+static void event_cb_key_event(input_event_t * event, void * private_data)
 {
-    switch (event->code) {
+    switch (event->code)
+    {
     case KEY_1: {
         log_info("[KEY_1] [EVT] INIT DONE %lld\r\n", aos_now_ms());
         log_info("short press \r\n");
@@ -178,22 +179,22 @@ static void event_cb_key_event(input_event_t *event, void *private_data)
         log_info("factory reset. rebooting...\r\n");
         hal_reboot();
     }
-        break;
+    break;
     case KEY_2: {
-            log_info("[KEY_2] [EVT] INIT DONE %lld\r\n", aos_now_ms());
-            log_info("long press \r\n");
-        }
-        break;
+        log_info("[KEY_2] [EVT] INIT DONE %lld\r\n", aos_now_ms());
+        log_info("long press \r\n");
+    }
+    break;
     case KEY_3: {
-            log_info("[KEY_3] [EVT] INIT DONE %lld\r\n", aos_now_ms());
-            log_info("longlong press \r\n");
-            // xTaskCreate(task_factory_reset, "factory-reset", 256, NULL, 10, NULL);
-        }
-        break;
+        log_info("[KEY_3] [EVT] INIT DONE %lld\r\n", aos_now_ms());
+        log_info("longlong press \r\n");
+        // xTaskCreate(task_factory_reset, "factory-reset", 256, NULL, 10, NULL);
+    }
+    break;
     default: {
-            log_info("[KEY] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
-            /*nothing*/
-        }
+        log_info("[KEY] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
+        /*nothing*/
+    }
     }
 }
 
@@ -204,9 +205,10 @@ void InitPlatform(void)
     bl_sys_init();
 
     uint32_t fdt = 0, offset = 0;
-    if (0 == get_dts_addr("gpio", &fdt, &offset)) {
+    if (0 == get_dts_addr("gpio", &fdt, &offset))
+    {
         hal_gpio_init_from_dts(fdt, offset);
-        fdt_button_module_init((const void *)fdt, (int)offset);
+        fdt_button_module_init((const void *) fdt, (int) offset);
     }
 
     aos_register_event_filter(EV_KEY, event_cb_key_event, NULL);

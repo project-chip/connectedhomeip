@@ -42,8 +42,8 @@ namespace Internal {
 class BL602Config
 {
 public:
-    static constexpr const char* kBLConfigKey_wifissid                  = ("bl-wifi-ssid");
-    static constexpr const char* kBLConfigKey_wifipassword              = ("bl-wifi-psk");
+    static constexpr const char * kBLConfigKey_wifissid     = ("bl-wifi-ssid");
+    static constexpr const char * kBLConfigKey_wifipassword = ("bl-wifi-psk");
     struct Key;
 
     // Maximum length of an easyflash key name
@@ -104,7 +104,7 @@ public:
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR WriteWifiInfo(const char * ssid, const char * passwd);
-    static CHIP_ERROR ReadWiFiInfo(const char *ssid, uint32_t ssid_size, const char *passwd, uint32_t passwd_size);
+    static CHIP_ERROR ReadWiFiInfo(const char * ssid, uint32_t ssid_size, const char * passwd, uint32_t passwd_size);
     static bool isWiFiInfoSaved(void);
 
     static CHIP_ERROR ClearConfigValue(Key key);

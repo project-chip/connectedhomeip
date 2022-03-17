@@ -14,8 +14,7 @@
 
 import("//build_overrides/build.gni")
 
-if ((current_cpu == "riscv") &&
-    (current_os == "freertos")) {
+if (current_cpu == "riscv" && current_os == "freertos") {
   declare_args() {
     # Build file to import for RISCV defaults.
     riscv_platform_config = ""

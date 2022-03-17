@@ -32,7 +32,7 @@
 #define IOT_DVK_3S 0
 
 #if BOARD_ID == IOT_DVK_3S
-hosal_pwm_dev_t pwmR = {.port = 0xff};
+hosal_pwm_dev_t pwmR = { .port = 0xff };
 #endif
 
 static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
@@ -40,20 +40,22 @@ static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 
 #if BOARD_ID == IOT_DVK_3S
 
-    uint32_t level = (red * 10000 ) / UINT8_MAX;
+    uint32_t level = (red * 10000) / UINT8_MAX;
     log_info("red level: %d\r\n", level);
 
-    if (pwmR.port == 0xff) {
-        pwmR.port = 0;
+    if (pwmR.port == 0xff)
+    {
+        pwmR.port       = 0;
         pwmR.config.pin = 0;
-        pwmR.config.duty_cycle = level; //duty_cycle range is 0~10000 correspond to 0~100%
+        pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
         pwmR.config.freq = 1000;
         hosal_pwm_init(&pwmR);
         vTaskDelay(50);
         hosal_pwm_start(&pwmR);
     }
-    else {
-        pwmR.config.duty_cycle = level; //duty_cycle range is 0~10000 correspond to 0~100%
+    else
+    {
+        pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
         pwmR.config.freq = 1000;
         hosal_pwm_para_chg(&pwmR, pwmR.config);
     }
@@ -61,30 +63,30 @@ static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 
     hosal_pwm_dev_t pwmR, pwmG, pwmB;
 
-    uint32_t level = (red * 10000 ) / UINT8_MAX;
+    uint32_t level = (red * 10000) / UINT8_MAX;
     log_info("red level: %d\r\n", level);
-    pwmR.port = 0;
-    pwmR.config.pin = 20;
-    pwmR.config.duty_cycle = level; //duty_cycle range is 0~10000 correspond to 0~100%
-    pwmR.config.freq = 1000;
+    pwmR.port              = 0;
+    pwmR.config.pin        = 20;
+    pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
+    pwmR.config.freq       = 1000;
     hosal_pwm_init(&pwmR);
     // vTaskDelay(100);
 
-    level = (green * 10000 ) / UINT8_MAX;
+    level = (green * 10000) / UINT8_MAX;
     log_info("green level: %d\r\n", level);
-    pwmG.port = 1;
-    pwmG.config.pin = 21;
-    pwmG.config.duty_cycle = level; //duty_cycle range is 0~10000 correspond to 0~100%
-    pwmG.config.freq = 1000;
+    pwmG.port              = 1;
+    pwmG.config.pin        = 21;
+    pwmG.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
+    pwmG.config.freq       = 1000;
     hosal_pwm_init(&pwmG);
     // vTaskDelay(100);
 
-    level = (blue * 10000 ) / UINT8_MAX;
+    level = (blue * 10000) / UINT8_MAX;
     log_info("blue level: %d\r\n", level);
-    pwmB.port = 2;
-    pwmB.config.pin = 17;
-    pwmB.config.duty_cycle = level; //duty_cycle range is 0~10000 correspond to 0~100%
-    pwmB.config.freq = 1000;
+    pwmB.port              = 2;
+    pwmB.config.pin        = 17;
+    pwmB.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
+    pwmB.config.freq       = 1000;
     hosal_pwm_init(&pwmB);
     vTaskDelay(50);
 
@@ -123,7 +125,8 @@ void LEDWidget::SetBrightness(uint8_t brightness)
     uint8_t red, green, blue;
     log_info("mDefaultOnBrightness: %d, brightness: %d\r\n", mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
-    log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red, green, blue);
+    log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
+             green, blue);
     showRGB(red, green, blue);
 
     if (brightness > 0)
@@ -144,13 +147,9 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
     Animate();
 }
 
-void ClearErrorState(TimerHandle_t handle)
-{
-}
+void ClearErrorState(TimerHandle_t handle) {}
 
-void LEDWidget::BlinkOnError()
-{
-}
+void LEDWidget::BlinkOnError() {}
 
 void LEDWidget::Animate()
 {
@@ -177,7 +176,8 @@ void LEDWidget::DoSet(bool state)
     uint8_t brightness = state ? mDefaultOnBrightness : 0;
     log_info("state: %d, mDefaultOnBrightness: %d, brightness: %d\r\n", state, mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
-    log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red, green, blue);
+    log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
+             green, blue);
     showRGB(red, green, blue);
 }
 

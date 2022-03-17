@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/bl602_sdk.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/bl602_sdk.gni")
 
-import("${build_root}/config/defaults.gni")
 import("${bl602_sdk_build_root}/bl602_executable.gni")
 import("${bl602_sdk_build_root}/bl602_sdk.gni")
+import("${build_root}/config/defaults.gni")
 
 assert(current_os == "freertos")
 
@@ -69,8 +69,8 @@ bl602_executable("lighting_app") {
     "src/AppTask.cpp",
     "src/CHIPDeviceManager.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/LightingManager.cpp",
     "src/LEDWidget.cpp",
+    "src/LightingManager.cpp",
     "src/main.cpp",
   ]
 
@@ -85,14 +85,9 @@ bl602_executable("lighting_app") {
   include_dirs = [ "include" ]
 
   if (bl602_board == "IOT_DVK_3S") {
-    defines = [
-      "BOARD_ID=0",
-    ]
-  }
-  else {
-    defines = [
-      "BOARD_ID=1",
-    ]
+    defines = [ "BOARD_ID=0" ]
+  } else {
+    defines = [ "BOARD_ID=1" ]
   }
 
   if (show_qr_code) {

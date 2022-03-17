@@ -26,5 +26,3 @@ declare_args() {
   # INCLUDE_xSemaphoreGetMutexHolder
   chip_stack_lock_tracking = "none"
 }
-
-

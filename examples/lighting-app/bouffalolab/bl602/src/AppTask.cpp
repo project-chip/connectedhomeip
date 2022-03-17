@@ -24,22 +24,20 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <lib/support/CodeUtils.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <app/server/Server.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/ErrorStr.h>
 #include <bl_sys_ota.h>
+#include <lib/support/ErrorStr.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -57,7 +55,7 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 BaseType_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sHaveBLEConnections      = false;
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 } // namespace
@@ -68,9 +66,9 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 
 namespace {
-    chip::app::Clusters::NetworkCommissioning::Instance
+chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
-} //namespace
+} // namespace
 
 using namespace ::chip::System;
 
@@ -114,7 +112,7 @@ CHIP_ERROR AppTask::Init()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    err            = LightMgr().Init();
+    err = LightMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         log_error("LightMgr().Init() failed\r\n");
@@ -168,7 +166,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -259,8 +257,8 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     }
 #endif
 
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
+    AppEvent button_event = {};
+    button_event.Type     = AppEvent::kEventType_Button;
     // button_event.ButtonEvent.PinNo  = btnIdx;
     button_event.ButtonEvent.Action = btnAction;
 
@@ -270,7 +268,8 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         log_info("posting button_event(lock button)\r\n");
         sAppTask.PostEvent(&button_event);
     }
-    else */ if (btnIdx == APP_FUNCTION_BUTTON)
+    else */
+    if (btnIdx == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = FunctionHandler;
         log_info("posting button_event(function button)\r\n");
@@ -353,7 +352,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
 #if 0 // TODO: 3R
-            // Set lock status LED back to show state of lock.
+      // Set lock status LED back to show state of lock.
             sLockLED.Set(!BoltLockMgr().IsUnlocked());
 #endif
 
@@ -460,7 +459,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
             log_info("sending event type from isr: %d\r\n", aEvent->Type);
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
 
 #ifdef portYIELD_FROM_ISR
             portYIELD_FROM_ISR(higherPrioTaskWoken);
@@ -513,10 +512,11 @@ void AppTask::UpdateClusterState(void)
 void AppTask::OtaTask(void)
 {
     int ret;
-    const char *const task_name = "ota task";
+    const char * const task_name = "ota task";
 
     ret = xTaskCreate(ota_tcp_server, task_name, 512, NULL, 6, &OTA_TASK_HANDLE);
-    if (ret != pdPASS) {
+    if (ret != pdPASS)
+    {
         printf("unable to start task client task");
         return;
     }

@@ -26,10 +26,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <BL602Config.h>
+#include <lwip/netifapi.h>
 #include <mdns_server.h>
 #include <wifi_mgmr_ext.h>
-#include <lwip/netifapi.h>
-#include <BL602Config.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 namespace {
@@ -41,7 +41,7 @@ static constexpr size_t kMaxResults     = 20;
 namespace chip {
 namespace Dnssd {
 
-#define MDNS_MAX_PACKET_SIZE    64
+#define MDNS_MAX_PACKET_SIZE 64
 
 static const DnssdService * glservice;
 
@@ -67,26 +67,28 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-typedef struct {
-    const char * key;                       /*!< item key name */
-    const char * value;                     /*!< item value string */
+typedef struct
+{
+    const char * key;   /*!< item key name */
+    const char * value; /*!< item value string */
     size_t value_len;
 } mdns_txt_item_t;
 
-typedef struct mdns {
-    struct netif *netif;
+typedef struct mdns
+{
+    struct netif * netif;
     int slot;
 } mdns_t;
 
-
-#define MDNS_TXT_MAX_LEN    128
-static mdns_t mdns = {NULL, -1};
+#define MDNS_TXT_MAX_LEN 128
+static mdns_t mdns      = { NULL, -1 };
 mdns_txt_item_t * items = nullptr;
 uint8_t packet[MDNS_TXT_MAX_LEN];
 
 static inline uint8_t _mdns_append_u8(uint8_t * packet, uint16_t * index, uint8_t value)
 {
-    if (*index >= MDNS_MAX_PACKET_SIZE) {
+    if (*index >= MDNS_MAX_PACKET_SIZE)
+    {
         return 0;
     }
 
@@ -95,22 +97,24 @@ static inline uint8_t _mdns_append_u8(uint8_t * packet, uint16_t * index, uint8_
     return 1;
 }
 
-
 static inline int append_one_txt_record_entry(uint8_t * packet, uint16_t * index, mdns_txt_item_t * txt)
 {
-    if (txt == NULL || txt->key == NULL || packet == NULL) {
+    if (txt == NULL || txt->key == NULL || packet == NULL)
+    {
         return -1;
     }
 
     size_t key_len = strlen(txt->key);
-    size_t len = key_len + txt->value_len + (txt->value ? 1 : 0);
-    if ((*index + len + 1) >= MDNS_MAX_PACKET_SIZE) {
+    size_t len     = key_len + txt->value_len + (txt->value ? 1 : 0);
+    if ((*index + len + 1) >= MDNS_MAX_PACKET_SIZE)
+    {
         return 0;
     }
 
     _mdns_append_u8(packet, index, len);
     memcpy(packet + *index, txt->key, key_len);
-    if (txt->value) {
+    if (txt->value)
+    {
         packet[*index + key_len] = '=';
         memcpy(packet + *index + key_len + 1, txt->value, txt->value_len);
     }
@@ -120,77 +124,85 @@ static inline int append_one_txt_record_entry(uint8_t * packet, uint16_t * index
     return len + 1;
 }
 
-static void dnssd_txt_resolve(uint8_t *packet, mdns_txt_item_t *txt, int count)
+static void dnssd_txt_resolve(uint8_t * packet, mdns_txt_item_t * txt, int count)
 {
     uint16_t index = 0;
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         append_one_txt_record_entry(packet, &index, &(txt[i]));
     }
 }
 
-static void srv_txt(struct mdns_service *service, void *txt_userdata)
+static void srv_txt(struct mdns_service * service, void * txt_userdata)
 {
     int i, ret;
     int index = 0;
 
-    for (i = 0; i < 3; i ++) {
+    for (i = 0; i < 3; i++)
+    {
         ret = mdns_resp_add_service_txtitem(service, &(packet[index + 1]), packet[index]);
-	    if (ret) {
-		    log_info("send txt failed.\r\n");
+        if (ret)
+        {
+            log_info("send txt failed.\r\n");
 
             return;
-	    }
+        }
 
         index = index + packet[index] + 1;
     }
 }
 
-static void ota_txt(struct mdns_service *service, void *txt_userdata)
+static void ota_txt(struct mdns_service * service, void * txt_userdata)
 {
     int ret = mdns_resp_add_service_txtitem(service, "version=12345678", 16);
-	if (ret) {
-		log_info("send ota txt failed.\r\n");
-	}
+    if (ret)
+    {
+        log_info("send ota txt failed.\r\n");
+    }
 }
 
-static err_t mdns_responder_stop_netifapi_errt_fn(struct netif *netif)
+static err_t mdns_responder_stop_netifapi_errt_fn(struct netif * netif)
 {
     return mdns_responder_stop(netif);
 }
 
-int mdns_responder_ops(struct netif *netif)
+int mdns_responder_ops(struct netif * netif)
 {
     int ret, slot = -1;
-	int protocol = 0;
+    int protocol        = 0;
     uint16_t packet_len = 0;
-   
-    if (netif == NULL) {
+
+    if (netif == NULL)
+    {
         log_info("netif is NULL\r\n");
         return -1;
     }
 
-	mdns.netif = netif;
-   
+    mdns.netif = netif;
+
     ret = mdns_resp_add_netif(netif, glservice->mHostName, 10);
-    if (ret != 0) {
+    if (ret != 0)
+    {
         mdns_resp_deinit();
         log_info("add netif failed:%d\r\n", ret);
         return -1;
-    }  
-	
-	items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
+    }
 
-	for (size_t i = 0; i < glservice->mTextEntrySize; i++) {
-		items[i].key = glservice->mTextEntries[i].mKey;
-		items[i].value = reinterpret_cast<const char *>(glservice->mTextEntries[i].mData);
-		items[i].value_len = glservice->mTextEntries[i].mDataSize;
-        packet_len = packet_len + strlen(items[i].key) + items[i].value_len + 1;
-	}
+    items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
 
-    //todo:use malloc?
-	//packet = static_cast<uint8_t*>(chip::Platform::MemoryCalloc(packet_len, sizeof(uint8_t)));
-    if (MDNS_TXT_MAX_LEN < packet_len) {
+    for (size_t i = 0; i < glservice->mTextEntrySize; i++)
+    {
+        items[i].key       = glservice->mTextEntries[i].mKey;
+        items[i].value     = reinterpret_cast<const char *>(glservice->mTextEntries[i].mData);
+        items[i].value_len = glservice->mTextEntries[i].mDataSize;
+        packet_len         = packet_len + strlen(items[i].key) + items[i].value_len + 1;
+    }
+
+    // todo:use malloc?
+    // packet = static_cast<uint8_t*>(chip::Platform::MemoryCalloc(packet_len, sizeof(uint8_t)));
+    if (MDNS_TXT_MAX_LEN < packet_len)
+    {
         return -1;
     }
 
@@ -198,55 +210,63 @@ int mdns_responder_ops(struct netif *netif)
     chip::Platform::MemoryFree(items);
 
     log_info("name = %s nType = %s protocol = %d port = %d \r\n", glservice->mName, glservice->mType, protocol, glservice->mPort);
-    slot = mdns_resp_add_service(netif, glservice->mName, glservice->mType, static_cast<uint8_t>(glservice->mProtocol), glservice->mPort, 60, srv_txt, NULL);
-    if (slot < 0) {
+    slot = mdns_resp_add_service(netif, glservice->mName, glservice->mType, static_cast<uint8_t>(glservice->mProtocol),
+                                 glservice->mPort, 60, srv_txt, NULL);
+    if (slot < 0)
+    {
         mdns_resp_remove_netif(netif);
         mdns_resp_deinit();
         log_info("add server failed:%d\r\n", slot);
         return -1;
     }
 
-    //for ota
-    slot = mdns_resp_add_service(netif, "MATTER OTA", "_ota", static_cast<uint8_t>(glservice->mProtocol), 3333, 1000, ota_txt, NULL);
-    if (slot < 0) {
+    // for ota
+    slot =
+        mdns_resp_add_service(netif, "MATTER OTA", "_ota", static_cast<uint8_t>(glservice->mProtocol), 3333, 1000, ota_txt, NULL);
+    if (slot < 0)
+    {
         mdns_resp_remove_netif(netif);
         mdns_resp_deinit();
         log_info("ota mdns fail.\r\n");
     }
 
-    return slot; 
-} 
+    return slot;
+}
 
-static err_t mdns_responder_start_netifapi_errt_fn(struct netif *netif)
-{   
+static err_t mdns_responder_start_netifapi_errt_fn(struct netif * netif)
+{
     return mdns_responder_ops(netif);
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    CHIP_ERROR error        = CHIP_NO_ERROR;
-    struct netif *netif;
-	int slot;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    struct netif * netif;
+    int slot;
     bool mdns_flag;
 
-    if (!(chip::DeviceLayer::ConnectivityMgrImpl()._IsWiFiStationConnected())) {
+    if (!(chip::DeviceLayer::ConnectivityMgrImpl()._IsWiFiStationConnected()))
+    {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    if (service) {
+    if (service)
+    {
         memcpy(glservice, service, sizeof(DnssdService));
     }
 
     netif = wifi_mgmr_sta_netif_get();
-    if (netif == NULL) {
+    if (netif == NULL)
+    {
         log_info("find failed\r\n");
-		return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     slot = netifapi_netif_common(netif, NULL, mdns_responder_start_netifapi_errt_fn);
-    if (slot < 0) {
+    if (slot < 0)
+    {
         log_info("start mdns failed\r\n");
-		return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     return CHIP_NO_ERROR;
@@ -254,8 +274,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-    //netifapi_netif_common(mdns.netif, NULL, mdns_responder_stop_netifapi_errt_fn);	
-	return CHIP_NO_ERROR;
+    // netifapi_netif_common(mdns.netif, NULL, mdns_responder_stop_netifapi_errt_fn);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()

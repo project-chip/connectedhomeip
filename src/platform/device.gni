@@ -168,5 +168,5 @@ assert(
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
         chip_device_platform == "p6" || chip_device_platform == "android" ||
         chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
-        chip_device_platform == "webos"|| chip_device_platform == "bl602",
+        chip_device_platform == "webos" || chip_device_platform == "bl602",
     "Please select a valid value for chip_device_platform")

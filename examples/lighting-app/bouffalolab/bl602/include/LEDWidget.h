@@ -19,17 +19,15 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <FreeRTOS.h>
+#include <stdint.h>
 #include <task.h>
 #include <timers.h>
 
 class LEDWidget
 {
 public:
-    LEDWidget() {
-        Init(0);
-    }
+    LEDWidget() { Init(0); }
 
     void Init(uint8_t gpioNum);
 

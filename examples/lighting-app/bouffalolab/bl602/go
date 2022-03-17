@@ -1,10 +1,10 @@
 #!/bin/bash
 
-MATTER_BL_ROOT=$(pwd)
-export BL602_SDK_ROOT=$MATTER_BL_ROOT/third_party/connectedhomeip/third_party/bouffalolab/bl602_sdk/repo
-export PATH=${BL602_SDK_ROOT}/toolchain/riscv/Linux/bin:$PATH
+MATTER_BL_ROOT=$PWD
+export BL602_SDK_ROOT="$MATTER_BL_ROOT"/third_party/connectedhomeip/third_party/bouffalolab/bl602_sdk/repo
+export PATH="$BL602_SDK_ROOT/toolchain/riscv/Linux/bin:$PATH"
 
-export BL_SDK_VER=$(cd $BL602_SDK_ROOT && git describe --always --tags --dirty)
+export BL_SDK_VER="$(cd "$BL602_SDK_ROOT" && git describe --always --tags --dirty)"
 
 #cd $MATTER_BL_ROOT/connectedhomeip/examples/lighting-app/bl602
 #git submodule update --init
@@ -13,5 +13,5 @@ export BL602_BOARD=BL-HWC-G1
 #export BL602_BOARD=3R-HWC-G1
 
 #gn clean out/debug
-gn gen out/debug --args="bl602_sdk_root=\"${BL602_SDK_ROOT}\" bl602_board=\"${BL602_BOARD}\""
+gn gen out/debug --args="bl602_sdk_root=\"$BL602_SDK_ROOT\" bl602_board=\"$BL602_BOARD\""
 ninja -C out/debug

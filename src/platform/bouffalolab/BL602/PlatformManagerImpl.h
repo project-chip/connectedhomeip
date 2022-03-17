@@ -29,13 +29,14 @@
 namespace chip {
 namespace DeviceLayer {
 
-typedef struct {
+typedef struct
+{
     uint32_t time;
     uint16_t type;
     uint16_t code;
     unsigned long value;
     unsigned long extra;
-}input_event_t;
+} input_event_t;
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the BL602 platform.
@@ -67,7 +68,7 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
-    friend void event_cb_wifi_event(input_event_t *event, void *private_data);
+    friend void event_cb_wifi_event(input_event_t * event, void * private_data);
 
     static PlatformManagerImpl sInstance;
 

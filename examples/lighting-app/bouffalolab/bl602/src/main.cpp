@@ -19,13 +19,13 @@
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include <FreeRTOS.h>
-#include <app/server/Server.h>
-#include <task.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <task.h>
 
 #include <cmath>
 #include <cstdio>
@@ -64,9 +64,9 @@ static const char * TAG = "light-app";
 static DeviceCallbacks EchoCallbacks;
 
 namespace {
-    app::Clusters::NetworkCommissioning::Instance
-        sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
-} //namespace
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
+} // namespace
 
 static void InitServer(intptr_t context)
 {
@@ -77,7 +77,6 @@ static void InitServer(intptr_t context)
 
     sWiFiNetworkCommissioningInstance.Init();
 }
-
 
 extern "C" int main()
 {
@@ -98,8 +97,9 @@ extern "C" int main()
     log_info("------------------------Starting App Task---------------------------\r\n");
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
-    if (error != CHIP_NO_ERROR) {
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
+    if (error != CHIP_NO_ERROR)
+    {
         log_info("device init failed: %s", ErrorStr(error));
         return;
     }

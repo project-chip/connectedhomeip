@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 
+#include <BL602Config.h>
+#include <aos/yloop.h>
+#include <hal_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <BL602Config.h>
-#include <wifi_mgmr_ext.h>
-#include <hal_wifi.h>
 #include <tcpip.h>
-#include <aos/yloop.h>
+#include <wifi_mgmr_ext.h>
 
 #include <limits>
 #include <string>
@@ -88,11 +88,14 @@ CHIP_ERROR BLWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR BLWiFiDriver::SaveConfiguration()
 {
-    if (NULL == mStagingNetwork.ssid || 0 == mStagingNetwork.ssidLen || NULL == mStagingNetwork.credentials || 0 == mStagingNetwork.credentialsLen) {
+    if (NULL == mStagingNetwork.ssid || 0 == mStagingNetwork.ssidLen || NULL == mStagingNetwork.credentials ||
+        0 == mStagingNetwork.credentialsLen)
+    {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(blWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Put(blWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(blWiFiCredentialsKeyName, mStagingNetwork.credentials,
                                                                   mStagingNetwork.credentialsLen));
     return CHIP_NO_ERROR;
@@ -143,16 +146,16 @@ Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
 
 CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
+    // ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
-	char wifi_ssid[64] = {0};
-    char passwd[64] = {0};
+    char wifi_ssid[64] = { 0 };
+    char passwd[64]    = { 0 };
     // Set the wifi configuration
     memcpy(wifi_ssid, ssid, ssidLen);
     memcpy(passwd, key, keyLen);
     wifi_interface_t wifi_interface;
     wifi_interface = wifi_mgmr_sta_enable();
-    wifi_mgmr_sta_connect(wifi_interface, ssid, passwd, NULL, NULL, 0, 0); 
+    wifi_mgmr_sta_connect(wifi_interface, ssid, passwd, NULL, NULL, 0, 0);
 
     // Configure the WiFi interface.
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
@@ -162,17 +165,19 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
 CHIP_ERROR BLWiFiDriver::ReConnectWiFiNetwork(void)
 {
-	char ssid[64] = {0};
-    char psk[64] = {0};
+    char ssid[64]  = { 0 };
+    char psk[64]   = { 0 };
     size_t ssidLen = 0;
-    size_t pskLen = 0;
+    size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get((const char*)blWiFiSSIDKeyName, (void *)ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get((const char *)blWiFiCredentialsKeyName, (void *)psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Get((const char *) blWiFiSSIDKeyName, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Get((const char *) blWiFiCredentialsKeyName, (void *) psk, 64, &pskLen, 0));
 
     ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 
-    return CHIP_NO_ERROR; 
+    return CHIP_NO_ERROR;
 }
 
 void BLWiFiDriver::OnConnectWiFiNetwork()
@@ -188,10 +193,10 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
-    static int save = 0;
-    
-    //VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
-    //VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
+    static int save         = 0;
+
+    // VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
+    // VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
                     networkId.data());
 

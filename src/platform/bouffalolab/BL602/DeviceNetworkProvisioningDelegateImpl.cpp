@@ -29,9 +29,9 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key) 
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    //BL602Config::WriteWifiInfo(ssid, passwd);
+    // BL602Config::WriteWifiInfo(ssid, passwd);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(NetworkProvisioning, "BL602NetworkProvisioningDelegate: SSID: %s", ssid);
