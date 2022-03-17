@@ -48,7 +48,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession()
+    ~IncomingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG
@@ -113,7 +113,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~OutgoingGroupSession()
+    ~OutgoingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG

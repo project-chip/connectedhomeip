@@ -129,7 +129,7 @@ private:
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate
 {
 public:
-    virtual ~Resolver() = default;
+    ~Resolver() override = default;
 
     // AddressResolve::Resolver
 

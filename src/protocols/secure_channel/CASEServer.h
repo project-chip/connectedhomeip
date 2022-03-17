@@ -31,7 +31,7 @@ class CASEServer : public SessionEstablishmentDelegate, public Messaging::Exchan
 {
 public:
     CASEServer() {}
-    ~CASEServer()
+    ~CASEServer() override
     {
         if (mExchangeManager != nullptr)
         {
