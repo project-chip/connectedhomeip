@@ -326,7 +326,6 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
@@ -349,9 +348,9 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -381,9 +380,9 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
             {
@@ -413,6 +412,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -446,8 +446,6 @@ private:
                          {
                              id actualValue = value;
                              VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(3)));
-                             VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                              VerifyOrReturn(CheckValue(
@@ -516,7 +514,7 @@ private:
                                          .targets[2])
                                      .deviceType));
                              VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege, 1));
                              VerifyOrReturn(CheckValue(
@@ -596,7 +594,7 @@ private:
                                          .targets[2])
                                      .deviceType));
                              VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex, 1));
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).privilege, 3));
                              VerifyOrReturn(CheckValue(
@@ -675,6 +673,8 @@ private:
                                  ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                          .targets[2])
                                      .deviceType));
+                             VerifyOrReturn(CheckValue(
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex, 1));
                          }
 
                          NextTest();
@@ -693,14 +693,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -711,6 +710,7 @@ private:
                 NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -743,8 +743,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(2)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -754,7 +752,7 @@ private:
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
                                   VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege, 1));
                                   VerifyOrReturn(CheckValue(
@@ -763,6 +761,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -781,18 +781,18 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:3];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -824,8 +824,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -834,6 +832,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -852,18 +852,18 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -895,8 +895,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -905,6 +903,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -923,14 +923,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -939,6 +938,7 @@ private:
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
             }
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -970,8 +970,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -980,6 +978,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -998,14 +998,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -1018,6 +1017,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1049,8 +1049,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1059,6 +1057,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1077,14 +1077,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -1112,6 +1111,7 @@ private:
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
             }
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1143,8 +1143,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1153,6 +1151,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1171,14 +1171,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -1286,6 +1285,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1317,8 +1317,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1327,6 +1325,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1345,11 +1345,11 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1382,8 +1382,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1392,6 +1390,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -55049,14 +55049,14 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
             temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
             groupKeyMapArgument = temp_0;
         }
@@ -55092,18 +55092,18 @@ private:
                                  {
                                      id actualValue = value;
                                      VerifyOrReturn(CheckValue("GroupKeyMap", [actualValue count], static_cast<uint32_t>(2)));
-                                     VerifyOrReturn(CheckValue("FabricIndex",
-                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex, 1));
                                      VerifyOrReturn(CheckValue("GroupId",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId, 257U));
                                      VerifyOrReturn(CheckValue("GroupKeySetID",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID, 417U));
                                      VerifyOrReturn(CheckValue("FabricIndex",
-                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex, 1));
+                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex, 1));
                                      VerifyOrReturn(CheckValue("GroupId",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId, 258U));
                                      VerifyOrReturn(CheckValue("GroupKeySetID",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID, 418U));
+                                     VerifyOrReturn(CheckValue("FabricIndex",
+                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex, 1));
                                  }
 
                                  NextTest();
@@ -55131,20 +55131,20 @@ private:
                                      {
                                          id actualValue = value;
                                          VerifyOrReturn(CheckValue("GroupTable", [actualValue count], static_cast<uint32_t>(2)));
-                                         VerifyOrReturn(CheckValue("FabricIndex",
-                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex, 1));
                                          VerifyOrReturn(CheckValue("GroupId",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId, 257U));
                                          VerifyOrReturn(CheckValueAsString("GroupName",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName,
                                              @"Group #1"));
                                          VerifyOrReturn(CheckValue("FabricIndex",
-                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex, 1));
+                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex, 1));
                                          VerifyOrReturn(CheckValue("GroupId",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId, 258U));
                                          VerifyOrReturn(CheckValueAsString("GroupName",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName,
                                              @"Group #2"));
+                                         VerifyOrReturn(CheckValue("FabricIndex",
+                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex, 1));
                                      }
 
                                      NextTest();
@@ -55710,11 +55710,11 @@ private:
                                   {
                                       id actualValue = value;
                                       VerifyOrReturn(CheckValue("Fabrics", [actualValue count], static_cast<uint32_t>(1)));
+                                      VerifyOrReturn(CheckValueAsString("Label",
+                                          ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @""));
                                       VerifyOrReturn(CheckValue("FabricIndex",
                                           ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                           ourFabricIndex));
-                                      VerifyOrReturn(CheckValueAsString("Label",
-                                          ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @""));
                                   }
 
                                   NextTest();
@@ -55776,11 +55776,11 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Fabrics", [actualValue count], static_cast<uint32_t>(1)));
+                                 VerifyOrReturn(CheckValueAsString("Label",
+                                     ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @"Batcave"));
                                  VerifyOrReturn(CheckValue("FabricIndex",
                                      ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                      ourFabricIndex));
-                                 VerifyOrReturn(CheckValueAsString("Label",
-                                     ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @"Batcave"));
                              }
 
                              NextTest();
@@ -56238,11 +56238,11 @@ private:
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).group = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56267,19 +56267,19 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).group = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[2] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[2]).node = [NSNumber numberWithUnsignedLongLong:2ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[2]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56313,21 +56313,21 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(3)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Group", ((CHIPBindingClusterTargetStruct *) actualValue[0]).group, 1U));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[1]).node, 1ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint, 1U));
                                  VerifyOrReturn(
                                      CheckValue("Cluster", ((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster, 6UL));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[2]).node, 2ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
                              }
 
                              NextTest();
@@ -56346,9 +56346,9 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56382,11 +56382,11 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(1)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[0]).node, 3ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[0]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                              }
 
                              NextTest();
@@ -56413,21 +56413,21 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(3)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Group", ((CHIPBindingClusterTargetStruct *) actualValue[0]).group, 1U));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[1]).node, 1ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint, 1U));
                                  VerifyOrReturn(
                                      CheckValue("Cluster", ((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster, 6UL));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[2]).node, 2ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
                              }
 
                              NextTest();

@@ -7235,7 +7235,6 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPGroupKeyManagementClusterGroupInfoMapStruct *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
                         {
                             using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].endpoints)>;
@@ -7263,6 +7262,7 @@ using namespace chip::app::Clusters;
                             auto & definedValue_2 = listHolder_0->mList[i_0].groupName.Emplace();
                             definedValue_2 = [self asCharSpan:element_0.groupName];
                         }
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -10664,7 +10664,6 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPOperationalCredentialsClusterNOCStruct *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].noc = [self asByteSpan:element_0.noc];
                         if (element_0.icac == nil) {
                             listHolder_0->mList[i_0].icac.SetNull();
@@ -10672,6 +10671,7 @@ using namespace chip::app::Clusters;
                             auto & nonNullValue_2 = listHolder_0->mList[i_0].icac.SetNonNull();
                             nonNullValue_2 = [self asByteSpan:element_0.icac];
                         }
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -10710,12 +10710,12 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPOperationalCredentialsClusterFabricDescriptor *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].rootPublicKey = [self asByteSpan:element_0.rootPublicKey];
                         listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
                         listHolder_0->mList[i_0].fabricId = element_0.fabricId.unsignedLongLongValue;
                         listHolder_0->mList[i_0].nodeId = element_0.nodeId.unsignedLongLongValue;
                         listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
