@@ -33908,7 +33908,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
     XCTAssertNotNil(cluster);
 
     id octetStringArgument;
-    octetStringArgument = [[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9];
+    octetStringArgument = [[NSData alloc] initWithBytes:"Tes\000ti\000ng" length:9];
     [cluster writeAttributeOctetStringWithValue:octetStringArgument
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING with embedded null Error: %@", err);
@@ -33936,7 +33936,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
         {
             id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9]]);
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"Tes\000ti\000ng" length:9]]);
         }
 
         [expectation fulfill];
@@ -33954,7 +33954,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
     XCTAssertNotNil(cluster);
 
     id octetStringArgument;
-    octetStringArgument = [[NSData alloc] initWithBytes:"\x0d\x0a\xff\x22\xa0" length:5];
+    octetStringArgument = [[NSData alloc] initWithBytes:"\015\012\377\042\240" length:5];
     [cluster writeAttributeOctetStringWithValue:octetStringArgument
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING with weird chars Error: %@", err);
@@ -33982,7 +33982,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
         {
             id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"\x0d\x0a\xff\x22\xa0" length:5]]);
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"\015\012\377\042\240" length:5]]);
         }
 
         [expectation fulfill];
@@ -48057,15 +48057,15 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
         [NSNumber numberWithUnsignedChar:0];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
-        [[NSData alloc] initWithBytes:"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf" length:16];
+        [[NSData alloc] initWithBytes:"\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
         [NSNumber numberWithUnsignedLongLong:1110000ULL];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
-        [[NSData alloc] initWithBytes:"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" length:16];
+        [[NSData alloc] initWithBytes:"\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
         [NSNumber numberWithUnsignedLongLong:1110001ULL];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
-        [[NSData alloc] initWithBytes:"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" length:16];
+        [[NSData alloc] initWithBytes:"\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
         [NSNumber numberWithUnsignedLongLong:1110002ULL];
 
@@ -48095,15 +48095,15 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
-        [[NSData alloc] initWithBytes:"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" length:16];
+        [[NSData alloc] initWithBytes:"\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
         [NSNumber numberWithUnsignedLongLong:2110000ULL];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
-        [[NSData alloc] initWithBytes:"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef" length:16];
+        [[NSData alloc] initWithBytes:"\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
         [NSNumber numberWithUnsignedLongLong:2110001ULL];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
-        [[NSData alloc] initWithBytes:"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" length:16];
+        [[NSData alloc] initWithBytes:"\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
         [NSNumber numberWithUnsignedLongLong:2110002ULL];
 
