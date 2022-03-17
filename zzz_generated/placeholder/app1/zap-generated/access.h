@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+// Prevent changing generated format
+// clang-format off
+
 #define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
 #define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
 #define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
@@ -27,74 +30,66 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, event, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
 // clang-format on

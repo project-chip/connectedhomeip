@@ -3,6 +3,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+// Prevent changing generated format
+// clang-format off
+
 #define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
 #define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
 #define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
@@ -12,7 +15,7 @@
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     {{/first}}
     {{#zcl_attributes}}
@@ -40,13 +43,12 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
     {{#zcl_attributes}}
@@ -74,13 +76,12 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
     {{#zcl_attributes}}
@@ -108,7 +109,6 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
@@ -116,7 +116,7 @@
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     {{/first}}
     {{#zcl_attributes}}
@@ -144,13 +144,12 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
     {{#zcl_attributes}}
@@ -178,13 +177,12 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
     {{#zcl_attributes}}
@@ -212,7 +210,6 @@
     {{/zcl_attributes}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
@@ -220,7 +217,7 @@
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
     {{/first}}
     {{#zcl_commands_source_client}}
@@ -248,13 +245,12 @@
     {{/zcl_commands_source_client}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
     {{/first}}
     {{#zcl_commands_source_client}}
@@ -282,13 +278,12 @@
     {{/zcl_commands_source_client}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
     {{/first}}
     {{#zcl_commands_source_client}}
@@ -316,7 +311,6 @@
     {{/zcl_commands_source_client}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
@@ -324,7 +318,7 @@
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (*cluster*, event, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     {{/first}}
     {{#zcl_events}}
@@ -352,13 +346,12 @@
     {{/zcl_events}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     {{/first}}
     {{#zcl_events}}
@@ -386,13 +379,12 @@
     {{/zcl_events}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
 
 {{#chip_server_clusters}}
     {{#first}}
-// clang-format off
+// Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     {{/first}}
     {{#zcl_events}}
@@ -420,6 +412,9 @@
     {{/zcl_events}}
     {{#last}}
 }
-// clang-format on
     {{/last}}
 {{/chip_server_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// clang-format on

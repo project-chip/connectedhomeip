@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+// Prevent changing generated format
+// clang-format off
+
 #define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
 #define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
 #define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
@@ -27,7 +30,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -60,9 +63,8 @@
     /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -95,9 +97,8 @@
     /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -130,11 +131,10 @@
     /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -167,9 +167,8 @@
     257, /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: administer */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -202,9 +201,8 @@
     71, /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: administer */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -237,11 +235,10 @@
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Attribute: RFIDProgrammingEventMask, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
     257, /* Cluster: Door Lock, Command: GetLogRecord, Privilege: manage */ \
     257, /* Cluster: Door Lock, Command: SetPINCode, Privilege: administer */ \
@@ -272,9 +269,8 @@
     257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
     4, /* Cluster: Door Lock, Command: GetLogRecord, Privilege: manage */ \
     5, /* Cluster: Door Lock, Command: SetPINCode, Privilege: administer */ \
@@ -305,9 +301,8 @@
     36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
     GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Command: GetLogRecord, Privilege: manage */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetPINCode, Privilege: administer */ \
@@ -338,27 +333,27 @@
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
-// clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// clang-format off
+// Parallel array data (*cluster*, event, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     31, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     31, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     1, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
-// clang-format on
 
-// clang-format off
+// Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
 // clang-format on
