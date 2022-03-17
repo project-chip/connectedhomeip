@@ -155,8 +155,19 @@ public:
     AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server())
     {
         GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
-        LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder()));
-        LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder()));
+
+        CHIP_ERROR err = mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder());
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to setup commissionable responder: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        err = mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to setup commissioner responder: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     ~AdvertiserMinMdns() override {}
 
@@ -342,7 +353,13 @@ CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 
         // Mark as unused
         ptr->GetAllocator()->Clear();
-        LogErrorOnFailure(mResponseSender.RemoveQueryResponder(ptr->GetAllocator()->GetQueryResponder()));
+
+        CHIP_ERROR err = mResponseSender.RemoveQueryResponder(ptr->GetAllocator()->GetQueryResponder());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to remove query responder: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
         mOperationalResponders.Remove(ptr);
 
         // Finally release the memory
