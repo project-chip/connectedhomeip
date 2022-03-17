@@ -31,8 +31,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
 // clang-format on
 
@@ -40,15 +38,11 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
 // clang-format on
 
 // clang-format off
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
@@ -60,8 +54,6 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
 // clang-format on
 
@@ -69,15 +61,11 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
 // clang-format on
 
 // clang-format off
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
 }
@@ -106,8 +94,6 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     31, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     31, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
-    31, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    31, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
 // clang-format on
 
@@ -115,15 +101,11 @@
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     1, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
-    0, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    1, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
 // clang-format on
 
 // clang-format off
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
