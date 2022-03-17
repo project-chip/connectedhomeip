@@ -31,6 +31,7 @@ static_library("helpers") {
   cflags = [ "-Wconversion" ]
 
   deps = [
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
