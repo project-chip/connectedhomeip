@@ -24,6 +24,7 @@ Generated files
           $ rm -rf out/
 
 ## Flash
+
 -   Download [FLASH_TOOL](https://dev.bouffalolab.com/download/).
 
 ### Setting up Python Controller
