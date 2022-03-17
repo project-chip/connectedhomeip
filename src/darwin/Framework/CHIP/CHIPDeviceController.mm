@@ -36,6 +36,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CHIPMem.h>
@@ -479,9 +480,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         return NO;
     }
 
-    chip::SetupPayload setupPayload;
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0,
-        chip::Controller::DeviceController::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
+        self.cppCommissioner, deviceID, static_cast<uint16_t>(duration));
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -502,8 +502,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::SetupPayload setupPayload;
-
     if (duration > UINT16_MAX) {
         CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
@@ -518,15 +516,14 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
         return nil;
-    } else {
-        setupPayload.discriminator = (uint16_t) discriminator;
     }
 
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
-    setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator,
-        chip::Controller::DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
+    chip::SetupPayload setupPayload;
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
+        static_cast<uint16_t>(duration), 1000, static_cast<uint16_t>(discriminator),
+        chip::MakeOptional(static_cast<uint32_t>(setupPIN)), setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));

@@ -35,6 +35,7 @@
 #include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <controller/java/AndroidClusterExceptions.h>
 #include <credentials/CHIPCert.h>
 #include <jni.h>
@@ -560,7 +561,6 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::SetupPayload setupPayload;
 
     DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
@@ -569,10 +569,9 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kOriginalSetupCode;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, option, setupPayload);
+    err = AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(), duration);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -588,9 +587,6 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::SetupPayload setupPayload;
-    setupPayload.discriminator = discriminator;
-    setupPayload.setUpPINCode  = setupPinCode;
 
     DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
@@ -599,11 +595,12 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, iteration, discriminator, option,
-                                                         setupPayload);
+    chip::SetupPayload setupPayload;
+    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(), duration,
+                                                                 iteration, discriminator,
+                                                                 MakeOptional(static_cast<uint32_t>(setupPinCode)), setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
