@@ -18,24 +18,29 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-
+   
 tests:
-    - label: "Commission DUT to TH"
-      verification: ""
-      disabled: true
+  - label: "Commission DUT to TH"
+    verification: |
 
-    - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read measured-value 1 1"
-      disabled: true
+    disabled: true
 
-    - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read min-measured-value 1 1"
-      disabled: true
+  - label: "DUT reads attribute value from TH."
+    verification: |
+        ./chip-tool flowmeasurement read measured-value 1 1
+    disabled: true
 
-    - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read max-measured-value 1 1"
-      disabled: true
+  - label: "DUT reads attribute value from TH."
+    verification: |
+        ./chip-tool flowmeasurement read min-measured-value 1 1
+    disabled: true
 
-    - label: "DUT reads attribute value from TH."
-      verification: "chip-tool flowmeasurement read tolerance 1 1"
-      disabled: true
+  - label: "DUT reads attribute value from TH."
+    verification: |
+        ./chip-tool flowmeasurement read max-measured-value 1 1
+    disabled: true
+
+  - label: "DUT reads attribute value from TH."
+    verification: |
+        chip-tool flowmeasurement read tolerance 1 1
+    disabled: true

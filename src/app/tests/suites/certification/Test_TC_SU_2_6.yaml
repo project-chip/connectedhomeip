@@ -12,23 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    31.7.1. [TC-SU-2.6] Tests NotifyUpdateApplied Command sent to OTA-P from the
-    DUT after it has successfully updated to the new software version.
+name: 31.7.1. [TC-SU-2.6] Tests NotifyUpdateApplied Command sent to OTA-P from the DUT after it has successfully
+    updated to the new software version.
 
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-
+    
 tests:
-    - label:
-          "DUT sends the NotifyUpdateApplied Command to the OTA-P after
-          installing the software update."
-      verification:
-          "Verify that the OTA Provider show NotifyUpdateApplied message
-          received from DUT in the logs [1645743059329] [97806:20280748] CHIP:
-          [ZCL] OTA Provider received NotifyUpdateApplied [1645743059329]
-          [97806:20280748] CHIP: [ZCL] Update Token: 32 [1645743059329]
-          [97806:20280748] CHIP: [ZCL] Software Version: 1"
-      disabled: true
+  - label: "DUT sends the NotifyUpdateApplied Command to the OTA-P after installing the software update."
+    verification: |
+        Verify that the OTA Provider show NotifyUpdateApplied message received from DUT in the logs
+
+        [1645743059329] [97806:20280748] CHIP: [ZCL] OTA Provider received NotifyUpdateApplied
+        [1645743059329] [97806:20280748] CHIP: [ZCL]   Update Token: 32
+        [1645743059329] [97806:20280748] CHIP: [ZCL]   Software Version: 1
+    disabled: true
