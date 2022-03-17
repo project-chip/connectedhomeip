@@ -271,6 +271,11 @@ combination with JLinkRTTClient as follows:
         -  'switch groups onoff off'    : Sends On group command to bound group
         -  'switch groups onoff toggle' : Sends On group command to bound group
 
+    **_Binding Cluster_**
+
+        - 'switch binding unicast  <fabric index> <node id> <endpoint>' : Creates a unicast binding
+        - 'switch binding group <fabric index> <group id>'              : Creates a group binding
+
 *   You can provision and control the Chip device using the python controller,
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     standalone, Android or iOS app

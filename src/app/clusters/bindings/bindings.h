@@ -20,8 +20,12 @@
 #include <app/util/binding-table.h>
 
 /**
- * @brief Saves binding in storage and notifies a new binding has been added
+ * @brief appends a binding to the list of bindings
+ *        This function is to be used when a device wants to add a binding to it's own table
+ *        If entry is a unicast binding, BindingManager will be notified and will establish a case session with the peer device
+ *        Entry will be added to the binding table and persisted into storage
+ *        BindingManager will be notified and the binding added callback will be called if it has been set
  *
- * @param entry binding to save
+ * @param entry binding to add
  */
-void SaveBindingEntry(EmberBindingTableEntry & entry);
+void AddBindingEntry(const EmberBindingTableEntry & entry);

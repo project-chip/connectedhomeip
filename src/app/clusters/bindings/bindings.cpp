@@ -84,7 +84,7 @@ CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, F
     return CHIP_NO_ERROR;
 }
 
-void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
     EmberBindingTableEntry bindingEntry;
 
@@ -98,7 +98,7 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
                                                        entry.cluster);
     }
 
-    SaveBindingEntry(bindingEntry);
+    AddBindingEntry(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -189,7 +189,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         auto iter = newBindingList.begin();
         while (iter.Next())
         {
-            AddBindingEntry(iter.GetValue(), path.mEndpointId);
+            CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
         return CHIP_NO_ERROR;
     }
@@ -201,7 +201,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        AddBindingEntry(target, path.mEndpointId);
+        CreateBindingEntry(target, path.mEndpointId);
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
@@ -213,7 +213,7 @@ void MatterBindingPluginServerInitCallback()
     registerAttributeAccessOverride(&gAttrAccess);
 }
 
-void SaveBindingEntry(EmberBindingTableEntry & entry)
+void AddBindingEntry(const EmberBindingTableEntry & entry)
 {
     if (entry.type == EMBER_UNICAST_BINDING)
     {

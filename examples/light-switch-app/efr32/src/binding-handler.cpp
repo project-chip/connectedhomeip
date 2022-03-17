@@ -233,6 +233,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
     entry->type                    = EMBER_MULTICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
+    entry->clusterId.SetValue(6); // Hardcoded to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -240,7 +241,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 {
-    VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
     EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
     entry->type                    = EMBER_UNICAST_BINDING;
@@ -248,7 +249,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
     entry->nodeId                  = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->remote                  = atoi(argv[2]);
-    entry->clusterId.SetValue(atoi(argv[3]));
+    entry->clusterId.SetValue(6)); // Hardcode to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -361,8 +362,7 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchBindingSubCommands[] = {
         { &BindingHelpHandler, "help", "Usage: switch binding <subcommand>" },
         { &BindingGroupBindCommandHandler, "group", "Usage: switch binding group <fabric index> <group id>" },
-        { &BindingUnicastBindCommandHandler, "unicast",
-          "Usage: switch binding group <fabric index> <node id> <endpoint> <cluster>" }
+        { &BindingUnicastBindCommandHandler, "unicast", "Usage: switch binding group <fabric index> <node id> <endpoint>" }
     };
 
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
@@ -407,7 +407,7 @@ void BindingWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
     EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
-    SaveBindingEntry(*entry);
+    AddBindingEntry(*entry);
 
     Platform::Delete(entry);
 }
