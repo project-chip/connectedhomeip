@@ -45,7 +45,9 @@ void BLEBase::ClearState()
 {
     if (mBleLayer)
     {
+#if CONFIG_NETWORK_LAYER_BLE
         mBleLayer->CancelBleIncompleteConnection();
+#endif
         mBleLayer->OnChipBleConnectReceived = nullptr;
         mBleLayer->mBleTransport            = nullptr;
         mBleLayer                           = nullptr;
@@ -53,7 +55,9 @@ void BLEBase::ClearState()
 
     if (mBleEndPoint)
     {
+#if CONFIG_NETWORK_LAYER_BLE
         mBleEndPoint->Close();
+#endif
         mBleEndPoint = nullptr;
     }
 
@@ -103,7 +107,9 @@ CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::
 
     if (mState == State::kConnected)
     {
+#if CONFIG_NETWORK_LAYER_BLE
         ReturnErrorOnFailure(mBleEndPoint->Send(std::move(msgBuf)));
+#endif
     }
     else
     {
@@ -139,7 +145,9 @@ void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endPoint)
     mBleEndPoint = endPoint;
 
     // Initiate CHIP over BLE protocol connection.
+#if CONFIG_NETWORK_LAYER_BLE
     err = mBleEndPoint->StartConnect();
+#endif
     SuccessOrExit(err);
 
 exit:
@@ -147,7 +155,9 @@ exit:
     {
         if (mBleEndPoint != nullptr)
         {
+#if CONFIG_NETWORK_LAYER_BLE
             mBleEndPoint->Close();
+#endif
             mBleEndPoint = nullptr;
         }
         ChipLogError(Inet, "Failed to setup BLE endPoint: %s", ErrorStr(err));
@@ -180,11 +190,13 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
     {
         if (!mPendingPackets[i].IsNull())
         {
+#if CONFIG_NETWORK_LAYER_BLE
             err = endPoint->Send(std::move(mPendingPackets[i]));
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Deferred sending failed: %s", ErrorStr(err));
             }
+#endif
         }
     }
     ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);
