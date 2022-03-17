@@ -350,7 +350,7 @@ def cmd_check(context):
         sys.exit(1)
 
 
-@main.command("check", help="Run check followd by fix")
+@main.command("fix", help="Run check followd by fix")
 @click.pass_context
 def cmd_fix(context):
     runner = context.obj
