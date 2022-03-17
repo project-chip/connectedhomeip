@@ -1,4 +1,5 @@
 #CHIP BL602 Lighting Example
+
 ## Build
 
 -   Install some additional tools(likely already present for CHIP developers):
