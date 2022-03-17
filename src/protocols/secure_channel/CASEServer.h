@@ -41,7 +41,7 @@ public:
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
 #if CONFIG_NETWORK_LAYER_BLE
-                                             Ble::BleLayer * bleLayer, 
+                                             Ble::BleLayer * bleLayer,
 #endif
 SessionManager * sessionManager, FabricTable * fabrics);
 
