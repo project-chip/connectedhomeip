@@ -51,9 +51,9 @@ static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribu
 
 #ifdef GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER
 namespace GeneratedAccessWriteAttribute {
-constexpr ClusterId kCluster[]     = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
-constexpr AttributeId kAttribute[] = GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE;
-constexpr uint8_t kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
+constexpr ClusterId kCluster[]     = GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER;
+constexpr AttributeId kAttribute[] = GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE;
+constexpr uint8_t kPrivilege[]     = GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessWriteAttribute
