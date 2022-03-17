@@ -482,10 +482,9 @@ int Test_Setup(void * inContext)
     TestContext & ctx = *static_cast<TestContext *>(inContext);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitProvider(), FAILURE);
 
-    chip::CompressedFabricId compressedFabricId = ctx.GetBobFabric()->GetCompressedId();
-    uint8_t buf[sizeof(compressedFabricId)];
+    uint8_t buf[sizeof(chip::CompressedFabricId)];
     chip::MutableByteSpan span(buf);
-    chip::Encoding::BigEndian::Put64(span.data(), span.size());
+    VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedId(span), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(ctx.GetBobFabricIndex(), span), FAILURE);
 
     return SUCCESS;

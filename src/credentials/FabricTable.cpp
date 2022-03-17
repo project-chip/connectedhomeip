@@ -809,8 +809,8 @@ CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, cons
     return err;
 }
 
-CHIP_ERROR FabricInfo::BuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                   ByteSpan nodePrivateKey)
+CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                           ByteSpan nodePrivateKey)
 {
     Reset();
 
@@ -818,6 +818,7 @@ CHIP_ERROR FabricInfo::BuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpa
     ReturnErrorOnFailure(SetICACert(icacCert));
     ReturnErrorOnFailure(SetNOCCert(nocCert));
 
+    // NOTE: this requres ENABLE_HSM_CASE_OPS_KEY is not defined
     P256SerializedKeypair opKeysSerialized;
     memcpy(static_cast<uint8_t *>(opKeysSerialized), nodePubKey.data(), nodePubKey.size());
     memcpy(static_cast<uint8_t *>(opKeysSerialized) + nodePubKey.size(), nodePrivateKey.data(), nodePrivateKey.size());

@@ -209,7 +209,8 @@ public:
     friend class FabricTable;
 
     // Test-only, build a fabric using given root cert and NOC
-    CHIP_ERROR BuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey, ByteSpan nodePrivateKey);
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                   ByteSpan nodePrivateKey);
 
 private:
     static constexpr size_t MetadataTLVMaxSize()
