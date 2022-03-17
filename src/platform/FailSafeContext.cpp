@@ -35,14 +35,13 @@ void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 
 void FailSafeContext::CommissioningFailedTimerComplete()
 {
-    // TODO: If the fail-safe timer expires before the CommissioningComplete command is
-    // successfully invoked, conduct clean-up steps.
-
     ChipDeviceEvent event;
-    event.Type                                  = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerFabricIndex = mFabricIndex;
-    event.CommissioningComplete.Status          = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                           = PlatformMgr().PostEvent(&event);
+    event.Type                                                 = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerFabricIndex                = mFabricIndex;
+    event.CommissioningComplete.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
+    event.CommissioningComplete.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
+    event.CommissioningComplete.Status                         = CHIP_ERROR_TIMEOUT;
+    CHIP_ERROR status                                          = PlatformMgr().PostEvent(&event);
 
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;
