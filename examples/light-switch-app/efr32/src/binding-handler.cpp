@@ -233,7 +233,8 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
     entry->type                    = EMBER_MULTICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
-    entry->clusterId.SetValue(6); // Hardcoded to OnOff cluster for now
+    entry->local                   = 1; // Hardcoded to endpoint 1 for now
+    entry->clusterId.SetValue(6);       // Hardcoded to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
