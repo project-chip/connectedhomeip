@@ -192,6 +192,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable k32w builds by default.
     enable_k32w_builds = false
+
+    # Set this to true to enable bl602 builds by default.
+    enable_bl602_builds = false
   }
 
   declare_args() {
@@ -273,6 +276,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
+
+    # Build the bl602 lock app example.
+    enable_bl602_lighting_app_build = enable_bl602_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
   }
