@@ -265,8 +265,6 @@ exit:
 
 void WiFiDriverImpl::DisconnectNetwork(ByteSpan networkId)
 {
-    Status status = Status::kSuccess;
-
     VerifyOrReturn(mWiFiInterface != nullptr, ChipLogError(DeviceLayer, "Wifi network not available"));
     VerifyOrReturn(NetworkMatch(mStagingNetwork, networkId), ChipLogError(DeviceLayer, "Network not found"));
     ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver disconnect network: SSID: %.*s", static_cast<int>(networkId.size()),

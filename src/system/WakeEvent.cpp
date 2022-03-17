@@ -143,7 +143,7 @@ void WakeEvent::Close(LayerSockets & systemLayer)
     mReadFD = -1;
 }
 
-void WakeEvent::Confirm()
+void WakeEvent::Confirm() const
 {
     uint64_t value;
 
@@ -153,7 +153,7 @@ void WakeEvent::Confirm()
     }
 }
 
-CHIP_ERROR WakeEvent::Notify()
+CHIP_ERROR WakeEvent::Notify() const
 {
     uint64_t value = 1;
 
