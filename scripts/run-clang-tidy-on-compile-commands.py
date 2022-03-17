@@ -186,10 +186,13 @@ class ClangTidyRunner:
                     continue
                 diagnostics = content.get("Diagnostics", [])
 
+                # Allow all diagnostics for distinct paths to be applied
+                # at once but never again for future paths
                 for d in diagnostics:
                   if d['DiagnosticMessage']['FilePath'] not in already_seen:
                     all_diagnostics.append(d)
 
+                # in the future assume these files were already processed
                 for d in diagnostics:
                   already_seen.add(d['DiagnosticMessage']['FilePath'])
 
