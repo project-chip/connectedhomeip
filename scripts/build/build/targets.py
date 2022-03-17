@@ -248,6 +248,8 @@ def HostTargets():
     # builds is exponential here
     builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
         ['-all-clusters', '-chip-tool']), test_group=True),
+    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), separate_event_loop=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="tsan", requires=["clang"], conflicts=[
@@ -256,8 +258,6 @@ def HostTargets():
                           'tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
-    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool']), separate_event_loop=False),
     builder.AppendVariant(name="clang", use_clang=True),
 
     builder.WhitelistVariantNameForGlob('ipv6only')
