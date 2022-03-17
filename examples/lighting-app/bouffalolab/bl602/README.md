@@ -23,7 +23,7 @@ Generated files
 
 ## Flash
 
-- use BLDevCube tool
+-   use BLDevCube tool
 
 ### Setting up Python Controller
 
