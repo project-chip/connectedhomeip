@@ -45,10 +45,10 @@ static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 
     if (pwmR.port == 0xff)
     {
-        pwmR.port       = 0;
-        pwmR.config.pin = 0;
+        pwmR.port              = 0;
+        pwmR.config.pin        = 0;
         pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-        pwmR.config.freq = 1000;
+        pwmR.config.freq       = 1000;
         hosal_pwm_init(&pwmR);
         vTaskDelay(50);
         hosal_pwm_start(&pwmR);
@@ -56,7 +56,7 @@ static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
     else
     {
         pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-        pwmR.config.freq = 1000;
+        pwmR.config.freq       = 1000;
         hosal_pwm_para_chg(&pwmR, pwmR.config);
     }
 #else
