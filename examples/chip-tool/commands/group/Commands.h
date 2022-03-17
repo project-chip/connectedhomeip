@@ -145,10 +145,10 @@ private:
     chip::GroupId groupId;
 };
 
-class ShowKeySet : public CHIPCommand
+class ShowKeySets : public CHIPCommand
 {
 public:
-    ShowKeySet(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("show-keysets", credsIssuerConfig) {}
+    ShowKeySets(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("show-keysets", credsIssuerConfig) {}
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(5); }
 
     CHIP_ERROR RunCommand() override
@@ -278,7 +278,6 @@ public:
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
         ReturnLogErrorOnFailure(CurrentCommissioner().GetFabricInfo()->GetCompressedId(compressed_fabric_id_span));
-        // static const uint8_t epochKeySize = static_cast<uint8_t>(sizeof(chip::Credentials::GroupDataProvider::EpochKey));
 
         if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
              keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
@@ -288,10 +287,11 @@ public:
         }
 
         chip::Credentials::GroupDataProvider::KeySet keySet(keysetId, keyPolicy, 1);
-        chip::Credentials::GroupDataProvider::EpochKey epoch_keys;
-        epoch_keys.start_time = validityTime;
+        chip::Credentials::GroupDataProvider::EpochKey epoch_key;
+        epoch_key.start_time = validityTime;
+        memcpy(epoch_key.key, epochKey.data(), chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes);
 
-        memcpy(keySet.epoch_keys, epochKey.data(), sizeof(chip::Credentials::GroupDataProvider::EpochKey));
+        memcpy(keySet.epoch_keys, &epoch_key, sizeof(chip::Credentials::GroupDataProvider::EpochKey));
         ReturnErrorOnFailure(groupDataProvider->SetKeySet(fabricIndex, compressed_fabric_id_span, keySet));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -361,7 +361,7 @@ void registerCommandsGroup(Commands & commands, CredentialIssuerCommands * creds
         make_unique<ShowControllerGroups>(credsIssuerConfig),
         make_unique<AddGroup>(credsIssuerConfig),
         make_unique<RemoveGroup>(credsIssuerConfig),
-        make_unique<ShowKeySet>(credsIssuerConfig),
+        make_unique<ShowKeySets>(credsIssuerConfig),
         make_unique<BindKeySet>(credsIssuerConfig),
         make_unique<UnbindKeySet>(credsIssuerConfig),
         make_unique<AddKeySet>(credsIssuerConfig),
