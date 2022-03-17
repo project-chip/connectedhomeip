@@ -1829,8 +1829,6 @@ void BLEManagerImpl::CHIPoBLEProfile_charValueChangeCB(uint8_t paramId, uint16_t
 void BLEManagerImpl::CHIPoBLEProfile_c3ValueReadCB(uint8_t * destBuf, uint16_t maxLen, uint16_t connHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle packetBuf;
-    uint16_t len;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
     uint16_t lifetimeCounter = 0;
@@ -1844,11 +1842,13 @@ void BLEManagerImpl::CHIPoBLEProfile_c3ValueReadCB(uint8_t * destBuf, uint16_t m
 
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
-
+ 
+    System::PacketBufferHandle packetBuf;
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
                                                                          packetBuf, additionalDataFields);
     SuccessOrExit(err);
 
+    uint16_t len;
     len = (maxLen < packetBuf->DataLength()) ? maxLen : packetBuf->DataLength();
     memcpy(destBuf, packetBuf->Start(), len);
 
