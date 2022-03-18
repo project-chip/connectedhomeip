@@ -55,12 +55,20 @@ public:
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    inline bool NocCommandHasBeenInvoked() const { return mNocCommandHasBeenInvoked; }
+    inline bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
+    inline bool AddNocCommandHasBeenInvoked() { return mAddNocCommandHasBeenInvoked; }
+    inline bool UpdateNocCommandHasBeenInvoked() { return mUpdateNocCommandHasBeenInvoked; }
 
-    inline void SetNocCommandInvoked(FabricIndex nocFabricIndex)
+    inline void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     {
-        mNocCommandHasBeenInvoked = true;
-        mFabricIndex              = nocFabricIndex;
+        mAddNocCommandHasBeenInvoked = true;
+        mFabricIndex                 = nocFabricIndex;
+    }
+
+    inline void SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex)
+    {
+        mUpdateNocCommandHasBeenInvoked = true;
+        mFabricIndex                    = nocFabricIndex;
     }
 
     inline FabricIndex GetFabricIndex() const
@@ -72,9 +80,10 @@ public:
 private:
     // ===== Private members reserved for use by this class only.
 
-    bool mFailSafeArmed            = false;
-    bool mNocCommandHasBeenInvoked = false;
-    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+    bool mFailSafeArmed                  = false;
+    bool mAddNocCommandHasBeenInvoked    = false;
+    bool mUpdateNocCommandHasBeenInvoked = false;
+    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
