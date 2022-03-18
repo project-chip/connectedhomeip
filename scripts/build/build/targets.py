@@ -227,7 +227,7 @@ def HostTargets():
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
-    builder.AppendVariant(name="ipv6only", enable_ipv4=False),
+    builder.AppendVariant(name="ipv4", enable_ipv4=True),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
@@ -256,7 +256,7 @@ def HostTargets():
     yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
     yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE, use_clang=True).GlobBlacklist("Reduce default build variants")
     yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
-    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv4', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=True).GlobBlacklist("Reduce default build variants")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
@@ -267,16 +267,16 @@ def Esp32Targets():
     esp32_target = Target('esp32', Esp32Builder)
 
     yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv4', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=True)
     yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv4', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=True)
 
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
     devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
-    yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield devkitc.Extend('all-clusters-ipv4', app=Esp32App.ALL_CLUSTERS, enable_ipv4=True)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
     yield devkitc.Extend('light', app=Esp32App.LIGHT)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
