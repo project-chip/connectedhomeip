@@ -109,7 +109,7 @@ limitations under the License.
         <!-- Conformance feature RID - for now optional -->
         <attribute side="server" code="26" define="MIN_RFID_CODE_LENGTH" type="INT8U" writable="false" optional="true">MinRFIDCodeLength</attribute>
         <!-- Conformance feature USR - for now optional -->
-        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="BITMAP8" min="0x00" max="0x07" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
+        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
         <!-- Conformance feature LOG - for now optional -->
         <attribute side="server" code="32" define="ENABLE_LOGGING" type="boolean" reportable="true" default="0" writable="true" optional="true">
             <description>EnableLogging</description>
@@ -141,8 +141,8 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="BITMAP16" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
-        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
+        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="DlSupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
+        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="DlDefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
         <attribute side="server" code="40" define="ENABLE_LOCAL_PROGRAMMING" type="boolean" reportable="true" default="1" writable="true" optional="true">
             <description>EnableLocalProgramming</description>
             <access op="read" role="view" />
@@ -163,7 +163,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="BITMAP8" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
+        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="DlLocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
             <description>LocalProgrammingFeatures</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
@@ -199,49 +199,49 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
-        <attribute side="server" code="64" define="ALARM_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="64" define="ALARM_MASK" type="DlAlarmMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>AlarmMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & PIN] - for now optional -->
-        <attribute side="server" code="65" define="KEYPAD_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="65" define="KEYPAD_OPERATION_EVENT_MASK" type="DlKeypadOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>KeypadOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="66" define="REMOTE_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="66" define="REMOTE_OPERATION_EVENT_MASK" type="DlRemoteOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RemoteOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="67" define="MANUAL_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="67" define="MANUAL_OPERATION_EVENT_MASK" type="DlManualOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>ManualOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & RID] - for now optional -->
-        <attribute side="server" code="68" define="RFID_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="68" define="RFID_OPERATION_EVENT_MASK" type="DlRFIDOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RFIDOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & PIN] - for now optional -->
-        <attribute side="server" code="69" define="KEYPAD_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="69" define="KEYPAD_PROGRAMMING_EVENT_MASK" type="DlKeypadOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>KeypadProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="70" define="REMOTE_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="70" define="REMOTE_PROGRAMMING_EVENT_MASK" type="DlRemoteProgrammingEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RemoteProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & RID] - for now optional -->
-        <attribute side="server" code="71" define="RFID_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="71" define="RFID_PROGRAMMING_EVENT_MASK" type="DlRFIDProgrammingEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RFIDProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
@@ -663,6 +663,13 @@ limitations under the License.
         <item value="2" name="Tri" />
     </enum>
 
+    <bitmap name="DlCredentialRuleMask" type="BITMAP8">
+        <cluster code="0x0101" />
+        <field mask="0x01" name="Single" />
+        <field mask="0x02" name="Dual" />
+        <field mask="0x04" name="Tri" />
+    </bitmap> 
+
     <struct name="DlCredential">
         <cluster code="0x0101" />
         <item name="CredentialType" type="DlCredentialType" />
@@ -882,7 +889,7 @@ limitations under the License.
         <field mask="0x40" name="UnlockInvalidSchedule" />
     </bitmap>
 
-    <!-- RemoteOperationEventMask attribute bit meaning set -->
+    <!-- ManualOperationEventMask attribute bit meaning set -->
     <bitmap name="DlManualOperationEventMask" type="BITMAP16">
         <cluster code="0x0101" />
         <field mask="0x001" name="Unknown" />

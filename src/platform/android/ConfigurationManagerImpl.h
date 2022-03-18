@@ -56,8 +56,6 @@ public:
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
-
-    CHIP_ERROR Init() override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset() override;
     void InitiateFactoryReset() override;

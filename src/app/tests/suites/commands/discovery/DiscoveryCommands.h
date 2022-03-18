@@ -47,7 +47,7 @@ class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate, publ
 {
 public:
     DiscoveryCommands(){};
-    virtual ~DiscoveryCommands(){};
+    ~DiscoveryCommands() override{};
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 

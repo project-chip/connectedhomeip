@@ -25,7 +25,7 @@ class CommissionerCommands : public chip::Controller::DevicePairingDelegate
 {
 public:
     CommissionerCommands(){};
-    virtual ~CommissionerCommands(){};
+    ~CommissionerCommands() override{};
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)             = 0;
     virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner() = 0;

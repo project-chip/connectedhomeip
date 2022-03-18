@@ -656,14 +656,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
     ctx.EnableAsyncDispatch();
-
-    ctx.SetBobNodeId(kPlaceholderNodeId);
-    ctx.SetAliceNodeId(kPlaceholderNodeId);
-    ctx.SetBobKeyId(0);
-    ctx.SetAliceKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);

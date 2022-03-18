@@ -6484,21 +6484,21 @@ namespace Structs {
 namespace TargetStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kNode        = 1,
     kGroup       = 2,
     kEndpoint    = 3,
     kCluster     = 4,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     Optional<chip::NodeId> node;
     Optional<chip::GroupId> group;
     Optional<chip::EndpointId> endpoint;
     Optional<chip::ClusterId> cluster;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6644,21 +6644,21 @@ using DecodableType = Type;
 namespace AccessControlEntry {
 enum class Fields
 {
-    kFabricIndex = 0,
     kPrivilege   = 1,
     kAuthMode    = 2,
     kSubjects    = 3,
     kTargets     = 4,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    Privilege privilege           = static_cast<Privilege>(0);
-    AuthMode authMode             = static_cast<AuthMode>(0);
+    Privilege privilege = static_cast<Privilege>(0);
+    AuthMode authMode   = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -6676,11 +6676,11 @@ private:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    Privilege privilege           = static_cast<Privilege>(0);
-    AuthMode authMode             = static_cast<AuthMode>(0);
+    Privilege privilege = static_cast<Privilege>(0);
+    AuthMode authMode   = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6695,15 +6695,15 @@ public:
 namespace ExtensionEntry {
 enum class Fields
 {
-    kFabricIndex = 0,
     kData        = 1,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan data;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6840,11 +6840,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminFabricIndex = 0,
     kAdminNodeID      = 1,
     kAdminPasscodeID  = 2,
     kChangeType       = 3,
     kLatestValue      = 4,
+    kAdminFabricIndex = 254,
 };
 
 struct Type
@@ -6855,11 +6855,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
 
     auto GetFabricIndex() const { return adminFabricIndex; }
 
@@ -6873,11 +6873,11 @@ public:
     static constexpr EventId GetEventId() { return Events::AccessControlEntryChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::DecodableType> latestValue;
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6887,11 +6887,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminFabricIndex = 0,
     kAdminNodeID      = 1,
     kAdminPasscodeID  = 2,
     kChangeType       = 3,
     kLatestValue      = 4,
+    kAdminFabricIndex = 254,
 };
 
 struct Type
@@ -6902,11 +6902,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
 
     auto GetFabricIndex() const { return adminFabricIndex; }
 
@@ -6920,11 +6920,11 @@ public:
     static constexpr EventId GetEventId() { return Events::AccessControlExtensionChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::DecodableType> latestValue;
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -15050,23 +15050,23 @@ namespace Structs {
 namespace FabricDescriptor {
 enum class Fields
 {
-    kFabricIndex   = 0,
     kRootPublicKey = 1,
     kVendorId      = 2,
     kFabricId      = 3,
     kNodeId        = 4,
     kLabel         = 5,
+    kFabricIndex   = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan rootPublicKey;
     uint16_t vendorId       = static_cast<uint16_t>(0);
     chip::FabricId fabricId = static_cast<chip::FabricId>(0);
     chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15089,17 +15089,17 @@ using DecodableType = Type;
 namespace NOCStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kNoc         = 1,
     kIcac        = 2,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
     DataModel::Nullable<chip::ByteSpan> icac;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15804,19 +15804,19 @@ namespace Structs {
 namespace GroupInfoMapStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kGroupId     = 1,
     kEndpoints   = 2,
     kGroupName   = 3,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     DataModel::List<const chip::EndpointId> endpoints;
     Optional<chip::CharSpan> groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -15834,10 +15834,10 @@ private:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
     Optional<chip::CharSpan> groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15852,17 +15852,17 @@ public:
 namespace GroupKeyMapStruct {
 enum class Fields
 {
-    kFabricIndex   = 0,
     kGroupId       = 1,
     kGroupKeySetID = 2,
+    kFabricIndex   = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::GroupId groupId         = static_cast<chip::GroupId>(0);
     uint16_t groupKeySetID        = static_cast<uint16_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -19397,9 +19397,9 @@ struct TypeInfo
 namespace CredentialRulesSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CredentialRulesSupport::Id; }
@@ -19482,9 +19482,9 @@ struct TypeInfo
 namespace SupportedOperatingModes {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedOperatingModes::Id; }
@@ -19494,9 +19494,9 @@ struct TypeInfo
 namespace DefaultConfigurationRegister {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultConfigurationRegister::Id; }
@@ -19554,9 +19554,9 @@ struct TypeInfo
 namespace LocalProgrammingFeatures {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalProgrammingFeatures::Id; }
@@ -19626,9 +19626,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -19638,9 +19638,9 @@ struct TypeInfo
 namespace KeypadOperationEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadOperationEventMask::Id; }
@@ -19650,9 +19650,9 @@ struct TypeInfo
 namespace RemoteOperationEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteOperationEventMask::Id; }
@@ -19662,9 +19662,9 @@ struct TypeInfo
 namespace ManualOperationEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManualOperationEventMask::Id; }
@@ -19674,9 +19674,9 @@ struct TypeInfo
 namespace RFIDOperationEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RFIDOperationEventMask::Id; }
@@ -19686,9 +19686,9 @@ struct TypeInfo
 namespace KeypadProgrammingEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadProgrammingEventMask::Id; }
@@ -19698,9 +19698,9 @@ struct TypeInfo
 namespace RemoteProgrammingEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteProgrammingEventMask::Id; }
@@ -19710,9 +19710,9 @@ struct TypeInfo
 namespace RFIDProgrammingEventMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RFIDProgrammingEventMask::Id; }
@@ -19805,38 +19805,50 @@ struct TypeInfo
             static_cast<uint8_t>(0);
         Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::DecodableType numberOfHolidaySchedulesSupported =
             static_cast<uint8_t>(0);
-        Attributes::MaxPINCodeLength::TypeInfo::DecodableType maxPINCodeLength             = static_cast<uint8_t>(0);
-        Attributes::MinPINCodeLength::TypeInfo::DecodableType minPINCodeLength             = static_cast<uint8_t>(0);
-        Attributes::MaxRFIDCodeLength::TypeInfo::DecodableType maxRFIDCodeLength           = static_cast<uint8_t>(0);
-        Attributes::MinRFIDCodeLength::TypeInfo::DecodableType minRFIDCodeLength           = static_cast<uint8_t>(0);
-        Attributes::CredentialRulesSupport::TypeInfo::DecodableType credentialRulesSupport = static_cast<uint8_t>(0);
-        Attributes::EnableLogging::TypeInfo::DecodableType enableLogging                   = static_cast<bool>(0);
+        Attributes::MaxPINCodeLength::TypeInfo::DecodableType maxPINCodeLength   = static_cast<uint8_t>(0);
+        Attributes::MinPINCodeLength::TypeInfo::DecodableType minPINCodeLength   = static_cast<uint8_t>(0);
+        Attributes::MaxRFIDCodeLength::TypeInfo::DecodableType maxRFIDCodeLength = static_cast<uint8_t>(0);
+        Attributes::MinRFIDCodeLength::TypeInfo::DecodableType minRFIDCodeLength = static_cast<uint8_t>(0);
+        Attributes::CredentialRulesSupport::TypeInfo::DecodableType credentialRulesSupport =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>(0);
+        Attributes::EnableLogging::TypeInfo::DecodableType enableLogging = static_cast<bool>(0);
         Attributes::Language::TypeInfo::DecodableType language;
         Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings       = static_cast<uint8_t>(0);
         Attributes::AutoRelockTime::TypeInfo::DecodableType autoRelockTime = static_cast<uint32_t>(0);
         Attributes::SoundVolume::TypeInfo::DecodableType soundVolume       = static_cast<uint8_t>(0);
         Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
             static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
-        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes           = static_cast<uint16_t>(0);
-        Attributes::DefaultConfigurationRegister::TypeInfo::DecodableType defaultConfigurationRegister = static_cast<uint16_t>(0);
-        Attributes::EnableLocalProgramming::TypeInfo::DecodableType enableLocalProgramming             = static_cast<bool>(0);
-        Attributes::EnableOneTouchLocking::TypeInfo::DecodableType enableOneTouchLocking               = static_cast<bool>(0);
-        Attributes::EnableInsideStatusLED::TypeInfo::DecodableType enableInsideStatusLED               = static_cast<bool>(0);
-        Attributes::EnablePrivacyModeButton::TypeInfo::DecodableType enablePrivacyModeButton           = static_cast<bool>(0);
-        Attributes::LocalProgrammingFeatures::TypeInfo::DecodableType localProgrammingFeatures         = static_cast<uint8_t>(0);
+        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>(0);
+        Attributes::DefaultConfigurationRegister::TypeInfo::DecodableType defaultConfigurationRegister =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>(0);
+        Attributes::EnableLocalProgramming::TypeInfo::DecodableType enableLocalProgramming   = static_cast<bool>(0);
+        Attributes::EnableOneTouchLocking::TypeInfo::DecodableType enableOneTouchLocking     = static_cast<bool>(0);
+        Attributes::EnableInsideStatusLED::TypeInfo::DecodableType enableInsideStatusLED     = static_cast<bool>(0);
+        Attributes::EnablePrivacyModeButton::TypeInfo::DecodableType enablePrivacyModeButton = static_cast<bool>(0);
+        Attributes::LocalProgrammingFeatures::TypeInfo::DecodableType localProgrammingFeatures =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>(0);
         Attributes::WrongCodeEntryLimit::TypeInfo::DecodableType wrongCodeEntryLimit                   = static_cast<uint8_t>(0);
         Attributes::UserCodeTemporaryDisableTime::TypeInfo::DecodableType userCodeTemporaryDisableTime = static_cast<uint8_t>(0);
         Attributes::SendPINOverTheAir::TypeInfo::DecodableType sendPINOverTheAir                       = static_cast<bool>(0);
         Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableType requirePINforRemoteOperation = static_cast<bool>(0);
         Attributes::ExpiringUserTimeout::TypeInfo::DecodableType expiringUserTimeout                   = static_cast<uint16_t>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask                                       = static_cast<uint16_t>(0);
-        Attributes::KeypadOperationEventMask::TypeInfo::DecodableType keypadOperationEventMask         = static_cast<uint16_t>(0);
-        Attributes::RemoteOperationEventMask::TypeInfo::DecodableType remoteOperationEventMask         = static_cast<uint16_t>(0);
-        Attributes::ManualOperationEventMask::TypeInfo::DecodableType manualOperationEventMask         = static_cast<uint16_t>(0);
-        Attributes::RFIDOperationEventMask::TypeInfo::DecodableType RFIDOperationEventMask             = static_cast<uint16_t>(0);
-        Attributes::KeypadProgrammingEventMask::TypeInfo::DecodableType keypadProgrammingEventMask     = static_cast<uint16_t>(0);
-        Attributes::RemoteProgrammingEventMask::TypeInfo::DecodableType remoteProgrammingEventMask     = static_cast<uint16_t>(0);
-        Attributes::RFIDProgrammingEventMask::TypeInfo::DecodableType RFIDProgrammingEventMask         = static_cast<uint16_t>(0);
+        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>>(0);
+        Attributes::KeypadOperationEventMask::TypeInfo::DecodableType keypadOperationEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>(0);
+        Attributes::RemoteOperationEventMask::TypeInfo::DecodableType remoteOperationEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>>(0);
+        Attributes::ManualOperationEventMask::TypeInfo::DecodableType manualOperationEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>>(0);
+        Attributes::RFIDOperationEventMask::TypeInfo::DecodableType RFIDOperationEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>>(0);
+        Attributes::KeypadProgrammingEventMask::TypeInfo::DecodableType keypadProgrammingEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>(0);
+        Attributes::RemoteProgrammingEventMask::TypeInfo::DecodableType remoteProgrammingEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>>(0);
+        Attributes::RFIDProgrammingEventMask::TypeInfo::DecodableType RFIDProgrammingEventMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -35049,7 +35061,6 @@ using DecodableType = Type;
 namespace TestFabricScoped {
 enum class Fields
 {
-    kFabricIndex                          = 0,
     kFabricSensitiveInt8u                 = 1,
     kOptionalFabricSensitiveInt8u         = 2,
     kNullableFabricSensitiveInt8u         = 3,
@@ -35057,19 +35068,20 @@ enum class Fields
     kFabricSensitiveCharString            = 5,
     kFabricSensitiveStruct                = 6,
     kFabricSensitiveInt8uList             = 7,
+    kFabricIndex                          = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    uint8_t fabricSensitiveInt8u  = static_cast<uint8_t>(0);
+    uint8_t fabricSensitiveInt8u = static_cast<uint8_t>(0);
     Optional<uint8_t> optionalFabricSensitiveInt8u;
     DataModel::Nullable<uint8_t> nullableFabricSensitiveInt8u;
     Optional<DataModel::Nullable<uint8_t>> nullableOptionalFabricSensitiveInt8u;
     chip::CharSpan fabricSensitiveCharString;
     Structs::SimpleStruct::Type fabricSensitiveStruct;
     DataModel::List<const uint8_t> fabricSensitiveInt8uList;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -35087,14 +35099,14 @@ private:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    uint8_t fabricSensitiveInt8u  = static_cast<uint8_t>(0);
+    uint8_t fabricSensitiveInt8u = static_cast<uint8_t>(0);
     Optional<uint8_t> optionalFabricSensitiveInt8u;
     DataModel::Nullable<uint8_t> nullableFabricSensitiveInt8u;
     Optional<DataModel::Nullable<uint8_t>> nullableOptionalFabricSensitiveInt8u;
     chip::CharSpan fabricSensitiveCharString;
     Structs::SimpleStruct::DecodableType fabricSensitiveStruct;
     DataModel::DecodableList<uint8_t> fabricSensitiveInt8uList;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -37909,7 +37921,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kArg1 = 1,
+    kArg1 = 254,
 };
 
 struct Type

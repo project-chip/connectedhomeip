@@ -41,7 +41,7 @@ static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
 static constexpr size_t kKeyVendorProductMaxLength           = 11;
 static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
 static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength              = 5;
+static constexpr size_t kKeyDeviceTypeMaxLength              = 10;
 static constexpr size_t kKeyDeviceNameMaxLength              = 32;
 static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
@@ -104,8 +104,7 @@ uint16_t GetProduct(const ByteSpan & value);
 uint16_t GetVendor(const ByteSpan & value);
 uint16_t GetLongDiscriminator(const ByteSpan & value);
 uint8_t GetCommissioningMode(const ByteSpan & value);
-// TODO: possibly 32-bit? see spec issue #3226
-uint16_t GetDeviceType(const ByteSpan & value);
+uint32_t GetDeviceType(const ByteSpan & value);
 void GetDeviceName(const ByteSpan & value, char * name);
 void GetRotatingDeviceId(const ByteSpan & value, uint8_t * rotatingId, size_t * len);
 uint16_t GetPairingHint(const ByteSpan & value);
