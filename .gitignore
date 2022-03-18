@@ -13,8 +13,9 @@ out/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
 
-# Environment directory
+# Pigweed Environment
 .environment/
+build_overrides/pigweed_environment.gni
 
 # Temporary Directories
 .tmp/

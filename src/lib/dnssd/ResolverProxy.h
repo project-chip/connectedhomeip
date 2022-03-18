@@ -86,6 +86,24 @@ public:
         ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(udpEndPoint));
         VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mDelegate = chip::Platform::New<ResolverDelegateProxy>();
+
+        if (mDelegate != nullptr)
+        {
+            if (mPreInitOperationalDelegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Setting operational delegate post init");
+                mDelegate->SetOperationalDelegate(mPreInitOperationalDelegate);
+                mPreInitOperationalDelegate = nullptr;
+            }
+
+            if (mPreInitCommissioningDelegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Setting commissioning delegate post init");
+                mDelegate->SetCommissioningDelegate(mPreInitCommissioningDelegate);
+                mPreInitCommissioningDelegate = nullptr;
+            }
+        }
+
         return mDelegate != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
@@ -97,7 +115,8 @@ public:
         }
         else
         {
-            ChipLogError(Discovery, "Failed to proxy operational discovery: missing delegate");
+            ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
+            mPreInitOperationalDelegate = delegate;
         }
     }
 
@@ -109,7 +128,8 @@ public:
         }
         else
         {
-            ChipLogError(Discovery, "Failed to proxy commissioning discovery: missing delegate");
+            ChipLogError(Discovery, "Delaying proxy of commissioning discovery: missing delegate");
+            mPreInitCommissioningDelegate = delegate;
         }
     }
 
@@ -125,10 +145,11 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
 private:
-    ResolverDelegateProxy * mDelegate = nullptr;
+    ResolverDelegateProxy * mDelegate                            = nullptr;
+    OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
+    CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
 };
 
 } // namespace Dnssd

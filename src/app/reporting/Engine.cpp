@@ -763,10 +763,9 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
         ChipLogDetail(DataManagement, "urgent event schedule run");
         return ScheduleRun();
     }
-    else
-    {
-        return ScheduleBufferPressureEventDelivery(aBytesWritten);
-    }
+
+    return ScheduleBufferPressureEventDelivery(aBytesWritten);
+
     return CHIP_NO_ERROR;
 }
 

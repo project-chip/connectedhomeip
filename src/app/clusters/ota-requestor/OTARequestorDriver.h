@@ -56,10 +56,17 @@ enum class UpdateFailureState
 
 enum class UpdateNotFoundReason
 {
-    Busy,
-    NotAvailable,
-    UpToDate,
-    ConnectionFailed,
+    kBusy,
+    kNotAvailable,
+    kUpToDate,
+};
+
+// The reasons for why the OTA Requestor has entered idle state
+enum class IdleStateReason
+{
+    kUnknown,
+    kIdle,
+    kInvalidSession,
 };
 
 // Interface class to abstract the OTA-related business logic. Each application
@@ -80,8 +87,8 @@ public:
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 
-    // Called when the OTA Requestor enters the kIdle update state
-    virtual void HandleIdleState() = 0;
+    // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
+    virtual void HandleIdleState(IdleStateReason reason) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
@@ -121,7 +128,9 @@ public:
     // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
     // the driver's internal logic such as, for example, traversing the default providers list.
     // Returns true if there is a Provider available for the next query, returns false otherwise.
-    virtual bool DetermineProviderLocation(ProviderLocationType & providerLocation) = 0;
+    // [in] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
+    // back to the beginning.
+    virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) = 0;
 };
 
 } // namespace chip

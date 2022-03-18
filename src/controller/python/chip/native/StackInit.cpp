@@ -21,7 +21,9 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 namespace {
 
@@ -80,6 +82,13 @@ void pychip_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
+
+    // Hack needed due to the fact that DnsSd server uses the CommissionableDataProvider even
+    // when never starting operational advertising. This will not be used but prevents
+    // null pointer dereferences.
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
+
     int result = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
 #if CHIP_ERROR_LOGGING
     int tmpErrno = errno;

@@ -285,7 +285,7 @@ public:
 class ClockImpl : public ClockBase
 {
 public:
-    ~ClockImpl() = default;
+    ~ClockImpl() override = default;
     Microseconds64 GetMonotonicMicroseconds64() override;
     Milliseconds64 GetMonotonicMilliseconds64() override;
     CHIP_ERROR GetClock_RealTime(Microseconds64 & aCurTime) override;

@@ -19,6 +19,9 @@
 
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
+
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -47,10 +50,11 @@ struct RegisterContext : public GenericContext
 
     RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
-        type = ContextType::Register;
-        strncpy(mType, sType, sizeof(mType));
+        type     = ContextType::Register;
         context  = cbContext;
         callback = cb;
+
+        Platform::CopyString(mType, sType);
     }
 
     bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
@@ -80,11 +84,12 @@ struct ResolveContext : public GenericContext
 
     ResolveContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
     {
-        type     = ContextType::Resolve;
-        context  = cbContext;
-        callback = cb;
-        strncpy(name, cbContextName, sizeof(name));
+        type        = ContextType::Resolve;
+        context     = cbContext;
+        callback    = cb;
         addressType = cbAddressType;
+
+        Platform::CopyString(name, cbContextName);
     }
 };
 
@@ -105,7 +110,8 @@ struct GetAddrInfoContext : public GenericContext
         callback    = cb;
         interfaceId = cbInterfaceId;
         port        = cbContextPort;
-        strncpy(name, cbContextName, sizeof(name));
+
+        Platform::CopyString(name, cbContextName);
     }
 };
 

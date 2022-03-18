@@ -51,6 +51,8 @@ public class TvApp {
 
   public native void setChannelManager(int endpoint, ChannelManager manager);
 
+  public native void setDACProvider(DACProvider provider);
+
   static {
     System.loadLibrary("TvApp");
   }

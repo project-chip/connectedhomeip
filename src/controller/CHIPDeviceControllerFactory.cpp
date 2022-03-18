@@ -24,8 +24,10 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -201,6 +203,31 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
+    stateParams.sessionIDAllocator    = Platform::New<SessionIDAllocator>();
+    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
+    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+
+    DeviceProxyInitParams deviceInitParams = {
+        .sessionManager = stateParams.sessionMgr,
+        .exchangeMgr    = stateParams.exchangeMgr,
+        .idAllocator    = stateParams.sessionIDAllocator,
+        .fabricTable    = stateParams.fabricTable,
+        .clientPool     = stateParams.caseClientPool,
+        .mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+    };
+
+    CASESessionManagerConfig sessionManagerConfig = {
+        .sessionInitParams = deviceInitParams,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = NoSuchThingWeWouldNeedToAddIt,
+#endif
+        .devicePool = stateParams.operationalDevicePool,
+    };
+
+    // TODO: Need to be able to create a CASESessionManagerConfig here!
+    stateParams.caseSessionManager = Platform::New<CASESessionManager>(sessionManagerConfig);
+    ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer));
+
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
     ChipLogDetail(Controller, "System State Initialized...");
@@ -287,6 +314,33 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASEServer = nullptr;
     }
 
+    if (mCASESessionManager != nullptr)
+    {
+        mCASESessionManager->Shutdown();
+        Platform::Delete(mCASESessionManager);
+        mCASESessionManager = nullptr;
+    }
+
+    // mSessionIDAllocator, mCASEClientPool, and mDevicePool must be deallocated
+    // after mCASESessionManager, which uses them.
+    if (mSessionIDAllocator != nullptr)
+    {
+        Platform::Delete(mSessionIDAllocator);
+        mSessionIDAllocator = nullptr;
+    }
+
+    if (mOperationalDevicePool != nullptr)
+    {
+        Platform::Delete(mOperationalDevicePool);
+        mOperationalDevicePool = nullptr;
+    }
+
+    if (mCASEClientPool != nullptr)
+    {
+        Platform::Delete(mCASEClientPool);
+        mCASEClientPool = nullptr;
+    }
+
     Dnssd::Resolver::Instance().Shutdown();
 
     // Shut down the interaction model
@@ -324,7 +378,11 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     }
 
     mSystemLayer        = nullptr;
+    mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mMessageCounterManager != nullptr)
     {

@@ -33,9 +33,6 @@ enum CommissioningStage : uint8_t
     kSecurePairing,
     kReadCommissioningInfo,
     kArmFailsafe,
-    // kConfigTime,  // NOT YET IMPLEMENTED
-    // kConfigTimeZone,  // NOT YET IMPLEMENTED
-    // kConfigDST,  // NOT YET IMPLEMENTED
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -52,8 +49,9 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
-    kConfigACL,
 };
+
+const char * StageToString(CommissioningStage stage);
 
 struct WiFiCredentials
 {

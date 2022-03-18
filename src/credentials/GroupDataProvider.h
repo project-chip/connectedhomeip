@@ -87,7 +87,10 @@ public:
         GroupId group_id = kUndefinedGroupId;
         // Set of group keys that generate operational group keys for use with this group
         KeysetId keyset_id = 0;
-        bool operator==(const GroupKey & other) { return this->group_id == other.group_id && this->keyset_id == other.keyset_id; }
+        bool operator==(const GroupKey & other) const
+        {
+            return this->group_id == other.group_id && this->keyset_id == other.keyset_id;
+        }
     };
 
     struct GroupEndpoint
@@ -99,7 +102,7 @@ public:
         // Endpoint on the Node to which messages to this group may be forwarded
         EndpointId endpoint_id = kInvalidEndpointId;
 
-        bool operator==(const GroupEndpoint & other)
+        bool operator==(const GroupEndpoint & other) const
         {
             return this->group_id == other.group_id && this->endpoint_id == other.endpoint_id;
         }
@@ -217,12 +220,13 @@ public:
     GroupDataProvider(const GroupDataProvider &) = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
-    uint16_t GetMaxGroupsPerFabric() { return mMaxGroupsPerFabric; }
-    uint16_t GetMaxGroupKeysPerFabric() { return mMaxGroupKeysPerFabric; }
+    uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
+    uint16_t GetMaxGroupKeysPerFabric() const { return mMaxGroupKeysPerFabric; }
 
     /**
-     *  Initialize the GroupDataProvider, including any persistent data store
-     *  initialization. Must be called once before any other API succeeds.
+     *  Initialize the GroupDataProvider, including possibly any persistent
+     *  data store initialization done by the implementation. Must be called once
+     *  before any other API succeeds.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE if called when already initialized.
      *  @retval #CHIP_NO_ERROR on success

@@ -203,7 +203,7 @@ CHIP_ERROR AppTask::Init()
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
         {
-            requestor->NotifyUpdateApplied(savedSoftwareVersion);
+            requestor->NotifyUpdateApplied();
         }
     }
 

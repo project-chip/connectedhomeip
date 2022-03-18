@@ -105,9 +105,7 @@ Server::Server() :
         .dnsCache          = nullptr,
 #endif
         .devicePool        = &mDevicePool,
-        .dnsResolver       = nullptr,
-    }),
-    mGroupsProvider(mDeviceStorage)
+    })
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
@@ -142,6 +140,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     // Group data provider must be initialized after mDeviceStorage
+    mGroupsProvider.SetStorageDelegate(&mDeviceStorage);
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
@@ -197,6 +196,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr);
     SuccessOrExit(err);
+
+    chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
@@ -258,7 +259,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init();
+    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them

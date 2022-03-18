@@ -61,7 +61,7 @@ public:
     void ApplyUpdate() override;
 
     // Initiate the session to send NotifyUpdateApplied command
-    void NotifyUpdateApplied(uint32_t version) override;
+    void NotifyUpdateApplied() override;
 
     // Get image update progress in percents unit
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
@@ -114,11 +114,21 @@ public:
         mOtaRequestorDriver = &driver;
         mBdxDownloader      = &downloader;
 
-        uint32_t version;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
-        mCurrentVersion = version;
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
         storage.LoadDefaultProviders(mDefaultOtaProviderList);
+
+        ProviderLocationType providerLocation;
+        if (storage.LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
+        {
+            mProviderLocation.SetValue(providerLocation);
+        }
+
+        MutableByteSpan updateToken(mUpdateTokenBuffer);
+        if (storage.LoadUpdateToken(updateToken) == CHIP_NO_ERROR)
+        {
+            mUpdateToken = updateToken;
+        }
 
         // Schedule the initializations that needs to be performed in the CHIP context
         DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
@@ -204,9 +214,14 @@ private:
     static void InitState(intptr_t context);
 
     /**
+     * Map a CHIP_ERROR to an IdleStateReason enum type
+     */
+    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
+
+    /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
-    void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason);
+    void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR);
 
     /**
      * Record the error update state by informing the driver of the error and calling `RecordNewUpdateState`
@@ -266,6 +281,11 @@ private:
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Store current update information to KVS
+     */
+    void StoreCurrentUpdateInfo();
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -312,7 +332,10 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
+    // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
+    // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
+    // in the OTARequestorDriver on reboot.
+    Optional<ProviderLocationType> mProviderLocation;
 };
 
 } // namespace chip

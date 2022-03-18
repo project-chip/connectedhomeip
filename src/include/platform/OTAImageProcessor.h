@@ -90,6 +90,17 @@ public:
      */
     virtual uint64_t GetBytesDownloaded() { return mParams.downloadedBytes; }
 
+    /**
+     * Called to check if the current image is executed for the first time.
+     */
+    virtual bool IsFirstImageRun() = 0;
+
+    /**
+     * Called to confirm the current image in case it is running tentatively after applying
+     * a software update.
+     */
+    virtual CHIP_ERROR ConfirmCurrentImage() = 0;
+
 protected:
     OTAImageProgress mParams;
 };

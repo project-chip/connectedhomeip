@@ -569,7 +569,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
 {
     const char * deliminator = strrchr(type, '.');
 
-    if (deliminator == NULL)
+    if (deliminator == nullptr)
     {
         ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
         return DnssdServiceProtocol::kDnssdProtocolUnknown;

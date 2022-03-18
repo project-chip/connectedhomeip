@@ -40,6 +40,11 @@ class ProvisioningDataSet;
 
 namespace Internal {
 
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+template <class ConfigClass>
+class LegacyTemporaryCommissionableDataProvider;
+#endif // CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+
 /**
  * Provides a generic implementation of ConfigurationManager features that works on multiple platforms.
  *
@@ -73,15 +78,6 @@ public:
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
-    // TODO: Remove SetupPinCode Get/Set APIs
-    // Device shouldn't store and access PIN Code - only Spake2p parameters and verifier
-    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override;
-    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
-    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
-    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
-    CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
-    CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen) override;
-    CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen) override;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
@@ -91,7 +87,7 @@ public:
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
-    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
@@ -130,12 +126,17 @@ public:
 #endif
     void LogDeviceConfig() override;
 
-    virtual ~GenericConfigurationManagerImpl() = default;
+    ~GenericConfigurationManagerImpl() override = default;
 
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     chip::LifetimePersistedCounter mLifetimePersistedCounter;
 #endif
+
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+    friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;
+#endif // CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
     // Methods to read and write configuration values, as well as run the configuration unit test.

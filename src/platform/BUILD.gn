@@ -56,6 +56,12 @@ if (chip_device_platform != "none") {
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
 
+    # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    # Linux platform has already transitioned.
+    chip_use_transitional_commissionable_data_provider =
+        chip_device_platform != "linux"
+
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
 
@@ -133,6 +139,12 @@ if (chip_device_platform != "none") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
+    }
+
+    if (chip_use_transitional_commissionable_data_provider) {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
+    } else {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -271,6 +283,7 @@ if (chip_device_platform != "none") {
       "../include/platform/CHIPDeviceError.h",
       "../include/platform/CHIPDeviceEvent.h",
       "../include/platform/CHIPDeviceLayer.h",
+      "../include/platform/CommissionableDataProvider.h",
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
@@ -279,6 +292,7 @@ if (chip_device_platform != "none") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
+      "../include/platform/TestOnlyCommissionableDataProvider.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
@@ -297,6 +311,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
+      "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
