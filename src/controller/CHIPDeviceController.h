@@ -211,7 +211,8 @@ public:
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        return mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection,
+                                                                      onFailure);
     }
 
     /**
@@ -350,14 +351,6 @@ protected:
 
     State mState;
 
-    CASESessionManager * mCASESessionManager = nullptr;
-
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
-#endif
-    CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
-    OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
-
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
@@ -376,8 +369,6 @@ protected:
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
-
-    SessionIDAllocator mIDAllocator;
 
     uint16_t mVendorId;
 
