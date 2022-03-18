@@ -71,8 +71,8 @@ tests:
           client-generated-command-list 1234 0 [...]
           [1646048092.858800][36301:36306] CHIP:TOO: Endpoint: 0 Cluster:
           0x0000_002E Attribute 0x0000_FFF9 DataVersion: 502821112
-          [1646048092.858890][36301:36306] CHIP:TOO: AcceptedCommandList:
-          0 entries"
+          [1646048092.858890][36301:36306] CHIP:TOO: AcceptedCommandList: 0
+          entries"
       disabled: true
 
     - label: "TH reads the GeneratedCommandList attribute from the DUT"
@@ -81,8 +81,8 @@ tests:
           server-generated-command-list 1234 0 [...]
           [1646048186.753316][36310:36315] CHIP:TOO: Endpoint: 0 Cluster:
           0x0000_002E Attribute 0x0000_FFF8 DataVersion: 502821112
-          [1646048186.753391][36310:36315] CHIP:TOO: GeneratedCommandList:
-          0 entries"
+          [1646048186.753391][36310:36315] CHIP:TOO: GeneratedCommandList: 0
+          entries"
       disabled: true
 
     - label: "TH reads the EventList attribute from the DUT"
