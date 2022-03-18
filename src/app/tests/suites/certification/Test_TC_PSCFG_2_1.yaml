@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-  
+
 tests:
   - label: "Commission DUT to TH"
     verification: |
@@ -29,7 +29,7 @@ tests:
     verification: |
         ./chip-tool powersourceconfiguration read sources 1234 0
 
-        The response should look like this: 
+        The response should look like this:
 
         [1641813530.468521][38091:38096] CHIP:EM: Removed CHIP MessageCounter:11072693 from RetransTable on exchange 57191i
         [1641813530.468647][38091:38096] CHIP:DMG: ReportDataMessage =

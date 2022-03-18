@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "Commission DUT to TH"
     verification: |
@@ -27,7 +27,7 @@ tests:
 
   - label: "TH reads MeasuredValue attribute from DUT"
     verification: |
-        ./chip-tool pressuremeasurement read measured-value 1 1 
+        ./chip-tool pressuremeasurement read measured-value 1 1
         Verify response: cluster id: 0x0403 Attribute: 0
     disabled: true
 

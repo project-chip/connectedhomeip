@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "Commission DUT to TH"
     verification: |
@@ -30,7 +30,7 @@ tests:
         ./chip-tool powersourceconfiguration read cluster-revision 1234 0
 
 
-        The response should look like this: 
+        The response should look like this:
 
         [1641813555.191189][38097:38102] CHIP:DMG: ReportDataMessage =
         [1641813555.191325][38097:38102] CHIP:DMG: {
@@ -64,7 +64,7 @@ tests:
     verification: |
         ./chip-tool powersourceconfiguration read attribute-list 1234 0
 
-        The response should look like this: 
+        The response should look like this:
 
         [CHIP:DMG:        SuppressResponse = true,
         [CHIP:DMG: }

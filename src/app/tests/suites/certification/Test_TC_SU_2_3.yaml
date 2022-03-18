@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "IF (PICS_DT_RequestorCanConsent_True) DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
         sends a QueryImageResponse back to DUT. QueryStatus is set to Available, UserConsentNeeded is

@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "TH sends a LaunchContent command to the DUT with a search parameter and string, and AutoPlay
         flag set to false"

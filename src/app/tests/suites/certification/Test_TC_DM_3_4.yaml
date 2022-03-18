@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "if (PICS_WIFI) DUT reads MaxNetworks attribute on TH"
     verification: |

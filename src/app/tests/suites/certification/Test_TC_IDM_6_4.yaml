@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "DUT sends Subscribe Request Message to the TH for a supported event."
     verification: |
@@ -64,6 +64,6 @@ tests:
         it multiple times). TH resubscribes to the same event after bootup to the DUT."
     verification: |
         In case of chip tool, here is an example command to use
-         
+
         sudo ./chip-tool softwarediagnostics subscribe-by-id 0x0 0 100 0 1 0
     disabled: true

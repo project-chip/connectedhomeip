@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "if PICS_WIFI) OR (PICS_THREAD then DUT issues a ScanNetworks command"
     verification: |

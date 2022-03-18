@@ -19,11 +19,11 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "TH_CR2 starts a commissioning process with TH_CE"
     verification: |
-        1. Provision the device using 2nd controller chip tool on the raspi (use above instructions) 
+        1. Provision the device using 2nd controller chip tool on the raspi (use above instructions)
     disabled: true
 
   - label: "TH_CR2 opens a commissioning window on TH_CE using a commissioning timeout of PIXIT_COMM_WIN
@@ -45,16 +45,16 @@ tests:
         [1635871562.959530][4336:4341] CHIP:DMG:                                 ClusterId = 0x3c,
         [1635871562.959625][4336:4341] CHIP:DMG:                                 CommandId = 0x1,
         [1635871562.959698][4336:4341] CHIP:DMG:                         },
-        [1635871562.959776][4336:4341] CHIP:DMG:                         
+        [1635871562.959776][4336:4341] CHIP:DMG:
         [1635871562.959841][4336:4341] CHIP:DMG:                         StatusIB =
         [1635871562.959911][4336:4341] CHIP:DMG:                         {
         [1635871562.959980][4336:4341] CHIP:DMG:                                 status = 0x0,
         [1635871562.960064][4336:4341] CHIP:DMG:                         },
-        [1635871562.960313][4336:4341] CHIP:DMG:                         
+        [1635871562.960313][4336:4341] CHIP:DMG:
         [1635871562.960459][4336:4341] CHIP:DMG:                 },
-        [1635871562.960544][4336:4341] CHIP:DMG:                 
+        [1635871562.960544][4336:4341] CHIP:DMG:
         [1635871562.960604][4336:4341] CHIP:DMG:         ],
-        [1635871562.960668][4336:4341] CHIP:DMG:         
+        [1635871562.960668][4336:4341] CHIP:DMG:
         [1635871562.960723][4336:4341] CHIP:DMG: }
         [1635871562.960824][4336:4341] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
         [1635871562.960894][4336:4341] CHIP:TOO: Default Success Response
@@ -63,7 +63,7 @@ tests:
   - label: "Set up a DUT_CR1 to start attempting to do PASE to TH_CE and failing 20 times. This can be
         done using an invalid passcode"
     verification: |
-        1. On your DUT controller connect using wrong passcode. Repeat the step for 20 times. 
+        1. On your DUT controller connect using wrong passcode. Repeat the step for 20 times.
 
         Below the example when using chip tool as controller
 
@@ -72,7 +72,7 @@ tests:
 
   - label: "DUT_CR1 starts a 21st commissioning process with a valid passcode"
     verification: |
-        1. On your DUT controller  connect using IP address and correct passcode.  
+        1. On your DUT controller  connect using IP address and correct passcode.
 
         Below the example when using chip tool as controller
 

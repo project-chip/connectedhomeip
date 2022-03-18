@@ -33,7 +33,7 @@ tests:
         [1646259751838] [5046:202503] CHIP: [DMG] ICR moving to [ResponseRe]
         [1646259751838] [5046:202503] CHIP: [DMG] InvokeResponseMessage =
         [1646259751838] [5046:202503] CHIP: [DMG] {
-        [1646259751838] [5046:202503] CHIP: [DMG]         suppressResponse = false, 
+        [1646259751838] [5046:202503] CHIP: [DMG]         suppressResponse = false,
         [1646259751838] [5046:202503] CHIP: [DMG]         InvokeResponseIBs =
         [1646259751838] [5046:202503] CHIP: [DMG]         [
         [1646259751838] [5046:202503] CHIP: [DMG]                 InvokeResponseIB =
@@ -46,18 +46,18 @@ tests:
         [1646259751838] [5046:202503] CHIP: [DMG]                                         ClusterId = 0x6,
         [1646259751838] [5046:202503] CHIP: [DMG]                                         CommandId = 0x1,
         [1646259751838] [5046:202503] CHIP: [DMG]                                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 
+        [1646259751838] [5046:202503] CHIP: [DMG]
         [1646259751838] [5046:202503] CHIP: [DMG]                                 StatusIB =
         [1646259751838] [5046:202503] CHIP: [DMG]                                 {
         [1646259751838] [5046:202503] CHIP: [DMG]                                         status = 0x7f,
         [1646259751838] [5046:202503] CHIP: [DMG]                                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 
+        [1646259751838] [5046:202503] CHIP: [DMG]
         [1646259751838] [5046:202503] CHIP: [DMG]                         },
-        [1646259751838] [5046:202503] CHIP: [DMG]                         
+        [1646259751838] [5046:202503] CHIP: [DMG]
         [1646259751838] [5046:202503] CHIP: [DMG]                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]                 
+        [1646259751838] [5046:202503] CHIP: [DMG]
         [1646259751838] [5046:202503] CHIP: [DMG]         ],
-        [1646259751838] [5046:202503] CHIP: [DMG]         
+        [1646259751838] [5046:202503] CHIP: [DMG]
         [1646259751838] [5046:202503] CHIP: [DMG]         InteractionModelRevision = 1
         [1646259751838] [5046:202503] CHIP: [DMG] },
         [1646259751838] [5046:202503] CHIP: [DMG] Received Command Response Status for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
@@ -77,7 +77,7 @@ tests:
         [1646259975665] [5055:204669] CHIP: [DMG] ICR moving to [ResponseRe]
         [1646259975665] [5055:204669] CHIP: [DMG] InvokeResponseMessage =
         [1646259975665] [5055:204669] CHIP: [DMG] {
-        [1646259975665] [5055:204669] CHIP: [DMG]         suppressResponse = false, 
+        [1646259975665] [5055:204669] CHIP: [DMG]         suppressResponse = false,
         [1646259975665] [5055:204669] CHIP: [DMG]         InvokeResponseIBs =
         [1646259975665] [5055:204669] CHIP: [DMG]         [
         [1646259975665] [5055:204669] CHIP: [DMG]                 InvokeResponseIB =
@@ -90,18 +90,18 @@ tests:
         [1646259975665] [5055:204669] CHIP: [DMG]                                         ClusterId = 0x3,
         [1646259975665] [5055:204669] CHIP: [DMG]                                         CommandId = 0x0,
         [1646259975665] [5055:204669] CHIP: [DMG]                                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 
+        [1646259975665] [5055:204669] CHIP: [DMG]
         [1646259975665] [5055:204669] CHIP: [DMG]                                 StatusIB =
         [1646259975665] [5055:204669] CHIP: [DMG]                                 {
         [1646259975665] [5055:204669] CHIP: [DMG]                                         status = 0xc3,
         [1646259975665] [5055:204669] CHIP: [DMG]                                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 
+        [1646259975665] [5055:204669] CHIP: [DMG]
         [1646259975665] [5055:204669] CHIP: [DMG]                         },
-        [1646259975665] [5055:204669] CHIP: [DMG]                         
+        [1646259975665] [5055:204669] CHIP: [DMG]
         [1646259975665] [5055:204669] CHIP: [DMG]                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]                 
+        [1646259975665] [5055:204669] CHIP: [DMG]
         [1646259975665] [5055:204669] CHIP: [DMG]         ],
-        [1646259975665] [5055:204669] CHIP: [DMG]         
+        [1646259975665] [5055:204669] CHIP: [DMG]
         [1646259975666] [5055:204669] CHIP: [DMG]         InteractionModelRevision = 1
         [1646259975666] [5055:204669] CHIP: [DMG] },
         [1646259975666] [5055:204669] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
@@ -118,7 +118,7 @@ tests:
         [1646260061731] [5058:205583] CHIP: [DMG] ICR moving to [ResponseRe]
         [1646260061731] [5058:205583] CHIP: [DMG] InvokeResponseMessage =
         [1646260061731] [5058:205583] CHIP: [DMG] {
-        [1646260061731] [5058:205583] CHIP: [DMG]         suppressResponse = false, 
+        [1646260061731] [5058:205583] CHIP: [DMG]         suppressResponse = false,
         [1646260061731] [5058:205583] CHIP: [DMG]         InvokeResponseIBs =
         [1646260061732] [5058:205583] CHIP: [DMG]         [
         [1646260061732] [5058:205583] CHIP: [DMG]                 InvokeResponseIB =
@@ -131,18 +131,18 @@ tests:
         [1646260061732] [5058:205583] CHIP: [DMG]                                         ClusterId = 0x3,
         [1646260061732] [5058:205583] CHIP: [DMG]                                         CommandId = 0x3,
         [1646260061732] [5058:205583] CHIP: [DMG]                                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 
+        [1646260061732] [5058:205583] CHIP: [DMG]
         [1646260061732] [5058:205583] CHIP: [DMG]                                 StatusIB =
         [1646260061732] [5058:205583] CHIP: [DMG]                                 {
         [1646260061732] [5058:205583] CHIP: [DMG]                                         status = 0x81,
         [1646260061732] [5058:205583] CHIP: [DMG]                                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 
+        [1646260061732] [5058:205583] CHIP: [DMG]
         [1646260061732] [5058:205583] CHIP: [DMG]                         },
-        [1646260061732] [5058:205583] CHIP: [DMG]                         
+        [1646260061732] [5058:205583] CHIP: [DMG]
         [1646260061732] [5058:205583] CHIP: [DMG]                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]                 
+        [1646260061732] [5058:205583] CHIP: [DMG]
         [1646260061732] [5058:205583] CHIP: [DMG]         ],
-        [1646260061732] [5058:205583] CHIP: [DMG]         
+        [1646260061732] [5058:205583] CHIP: [DMG]
         [1646260061732] [5058:205583] CHIP: [DMG]         InteractionModelRevision = 1
         [1646260061732] [5058:205583] CHIP: [DMG] },
         [1646260061732] [5058:205583] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0003 Status=0x81
@@ -169,13 +169,13 @@ tests:
 
   - label: "(OPTIONAL) TH sends the Invoke Request Message to the DUT with the command which requires
         another command in response."
-    verification: |   
+    verification: |
         In case of chip tool, here is an example command to use
         ./chip-tool generalcommissioning arm-fail-safe  1000 1 100 5 0
 
         [1646239170811] [72173:10220345] CHIP: [DMG] InvokeResponseMessage =
         [1646239170811] [72173:10220345] CHIP: [DMG] {
-        [1646239170811] [72173:10220345] CHIP: [DMG]         suppressResponse = false, 
+        [1646239170811] [72173:10220345] CHIP: [DMG]         suppressResponse = false,
         [1646239170811] [72173:10220345] CHIP: [DMG]         InvokeResponseIBs =
         [1646239170811] [72173:10220345] CHIP: [DMG]         [
         [1646239170811] [72173:10220345] CHIP: [DMG]                 InvokeResponseIB =
@@ -188,25 +188,25 @@ tests:
         [1646239170811] [72173:10220345] CHIP: [DMG]                                         ClusterId = 0x30,
         [1646239170811] [72173:10220345] CHIP: [DMG]                                         CommandId = 0x1,
         [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandData = 
+        [1646239170811] [72173:10220345] CHIP: [DMG]
+        [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandData =
         [1646239170811] [72173:10220345] CHIP: [DMG]                                 {
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x0 = 0, 
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x1 = "", 
+        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x0 = 0,
+        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x1 = "",
         [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
         [1646239170811] [72173:10220345] CHIP: [DMG]                         },
-        [1646239170811] [72173:10220345] CHIP: [DMG]                         
+        [1646239170811] [72173:10220345] CHIP: [DMG]
         [1646239170811] [72173:10220345] CHIP: [DMG]                 },
-        [1646239170811] [72173:10220345] CHIP: [DMG]                 
+        [1646239170811] [72173:10220345] CHIP: [DMG]
         [1646239170811] [72173:10220345] CHIP: [DMG]         ],
-        [1646239170811] [72173:10220345] CHIP: [DMG]         
+        [1646239170811] [72173:10220345] CHIP: [DMG]
         [1646239170811] [72173:10220345] CHIP: [DMG]         InteractionModelRevision = 1
         [1646239170811] [72173:10220345] CHIP: [DMG] },
         [1646239170812] [72173:10220345] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
         [1646239170812] [72173:10220345] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
         [1646239170813] [72173:10220345] CHIP: [TOO]   ArmFailSafeResponse: {
         [1646239170813] [72173:10220345] CHIP: [TOO]     errorCode: 0
-        [1646239170813] [72173:10220345] CHIP: [TOO]     debugText: 
+        [1646239170813] [72173:10220345] CHIP: [TOO]     debugText:
         [1646239170813] [72173:10220345] CHIP: [TOO]    }
     disabled: true
 
@@ -244,17 +244,17 @@ tests:
         [1646261193889] [5094:213098] CHIP: [DMG]                                         Cluster = 0x28,
         [1646261193889] [5094:213098] CHIP: [DMG]                                         Attribute = 0x0000_FFF9,
         [1646261193889] [5094:213098] CHIP: [DMG]                                 }
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         
+        [1646261193889] [5094:213098] CHIP: [DMG]
         [1646261193889] [5094:213098] CHIP: [DMG]                                         Data = [
-        [1646261193889] [5094:213098] CHIP: [DMG]                                                 
+        [1646261193889] [5094:213098] CHIP: [DMG]
         [1646261193889] [5094:213098] CHIP: [DMG]                                         ],
         [1646261193889] [5094:213098] CHIP: [DMG]                         },
-        [1646261193889] [5094:213098] CHIP: [DMG]                         
+        [1646261193889] [5094:213098] CHIP: [DMG]
         [1646261193889] [5094:213098] CHIP: [DMG]                 },
-        [1646261193889] [5094:213098] CHIP: [DMG]                 
+        [1646261193889] [5094:213098] CHIP: [DMG]
         [1646261193889] [5094:213098] CHIP: [DMG]         ],
-        [1646261193889] [5094:213098] CHIP: [DMG]         
-        [1646261193889] [5094:213098] CHIP: [DMG]         SuppressResponse = true, 
+        [1646261193889] [5094:213098] CHIP: [DMG]
+        [1646261193889] [5094:213098] CHIP: [DMG]         SuppressResponse = true,
         [1646261193889] [5094:213098] CHIP: [DMG]         InteractionModelRevision = 1
         [1646261193889] [5094:213098] CHIP: [DMG] }
         [1646261193889] [5094:213098] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9DataVersion: 759594214

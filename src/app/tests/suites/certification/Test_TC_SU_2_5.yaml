@@ -19,7 +19,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-  
+
 tests:
   - label: "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to 'Proceed'
         DelayedActionTime is set to 0."

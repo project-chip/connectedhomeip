@@ -19,7 +19,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "OTA-R/TH sends a QueryImage Command to the DUT. UserConsentNeeded field is set to False."
     verification: |

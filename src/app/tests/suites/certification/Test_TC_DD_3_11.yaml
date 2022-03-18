@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "Version: Use a QR code from a commissionee that has their QR code Version bit string set to
         000"

@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
- 
+
 tests:
   - label: "DUT receives Onboarding Payload from the TH with Custom Flow bits set to value 2"
     verification: |

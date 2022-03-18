@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "Start the commissioning process of TH1 on DUT"
     verification: |
@@ -72,7 +72,7 @@ tests:
         [1646317402.469969][13150:13155] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
         [1646317402.470096][13150:13155] CHIP:TOO:   ArmFailSafeResponse: {
         [1646317402.470169][13150:13155] CHIP:TOO:     errorCode: 4
-        [1646317402.470218][13150:13155] CHIP:TOO:     debugText: 
+        [1646317402.470218][13150:13155] CHIP:TOO:     debugText:
         [1646317402.470266][13150:13155] CHIP:TOO:    }
         [1646317402.470338][13150:13155] CHIP:DMG: ICR moving to [AwaitingDe]
     disabled: true

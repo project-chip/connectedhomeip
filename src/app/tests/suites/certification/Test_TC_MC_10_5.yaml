@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "TH sends a LaunchURL command to the DUT with a known good content URL string"
     verification: |
