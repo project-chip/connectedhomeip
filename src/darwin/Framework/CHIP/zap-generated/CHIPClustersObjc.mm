@@ -324,7 +324,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -336,12 +336,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -363,10 +363,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -389,7 +389,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -401,12 +401,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -428,10 +428,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -640,7 +640,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -652,12 +652,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -679,10 +679,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -705,7 +705,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -717,12 +717,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -744,10 +744,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1148,25 +1148,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = AdministratorCommissioning::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<AdministratorCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<AdministratorCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1176,8 +1175,7 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = AdministratorCommissioning::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<AdministratorCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<AdministratorCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -1190,10 +1188,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1217,25 +1215,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<AdministratorCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<AdministratorCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1245,13 +1242,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<AdministratorCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<AdministratorCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -1259,10 +1254,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1915,7 +1910,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1927,12 +1922,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1954,10 +1949,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1980,7 +1975,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1992,12 +1987,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -2019,10 +2014,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2389,7 +2384,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2401,12 +2396,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -2428,10 +2423,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2443,8 +2438,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<ApplicationLauncherGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<ApplicationLauncherGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -2455,7 +2449,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2467,12 +2461,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -2494,10 +2488,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2509,8 +2503,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<ApplicationLauncherAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<ApplicationLauncherAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -2818,7 +2811,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2830,12 +2823,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -2857,10 +2850,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2883,7 +2876,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2895,12 +2888,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -2922,10 +2915,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3368,7 +3361,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3380,12 +3373,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -3407,10 +3400,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3433,7 +3426,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3445,12 +3438,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -3472,10 +3465,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4846,7 +4839,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBasicGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4858,12 +4851,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -4885,10 +4878,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBasicGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4911,7 +4904,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBasicAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4923,12 +4916,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -4950,10 +4943,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBasicAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5328,7 +5321,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5340,12 +5333,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -5367,10 +5360,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5393,7 +5386,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5405,12 +5398,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -5432,10 +5425,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5709,7 +5702,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBindingGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5721,12 +5714,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -5748,10 +5741,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBindingGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5774,7 +5767,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBindingAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5786,12 +5779,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -5813,10 +5806,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBindingAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6033,7 +6026,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6045,12 +6038,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -6072,10 +6065,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6098,7 +6091,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6110,12 +6103,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -6137,10 +6130,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6763,7 +6756,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6775,12 +6768,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -6802,10 +6795,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6828,7 +6821,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6840,12 +6833,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -6867,10 +6860,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7960,7 +7953,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7972,12 +7965,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -7999,10 +7992,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8014,8 +8007,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -8026,7 +8018,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8038,12 +8030,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -8065,10 +8057,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8080,8 +8072,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -8468,7 +8459,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPChannelGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8480,12 +8471,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -8507,10 +8498,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPChannelGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8533,7 +8524,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPChannelAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8545,12 +8536,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -8572,10 +8563,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPChannelAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -12589,7 +12580,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -12601,12 +12592,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -12628,10 +12619,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -12654,7 +12645,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -12666,12 +12657,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -12693,10 +12684,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13183,7 +13174,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13195,12 +13186,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -13222,10 +13213,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13248,7 +13239,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13260,12 +13251,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -13287,10 +13278,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13694,7 +13685,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13706,12 +13697,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -13733,10 +13724,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13759,7 +13750,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13771,12 +13762,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -13798,10 +13789,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13977,7 +13968,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -13989,12 +13980,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -14016,10 +14007,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14042,7 +14033,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14054,12 +14045,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -14081,10 +14072,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -15980,7 +15971,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -15992,12 +15983,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -16019,10 +16010,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -16045,7 +16036,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -16057,12 +16048,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -16084,10 +16075,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -16921,25 +16912,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -16949,13 +16939,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -16963,10 +16951,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -16978,8 +16966,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<ElectricalMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -16990,25 +16977,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -17018,13 +17004,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -17032,10 +17016,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -17047,8 +17031,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<ElectricalMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -17768,25 +17751,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -17796,8 +17778,7 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -17810,10 +17791,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -17837,25 +17818,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -17865,13 +17845,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -17879,10 +17857,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18257,7 +18235,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18269,12 +18247,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -18296,10 +18274,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18322,7 +18300,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18334,12 +18312,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -18361,10 +18339,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18642,7 +18620,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18654,12 +18632,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -18681,10 +18659,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18707,7 +18685,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -18719,12 +18697,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -18746,10 +18724,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19155,7 +19133,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19167,12 +19145,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -19194,10 +19172,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19220,7 +19198,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19232,12 +19210,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -19259,10 +19237,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19749,7 +19727,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19761,12 +19739,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -19780,8 +19758,7 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -19789,10 +19766,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19804,8 +19781,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GeneralCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GeneralCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -19816,7 +19792,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19828,12 +19804,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -19847,8 +19823,7 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -19856,10 +19831,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -19871,8 +19846,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GeneralCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GeneralCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -20519,7 +20493,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -20531,12 +20505,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -20558,10 +20532,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -20573,8 +20547,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -20585,7 +20558,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -20597,12 +20570,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -20624,10 +20597,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -20639,8 +20612,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -21208,7 +21180,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21220,12 +21192,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -21247,10 +21219,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21262,8 +21234,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GroupKeyManagementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GroupKeyManagementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -21274,7 +21245,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21286,12 +21257,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -21313,10 +21284,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21328,8 +21299,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<GroupKeyManagementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<GroupKeyManagementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -21658,7 +21628,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21670,12 +21640,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -21697,10 +21667,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21723,7 +21693,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21735,12 +21705,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -21762,10 +21732,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22115,7 +22085,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22127,12 +22097,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -22154,10 +22124,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22180,7 +22150,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22192,12 +22162,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -22219,10 +22189,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22691,25 +22661,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = IlluminanceMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -22719,13 +22688,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = IlluminanceMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -22733,10 +22700,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22748,8 +22715,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -22760,25 +22726,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = IlluminanceMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -22788,13 +22753,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = IlluminanceMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -22802,10 +22765,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22817,8 +22780,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -22979,7 +22941,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -22991,12 +22953,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -23018,10 +22980,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -23044,7 +23006,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -23056,12 +23018,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -23083,10 +23045,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24418,7 +24380,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24430,12 +24392,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -24457,10 +24419,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24483,7 +24445,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24495,12 +24457,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -24522,10 +24484,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24885,25 +24847,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<LocalizationConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<LocalizationConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -24913,13 +24874,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<LocalizationConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<LocalizationConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -24927,10 +24886,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -24954,25 +24913,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<LocalizationConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<LocalizationConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -24982,13 +24940,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<LocalizationConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<LocalizationConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -24996,10 +24952,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25111,7 +25067,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25123,12 +25079,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -25150,10 +25106,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25176,7 +25132,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25188,12 +25144,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -25215,10 +25171,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25568,7 +25524,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25580,12 +25536,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -25607,10 +25563,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25633,7 +25589,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25645,12 +25601,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -25672,10 +25628,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -26428,7 +26384,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -26440,12 +26396,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -26467,10 +26423,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -26493,7 +26449,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -26505,12 +26461,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -26532,10 +26488,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27035,7 +26991,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27047,12 +27003,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -27074,10 +27030,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27100,7 +27056,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27112,12 +27068,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -27139,10 +27095,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27926,7 +27882,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27938,12 +27894,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -27957,8 +27913,7 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -27966,10 +27921,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27981,8 +27936,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<NetworkCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<NetworkCommissioningGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -27993,7 +27947,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -28005,12 +27959,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -28024,8 +27978,7 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -28033,10 +27986,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -28048,8 +28001,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<NetworkCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<NetworkCommissioningAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -29067,7 +29019,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29079,12 +29031,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -29106,10 +29058,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29132,7 +29084,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29144,12 +29096,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -29171,10 +29123,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29797,7 +29749,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29809,12 +29761,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -29836,10 +29788,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29862,7 +29814,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -29874,12 +29826,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -29901,10 +29853,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -30260,25 +30212,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -30288,13 +30239,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -30302,10 +30251,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -30329,25 +30278,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -30357,13 +30305,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -30371,10 +30317,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31074,25 +31020,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OperationalCredentials::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -31102,13 +31047,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = OperationalCredentials::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -31116,10 +31059,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31131,8 +31074,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<OperationalCredentialsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -31143,25 +31085,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OperationalCredentials::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -31171,13 +31112,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = OperationalCredentials::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -31185,10 +31124,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31200,8 +31139,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<OperationalCredentialsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -31902,7 +31840,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31914,12 +31852,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -31941,10 +31879,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31967,7 +31905,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -31979,12 +31917,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -32006,10 +31944,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -32287,25 +32225,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PowerSourceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -32315,13 +32252,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PowerSourceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -32329,10 +32264,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -32356,25 +32291,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PowerSourceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -32384,13 +32318,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PowerSourceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -32398,10 +32330,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -34437,7 +34369,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -34450,12 +34382,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -34479,10 +34411,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -34506,25 +34438,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PumpConfigurationAndControl::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -34534,8 +34465,7 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PumpConfigurationAndControl::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -34548,10 +34478,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35015,7 +34945,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35028,12 +34958,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -35057,10 +34987,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35084,25 +35014,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -35112,8 +35041,7 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -35126,10 +35054,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35736,7 +35664,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPScenesGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35748,12 +35676,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -35775,10 +35703,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPScenesGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35801,7 +35729,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPScenesAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -35813,12 +35741,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -35840,10 +35768,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPScenesAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36266,7 +36194,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36278,12 +36206,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -36305,10 +36233,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36320,8 +36248,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -36332,7 +36259,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36344,12 +36271,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -36371,10 +36298,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36386,8 +36313,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -36778,7 +36704,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36790,12 +36716,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -36817,10 +36743,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36843,7 +36769,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -36855,12 +36781,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -36882,10 +36808,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -37245,7 +37171,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -37257,12 +37183,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -37284,10 +37210,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -37310,7 +37236,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -37322,12 +37248,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -37349,10 +37275,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -45553,7 +45479,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -45565,12 +45491,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -45592,10 +45518,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -45618,7 +45544,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -45630,12 +45556,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -45657,10 +45583,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -47602,26 +47528,25 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             auto successFn
-                = Callback<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(
-                    success);
+                = Callback<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -47632,8 +47557,7 @@ using namespace chip::app::Clusters;
             }
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             auto successFn
-                = Callback<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(
-                    success);
+                = Callback<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -47646,10 +47570,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -47674,26 +47598,25 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             auto successFn
-                = Callback<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(
-                    success);
+                = Callback<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -47704,8 +47627,7 @@ using namespace chip::app::Clusters;
             }
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             auto successFn
-                = Callback<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(
-                    success);
+                = Callback<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
@@ -47718,10 +47640,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -51816,25 +51738,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -51844,13 +51765,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -51858,10 +51777,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -51885,25 +51804,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -51913,13 +51831,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -51927,10 +51843,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -52376,25 +52292,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = TimeFormatLocalization::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -52404,13 +52319,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = TimeFormatLocalization::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -52418,10 +52331,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -52433,8 +52346,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -52445,25 +52357,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = TimeFormatLocalization::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -52473,13 +52384,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = TimeFormatLocalization::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -52487,10 +52396,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -52502,8 +52411,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -52962,7 +52870,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -52974,12 +52882,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -53001,10 +52909,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53027,7 +52935,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53039,12 +52947,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -53066,10 +52974,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53223,7 +53131,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53235,12 +53143,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -53262,10 +53170,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53288,7 +53196,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -53300,12 +53208,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -53327,10 +53235,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -54317,25 +54225,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -54345,13 +54252,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -54359,10 +54264,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -54374,8 +54279,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -54386,25 +54290,24 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -54414,13 +54317,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            auto successFn
-                = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -54428,10 +54329,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -54443,8 +54344,7 @@ using namespace chip::app::Clusters;
                 path.mAttributeId = TypeInfo::GetAttributeId();
                 TypeInfo::DecodableType value;
                 CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
+                auto successFn = Callback<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>::FromCancelable(success);
                 if (err == CHIP_NO_ERROR) {
                     successFn->mCall(successFn->mContext, value);
                 }
@@ -55924,7 +55824,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                   NSError * _Nullable error))completionHandler
 {
     new CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -55936,12 +55836,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -55963,10 +55863,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeGeneratedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -55989,7 +55889,7 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+                                                                  NSError * _Nullable error))completionHandler
 {
     new CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -56001,12 +55901,12 @@ using namespace chip::app::Clusters;
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                             params:(CHIPSubscribeParams * _Nullable)params
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -56028,10 +55928,10 @@ using namespace chip::app::Clusters;
 }
 
 + (void)readAttributeAcceptedCommandListWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                         endpoint:(NSNumber *)endpoint
-                                                            queue:(dispatch_queue_t)queue
-                                                completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {

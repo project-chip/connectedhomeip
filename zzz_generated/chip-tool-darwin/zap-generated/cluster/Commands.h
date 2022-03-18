@@ -345,14 +345,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccessControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccessControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccessControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -377,16 +376,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccessControl.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AccessControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -423,14 +421,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccessControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccessControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -457,14 +454,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccessControl.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -775,14 +771,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccountLogin.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccountLogin.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccountLogin GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccountLogin GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -807,16 +802,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccountLogin.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AccountLogin.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -853,14 +847,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccountLogin AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccountLogin AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -887,14 +880,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccountLogin.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -1459,14 +1451,13 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AdministratorCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AdministratorCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -1493,17 +1484,16 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AdministratorCommissioning.GeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AdministratorCommissioning.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -1542,14 +1532,13 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AdministratorCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AdministratorCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -1576,17 +1565,16 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AdministratorCommissioning.AcceptedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"AdministratorCommissioning.AcceptedCommandList "
+                                                                  @"response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -2398,14 +2386,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationBasic.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -2432,16 +2419,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationBasic.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ApplicationBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -2480,14 +2466,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationBasic.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -2514,16 +2499,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationBasic.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ApplicationBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -2999,14 +2983,13 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationLauncher.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationLauncher.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -3033,16 +3016,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationLauncher.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ApplicationLauncher.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -3081,14 +3063,13 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationLauncher.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationLauncher.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -3115,16 +3096,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationLauncher.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ApplicationLauncher.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -3560,14 +3540,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AudioOutput GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AudioOutput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -3594,14 +3573,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AudioOutput.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -3638,14 +3616,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AudioOutput AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AudioOutput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -3672,14 +3649,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AudioOutput.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -4259,14 +4235,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BarrierControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BarrierControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BarrierControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BarrierControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -4291,16 +4266,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BarrierControl.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BarrierControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -4337,14 +4311,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BarrierControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BarrierControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BarrierControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BarrierControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -4369,16 +4342,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BarrierControl.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BarrierControl.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -6137,14 +6109,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Basic GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Basic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -6169,16 +6140,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Basic.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -6215,14 +6184,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Basic AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Basic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -6247,16 +6215,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Basic.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -6778,14 +6744,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BinaryInputBasic.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BinaryInputBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BinaryInputBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BinaryInputBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -6812,16 +6777,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BinaryInputBasic.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BinaryInputBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -6860,14 +6824,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BinaryInputBasic.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BinaryInputBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BinaryInputBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BinaryInputBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -6894,16 +6857,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BinaryInputBasic.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BinaryInputBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -7191,14 +7153,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Binding GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Binding GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -7225,14 +7186,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Binding.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -7269,14 +7229,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Binding AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Binding AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -7301,16 +7260,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Binding.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -7589,14 +7546,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BooleanState.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BooleanState.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BooleanState GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BooleanState GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -7621,16 +7577,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BooleanState.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BooleanState.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -7667,14 +7622,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BooleanState AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BooleanState AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -7701,14 +7655,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BooleanState.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -8611,14 +8564,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedActions.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedActions.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedActions GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedActions GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -8643,16 +8595,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedActions.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BridgedActions.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -8689,14 +8640,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedActions.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedActions.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedActions AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedActions AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -8721,16 +8671,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedActions.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BridgedActions.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -10181,14 +10130,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedDeviceBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedDeviceBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -10215,16 +10163,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -10263,14 +10210,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedDeviceBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedDeviceBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -10297,16 +10243,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -10771,14 +10716,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Channel GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Channel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -10805,14 +10749,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Channel.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -10849,14 +10792,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Channel AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Channel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -10881,16 +10823,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Channel.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -16396,14 +16336,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ColorControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ColorControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ColorControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ColorControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -16428,16 +16367,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ColorControl.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ColorControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -16474,14 +16412,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ColorControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ColorControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -16508,14 +16445,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ColorControl.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -16994,14 +16930,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ContentLauncher.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ContentLauncher.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ContentLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ContentLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -17026,16 +16961,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ContentLauncher.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ContentLauncher.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -17072,14 +17006,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ContentLauncher.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ContentLauncher.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ContentLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ContentLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -17104,16 +17037,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ContentLauncher.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ContentLauncher.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -17619,14 +17551,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Descriptor GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Descriptor GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -17653,14 +17584,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Descriptor.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -17697,14 +17627,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Descriptor AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Descriptor AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -17731,14 +17660,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Descriptor.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -17984,14 +17912,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DiagnosticLogs.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DiagnosticLogs.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DiagnosticLogs GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DiagnosticLogs GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -18016,16 +17943,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DiagnosticLogs.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"DiagnosticLogs.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -18062,14 +17988,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DiagnosticLogs.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DiagnosticLogs.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DiagnosticLogs AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DiagnosticLogs AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -18094,16 +18019,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DiagnosticLogs.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"DiagnosticLogs.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -20744,14 +20668,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DoorLock GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DoorLock GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -20778,14 +20701,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DoorLock.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -20822,14 +20744,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DoorLock AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DoorLock AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -20854,16 +20775,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DoorLock.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -22074,14 +21993,13 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ElectricalMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ElectricalMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -22108,16 +22026,15 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -22156,14 +22073,13 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ElectricalMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ElectricalMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -22190,16 +22106,15 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -23171,14 +23086,13 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "EthernetNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "EthernetNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -23205,17 +23119,16 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -23254,14 +23167,13 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "EthernetNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "EthernetNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -23288,17 +23200,16 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList "
+                                                                  @"response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -23809,14 +23720,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FanControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FanControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -23843,14 +23753,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FanControl.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -23887,14 +23796,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FanControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FanControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -23921,14 +23829,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FanControl.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -24281,14 +24188,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FixedLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FixedLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -24315,14 +24221,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FixedLabel.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -24359,14 +24264,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FixedLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FixedLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -24393,14 +24297,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FixedLabel.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -24908,14 +24811,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FlowMeasurement.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FlowMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FlowMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FlowMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -24940,16 +24842,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FlowMeasurement.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"FlowMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -24986,14 +24887,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FlowMeasurement.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FlowMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FlowMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FlowMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -25018,16 +24918,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FlowMeasurement.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"FlowMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -25675,14 +25574,13 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralCommissioning.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -25709,16 +25607,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralCommissioning.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GeneralCommissioning.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -25757,14 +25654,13 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralCommissioning.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -25791,16 +25687,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralCommissioning.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GeneralCommissioning.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -26662,14 +26557,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -26696,16 +26590,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -26744,14 +26637,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -26778,16 +26670,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -27475,14 +27366,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GroupKeyManagement.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GroupKeyManagement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GroupKeyManagement GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GroupKeyManagement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -27509,16 +27399,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GroupKeyManagement.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GroupKeyManagement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -27557,14 +27446,13 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GroupKeyManagement.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GroupKeyManagement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GroupKeyManagement AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GroupKeyManagement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -27591,16 +27479,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GroupKeyManagement.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GroupKeyManagement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -28105,14 +27992,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Groups GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Groups GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -28137,16 +28023,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Groups.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -28183,14 +28067,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Groups AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Groups AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -28215,16 +28098,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Groups.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -28717,14 +28598,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Identify GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Identify GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -28751,14 +28631,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Identify.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -28795,14 +28674,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Identify AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Identify AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -28827,16 +28705,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Identify.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -29444,14 +29320,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "IlluminanceMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "IlluminanceMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -29478,17 +29353,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"IlluminanceMeasurement.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -29527,14 +29400,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "IlluminanceMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "IlluminanceMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -29561,17 +29433,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"IlluminanceMeasurement.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -29819,14 +29689,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "KeypadInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "KeypadInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -29853,14 +29722,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"KeypadInput.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -29897,14 +29765,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "KeypadInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "KeypadInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -29931,14 +29798,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"KeypadInput.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -31766,14 +31632,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LevelControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LevelControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LevelControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LevelControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -31798,16 +31663,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LevelControl.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"LevelControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -31844,14 +31708,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LevelControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LevelControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -31878,14 +31741,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LevelControl.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -32365,14 +32227,13 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LocalizationConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LocalizationConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -32399,17 +32260,16 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LocalizationConfiguration.GeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"LocalizationConfiguration.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -32448,14 +32308,13 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LocalizationConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LocalizationConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -32482,17 +32341,16 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LocalizationConfiguration.AcceptedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"LocalizationConfiguration.AcceptedCommandList "
+                                                                  @"response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -32654,14 +32512,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LowPower GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LowPower GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -32688,14 +32545,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LowPower.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -32732,14 +32588,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LowPower AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LowPower AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -32764,16 +32619,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LowPower.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -33260,14 +33113,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -33294,14 +33146,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaInput.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -33338,14 +33189,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -33372,14 +33222,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaInput.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -34437,14 +34286,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaPlayback.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaPlayback.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaPlayback GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaPlayback GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -34469,16 +34317,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaPlayback.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"MediaPlayback.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -34515,14 +34362,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaPlayback AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaPlayback AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -34549,14 +34395,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaPlayback.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -35207,14 +35052,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ModeSelect GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ModeSelect GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -35241,14 +35085,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ModeSelect.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -35285,14 +35128,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ModeSelect AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ModeSelect AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -35319,14 +35161,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ModeSelect.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -36470,14 +36311,13 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"NetworkCommissioning.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"NetworkCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "NetworkCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "NetworkCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -36504,16 +36344,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"NetworkCommissioning.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"NetworkCommissioning.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -36552,14 +36391,13 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"NetworkCommissioning.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"NetworkCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "NetworkCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "NetworkCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -36586,16 +36424,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"NetworkCommissioning.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"NetworkCommissioning.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -37931,14 +37768,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OccupancySensing.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OccupancySensing.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OccupancySensing GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OccupancySensing GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -37965,16 +37801,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OccupancySensing.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OccupancySensing.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -38013,14 +37848,13 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OccupancySensing.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OccupancySensing.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OccupancySensing AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OccupancySensing AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -38047,16 +37881,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OccupancySensing.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OccupancySensing.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -38947,14 +38780,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOff GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOff GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -38979,16 +38811,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOff.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -39025,14 +38855,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOff AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOff AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -39057,16 +38886,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOff.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -39543,14 +39370,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOffSwitchConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOffSwitchConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -39577,17 +39403,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response "
+                                                                   @"%@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -39626,14 +39451,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOffSwitchConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOffSwitchConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -39660,17 +39484,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response "
+                                                                  @"%@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -40736,14 +40559,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OperationalCredentials.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OperationalCredentials GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OperationalCredentials GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -40770,17 +40592,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"OperationalCredentials.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OperationalCredentials.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -40819,14 +40639,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OperationalCredentials.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OperationalCredentials AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OperationalCredentials AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -40853,17 +40672,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"OperationalCredentials.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OperationalCredentials.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -41787,14 +41604,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSource GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSource GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -41821,14 +41637,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSource.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -41865,14 +41680,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSource AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSource AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -41899,14 +41713,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSource.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -42265,14 +42078,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSourceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSourceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -42299,17 +42111,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSourceConfiguration.GeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PowerSourceConfiguration.GeneratedCommandList response "
+                                                                   @"%@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -42348,14 +42159,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSourceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSourceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -42382,17 +42192,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSourceConfiguration.AcceptedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PowerSourceConfiguration.AcceptedCommandList response "
+                                                                  @"%@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -45134,14 +44943,13 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PumpConfigurationAndControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PumpConfigurationAndControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -45168,17 +44976,16 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PumpConfigurationAndControl.GeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PumpConfigurationAndControl.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -45217,14 +45024,13 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PumpConfigurationAndControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PumpConfigurationAndControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -45251,17 +45057,16 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PumpConfigurationAndControl.AcceptedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PumpConfigurationAndControl.AcceptedCommandList "
+                                                                  @"response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -45878,14 +45683,13 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "RelativeHumidityMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "RelativeHumidityMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -45912,17 +45716,16 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -45961,14 +45764,13 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "RelativeHumidityMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "RelativeHumidityMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -45995,17 +45797,16 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList "
+                                                                  @"response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -46881,14 +46682,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Scenes GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Scenes GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -46913,16 +46713,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Scenes.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -46959,14 +46757,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Scenes AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Scenes AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -46991,16 +46788,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Scenes.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -47562,14 +47357,13 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "SoftwareDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "SoftwareDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -47596,16 +47390,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -47644,14 +47437,13 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "SoftwareDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "SoftwareDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -47678,16 +47470,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -48212,14 +48003,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Switch GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Switch GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -48244,16 +48034,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Switch.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -48290,14 +48078,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Switch AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Switch AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -48322,16 +48109,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Switch.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -48800,14 +48585,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TargetNavigator.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TargetNavigator.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TargetNavigator GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TargetNavigator GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -48832,16 +48616,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TargetNavigator.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"TargetNavigator.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -48878,14 +48661,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TargetNavigator.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TargetNavigator.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TargetNavigator AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TargetNavigator AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -48910,16 +48692,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TargetNavigator.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"TargetNavigator.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -58926,14 +58707,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TestCluster GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TestCluster GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -58960,14 +58740,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TestCluster.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -59004,14 +58783,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TestCluster AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TestCluster AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -59038,14 +58816,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TestCluster.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -61681,15 +61458,13 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(
-                    chipTool, "ThermostatUserInterfaceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThermostatUserInterfaceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -61715,17 +61490,16 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThermostatUserInterfaceConfiguration."
-                                                                    @"GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ThermostatUserInterfaceConfiguration."
+                                                                   @"GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -61763,15 +61537,13 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(
-                    chipTool, "ThermostatUserInterfaceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThermostatUserInterfaceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -61797,17 +61569,16 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThermostatUserInterfaceConfiguration."
-                                                                    @"AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ThermostatUserInterfaceConfiguration."
+                                                                  @"AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -67163,14 +66934,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ThreadNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThreadNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -67197,17 +66967,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response "
+                                                                   @"%@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -67246,14 +67015,13 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ThreadNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThreadNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -67280,17 +67048,16 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response "
+                                                                  @"%@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -67898,14 +67665,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TimeFormatLocalization GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TimeFormatLocalization GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -67932,17 +67698,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"TimeFormatLocalization.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -67981,14 +67745,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TimeFormatLocalization AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TimeFormatLocalization AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -68015,17 +67778,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"TimeFormatLocalization.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -68601,14 +68362,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "UserLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "UserLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -68635,14 +68395,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"UserLabel.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -68679,14 +68438,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "UserLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "UserLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -68713,14 +68471,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"UserLabel.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -68923,14 +68680,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WakeOnLan GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WakeOnLan GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -68957,14 +68713,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WakeOnLan.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -69001,14 +68756,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WakeOnLan AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WakeOnLan AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -69035,14 +68789,13 @@ public:
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WakeOnLan.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -70329,14 +70082,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WiFiNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WiFiNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -70363,17 +70115,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"WiFiNetworkDiagnostics.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -70412,14 +70162,13 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WiFiNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WiFiNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -70446,17 +70195,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"WiFiNetworkDiagnostics.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -72428,14 +72175,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WindowCovering.GeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WindowCovering.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WindowCovering GeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WindowCovering GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -72460,16 +72206,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WindowCovering.GeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"WindowCovering.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -72506,14 +72251,13 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WindowCovering.AcceptedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WindowCovering.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WindowCovering AcceptedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WindowCovering AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
@@ -72538,16 +72282,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WindowCovering.AcceptedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"WindowCovering.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }

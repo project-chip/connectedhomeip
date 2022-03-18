@@ -1373,9 +1373,9 @@ class CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1402,9 +1402,8 @@ class CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1413,9 +1412,9 @@ class CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1459,9 +1458,8 @@ class CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1470,9 +1468,9 @@ class CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1488,9 +1486,8 @@ class CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1499,9 +1496,9 @@ class CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1544,12 +1541,10 @@ class CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBri
     : public CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
+    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1575,12 +1570,10 @@ class CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBrid
     : public CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
+    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1695,9 +1688,9 @@ class CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1724,9 +1717,9 @@ class CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1840,9 +1833,9 @@ class CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
+                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1869,9 +1862,9 @@ class CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1954,9 +1947,8 @@ class CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1965,9 +1957,9 @@ class CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1983,9 +1975,8 @@ class CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -1994,9 +1985,9 @@ class CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2040,9 +2031,9 @@ class CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2069,9 +2060,9 @@ class CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2126,7 +2117,7 @@ class CHIPBasicGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
+                                                             CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -2137,8 +2128,8 @@ class CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2153,8 +2144,8 @@ class CHIPBasicAcceptedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
+    CHIPBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
         CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -2165,8 +2156,8 @@ class CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2208,9 +2199,9 @@ class CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BinaryInputBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2237,9 +2228,9 @@ class CHIPBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BinaryInputBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2322,9 +2313,8 @@ class CHIPBindingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBindingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2333,9 +2323,9 @@ class CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPBindingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
         CHIPBindingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2351,9 +2341,8 @@ class CHIPBindingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBindingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2362,9 +2351,9 @@ class CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPBindingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPBindingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2406,9 +2395,8 @@ class CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2417,9 +2405,9 @@ class CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2435,9 +2423,8 @@ class CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2446,9 +2433,9 @@ class CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2554,9 +2541,9 @@ class CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2583,9 +2570,9 @@ class CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2640,9 +2627,9 @@ class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2669,9 +2656,9 @@ class CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2812,9 +2799,8 @@ class CHIPChannelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPChannelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2823,9 +2809,9 @@ class CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPChannelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
         CHIPChannelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2841,9 +2827,8 @@ class CHIPChannelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPChannelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2852,9 +2837,9 @@ class CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPChannelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPChannelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2896,9 +2881,8 @@ class CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2907,9 +2891,9 @@ class CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2925,9 +2909,8 @@ class CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -2936,9 +2919,9 @@ class CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3010,9 +2993,9 @@ class CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3039,9 +3022,9 @@ class CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3202,9 +3185,8 @@ class CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DescriptorGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DescriptorGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3213,9 +3195,9 @@ class CHIPDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPDescriptorGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3231,9 +3213,8 @@ class CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DescriptorAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DescriptorAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3242,9 +3223,9 @@ class CHIPDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPDescriptorAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3288,9 +3269,9 @@ class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3317,9 +3298,9 @@ class CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3402,9 +3383,8 @@ class CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3413,9 +3393,9 @@ class CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3431,9 +3411,8 @@ class CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3442,9 +3421,9 @@ class CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
         CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3486,9 +3465,9 @@ class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3515,9 +3494,9 @@ class CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3572,12 +3551,10 @@ class CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBri
     : public CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
+    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3603,12 +3580,10 @@ class CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBrid
     : public CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
+    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3664,9 +3639,8 @@ class CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3675,9 +3649,9 @@ class CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3693,9 +3667,8 @@ class CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3704,9 +3677,9 @@ class CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3778,9 +3751,8 @@ class CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3789,9 +3761,9 @@ class CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3807,9 +3779,8 @@ class CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3818,9 +3789,9 @@ class CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3864,9 +3835,9 @@ class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3893,9 +3864,9 @@ class CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -3981,9 +3952,9 @@ class CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+                                                                                          keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4010,9 +3981,9 @@ class CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4186,9 +4157,9 @@ class CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4215,9 +4186,9 @@ class CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4332,9 +4303,9 @@ class CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4361,9 +4332,9 @@ class CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4418,7 +4389,7 @@ class CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -4429,8 +4400,8 @@ class CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4446,7 +4417,7 @@ class CHIPGroupsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                             CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -4457,8 +4428,8 @@ class CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4500,9 +4471,8 @@ class CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4511,9 +4481,9 @@ class CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4529,9 +4499,8 @@ class CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4540,9 +4509,9 @@ class CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
         CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4584,10 +4553,9 @@ class CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4614,10 +4582,9 @@ class CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4673,9 +4640,8 @@ class CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4684,9 +4650,9 @@ class CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4702,9 +4668,8 @@ class CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4713,9 +4678,9 @@ class CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4759,9 +4724,8 @@ class CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4770,9 +4734,9 @@ class CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4788,9 +4752,8 @@ class CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4799,9 +4762,9 @@ class CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4873,12 +4836,10 @@ class CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBrid
     : public CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                       ResponseHandler handler,
-                                                                                       CHIPActionBlock action,
-                                                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                     OnSuccessFn, keepAlive){};
+    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4904,12 +4865,10 @@ class CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridg
     : public CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                       ResponseHandler handler,
-                                                                                       CHIPActionBlock action,
-                                                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                     OnSuccessFn, keepAlive){};
+    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4936,9 +4895,8 @@ class CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4947,9 +4905,9 @@ class CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4965,9 +4923,8 @@ class CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -4976,9 +4933,9 @@ class CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
         CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5048,9 +5005,8 @@ class CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5059,9 +5015,9 @@ class CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5077,9 +5033,8 @@ class CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5088,9 +5043,9 @@ class CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5164,9 +5119,9 @@ class CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5193,9 +5148,8 @@ class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5204,9 +5158,9 @@ class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridg
     : public CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5281,9 +5235,8 @@ class CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5292,9 +5245,9 @@ class CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5310,9 +5263,8 @@ class CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5321,9 +5273,9 @@ class CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5398,9 +5350,9 @@ class CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+                                                                                          keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5427,9 +5379,9 @@ class CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5545,9 +5497,9 @@ class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5574,9 +5526,9 @@ class CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5631,7 +5583,7 @@ class CHIPOnOffGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
+                                                             CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -5642,8 +5594,8 @@ class CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5658,8 +5610,8 @@ class CHIPOnOffAcceptedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
+    CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
         CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -5670,8 +5622,8 @@ class CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5712,12 +5664,10 @@ class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridg
     : public CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5743,12 +5693,10 @@ class CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5894,10 +5842,9 @@ class CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPOperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -5924,10 +5871,9 @@ class CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPOperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6011,9 +5957,8 @@ class CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6022,9 +5967,9 @@ class CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6040,9 +5985,8 @@ class CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6051,9 +5995,9 @@ class CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6124,12 +6068,10 @@ class CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridg
     : public CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6155,12 +6097,10 @@ class CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6243,12 +6183,10 @@ class CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBr
     : public CHIPCallbackBridge<PumpConfigurationAndControlGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         CHIPActionBlock action,
-                                                                                         bool keepAlive = false) :
+    CHIPPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PumpConfigurationAndControlGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn, keepAlive){};
+                                                                                                 OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6274,12 +6212,10 @@ class CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBri
     : public CHIPCallbackBridge<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         CHIPActionBlock action,
-                                                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn, keepAlive){};
+    CHIPPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6334,12 +6270,10 @@ class CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBr
     : public CHIPCallbackBridge<RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         CHIPActionBlock action,
-                                                                                         bool keepAlive = false) :
+    CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn, keepAlive){};
+                                                                                                 OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6365,12 +6299,10 @@ class CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBri
     : public CHIPCallbackBridge<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                         ResponseHandler handler,
-                                                                                         CHIPActionBlock action,
-                                                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                       OnSuccessFn, keepAlive){};
+    CHIPRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6426,7 +6358,7 @@ class CHIPScenesGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPScenesGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -6437,8 +6369,8 @@ class CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPScenesGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6454,7 +6386,7 @@ class CHIPScenesAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPScenesAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                             CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -6465,8 +6397,8 @@ class CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPScenesAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6539,9 +6471,9 @@ class CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
+                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6568,9 +6500,9 @@ class CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6625,7 +6557,7 @@ class CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -6636,8 +6568,8 @@ class CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6653,7 +6585,7 @@ class CHIPSwitchAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
+                                                             CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
@@ -6664,8 +6596,8 @@ class CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge
 {
 public:
     CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6738,9 +6670,9 @@ class CHIPTargetNavigatorGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<TargetNavigatorGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -6767,9 +6699,9 @@ class CHIPTargetNavigatorAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<TargetNavigatorAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7309,9 +7241,8 @@ class CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7320,9 +7251,9 @@ class CHIPTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPTestClusterGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7338,9 +7269,8 @@ class CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7349,9 +7279,9 @@ class CHIPTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPTestClusterAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7423,11 +7353,11 @@ class CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeC
 {
 public:
     CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                  ResponseHandler handler,
-                                                                                                  CHIPActionBlock action,
-                                                                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn, keepAlive){};
+                                                                                            ResponseHandler handler,
+                                                                                            CHIPActionBlock action,
+                                                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7454,11 +7384,11 @@ class CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCa
 {
 public:
     CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                  ResponseHandler handler,
-                                                                                                  CHIPActionBlock action,
-                                                                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn, keepAlive){};
+                                                                                           ResponseHandler handler,
+                                                                                           CHIPActionBlock action,
+                                                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7673,12 +7603,10 @@ class CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridg
     : public CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7704,12 +7632,10 @@ class CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7796,10 +7722,9 @@ class CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7826,10 +7751,9 @@ class CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7912,9 +7836,8 @@ class CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7923,9 +7846,9 @@ class CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7941,9 +7864,8 @@ class CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7952,9 +7874,9 @@ class CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7970,9 +7892,8 @@ class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -7981,9 +7902,9 @@ class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7999,9 +7920,8 @@ class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -8010,9 +7930,9 @@ class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8055,10 +7975,9 @@ class CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -8085,10 +8004,9 @@ class CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -8144,9 +8062,9 @@ class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
@@ -8173,9 +8091,9 @@ class CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge
 {
 public:
     CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };

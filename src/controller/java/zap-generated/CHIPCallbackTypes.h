@@ -54,11 +54,9 @@ typedef void (*CHIPAdministratorCommissioningClusterAdminFabricIndexAttributeCal
 typedef void (*CHIPAdministratorCommissioningClusterAdminVendorIdAttributeCallbackType)(
     void *, chip::app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::TypeInfo::DecodableArgType);
 typedef void (*CHIPAdministratorCommissioningClusterGeneratedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::AdministratorCommissioning::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::AdministratorCommissioning::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAdministratorCommissioningClusterAcceptedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAdministratorCommissioningClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPAdministratorCommissioningClusterClusterRevisionAttributeCallbackType)(
@@ -554,11 +552,9 @@ typedef void (*CHIPEthernetNetworkDiagnosticsClusterCarrierDetectAttributeCallba
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterTimeSinceResetAttributeCallbackType)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo::DecodableArgType);
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterAcceptedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterFeatureMapAttributeCallbackType)(
@@ -786,11 +782,9 @@ typedef void (*CHIPLocalizationConfigurationClusterActiveLocaleAttributeCallback
 typedef void (*CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType)(
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo::DecodableType &);
 typedef void (*CHIPLocalizationConfigurationClusterGeneratedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPLocalizationConfigurationClusterAcceptedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1091,11 +1085,9 @@ typedef void (*CHIPPumpConfigurationAndControlClusterControlModeAttributeCallbac
 typedef void (*CHIPPumpConfigurationAndControlClusterAlarmMaskAttributeCallbackType)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterGeneratedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::PumpConfigurationAndControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPumpConfigurationAndControlClusterAcceptedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::PumpConfigurationAndControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPumpConfigurationAndControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPPumpConfigurationAndControlClusterFeatureMapAttributeCallbackType)(
@@ -1112,11 +1104,9 @@ typedef void (*CHIPRelativeHumidityMeasurementClusterMaxMeasuredValueAttributeCa
 typedef void (*CHIPRelativeHumidityMeasurementClusterToleranceAttributeCallbackType)(
     void *, chip::app::Clusters::RelativeHumidityMeasurement::Attributes::Tolerance::TypeInfo::DecodableArgType);
 typedef void (*CHIPRelativeHumidityMeasurementClusterGeneratedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPRelativeHumidityMeasurementClusterAcceptedCommandListAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+    void *, const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPRelativeHumidityMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPRelativeHumidityMeasurementClusterClusterRevisionAttributeCallbackType)(
@@ -1460,12 +1450,10 @@ typedef void (*CHIPThermostatUserInterfaceConfigurationClusterScheduleProgrammin
         DecodableArgType);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterGeneratedCommandListAttributeCallbackType)(
     void *,
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::TypeInfo::
-        DecodableType &);
+    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterAcceptedCommandListAttributeCallbackType)(
     void *,
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo::
-        DecodableType &);
+    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterClusterRevisionAttributeCallbackType)(

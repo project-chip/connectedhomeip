@@ -45,8 +45,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -85,8 +84,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -195,8 +193,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -235,8 +232,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -399,8 +395,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -439,8 +434,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -717,8 +711,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -757,8 +750,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -906,8 +898,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -946,8 +937,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1117,8 +1107,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1157,8 +1146,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1339,8 +1327,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1379,8 +1366,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1779,8 +1765,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1819,8 +1804,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1947,8 +1931,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1987,8 +1970,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2097,8 +2079,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2137,8 +2118,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2265,8 +2245,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2305,8 +2284,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2546,8 +2524,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2586,8 +2563,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2950,8 +2926,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2990,8 +2965,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3223,8 +3197,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3263,8 +3236,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4078,8 +4050,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4118,8 +4089,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4267,8 +4237,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4307,8 +4276,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4574,8 +4542,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4614,8 +4581,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4724,8 +4690,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4764,8 +4729,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5124,8 +5088,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5164,8 +5127,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5472,8 +5434,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5512,8 +5473,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5799,8 +5759,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5839,8 +5798,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5967,8 +5925,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6007,8 +5964,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6175,8 +6131,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6215,8 +6170,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6412,8 +6366,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6452,8 +6405,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6617,8 +6569,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6657,8 +6608,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7059,8 +7009,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7099,8 +7048,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7312,8 +7260,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7352,8 +7299,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7480,8 +7426,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7520,8 +7465,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7648,8 +7592,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7688,8 +7631,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7908,8 +7850,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7948,8 +7889,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8058,8 +7998,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8098,8 +8037,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8334,8 +8272,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8374,8 +8311,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8541,8 +8477,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8581,8 +8516,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8652,8 +8586,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8692,8 +8625,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8864,8 +8796,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8904,8 +8835,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9172,8 +9102,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9212,8 +9141,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9417,8 +9345,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9457,8 +9384,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9733,8 +9659,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9773,8 +9698,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10116,8 +10040,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10156,8 +10079,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10302,8 +10224,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10342,8 +10263,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10488,8 +10408,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10528,8 +10447,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10822,8 +10740,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10862,8 +10779,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11156,8 +11072,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11196,8 +11111,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11363,8 +11277,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11403,8 +11316,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12013,8 +11925,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12053,8 +11964,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12253,8 +12163,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12293,8 +12202,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12493,8 +12401,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12533,8 +12440,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12741,8 +12647,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12781,8 +12686,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12963,8 +12867,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13003,8 +12906,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13189,8 +13091,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13229,8 +13130,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13496,8 +13396,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13536,8 +13435,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13884,8 +13782,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13924,8 +13821,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15320,8 +15216,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15360,8 +15255,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15529,8 +15423,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15569,8 +15462,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15728,8 +15620,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15768,8 +15659,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15857,8 +15747,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15897,8 +15786,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16268,8 +16156,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16308,8 +16195,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16792,8 +16678,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16832,8 +16717,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,

@@ -49838,37 +49838,36 @@ private:
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read AcceptedCommandList attribute Error: %@", err);
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read AcceptedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(18)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
-                    VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
-                    VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
-                    VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
-                    VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
-                    VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
-                    VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
-                    VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
-                    VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
-                    VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(18)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
+                VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
+                VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
+                VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
+                VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
+                VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
+                VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
+                VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
+                VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
+                VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -49879,27 +49878,26 @@ private:
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read GeneratedCommandList attribute Error: %@", err);
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read GeneratedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }

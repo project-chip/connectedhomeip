@@ -968,8 +968,8 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAccessControlGeneratedCommandListAttributeCallback::CHIPAccessControlGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAccessControlGeneratedCommandListAttributeCallback::CHIPAccessControlGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPAccessControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -1039,8 +1039,8 @@ void CHIPAccessControlGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAccessControlAcceptedCommandListAttributeCallback::CHIPAccessControlAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAccessControlAcceptedCommandListAttributeCallback::CHIPAccessControlAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPAccessControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -1181,8 +1181,8 @@ void CHIPAccessControlAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAccountLoginGeneratedCommandListAttributeCallback::CHIPAccountLoginGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAccountLoginGeneratedCommandListAttributeCallback::CHIPAccountLoginGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPAccountLoginClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -1252,8 +1252,8 @@ void CHIPAccountLoginGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAccountLoginAcceptedCommandListAttributeCallback::CHIPAccountLoginAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAccountLoginAcceptedCommandListAttributeCallback::CHIPAccountLoginAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPAccountLoginClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -1455,8 +1455,7 @@ void CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback::CallbackFn
 
 CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback::
     CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPAdministratorCommissioningClusterGeneratedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                   this),
+    chip::Callback::Callback<CHIPAdministratorCommissioningClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -1528,8 +1527,7 @@ void CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback::Callba
 
 CHIPAdministratorCommissioningAcceptedCommandListAttributeCallback::
     CHIPAdministratorCommissioningAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPAdministratorCommissioningClusterAcceptedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                   this),
+    chip::Callback::Callback<CHIPAdministratorCommissioningClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -2025,8 +2023,8 @@ void CHIPApplicationLauncherCatalogListAttributeCallback::CallbackFn(void * cont
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPApplicationLauncherGeneratedCommandListAttributeCallback::
-    CHIPApplicationLauncherGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPApplicationLauncherGeneratedCommandListAttributeCallback::CHIPApplicationLauncherGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPApplicationLauncherClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2044,8 +2042,7 @@ CHIPApplicationLauncherGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPApplicationLauncherGeneratedCommandListAttributeCallback::
-    ~CHIPApplicationLauncherGeneratedCommandListAttributeCallback()
+CHIPApplicationLauncherGeneratedCommandListAttributeCallback::~CHIPApplicationLauncherGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2097,8 +2094,8 @@ void CHIPApplicationLauncherGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPApplicationLauncherAcceptedCommandListAttributeCallback::
-    CHIPApplicationLauncherAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPApplicationLauncherAcceptedCommandListAttributeCallback::CHIPApplicationLauncherAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPApplicationLauncherClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2116,8 +2113,7 @@ CHIPApplicationLauncherAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPApplicationLauncherAcceptedCommandListAttributeCallback::
-    ~CHIPApplicationLauncherAcceptedCommandListAttributeCallback()
+CHIPApplicationLauncherAcceptedCommandListAttributeCallback::~CHIPApplicationLauncherAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2338,8 +2334,8 @@ void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAudioOutputGeneratedCommandListAttributeCallback::CHIPAudioOutputGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAudioOutputGeneratedCommandListAttributeCallback::CHIPAudioOutputGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPAudioOutputClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2409,8 +2405,8 @@ void CHIPAudioOutputGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAudioOutputAcceptedCommandListAttributeCallback::CHIPAudioOutputAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPAudioOutputAcceptedCommandListAttributeCallback::CHIPAudioOutputAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPAudioOutputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2620,8 +2616,8 @@ void CHIPBarrierControlGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBarrierControlAcceptedCommandListAttributeCallback::CHIPBarrierControlAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPBarrierControlAcceptedCommandListAttributeCallback::CHIPBarrierControlAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPBarrierControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2820,7 +2816,7 @@ void CHIPBasicVendorIDAttributeCallback::CallbackFn(void * context, chip::Vendor
 }
 
 CHIPBasicGeneratedCommandListAttributeCallback::CHIPBasicGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                           bool keepAlive) :
+                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPBasicClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -2849,8 +2845,8 @@ CHIPBasicGeneratedCommandListAttributeCallback::~CHIPBasicGeneratedCommandListAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBasicGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPBasicGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2890,10 +2886,8 @@ void CHIPBasicGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBasicAcceptedCommandListAttributeCallback::CHIPBasicAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                           bool keepAlive) :
-    chip::Callback::Callback<CHIPBasicClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+CHIPBasicAcceptedCommandListAttributeCallback::CHIPBasicAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBasicClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2920,8 +2914,8 @@ CHIPBasicAcceptedCommandListAttributeCallback::~CHIPBasicAcceptedCommandListAttr
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBasicAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPBasicAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3396,7 +3390,7 @@ void CHIPBindingBindingAttributeCallback::CallbackFn(
 }
 
 CHIPBindingGeneratedCommandListAttributeCallback::CHIPBindingGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
+                                                                                                   bool keepAlive) :
     chip::Callback::Callback<CHIPBindingClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -3425,8 +3419,8 @@ CHIPBindingGeneratedCommandListAttributeCallback::~CHIPBindingGeneratedCommandLi
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBindingGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPBindingGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3467,7 +3461,7 @@ void CHIPBindingGeneratedCommandListAttributeCallback::CallbackFn(
 }
 
 CHIPBindingAcceptedCommandListAttributeCallback::CHIPBindingAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
+                                                                                                 bool keepAlive) :
     chip::Callback::Callback<CHIPBindingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -3496,8 +3490,8 @@ CHIPBindingAcceptedCommandListAttributeCallback::~CHIPBindingAcceptedCommandList
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBindingAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPBindingAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3606,8 +3600,8 @@ void CHIPBindingAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBooleanStateGeneratedCommandListAttributeCallback::CHIPBooleanStateGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPBooleanStateGeneratedCommandListAttributeCallback::CHIPBooleanStateGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPBooleanStateClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -3677,8 +3671,8 @@ void CHIPBooleanStateGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBooleanStateAcceptedCommandListAttributeCallback::CHIPBooleanStateAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPBooleanStateAcceptedCommandListAttributeCallback::CHIPBooleanStateAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPBooleanStateClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4126,8 +4120,8 @@ void CHIPBridgedActionsGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedActionsAcceptedCommandListAttributeCallback::CHIPBridgedActionsAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPBridgedActionsAcceptedCommandListAttributeCallback::CHIPBridgedActionsAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPBridgedActionsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4327,8 +4321,8 @@ void CHIPBridgedDeviceBasicVendorIDAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::
-    CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPBridgedDeviceBasicClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4346,8 +4340,7 @@ CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::
-    ~CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback()
+CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::~CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4399,8 +4392,8 @@ void CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::
-    CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPBridgedDeviceBasicClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4418,8 +4411,7 @@ CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::
-    ~CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback()
+CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::~CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4679,7 +4671,7 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
 }
 
 CHIPChannelGeneratedCommandListAttributeCallback::CHIPChannelGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
+                                                                                                   bool keepAlive) :
     chip::Callback::Callback<CHIPChannelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4708,8 +4700,8 @@ CHIPChannelGeneratedCommandListAttributeCallback::~CHIPChannelGeneratedCommandLi
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPChannelGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPChannelGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4750,7 +4742,7 @@ void CHIPChannelGeneratedCommandListAttributeCallback::CallbackFn(
 }
 
 CHIPChannelAcceptedCommandListAttributeCallback::CHIPChannelAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
+                                                                                                 bool keepAlive) :
     chip::Callback::Callback<CHIPChannelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4779,8 +4771,8 @@ CHIPChannelAcceptedCommandListAttributeCallback::~CHIPChannelAcceptedCommandList
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPChannelAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPChannelAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4889,8 +4881,8 @@ void CHIPChannelAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPColorControlGeneratedCommandListAttributeCallback::CHIPColorControlGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPColorControlGeneratedCommandListAttributeCallback::CHIPColorControlGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPColorControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -4960,8 +4952,8 @@ void CHIPColorControlGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPColorControlAcceptedCommandListAttributeCallback::CHIPColorControlAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPColorControlAcceptedCommandListAttributeCallback::CHIPColorControlAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPColorControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -5685,8 +5677,8 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorGeneratedCommandListAttributeCallback::CHIPDescriptorGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPDescriptorGeneratedCommandListAttributeCallback::CHIPDescriptorGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPDescriptorClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -5756,8 +5748,8 @@ void CHIPDescriptorGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorAcceptedCommandListAttributeCallback::CHIPDescriptorAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPDescriptorAcceptedCommandListAttributeCallback::CHIPDescriptorAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPDescriptorClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -5967,8 +5959,8 @@ void CHIPDiagnosticLogsGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDiagnosticLogsAcceptedCommandListAttributeCallback::CHIPDiagnosticLogsAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPDiagnosticLogsAcceptedCommandListAttributeCallback::CHIPDiagnosticLogsAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPDiagnosticLogsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -6239,8 +6231,8 @@ void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPDoorLockGeneratedCommandListAttributeCallback::CHIPDoorLockGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPDoorLockGeneratedCommandListAttributeCallback::CHIPDoorLockGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
     chip::Callback::Callback<CHIPDoorLockClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -6310,8 +6302,8 @@ void CHIPDoorLockGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDoorLockAcceptedCommandListAttributeCallback::CHIPDoorLockAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPDoorLockAcceptedCommandListAttributeCallback::CHIPDoorLockAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
     chip::Callback::Callback<CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -6340,8 +6332,8 @@ CHIPDoorLockAcceptedCommandListAttributeCallback::~CHIPDoorLockAcceptedCommandLi
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPDoorLockAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPDoorLockAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6450,8 +6442,8 @@ void CHIPDoorLockAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::
-    CHIPElectricalMeasurementGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::CHIPElectricalMeasurementGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPElectricalMeasurementClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -6469,8 +6461,7 @@ CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::
-    ~CHIPElectricalMeasurementGeneratedCommandListAttributeCallback()
+CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::~CHIPElectricalMeasurementGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6522,8 +6513,8 @@ void CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::
-    CHIPElectricalMeasurementAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::CHIPElectricalMeasurementAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPElectricalMeasurementClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -6541,8 +6532,7 @@ CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::
-    ~CHIPElectricalMeasurementAcceptedCommandListAttributeCallback()
+CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::~CHIPElectricalMeasurementAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6868,8 +6858,7 @@ void CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback::CallbackFn(vo
 
 CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback::
     CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                   this),
+    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -6941,8 +6930,7 @@ void CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback::Callba
 
 CHIPEthernetNetworkDiagnosticsAcceptedCommandListAttributeCallback::
     CHIPEthernetNetworkDiagnosticsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                   this),
+    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -7083,8 +7071,8 @@ void CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPFanControlGeneratedCommandListAttributeCallback::CHIPFanControlGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPFanControlGeneratedCommandListAttributeCallback::CHIPFanControlGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPFanControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -7154,8 +7142,8 @@ void CHIPFanControlGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPFanControlAcceptedCommandListAttributeCallback::CHIPFanControlAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPFanControlAcceptedCommandListAttributeCallback::CHIPFanControlAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPFanControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -7382,8 +7370,8 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPFixedLabelGeneratedCommandListAttributeCallback::CHIPFixedLabelGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPFixedLabelGeneratedCommandListAttributeCallback::CHIPFixedLabelGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPFixedLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -7453,8 +7441,8 @@ void CHIPFixedLabelGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPFixedLabelAcceptedCommandListAttributeCallback::CHIPFixedLabelAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPFixedLabelAcceptedCommandListAttributeCallback::CHIPFixedLabelAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPFixedLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -8007,8 +7995,8 @@ void CHIPFlowMeasurementAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::
-    CHIPGeneralCommissioningGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::CHIPGeneralCommissioningGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGeneralCommissioningClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -8026,8 +8014,7 @@ CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::
-    ~CHIPGeneralCommissioningGeneratedCommandListAttributeCallback()
+CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::~CHIPGeneralCommissioningGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8079,8 +8066,8 @@ void CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::
-    CHIPGeneralCommissioningAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::CHIPGeneralCommissioningAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGeneralCommissioningClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -8098,8 +8085,7 @@ CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::
-    ~CHIPGeneralCommissioningAcceptedCommandListAttributeCallback()
+CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::~CHIPGeneralCommissioningAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8603,8 +8589,8 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::
-    CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGeneralDiagnosticsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -8622,8 +8608,7 @@ CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::
-    ~CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback()
+CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::~CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8675,8 +8660,8 @@ void CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::
-    CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGeneralDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -8694,8 +8679,7 @@ CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::
-    ~CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback()
+CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::~CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9051,8 +9035,8 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::
-    CHIPGroupKeyManagementGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::CHIPGroupKeyManagementGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGroupKeyManagementClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9070,8 +9054,7 @@ CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::
-    ~CHIPGroupKeyManagementGeneratedCommandListAttributeCallback()
+CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::~CHIPGroupKeyManagementGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9123,8 +9106,8 @@ void CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::
-    CHIPGroupKeyManagementAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::CHIPGroupKeyManagementAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPGroupKeyManagementClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9142,8 +9125,7 @@ CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::
-    ~CHIPGroupKeyManagementAcceptedCommandListAttributeCallback()
+CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::~CHIPGroupKeyManagementAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9267,7 +9249,7 @@ void CHIPGroupKeyManagementAttributeListAttributeCallback::CallbackFn(
 }
 
 CHIPGroupsGeneratedCommandListAttributeCallback::CHIPGroupsGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                                 bool keepAlive) :
     chip::Callback::Callback<CHIPGroupsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9296,8 +9278,8 @@ CHIPGroupsGeneratedCommandListAttributeCallback::~CHIPGroupsGeneratedCommandList
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPGroupsGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPGroupsGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9338,7 +9320,7 @@ void CHIPGroupsGeneratedCommandListAttributeCallback::CallbackFn(
 }
 
 CHIPGroupsAcceptedCommandListAttributeCallback::CHIPGroupsAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPGroupsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9367,8 +9349,8 @@ CHIPGroupsAcceptedCommandListAttributeCallback::~CHIPGroupsAcceptedCommandListAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPGroupsAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPGroupsAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9477,8 +9459,8 @@ void CHIPGroupsAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPIdentifyGeneratedCommandListAttributeCallback::CHIPIdentifyGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPIdentifyGeneratedCommandListAttributeCallback::CHIPIdentifyGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
     chip::Callback::Callback<CHIPIdentifyClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9548,8 +9530,8 @@ void CHIPIdentifyGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPIdentifyAcceptedCommandListAttributeCallback::CHIPIdentifyAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPIdentifyAcceptedCommandListAttributeCallback::CHIPIdentifyAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
     chip::Callback::Callback<CHIPIdentifyClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9578,8 +9560,8 @@ CHIPIdentifyAcceptedCommandListAttributeCallback::~CHIPIdentifyAcceptedCommandLi
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPIdentifyAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPIdentifyAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9956,8 +9938,8 @@ void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::
-    CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPIlluminanceMeasurementClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -9975,8 +9957,7 @@ CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::
-    ~CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback()
+CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::~CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -10028,8 +10009,8 @@ void CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::
-    CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPIlluminanceMeasurementClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -10047,8 +10028,7 @@ CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::
-    ~CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback()
+CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::~CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -10171,8 +10151,8 @@ void CHIPIlluminanceMeasurementAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPKeypadInputGeneratedCommandListAttributeCallback::CHIPKeypadInputGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPKeypadInputGeneratedCommandListAttributeCallback::CHIPKeypadInputGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPKeypadInputClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -10242,8 +10222,8 @@ void CHIPKeypadInputGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPKeypadInputAcceptedCommandListAttributeCallback::CHIPKeypadInputAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPKeypadInputAcceptedCommandListAttributeCallback::CHIPKeypadInputAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPKeypadInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -10714,8 +10694,8 @@ void CHIPLevelControlStartUpCurrentLevelAttributeCallback::CallbackFn(void * con
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPLevelControlGeneratedCommandListAttributeCallback::CHIPLevelControlGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPLevelControlGeneratedCommandListAttributeCallback::CHIPLevelControlGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPLevelControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -10785,8 +10765,8 @@ void CHIPLevelControlGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPLevelControlAcceptedCommandListAttributeCallback::CHIPLevelControlAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPLevelControlAcceptedCommandListAttributeCallback::CHIPLevelControlAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPLevelControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11139,8 +11119,8 @@ void CHIPLocalizationConfigurationAcceptedCommandListAttributeCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPLowPowerGeneratedCommandListAttributeCallback::CHIPLowPowerGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPLowPowerGeneratedCommandListAttributeCallback::CHIPLowPowerGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
     chip::Callback::Callback<CHIPLowPowerClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11210,8 +11190,8 @@ void CHIPLowPowerGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPLowPowerAcceptedCommandListAttributeCallback::CHIPLowPowerAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPLowPowerAcceptedCommandListAttributeCallback::CHIPLowPowerAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
     chip::Callback::Callback<CHIPLowPowerClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11240,8 +11220,8 @@ CHIPLowPowerAcceptedCommandListAttributeCallback::~CHIPLowPowerAcceptedCommandLi
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPLowPowerAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPLowPowerAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11450,8 +11430,8 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPMediaInputGeneratedCommandListAttributeCallback::CHIPMediaInputGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPMediaInputGeneratedCommandListAttributeCallback::CHIPMediaInputGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPMediaInputClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11521,8 +11501,8 @@ void CHIPMediaInputGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPMediaInputAcceptedCommandListAttributeCallback::CHIPMediaInputAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPMediaInputAcceptedCommandListAttributeCallback::CHIPMediaInputAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPMediaInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11923,8 +11903,8 @@ void CHIPMediaPlaybackSeekRangeStartAttributeCallback::CallbackFn(void * context
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPMediaPlaybackGeneratedCommandListAttributeCallback::CHIPMediaPlaybackGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPMediaPlaybackGeneratedCommandListAttributeCallback::CHIPMediaPlaybackGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPMediaPlaybackClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -11994,8 +11974,8 @@ void CHIPMediaPlaybackGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPMediaPlaybackAcceptedCommandListAttributeCallback::CHIPMediaPlaybackAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPMediaPlaybackAcceptedCommandListAttributeCallback::CHIPMediaPlaybackAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
     chip::Callback::Callback<CHIPMediaPlaybackClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -12234,8 +12214,8 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPModeSelectGeneratedCommandListAttributeCallback::CHIPModeSelectGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPModeSelectGeneratedCommandListAttributeCallback::CHIPModeSelectGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPModeSelectClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -12305,8 +12285,8 @@ void CHIPModeSelectGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPModeSelectAcceptedCommandListAttributeCallback::CHIPModeSelectAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPModeSelectAcceptedCommandListAttributeCallback::CHIPModeSelectAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPModeSelectClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -12745,8 +12725,8 @@ void CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::
-    CHIPNetworkCommissioningGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::CHIPNetworkCommissioningGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPNetworkCommissioningClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -12764,8 +12744,7 @@ CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::
-    ~CHIPNetworkCommissioningGeneratedCommandListAttributeCallback()
+CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::~CHIPNetworkCommissioningGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -12817,8 +12796,8 @@ void CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::
-    CHIPNetworkCommissioningAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::CHIPNetworkCommissioningAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPNetworkCommissioningClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -12836,8 +12815,7 @@ CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::
-    ~CHIPNetworkCommissioningAcceptedCommandListAttributeCallback()
+CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::~CHIPNetworkCommissioningAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -13421,7 +13399,7 @@ void CHIPOccupancySensingAttributeListAttributeCallback::CallbackFn(
 }
 
 CHIPOnOffGeneratedCommandListAttributeCallback::CHIPOnOffGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                           bool keepAlive) :
+                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPOnOffClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -13450,8 +13428,8 @@ CHIPOnOffGeneratedCommandListAttributeCallback::~CHIPOnOffGeneratedCommandListAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOnOffGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPOnOffGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13491,10 +13469,8 @@ void CHIPOnOffGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOnOffAcceptedCommandListAttributeCallback::CHIPOnOffAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                           bool keepAlive) :
-    chip::Callback::Callback<CHIPOnOffClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+CHIPOnOffAcceptedCommandListAttributeCallback::CHIPOnOffAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOnOffClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -13521,8 +13497,8 @@ CHIPOnOffAcceptedCommandListAttributeCallback::~CHIPOnOffAcceptedCommandListAttr
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOnOffAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPOnOffAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13703,8 +13679,8 @@ void CHIPOnOffSwitchConfigurationGeneratedCommandListAttributeCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback::
-    CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback::CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPOnOffSwitchConfigurationClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -14207,8 +14183,8 @@ void CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback::CallbackFn(v
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::
-    CHIPOperationalCredentialsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::CHIPOperationalCredentialsGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPOperationalCredentialsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -14226,8 +14202,7 @@ CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::
-    ~CHIPOperationalCredentialsGeneratedCommandListAttributeCallback()
+CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::~CHIPOperationalCredentialsGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14279,8 +14254,8 @@ void CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::
-    CHIPOperationalCredentialsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::CHIPOperationalCredentialsAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPOperationalCredentialsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -14298,8 +14273,7 @@ CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::
-    ~CHIPOperationalCredentialsAcceptedCommandListAttributeCallback()
+CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::~CHIPOperationalCredentialsAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14493,8 +14467,8 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPPowerSourceGeneratedCommandListAttributeCallback::CHIPPowerSourceGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPPowerSourceGeneratedCommandListAttributeCallback::CHIPPowerSourceGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPPowerSourceClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -14564,8 +14538,8 @@ void CHIPPowerSourceGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPPowerSourceAcceptedCommandListAttributeCallback::CHIPPowerSourceAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPPowerSourceAcceptedCommandListAttributeCallback::CHIPPowerSourceAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPPowerSourceClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -14847,8 +14821,8 @@ void CHIPPowerSourceConfigurationGeneratedCommandListAttributeCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback::
-    CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback::CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPPowerSourceConfigurationClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -15400,8 +15374,7 @@ void CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback::Cal
 
 CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback::
     CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                    this),
+    chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -15440,9 +15413,8 @@ void CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback::Callb
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(reinterpret_cast<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback *>(context),
-                    maybeDestroy);
+    std::unique_ptr<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -15474,8 +15446,7 @@ void CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback::Callb
 
 CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback::
     CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                    this),
+    chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -15514,9 +15485,8 @@ void CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback::Callba
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(reinterpret_cast<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback *>(context),
-                    maybeDestroy);
+    std::unique_ptr<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -15619,8 +15589,7 @@ void CHIPPumpConfigurationAndControlAttributeListAttributeCallback::CallbackFn(
 
 CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback::
     CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPRelativeHumidityMeasurementClusterGeneratedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                    this),
+    chip::Callback::Callback<CHIPRelativeHumidityMeasurementClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -15659,9 +15628,8 @@ void CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback::Callb
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(reinterpret_cast<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback *>(context),
-                    maybeDestroy);
+    std::unique_ptr<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -15693,8 +15661,7 @@ void CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback::Callb
 
 CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback::
     CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPRelativeHumidityMeasurementClusterAcceptedCommandListAttributeCallbackType>(CallbackFn,
-                                                                                                                    this),
+    chip::Callback::Callback<CHIPRelativeHumidityMeasurementClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -15733,9 +15700,8 @@ void CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback::Callba
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(reinterpret_cast<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback *>(context),
-                    maybeDestroy);
+    std::unique_ptr<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -15837,7 +15803,7 @@ void CHIPRelativeHumidityMeasurementAttributeListAttributeCallback::CallbackFn(
 }
 
 CHIPScenesGeneratedCommandListAttributeCallback::CHIPScenesGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                                 bool keepAlive) :
     chip::Callback::Callback<CHIPScenesClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -15866,8 +15832,8 @@ CHIPScenesGeneratedCommandListAttributeCallback::~CHIPScenesGeneratedCommandList
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPScenesGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPScenesGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15908,7 +15874,7 @@ void CHIPScenesGeneratedCommandListAttributeCallback::CallbackFn(
 }
 
 CHIPScenesAcceptedCommandListAttributeCallback::CHIPScenesAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPScenesClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -15937,8 +15903,8 @@ CHIPScenesAcceptedCommandListAttributeCallback::~CHIPScenesAcceptedCommandListAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPScenesAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPScenesAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16161,8 +16127,8 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::
-    CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -16180,8 +16146,7 @@ CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::
-    ~CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback()
+CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::~CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -16233,8 +16198,8 @@ void CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::
-    CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -16252,8 +16217,7 @@ CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::
-    ~CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback()
+CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::~CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -16377,7 +16341,7 @@ void CHIPSoftwareDiagnosticsAttributeListAttributeCallback::CallbackFn(
 }
 
 CHIPSwitchGeneratedCommandListAttributeCallback::CHIPSwitchGeneratedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                                 bool keepAlive) :
     chip::Callback::Callback<CHIPSwitchClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -16406,8 +16370,8 @@ CHIPSwitchGeneratedCommandListAttributeCallback::~CHIPSwitchGeneratedCommandList
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPSwitchGeneratedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPSwitchGeneratedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16448,7 +16412,7 @@ void CHIPSwitchGeneratedCommandListAttributeCallback::CallbackFn(
 }
 
 CHIPSwitchAcceptedCommandListAttributeCallback::CHIPSwitchAcceptedCommandListAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
+                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPSwitchClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -16477,8 +16441,8 @@ CHIPSwitchAcceptedCommandListAttributeCallback::~CHIPSwitchAcceptedCommandListAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPSwitchAcceptedCommandListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPSwitchAcceptedCommandListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20447,8 +20411,8 @@ void CHIPTestClusterNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestClusterGeneratedCommandListAttributeCallback::CHIPTestClusterGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPTestClusterGeneratedCommandListAttributeCallback::CHIPTestClusterGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
     chip::Callback::Callback<CHIPTestClusterClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -20518,8 +20482,8 @@ void CHIPTestClusterGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestClusterAcceptedCommandListAttributeCallback::CHIPTestClusterAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPTestClusterAcceptedCommandListAttributeCallback::CHIPTestClusterAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
     chip::Callback::Callback<CHIPTestClusterClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -20729,8 +20693,8 @@ void CHIPThermostatAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback::
     CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatUserInterfaceConfigurationClusterGeneratedCommandListAttributeCallbackType>(
-        CallbackFn, this),
+    chip::Callback::Callback<CHIPThermostatUserInterfaceConfigurationClusterGeneratedCommandListAttributeCallbackType>(CallbackFn,
+                                                                                                                       this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -20770,9 +20734,8 @@ void CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallba
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
     std::unique_ptr<CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(
-            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback *>(context),
-            maybeDestroy);
+        cppCallback(reinterpret_cast<CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback *>(context),
+                    maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -20804,8 +20767,8 @@ void CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallba
 
 CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback::
     CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatUserInterfaceConfigurationClusterAcceptedCommandListAttributeCallbackType>(
-        CallbackFn, this),
+    chip::Callback::Callback<CHIPThermostatUserInterfaceConfigurationClusterAcceptedCommandListAttributeCallbackType>(CallbackFn,
+                                                                                                                      this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -20845,9 +20808,8 @@ void CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallbac
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
     std::unique_ptr<CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)>
-        cppCallback(
-            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback *>(context),
-            maybeDestroy);
+        cppCallback(reinterpret_cast<CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback *>(context),
+                    maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -21684,8 +21646,8 @@ void CHIPThreadNetworkDiagnosticsGeneratedCommandListAttributeCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback::
-    CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback::CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -21899,8 +21861,8 @@ void CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::
-    CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPTimeFormatLocalizationClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -21918,8 +21880,7 @@ CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::
-    ~CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback()
+CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::~CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -21971,8 +21932,8 @@ void CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::
-    CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPTimeFormatLocalizationClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -21990,8 +21951,7 @@ CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::
-    ~CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback()
+CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::~CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22202,8 +22162,8 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPUserLabelGeneratedCommandListAttributeCallback::CHIPUserLabelGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPUserLabelGeneratedCommandListAttributeCallback::CHIPUserLabelGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPUserLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22273,8 +22233,8 @@ void CHIPUserLabelGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPUserLabelAcceptedCommandListAttributeCallback::CHIPUserLabelAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPUserLabelAcceptedCommandListAttributeCallback::CHIPUserLabelAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
     chip::Callback::Callback<CHIPUserLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22344,8 +22304,8 @@ void CHIPUserLabelAcceptedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPWakeOnLanGeneratedCommandListAttributeCallback::CHIPWakeOnLanGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPWakeOnLanGeneratedCommandListAttributeCallback::CHIPWakeOnLanGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
     chip::Callback::Callback<CHIPWakeOnLanClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22415,8 +22375,8 @@ void CHIPWakeOnLanGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPWakeOnLanAcceptedCommandListAttributeCallback::CHIPWakeOnLanAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPWakeOnLanAcceptedCommandListAttributeCallback::CHIPWakeOnLanAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
     chip::Callback::Callback<CHIPWakeOnLanClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22890,8 +22850,8 @@ void CHIPWiFiNetworkDiagnosticsRssiAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::
-    CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22909,8 +22869,7 @@ CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::
     }
 }
 
-CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::
-    ~CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback()
+CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::~CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22962,8 +22921,8 @@ void CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::
-    CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -22981,8 +22940,7 @@ CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::
     }
 }
 
-CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::
-    ~CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback()
+CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::~CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -23718,8 +23676,8 @@ void CHIPWindowCoveringGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPWindowCoveringAcceptedCommandListAttributeCallback::CHIPWindowCoveringAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
+CHIPWindowCoveringAcceptedCommandListAttributeCallback::CHIPWindowCoveringAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
     chip::Callback::Callback<CHIPWindowCoveringClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
