@@ -81,7 +81,6 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPAccessControlClusterAccessControlEntry *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].privilege
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].privilege)>>(
                                 element_0.privilege.unsignedCharValue);
@@ -159,6 +158,7 @@ using namespace chip::app::Clusters;
                                 }
                             }
                         }
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -259,8 +259,8 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPAccessControlClusterExtensionEntry *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].data = [self asByteSpan:element_0.data];
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -5630,7 +5630,6 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPBindingClusterTargetStruct *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         if (element_0.node != nil) {
                             auto & definedValue_2 = listHolder_0->mList[i_0].node.Emplace();
                             definedValue_2 = element_0.node.unsignedLongLongValue;
@@ -5647,6 +5646,7 @@ using namespace chip::app::Clusters;
                             auto & definedValue_2 = listHolder_0->mList[i_0].cluster.Emplace();
                             definedValue_2 = element_0.cluster.unsignedIntValue;
                         }
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -20954,9 +20954,9 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPGroupKeyManagementClusterGroupKeyMapStruct *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
                         listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -42246,7 +42246,6 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPTestClusterClusterTestFabricScoped *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].fabricSensitiveInt8u = element_0.fabricSensitiveInt8u.unsignedCharValue;
                         if (element_0.optionalFabricSensitiveInt8u != nil) {
                             auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
@@ -42303,6 +42302,7 @@ using namespace chip::app::Clusters;
                                 listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2();
                             }
                         }
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

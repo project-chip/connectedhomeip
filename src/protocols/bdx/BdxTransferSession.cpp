@@ -894,7 +894,7 @@ exit:
     mAwaitingResponse = false; // Prevent triggering timeout
 }
 
-bool TransferSession::IsTransferLengthDefinite()
+bool TransferSession::IsTransferLengthDefinite() const
 {
     return (mTransferLength > 0);
 }

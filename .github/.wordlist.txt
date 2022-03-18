@@ -300,6 +300,7 @@ cxx
 CY
 CYW
 DAC
+dadbdcdddedf
 DAP
 DAPLINK
 DataFrame
@@ -358,6 +359,7 @@ DevKitC
 DevKitM
 devtype
 df
+dfe
 dfu
 DgDxsfHx
 dhclient
@@ -542,6 +544,7 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupsettings
 gtk
 GUA
 Gv
@@ -646,6 +649,7 @@ kBusy
 kCase
 Kconfig
 KeypadInput
+keyset
 kGroup
 kInvalidCommandId
 KitProg
@@ -1184,6 +1188,7 @@ TestEmptyString
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead
+TestName
 TESTPASSWD
 TestPICS
 TESTSSID
@@ -1326,6 +1331,7 @@ WS
 WSL
 WSTK
 xa
+xAAAA
 xab
 xaver
 xb
@@ -1358,6 +1364,8 @@ xfffff
 xFFFFFFFD
 xffffffffe
 xfffffffff
+xffffffffffff
+xffffffffffffXXXX
 xtensa
 xwayland
 XXXX
@@ -1407,3 +1415,8 @@ datamodel
 appliable
 commissionee
 configs
+NAMESERVER
+UTF
+localedef
+nameserver
+nmcli

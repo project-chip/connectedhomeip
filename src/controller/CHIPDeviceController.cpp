@@ -1753,6 +1753,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
+    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                    params.GetCompletionStatus().AsString());
+
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
     mCommissioningStage    = step;
@@ -1997,7 +2000,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Sending operational certificate chain to the device");
         SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value());
         break;
@@ -2009,7 +2011,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
 
-        ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
@@ -2024,7 +2025,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Adding thread network");
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
         request.breadcrumb         = breadcrumb;
@@ -2038,7 +2038,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID  = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb = breadcrumb;
@@ -2056,7 +2055,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Enabling thread network");
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID  = extendedPanId;
         request.breadcrumb = breadcrumb;
@@ -2074,14 +2072,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendComplete: {
-        ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint,
                                                  timeout);
     }
     break;
     case CommissioningStage::kCleanup:
-        ChipLogProgress(Controller, "Rendezvous cleanup");
         if (mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnCommissioningComplete(proxy->GetDeviceId(), params.GetCompletionStatus());
