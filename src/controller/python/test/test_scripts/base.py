@@ -213,6 +213,15 @@ class BaseTestHelper:
             "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         return True
 
+    def TestStopPairing(self, nodeid: int):
+        self.logger.info(
+            "Removing PASE connection for {}".format(nodeid))
+        if self.devCtrl.StopPairing(nodeid) != 0:
+            self.logger.info("Unable to remove connection")
+            return False
+        self.logger.info("Removed successfully")
+        return True
+
     def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))

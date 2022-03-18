@@ -125,6 +125,8 @@ ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::De
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * peerAddrStr, uint32_t setupPINCode,
                                                                       chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+
 ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 ChipError::StorageType
@@ -361,6 +363,12 @@ ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Cont
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
 }
+
+ChipError::StorageType pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+{
+    return devCtrl->StopPairing(nodeid).AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     CommissioningParameters params;

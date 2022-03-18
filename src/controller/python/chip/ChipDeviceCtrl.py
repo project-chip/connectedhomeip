@@ -246,6 +246,13 @@ class ChipDeviceController():
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
+    def StopPairing(self, nodeid):
+        self.CheckIsActive()
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_StopPairing(
+                self.devCtrl, nodeid)
+        )
+
     def Commission(self, nodeid):
         self.CheckIsActive()
         self._ChipStack.commissioningCompleteEvent.clear()
@@ -931,3 +938,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
+
+            self._dmLib.pychip_DeviceController_StopPairing.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_StopPairing.restype = c_uint32
