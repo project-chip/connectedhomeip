@@ -252,6 +252,7 @@ def HostTargets():
         ['-chip-tool']), separate_event_loop=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
+    builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="tsan", requires=["clang"], conflicts=[
                           'asan'], use_tsan=True),
     builder.AppendVariant(name="asan", requires=["clang"], conflicts=[

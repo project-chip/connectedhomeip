@@ -118,7 +118,7 @@ public:
         }
     }
 
-    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+    uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
 
     void ScheduleUrgentEventDeliverySync();
 

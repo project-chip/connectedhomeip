@@ -167,7 +167,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData)
+bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
     if (nodeData.commissioningMode == 0)
     {

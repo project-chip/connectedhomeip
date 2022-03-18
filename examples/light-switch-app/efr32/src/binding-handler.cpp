@@ -23,6 +23,7 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -41,9 +42,11 @@ using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
 Engine sShellSwitchOnOffSubCommands;
-Engine sShellSwitchGroupsSubCommands;
 
+Engine sShellSwitchGroupsSubCommands;
 Engine sShellSwitchGroupsOnOffSubCommands;
+
+Engine sShellSwitchBindingSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 namespace {
@@ -203,6 +206,57 @@ CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 }
 
 /********************************************************
+ * bind switch shell functions
+ *********************************************************/
+
+CHIP_ERROR BindingHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchBindingSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BindingSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return BindingHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchBindingSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
+
+    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
+    entry->type                    = EMBER_MULTICAST_BINDING;
+    entry->fabricIndex             = atoi(argv[0]);
+    entry->groupId                 = atoi(argv[1]);
+    entry->local                   = 1; // Hardcoded to endpoint 1 for now
+    entry->clusterId.SetValue(6);       // Hardcoded to OnOff cluster for now
+
+    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
+
+    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
+    entry->type                    = EMBER_UNICAST_BINDING;
+    entry->fabricIndex             = atoi(argv[0]);
+    entry->nodeId                  = atoi(argv[1]);
+    entry->local                   = 1; // Hardcoded to endpoint 1 for now
+    entry->remote                  = atoi(argv[2]);
+    entry->clusterId.SetValue(6)); // Hardcode to OnOff cluster for now
+
+    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
  * Groups switch shell functions
  *********************************************************/
 
@@ -285,7 +339,7 @@ static void RegisterSwitchCommands()
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
-
+        { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
     };
 
     static const shell_command_t sSwitchOnOffSubCommands[] = {
@@ -299,19 +353,26 @@ static void RegisterSwitchCommands()
                                                                 { &GroupsOnOffSwitchCommandHandler, "onoff",
                                                                   "Usage: switch groups onoff <subcommand>" } };
 
-    static const shell_command_t sSwichGroupsOnOffSubCommands[] = {
+    static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
         { &GroupOnSwitchCommandHandler, "on", "Sends on command to bound group" },
         { &GroupOffSwitchCommandHandler, "off", "Sends off command to bound group" },
         { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" }
     };
 
+    static const shell_command_t sSwitchBindingSubCommands[] = {
+        { &BindingHelpHandler, "help", "Usage: switch binding <subcommand>" },
+        { &BindingGroupBindCommandHandler, "group", "Usage: switch binding group <fabric index> <group id>" },
+        { &BindingUnicastBindCommandHandler, "unicast", "Usage: switch binding group <fabric index> <node id> <endpoint>" }
+    };
+
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
-    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwichGroupsOnOffSubCommands, ArraySize(sSwichGroupsOnOffSubCommands));
+    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
+    sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
 
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
@@ -340,6 +401,16 @@ void SwitchWorkerFunction(intptr_t context)
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
 
     Platform::Delete(data);
+}
+
+void BindingWorkerFunction(intptr_t context)
+{
+    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
+
+    EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
+    AddBindingEntry(*entry);
+
+    Platform::Delete(entry);
 }
 
 CHIP_ERROR InitBindingHandler()

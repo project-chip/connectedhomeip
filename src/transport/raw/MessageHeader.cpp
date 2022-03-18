@@ -202,8 +202,17 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         mDestinationGroupId.ClearValue();
     }
 
+    if (mSecFlags.Has(Header::SecFlagValues::kMsgExtensionFlag))
+    {
+        // If present, skip over Message Extension block.
+        // Spec 4.4.1.8. Message Extensions (variable)
+        uint16_t mxLength;
+        SuccessOrExit(err = reader.Read16(&mxLength).StatusCode());
+        VerifyOrExit(mxLength <= reader.Remaining(), err = CHIP_ERROR_INTERNAL);
+        reader.Skip(mxLength);
+    }
+
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
-    VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 
 exit:
@@ -258,8 +267,17 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         mAckMessageCounter.ClearValue();
     }
 
+    if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_SecuredExtension))
+    {
+        // If present, skip over Secured Extension block.
+        // Spec 4.4.3.7. Secured Extensions (variable)
+        uint16_t sxLength;
+        SuccessOrExit(err = reader.Read16(&sxLength).StatusCode());
+        VerifyOrExit(sxLength <= reader.Remaining(), err = CHIP_ERROR_INTERNAL);
+        reader.Skip(sxLength);
+    }
+
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
-    VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 
 exit:
