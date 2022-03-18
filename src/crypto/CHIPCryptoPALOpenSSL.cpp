@@ -1943,31 +1943,42 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 }
 
 /**
- *  @brief Openssl P256 key builder for Operatinal and Ephermal keys.
+ *  @brief Openssl P256 key builder for Operatinal and Ephemeral keys.
  **/
 class OpensslDefaultP256KeypairBuilder : public P256KeypairBuilder
 {
 public:
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
-    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
+    virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
+
+    virtual void FreeP256KeyPair(P256Keypair* p256key) override;
 };
 
-P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
+P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx)
 {
-    (void) fabricIndex;
+    (void) fabricIdx;
     P256Keypair * keypair = nullptr;
     keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
 }
 
-P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForEphemeralUsage()
 {
     P256Keypair * keypair = nullptr;
     keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
+}
+
+void OpensslDefaultP256KeypairBuilder::FreeP256KeyPair(P256Keypair* p256key)
+{
+    if (p256key != nullptr){
+        p256key->Clear();
+        Platform::Delete(p256key);
+    }
+    return;
 }
 
 /**

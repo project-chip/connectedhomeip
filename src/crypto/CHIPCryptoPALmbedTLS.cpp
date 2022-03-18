@@ -1669,31 +1669,42 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 }
 
 /**
- *  @brief Mbedtls P256 key builder for Operatinal and Ephermal keys.
+ *  @brief Mbedtls P256 key builder for Operatinal and Ephemeral keys.
  **/
 class MbedTlsDefaultP256KeypairBuilder : public P256KeypairBuilder
 {
 public:
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
-    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
+    virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
+
+    virtual void FreeP256KeyPair(P256Keypair* p256key) override;
 };
 
-P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
+P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx)
 {
-    (void) fabricIndex;
+    (void) fabricIdx;
     P256Keypair * keypair = nullptr;
     keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
 }
 
-P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForEphemeralUsage()
 {
     P256Keypair * keypair = nullptr;
     keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
+}
+
+void MbedTlsDefaultP256KeypairBuilder::FreeP256KeyPair(P256Keypair* p256key)
+{
+    if (p256key != nullptr){
+        p256key->Clear();
+        Platform::Delete(p256key);
+    }
+    return;
 }
 
 /**

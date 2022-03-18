@@ -823,10 +823,12 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
-        keypair = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(gFabricBeingCommissioned.GetFabricId());
+        keypair = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
         VerifyOrExit(keypair != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(keypair));
+        err = gFabricBeingCommissioned.SetOperationalKeypair(keypair);
+        chip::Crypto::GetP256KeypairBuilder()->FreeP256KeyPair(keypair);
+        SuccessOrExit(err);
 
         // Generate the actual CSR from the ephemeral key
         VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);

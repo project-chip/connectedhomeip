@@ -742,10 +742,10 @@ exit:
     return error;
 }
 
-P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
+P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx)
 {
     static int initkey = 0;
-    (void) fabricIndex;
+    (void) fabricIdx;
     P256KeypairHSM * keypair = nullptr;
     keypair                  = Platform::New<P256KeypairHSM>();
     // fabricIndex - keyid mapping not implemented yet
@@ -772,14 +772,20 @@ P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(ui
     return keypair;
 }
 
-P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForEphemeralUsage()
 {
     P256KeypairHSM * keypair = nullptr;
-    ChipLogProgress(Crypto, "HSM-BuildP256KeyPairForEphermalUsage() called");
+    ChipLogProgress(Crypto, "HSM-BuildP256KeyPairForEphemeralUsage() called");
     keypair = Platform::New<P256KeypairHSM>();
-    keypair->SetKeyId(kKeyId_case_ephermal_keyid);
+    keypair->SetKeyId(kKeyId_case_ephemeral_keyid);
     keypair->Initialize();
     return keypair;
+}
+
+void HSMDefaultP256KeypairBuilder::FreeP256KeyPair(P256Keypair* p256key)
+{
+    (void) p256key;
+    return;
 }
 
 } // namespace Crypto

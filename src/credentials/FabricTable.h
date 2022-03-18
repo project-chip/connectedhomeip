@@ -75,7 +75,7 @@ public:
     {
         if (mOperationalKey != nullptr)
         {
-            chip::Platform::Delete(mOperationalKey);
+            chip::Crypto::GetP256KeypairBuilder()->FreeP256KeyPair(mOperationalKey);
         }
         ReleaseOperationalCerts();
     }
@@ -110,7 +110,7 @@ public:
     {
         if (mOperationalKey == nullptr)
         {
-            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabricId);
+            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabric);
         }
 
         return mOperationalKey;
@@ -180,7 +180,7 @@ public:
 
         if (mOperationalKey != nullptr)
         {
-            chip::Platform::Delete(mOperationalKey);
+            chip::Crypto::GetP256KeypairBuilder()->FreeP256KeyPair(mOperationalKey);
             mOperationalKey = nullptr;
         }
         ReleaseOperationalCerts();

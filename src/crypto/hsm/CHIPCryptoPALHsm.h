@@ -210,14 +210,16 @@ private:
 #endif //#if ENABLE_HSM_HMAC_SHA256
 
 /**
- *  @brief HSM P256 key builder for Operatinal and Ephermal keys.
+ *  @brief HSM P256 key builder for Operatinal and Ephemeral keys.
  **/
 class HSMDefaultP256KeypairBuilder : public P256KeypairBuilder
 {
 public:
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
-    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
+    virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
+
+    virtual void FreeP256KeyPair(P256Keypair* p256key) override;
 };
 
 #ifdef ENABLE_HSM_EC_KEY

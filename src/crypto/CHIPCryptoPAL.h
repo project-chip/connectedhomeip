@@ -30,6 +30,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -1480,7 +1481,7 @@ public:
 };
 
 /**
- *  @brief P256 key builder for Operatinal and Ephermal keys.
+ *  @brief P256 key builder for Operatinal and Ephemeral keys.
  **/
 class P256KeypairBuilder
 {
@@ -1491,13 +1492,19 @@ public:
      * @brief Create the keypair for given fabric Index.
      * @return Return reference to P256 Keypair
      **/
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) = 0;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) = 0;
 
     /**
-     * @brief Create the ephermal keypair for CASE.
+     * @brief Create the Ephemeral keypair for CASE.
      * @return Return reference to P256 Keypair
      **/
-    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() = 0;
+    virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() = 0;
+
+    /**
+     * @brief Free P256 KeyPair.
+     * @return None
+     **/
+    virtual void FreeP256KeyPair(P256Keypair* p256key) = 0;
 };
 
 /**

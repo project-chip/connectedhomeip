@@ -46,7 +46,7 @@ enum keyid_values
     kKeyId_hkdf_sha256_hmac_keyid,
     kKeyId_hmac_sha256_keyid,
     kKeyId_sha256_ecc_pub_keyid,
-    kKeyId_case_ephermal_keyid,
+    kKeyId_case_ephemeral_keyid,
     kKeyId_case_operational_keyid,
 };
 

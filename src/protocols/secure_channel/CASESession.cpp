@@ -107,6 +107,7 @@ void CASESession::Clear()
     mCommissioningHash.Clear();
     mCASESessionEstablished = false;
     PairingSession::Clear();
+    GetP256KeypairBuilder()->FreeP256KeyPair(mEphemeralKey);
 
     mState = kInitialized;
 
@@ -328,7 +329,7 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Generate an ephemeral keypair
-    mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphermalUsage();
+    mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphemeralUsage();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Fill in the random value
@@ -551,7 +552,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(DRBG_get_bytes(&msg_rand[0], sizeof(msg_rand)));
 
     // Generate an ephemeral keypair
-    mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphermalUsage();
+    mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphemeralUsage();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Generate a Shared Secret
