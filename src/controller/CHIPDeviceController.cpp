@@ -604,9 +604,10 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
-    mPairingDelegate         = nullptr;
-    mPairedDevicesUpdated    = false;
-    mDeviceBeingCommissioned = nullptr;
+    mPairingDelegate           = nullptr;
+    mPairedDevicesUpdated      = false;
+    mDeviceBeingCommissioned   = nullptr;
+    mDeviceInPASEEstablishment = nullptr;
 }
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
@@ -657,12 +658,13 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
     // Check to see if pairing in progress before shutting down
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
+    CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
     if (device != nullptr && device->IsSessionSetupInProgress())
     {
         ChipLogDetail(Controller, "Setup in progress, stopping setup before shutting down");
         OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
     }
+    // TODO: If we have a commissioning step in progress, is there a way to cancel that callback?
 
     mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
 
@@ -723,9 +725,9 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 {
     mCommissioneeDevicePool.ReleaseObject(device);
     // Make sure that there will be no dangling pointer
-    if (mDeviceBeingCommissioned == device)
+    if (mDeviceInPASEEstablishment == device)
     {
-        mDeviceBeingCommissioned = nullptr;
+        mDeviceInPASEEstablishment = nullptr;
     }
 }
 
@@ -788,8 +790,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     uint16_t keyID = 0;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingCommissioned == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    // This will initialize the commissionee device pool if it has not already been initialized.
     err = InitializePairedDeviceList();
     SuccessOrExit(err);
 
@@ -818,7 +821,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     device = mCommissioneeDevicePool.CreateObject();
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    mDeviceBeingCommissioned = device;
+    mDeviceInPASEEstablishment = device;
 
     {
         FabricIndex fabricIndex = mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
@@ -890,13 +893,16 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     MATTER_TRACE_EVENT_SCOPE("Commission", "DeviceCommissioner");
-    // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
-    // commissioning stage in the device.
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-    if (device == nullptr || device->GetDeviceId() != remoteDeviceId ||
-        (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
+    CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
+    if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
     {
         ChipLogError(Controller, "Invalid device for commissioning " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (!device->IsSecureConnected() && device != mDeviceInPASEEstablishment)
+    {
+        // We should not end up in this state because we won't attempt to establish more than one connection at a time.
+        ChipLogError(Controller, "Device is not connected and not being paired " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -954,17 +960,17 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
-    if (mDeviceBeingCommissioned != nullptr)
+    if (mDeviceInPASEEstablishment != nullptr)
     {
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
-        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-    }
+        ReleaseCommissioneeDevice(mDeviceInPASEEstablishment);
 
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(status);
+        if (mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnPairingComplete(status);
+        }
     }
 }
 
@@ -984,14 +990,19 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 void DeviceCommissioner::OnSessionEstablished()
 {
     // PASE session established.
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+    CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
 
-    PASESession * pairing = &mDeviceBeingCommissioned->GetPairing();
+    // We are in the callback for this pairing. Reset so we can pair another device.
+    mDeviceInPASEEstablishment = nullptr;
+
+    VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+
+    PASESession * pairing = &device->GetPairing();
 
     // TODO: the session should know which peer we are trying to connect to when started
-    pairing->SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
+    pairing->SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err = mDeviceBeingCommissioned->SetConnected();
+    CHIP_ERROR err = device->SetConnected();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1001,12 +1012,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
-    // TODO: Add code to receive CSR from the device, and process the signing request
-    // For IP rendezvous, this is sent as part of the state machine.
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
-        mDefaultCommissioner->StartCommissioning(this, mDeviceBeingCommissioned);
+        mDefaultCommissioner->StartCommissioning(this, device);
     }
     else
     {
@@ -1293,8 +1302,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(
     ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", to_underlying(data.statusCode));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    CommissioneeDeviceProxy * device = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -1303,9 +1311,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(
     err = ConvertFromOperationalCertStatus(data.statusCode);
     SuccessOrExit(err);
 
-    device = commissioner->mDeviceBeingCommissioned;
-
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
+    err = commissioner->OnOperationalCredentialsProvisioningCompletion(commissioner->mDeviceBeingCommissioned);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1348,7 +1354,7 @@ void DeviceCommissioner::OnRootCertFailureResponse(void * context, CHIP_ERROR er
     commissioner->CommissioningStageComplete(error);
 }
 
-CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device)
+CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(DeviceProxy * device)
 {
     MATTER_TRACE_EVENT_SCOPE("OnOperationalCredentialsProvisioningCompletion", "DeviceCommissioner");
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
@@ -1391,11 +1397,12 @@ CHIP_ERROR DeviceCommissioner::CloseBleConnection()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeout()
 {
+    // This is called from the session establishment timer. Please see
+    // https://github.com/project-chip/connectedhomeip/issues/14650
     VerifyOrReturn(mState == State::Initialized);
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-    StopPairing(device->GetDeviceId());
+    StopPairing(mDeviceBeingCommissioned->GetDeviceId());
 
     if (mPairingDelegate != nullptr)
     {
@@ -1461,7 +1468,11 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
+    NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
+    mDeviceBeingCommissioned = nullptr;
+
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1474,7 +1485,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
         // In this case, we should call back the commissioning complete and call session error
         if (mPairingDelegate != nullptr && mDeviceBeingCommissioned != nullptr)
         {
-            mPairingDelegate->OnCommissioningComplete(mDeviceBeingCommissioned->GetDeviceId(), status);
+            mPairingDelegate->OnCommissioningComplete(nodeId, status);
         }
     }
 }
@@ -1488,24 +1499,24 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
     {
         if (commissioner->mDeviceBeingCommissioned != nullptr &&
-            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId())
+            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId() &&
+            commissioner->mCommissioningDelegate != nullptr)
         {
-            // Let's release the device that's being paired, if pairing was successful,
-            // and the device is available on the operational network.
-            commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-            if (commissioner->mCommissioningDelegate != nullptr)
-            {
-                CommissioningDelegate::CommissioningReport report;
-                report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
-                commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-            }
+            CommissioningDelegate::CommissioningReport report;
+            report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
+            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
         }
     }
-    else
+    else if (commissioner->mPairingDelegate != nullptr)
     {
-        VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                       ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
         commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    }
+
+    // Release any CommissioneeDeviceProxies we have here as we now have an OperationalDeviceProxy.
+    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
+    if (commissionee != nullptr)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissionee);
     }
 }
 
@@ -1526,6 +1537,12 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
     }
+    // TODO: Determine if we really want the PASE session removed here. See #16089.
+    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
+    if (commissionee != nullptr)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissionee);
+    }
 
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
@@ -1536,19 +1553,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     else
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
-    }
-
-    if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
-    {
-        // This prevents a leak when commissioning fails in the middle.
-        // Can use one of the following to simulate a failure:
-        //   - comment out SendSigma2 on the device side (chip-tool will timeout in 1m or so)
-        //   - set kMinLookupTimeMsDefault (and max) in AddressResolve.h
-        //     to a very low value to quickly fail (e.g. 10 ms and 11ms), not enough time for the device
-        //     to actually become operational. Chiptool should fail fast after PASE
-        //
-        // Run the above cases under valgrind/asan to validate no additional leaks.
-        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
     }
 }
 
@@ -1763,8 +1767,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
-    mCommissioningStage    = step;
-    mCommissioningDelegate = delegate;
+    mCommissioningStage      = step;
+    mCommissioningDelegate   = delegate;
+    mDeviceBeingCommissioned = proxy;
     // TODO: Extend timeouts to the DAC and Opcert requests.
 
     // TODO(cecille): We probably want something better than this for breadcrumbs.
@@ -1847,8 +1852,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Value is only switchable on the devices with indoor/outdoor capability
         if (capability == app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor)
         {
-            // If the device supports indoor and outdoor configs, use the setting from the commissioner, otherwise fall back to the
-            // current device setting then to outdoor (most restrictive)
+            // If the device supports indoor and outdoor configs, use the setting from the commissioner, otherwise fall back to
+            // the current device setting then to outdoor (most restrictive)
             if (params.GetDeviceRegulatoryLocation().HasValue())
             {
                 regulatoryLocation = params.GetDeviceRegulatoryLocation().Value();
