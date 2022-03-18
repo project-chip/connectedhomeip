@@ -240,5 +240,4 @@ void AddBindingEntry(const EmberBindingTableEntry & entry)
     }
 
     BindingTable::GetInstance().Add(entry);
-    BindingManager::GetInstance().NotifyBindingAdded(entry);
 }
