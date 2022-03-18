@@ -49,12 +49,13 @@ CHIP_ERROR CHIPCommand::Run()
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
-    uint16_t port = mDefaultStorage.GetListenPort();
-    if (port != 0) {
+    uint16_t port                              = mDefaultStorage.GetListenPort();
+    if (port != 0)
+    {
         // Make sure different commissioners run on different ports.
         port += CurrentCommissionerId();
     }
-    factoryInitParams.listenPort               = port;
+    factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     // TODO(issue #15209): Replace this trust store with file-based trust store
