@@ -41,7 +41,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer        = bleLayer;
+    mBleLayer = bleLayer;
 #endif
     mSessionManager  = sessionManager;
     mFabrics         = fabrics;
