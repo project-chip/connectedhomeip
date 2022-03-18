@@ -266,12 +266,23 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
 
+    FabricIndex fabricIndex = event->CommissioningComplete.PeerFabricIndex;
+
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
     // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
     // Session Context at the Server.
     if (event->CommissioningComplete.AddNocCommandHasBeenInvoked || event->CommissioningComplete.UpdateNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(event->CommissioningComplete.PeerFabricIndex);
+        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+        if (caseSessionManager)
+        {
+            FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+            VerifyOrReturn(fabricInfo != nullptr);
+
+            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
+        }
+
+        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(fabricIndex);
     }
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -279,7 +290,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (event->CommissioningComplete.AddNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetFabricTable().Delete(event->CommissioningComplete.PeerFabricIndex);
+        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
     }
 
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
