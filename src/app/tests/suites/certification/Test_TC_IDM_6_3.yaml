@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.8.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT - Controller]
+name:
+    19.8.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
+    Controller]
 
 config:
     nodeId: 0x12344321
@@ -20,9 +22,9 @@ config:
     endpoint: 0
 
 tests:
-  - label: "DUT sends Read Request Message to the TH for a supported event."
-    verification: |
-        In case of chip tool, here is an example command to use
+    - label: "DUT sends Read Request Message to the TH for a supported event."
+      verification: |
+          In case of chip tool, here is an example command to use
 
-        sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
-    disabled: true
+          sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+      disabled: true

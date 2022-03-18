@@ -20,27 +20,27 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Commission DUT to TH"
-    verification: |
+    - label: "Commission DUT to TH"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "DUT reads attribute value from TH."
-    verification: |
-        ./chip-tool flowmeasurement read measured-value 1 1
-    disabled: true
+    - label: "DUT reads attribute value from TH."
+      verification: |
+          ./chip-tool flowmeasurement read measured-value 1 1
+      disabled: true
 
-  - label: "DUT reads attribute value from TH."
-    verification: |
-        ./chip-tool flowmeasurement read min-measured-value 1 1
-    disabled: true
+    - label: "DUT reads attribute value from TH."
+      verification: |
+          ./chip-tool flowmeasurement read min-measured-value 1 1
+      disabled: true
 
-  - label: "DUT reads attribute value from TH."
-    verification: |
-        ./chip-tool flowmeasurement read max-measured-value 1 1
-    disabled: true
+    - label: "DUT reads attribute value from TH."
+      verification: |
+          ./chip-tool flowmeasurement read max-measured-value 1 1
+      disabled: true
 
-  - label: "DUT reads attribute value from TH."
-    verification: |
-        chip-tool flowmeasurement read tolerance 1 1
-    disabled: true
+    - label: "DUT reads attribute value from TH."
+      verification: |
+          chip-tool flowmeasurement read tolerance 1 1
+      disabled: true

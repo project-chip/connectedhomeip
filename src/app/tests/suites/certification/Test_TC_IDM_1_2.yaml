@@ -28,42 +28,42 @@ tests:
 
           ./chip-tool onoff on 1 20
 
-        [1646259751838] [5046:202503] CHIP: [EM] Found matching exchange: 61331i, Delegate: 0x7fc26610f120
-        [1646259751838] [5046:202503] CHIP: [EM] Rxd Ack; Removing MessageCounter:12132811 from Retrans Table on exchange 61331i
-        [1646259751838] [5046:202503] CHIP: [EM] Removed CHIP MessageCounter:12132811 from RetransTable on exchange 61331i
-        [1646259751838] [5046:202503] CHIP: [DMG] ICR moving to [ResponseRe]
-        [1646259751838] [5046:202503] CHIP: [DMG] InvokeResponseMessage =
-        [1646259751838] [5046:202503] CHIP: [DMG] {
-        [1646259751838] [5046:202503] CHIP: [DMG]         suppressResponse = false,
-        [1646259751838] [5046:202503] CHIP: [DMG]         InvokeResponseIBs =
-        [1646259751838] [5046:202503] CHIP: [DMG]         [
-        [1646259751838] [5046:202503] CHIP: [DMG]                 InvokeResponseIB =
-        [1646259751838] [5046:202503] CHIP: [DMG]                 {
-        [1646259751838] [5046:202503] CHIP: [DMG]                         CommandStatusIB =
-        [1646259751838] [5046:202503] CHIP: [DMG]                         {
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 CommandPathIB =
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 {
-        [1646259751838] [5046:202503] CHIP: [DMG]                                         EndpointId = 0x3,
-        [1646259751838] [5046:202503] CHIP: [DMG]                                         ClusterId = 0x6,
-        [1646259751838] [5046:202503] CHIP: [DMG]                                         CommandId = 0x1,
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 StatusIB =
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 {
-        [1646259751838] [5046:202503] CHIP: [DMG]                                         status = 0x7f,
-        [1646259751838] [5046:202503] CHIP: [DMG]                                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]
-        [1646259751838] [5046:202503] CHIP: [DMG]                         },
-        [1646259751838] [5046:202503] CHIP: [DMG]
-        [1646259751838] [5046:202503] CHIP: [DMG]                 },
-        [1646259751838] [5046:202503] CHIP: [DMG]
-        [1646259751838] [5046:202503] CHIP: [DMG]         ],
-        [1646259751838] [5046:202503] CHIP: [DMG]
-        [1646259751838] [5046:202503] CHIP: [DMG]         InteractionModelRevision = 1
-        [1646259751838] [5046:202503] CHIP: [DMG] },
-        [1646259751838] [5046:202503] CHIP: [DMG] Received Command Response Status for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
-        [1646259751838] [5046:202503] CHIP: [TOO] Error: IM Error 0x0000057F: General error: 0x7f
-    disabled: true
+          [1646259751838] [5046:202503] CHIP: [EM] Found matching exchange: 61331i, Delegate: 0x7fc26610f120
+          [1646259751838] [5046:202503] CHIP: [EM] Rxd Ack; Removing MessageCounter:12132811 from Retrans Table on exchange 61331i
+          [1646259751838] [5046:202503] CHIP: [EM] Removed CHIP MessageCounter:12132811 from RetransTable on exchange 61331i
+          [1646259751838] [5046:202503] CHIP: [DMG] ICR moving to [ResponseRe]
+          [1646259751838] [5046:202503] CHIP: [DMG] InvokeResponseMessage =
+          [1646259751838] [5046:202503] CHIP: [DMG] {
+          [1646259751838] [5046:202503] CHIP: [DMG]         suppressResponse = false,
+          [1646259751838] [5046:202503] CHIP: [DMG]         InvokeResponseIBs =
+          [1646259751838] [5046:202503] CHIP: [DMG]         [
+          [1646259751838] [5046:202503] CHIP: [DMG]                 InvokeResponseIB =
+          [1646259751838] [5046:202503] CHIP: [DMG]                 {
+          [1646259751838] [5046:202503] CHIP: [DMG]                         CommandStatusIB =
+          [1646259751838] [5046:202503] CHIP: [DMG]                         {
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 CommandPathIB =
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 {
+          [1646259751838] [5046:202503] CHIP: [DMG]                                         EndpointId = 0x3,
+          [1646259751838] [5046:202503] CHIP: [DMG]                                         ClusterId = 0x6,
+          [1646259751838] [5046:202503] CHIP: [DMG]                                         CommandId = 0x1,
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 },
+          [1646259751838] [5046:202503] CHIP: [DMG]
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 StatusIB =
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 {
+          [1646259751838] [5046:202503] CHIP: [DMG]                                         status = 0x7f,
+          [1646259751838] [5046:202503] CHIP: [DMG]                                 },
+          [1646259751838] [5046:202503] CHIP: [DMG]
+          [1646259751838] [5046:202503] CHIP: [DMG]                         },
+          [1646259751838] [5046:202503] CHIP: [DMG]
+          [1646259751838] [5046:202503] CHIP: [DMG]                 },
+          [1646259751838] [5046:202503] CHIP: [DMG]
+          [1646259751838] [5046:202503] CHIP: [DMG]         ],
+          [1646259751838] [5046:202503] CHIP: [DMG]
+          [1646259751838] [5046:202503] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646259751838] [5046:202503] CHIP: [DMG] },
+          [1646259751838] [5046:202503] CHIP: [DMG] Received Command Response Status for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
+          [1646259751838] [5046:202503] CHIP: [TOO] Error: IM Error 0x0000057F: General error: 0x7f
+      disabled: true
 
     - label:
           "TH sends the Invoke Request Message to the DUT with the path that
@@ -73,42 +73,42 @@ tests:
 
           ./chip-tool any command-by-id 0x0003 0 1 1 2
 
-        [1646259975665] [5055:204669] CHIP: [EM] Found matching exchange: 26369i, Delegate: 0x7feb9b534af0
-        [1646259975665] [5055:204669] CHIP: [EM] Rxd Ack; Removing MessageCounter:10263298 from Retrans Table on exchange 26369i
-        [1646259975665] [5055:204669] CHIP: [EM] Removed CHIP MessageCounter:10263298 from RetransTable on exchange 26369i
-        [1646259975665] [5055:204669] CHIP: [DMG] ICR moving to [ResponseRe]
-        [1646259975665] [5055:204669] CHIP: [DMG] InvokeResponseMessage =
-        [1646259975665] [5055:204669] CHIP: [DMG] {
-        [1646259975665] [5055:204669] CHIP: [DMG]         suppressResponse = false,
-        [1646259975665] [5055:204669] CHIP: [DMG]         InvokeResponseIBs =
-        [1646259975665] [5055:204669] CHIP: [DMG]         [
-        [1646259975665] [5055:204669] CHIP: [DMG]                 InvokeResponseIB =
-        [1646259975665] [5055:204669] CHIP: [DMG]                 {
-        [1646259975665] [5055:204669] CHIP: [DMG]                         CommandStatusIB =
-        [1646259975665] [5055:204669] CHIP: [DMG]                         {
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 CommandPathIB =
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 {
-        [1646259975665] [5055:204669] CHIP: [DMG]                                         EndpointId = 0x2,
-        [1646259975665] [5055:204669] CHIP: [DMG]                                         ClusterId = 0x3,
-        [1646259975665] [5055:204669] CHIP: [DMG]                                         CommandId = 0x0,
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 StatusIB =
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 {
-        [1646259975665] [5055:204669] CHIP: [DMG]                                         status = 0xc3,
-        [1646259975665] [5055:204669] CHIP: [DMG]                                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]
-        [1646259975665] [5055:204669] CHIP: [DMG]                         },
-        [1646259975665] [5055:204669] CHIP: [DMG]
-        [1646259975665] [5055:204669] CHIP: [DMG]                 },
-        [1646259975665] [5055:204669] CHIP: [DMG]
-        [1646259975665] [5055:204669] CHIP: [DMG]         ],
-        [1646259975665] [5055:204669] CHIP: [DMG]
-        [1646259975666] [5055:204669] CHIP: [DMG]         InteractionModelRevision = 1
-        [1646259975666] [5055:204669] CHIP: [DMG] },
-        [1646259975666] [5055:204669] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
-        [1646259975666] [5055:204669] CHIP: [TOO] Error: IM Error 0x000005C3: General error: 0xc3
-    disabled: true
+          [1646259975665] [5055:204669] CHIP: [EM] Found matching exchange: 26369i, Delegate: 0x7feb9b534af0
+          [1646259975665] [5055:204669] CHIP: [EM] Rxd Ack; Removing MessageCounter:10263298 from Retrans Table on exchange 26369i
+          [1646259975665] [5055:204669] CHIP: [EM] Removed CHIP MessageCounter:10263298 from RetransTable on exchange 26369i
+          [1646259975665] [5055:204669] CHIP: [DMG] ICR moving to [ResponseRe]
+          [1646259975665] [5055:204669] CHIP: [DMG] InvokeResponseMessage =
+          [1646259975665] [5055:204669] CHIP: [DMG] {
+          [1646259975665] [5055:204669] CHIP: [DMG]         suppressResponse = false,
+          [1646259975665] [5055:204669] CHIP: [DMG]         InvokeResponseIBs =
+          [1646259975665] [5055:204669] CHIP: [DMG]         [
+          [1646259975665] [5055:204669] CHIP: [DMG]                 InvokeResponseIB =
+          [1646259975665] [5055:204669] CHIP: [DMG]                 {
+          [1646259975665] [5055:204669] CHIP: [DMG]                         CommandStatusIB =
+          [1646259975665] [5055:204669] CHIP: [DMG]                         {
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 CommandPathIB =
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 {
+          [1646259975665] [5055:204669] CHIP: [DMG]                                         EndpointId = 0x2,
+          [1646259975665] [5055:204669] CHIP: [DMG]                                         ClusterId = 0x3,
+          [1646259975665] [5055:204669] CHIP: [DMG]                                         CommandId = 0x0,
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 },
+          [1646259975665] [5055:204669] CHIP: [DMG]
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 StatusIB =
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 {
+          [1646259975665] [5055:204669] CHIP: [DMG]                                         status = 0xc3,
+          [1646259975665] [5055:204669] CHIP: [DMG]                                 },
+          [1646259975665] [5055:204669] CHIP: [DMG]
+          [1646259975665] [5055:204669] CHIP: [DMG]                         },
+          [1646259975665] [5055:204669] CHIP: [DMG]
+          [1646259975665] [5055:204669] CHIP: [DMG]                 },
+          [1646259975665] [5055:204669] CHIP: [DMG]
+          [1646259975665] [5055:204669] CHIP: [DMG]         ],
+          [1646259975665] [5055:204669] CHIP: [DMG]
+          [1646259975666] [5055:204669] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646259975666] [5055:204669] CHIP: [DMG] },
+          [1646259975666] [5055:204669] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
+          [1646259975666] [5055:204669] CHIP: [TOO] Error: IM Error 0x000005C3: General error: 0xc3
+      disabled: true
 
     - label:
           "TH sends the Invoke Request Message to the DUT with the path that
@@ -117,40 +117,40 @@ tests:
           In case of chip tool, here is an example command to use
           ./chip-tool any command-by-id 0x0003 3 1 1 0
 
-        [1646260061731] [5058:205583] CHIP: [EM] Removed CHIP MessageCounter:16578292 from RetransTable on exchange 22437i
-        [1646260061731] [5058:205583] CHIP: [DMG] ICR moving to [ResponseRe]
-        [1646260061731] [5058:205583] CHIP: [DMG] InvokeResponseMessage =
-        [1646260061731] [5058:205583] CHIP: [DMG] {
-        [1646260061731] [5058:205583] CHIP: [DMG]         suppressResponse = false,
-        [1646260061731] [5058:205583] CHIP: [DMG]         InvokeResponseIBs =
-        [1646260061732] [5058:205583] CHIP: [DMG]         [
-        [1646260061732] [5058:205583] CHIP: [DMG]                 InvokeResponseIB =
-        [1646260061732] [5058:205583] CHIP: [DMG]                 {
-        [1646260061732] [5058:205583] CHIP: [DMG]                         CommandStatusIB =
-        [1646260061732] [5058:205583] CHIP: [DMG]                         {
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 CommandPathIB =
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 {
-        [1646260061732] [5058:205583] CHIP: [DMG]                                         EndpointId = 0x0,
-        [1646260061732] [5058:205583] CHIP: [DMG]                                         ClusterId = 0x3,
-        [1646260061732] [5058:205583] CHIP: [DMG]                                         CommandId = 0x3,
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 StatusIB =
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 {
-        [1646260061732] [5058:205583] CHIP: [DMG]                                         status = 0x81,
-        [1646260061732] [5058:205583] CHIP: [DMG]                                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]
-        [1646260061732] [5058:205583] CHIP: [DMG]                         },
-        [1646260061732] [5058:205583] CHIP: [DMG]
-        [1646260061732] [5058:205583] CHIP: [DMG]                 },
-        [1646260061732] [5058:205583] CHIP: [DMG]
-        [1646260061732] [5058:205583] CHIP: [DMG]         ],
-        [1646260061732] [5058:205583] CHIP: [DMG]
-        [1646260061732] [5058:205583] CHIP: [DMG]         InteractionModelRevision = 1
-        [1646260061732] [5058:205583] CHIP: [DMG] },
-        [1646260061732] [5058:205583] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0003 Status=0x81
-        [1646260061733] [5058:205583] CHIP: [TOO] Error: IM Error 0x00000581: General error: 0x81
-    disabled: true
+          [1646260061731] [5058:205583] CHIP: [EM] Removed CHIP MessageCounter:16578292 from RetransTable on exchange 22437i
+          [1646260061731] [5058:205583] CHIP: [DMG] ICR moving to [ResponseRe]
+          [1646260061731] [5058:205583] CHIP: [DMG] InvokeResponseMessage =
+          [1646260061731] [5058:205583] CHIP: [DMG] {
+          [1646260061731] [5058:205583] CHIP: [DMG]         suppressResponse = false,
+          [1646260061731] [5058:205583] CHIP: [DMG]         InvokeResponseIBs =
+          [1646260061732] [5058:205583] CHIP: [DMG]         [
+          [1646260061732] [5058:205583] CHIP: [DMG]                 InvokeResponseIB =
+          [1646260061732] [5058:205583] CHIP: [DMG]                 {
+          [1646260061732] [5058:205583] CHIP: [DMG]                         CommandStatusIB =
+          [1646260061732] [5058:205583] CHIP: [DMG]                         {
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 CommandPathIB =
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 {
+          [1646260061732] [5058:205583] CHIP: [DMG]                                         EndpointId = 0x0,
+          [1646260061732] [5058:205583] CHIP: [DMG]                                         ClusterId = 0x3,
+          [1646260061732] [5058:205583] CHIP: [DMG]                                         CommandId = 0x3,
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 },
+          [1646260061732] [5058:205583] CHIP: [DMG]
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 StatusIB =
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 {
+          [1646260061732] [5058:205583] CHIP: [DMG]                                         status = 0x81,
+          [1646260061732] [5058:205583] CHIP: [DMG]                                 },
+          [1646260061732] [5058:205583] CHIP: [DMG]
+          [1646260061732] [5058:205583] CHIP: [DMG]                         },
+          [1646260061732] [5058:205583] CHIP: [DMG]
+          [1646260061732] [5058:205583] CHIP: [DMG]                 },
+          [1646260061732] [5058:205583] CHIP: [DMG]
+          [1646260061732] [5058:205583] CHIP: [DMG]         ],
+          [1646260061732] [5058:205583] CHIP: [DMG]
+          [1646260061732] [5058:205583] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646260061732] [5058:205583] CHIP: [DMG] },
+          [1646260061732] [5058:205583] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0003 Status=0x81
+          [1646260061733] [5058:205583] CHIP: [TOO] Error: IM Error 0x00000581: General error: 0x81
+      disabled: true
 
     - label:
           "Setup the TH such that it should not have the privilege for the
@@ -175,48 +175,49 @@ tests:
           Out of Scope for V1.0
       disabled: true
 
-  - label: "(OPTIONAL) TH sends the Invoke Request Message to the DUT with the command which requires
-        another command in response."
-    verification: |
-        In case of chip tool, here is an example command to use
-        ./chip-tool generalcommissioning arm-fail-safe  1000 1 100 5 0
+    - label:
+          "(OPTIONAL) TH sends the Invoke Request Message to the DUT with the
+          command which requires another command in response."
+      verification: |
+          In case of chip tool, here is an example command to use
+          ./chip-tool generalcommissioning arm-fail-safe  1000 1 100 5 0
 
-        [1646239170811] [72173:10220345] CHIP: [DMG] InvokeResponseMessage =
-        [1646239170811] [72173:10220345] CHIP: [DMG] {
-        [1646239170811] [72173:10220345] CHIP: [DMG]         suppressResponse = false,
-        [1646239170811] [72173:10220345] CHIP: [DMG]         InvokeResponseIBs =
-        [1646239170811] [72173:10220345] CHIP: [DMG]         [
-        [1646239170811] [72173:10220345] CHIP: [DMG]                 InvokeResponseIB =
-        [1646239170811] [72173:10220345] CHIP: [DMG]                 {
-        [1646239170811] [72173:10220345] CHIP: [DMG]                         CommandDataIB =
-        [1646239170811] [72173:10220345] CHIP: [DMG]                         {
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandPathIB =
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 {
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         EndpointId = 0x0,
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         ClusterId = 0x30,
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         CommandId = 0x1,
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
-        [1646239170811] [72173:10220345] CHIP: [DMG]
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandData =
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 {
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x0 = 0,
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x1 = "",
-        [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
-        [1646239170811] [72173:10220345] CHIP: [DMG]                         },
-        [1646239170811] [72173:10220345] CHIP: [DMG]
-        [1646239170811] [72173:10220345] CHIP: [DMG]                 },
-        [1646239170811] [72173:10220345] CHIP: [DMG]
-        [1646239170811] [72173:10220345] CHIP: [DMG]         ],
-        [1646239170811] [72173:10220345] CHIP: [DMG]
-        [1646239170811] [72173:10220345] CHIP: [DMG]         InteractionModelRevision = 1
-        [1646239170811] [72173:10220345] CHIP: [DMG] },
-        [1646239170812] [72173:10220345] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-        [1646239170812] [72173:10220345] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-        [1646239170813] [72173:10220345] CHIP: [TOO]   ArmFailSafeResponse: {
-        [1646239170813] [72173:10220345] CHIP: [TOO]     errorCode: 0
-        [1646239170813] [72173:10220345] CHIP: [TOO]     debugText:
-        [1646239170813] [72173:10220345] CHIP: [TOO]    }
-    disabled: true
+          [1646239170811] [72173:10220345] CHIP: [DMG] InvokeResponseMessage =
+          [1646239170811] [72173:10220345] CHIP: [DMG] {
+          [1646239170811] [72173:10220345] CHIP: [DMG]         suppressResponse = false,
+          [1646239170811] [72173:10220345] CHIP: [DMG]         InvokeResponseIBs =
+          [1646239170811] [72173:10220345] CHIP: [DMG]         [
+          [1646239170811] [72173:10220345] CHIP: [DMG]                 InvokeResponseIB =
+          [1646239170811] [72173:10220345] CHIP: [DMG]                 {
+          [1646239170811] [72173:10220345] CHIP: [DMG]                         CommandDataIB =
+          [1646239170811] [72173:10220345] CHIP: [DMG]                         {
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandPathIB =
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 {
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                         EndpointId = 0x0,
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                         ClusterId = 0x30,
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                         CommandId = 0x1,
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
+          [1646239170811] [72173:10220345] CHIP: [DMG]
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 CommandData =
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 {
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x0 = 0,
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                         0x1 = "",
+          [1646239170811] [72173:10220345] CHIP: [DMG]                                 },
+          [1646239170811] [72173:10220345] CHIP: [DMG]                         },
+          [1646239170811] [72173:10220345] CHIP: [DMG]
+          [1646239170811] [72173:10220345] CHIP: [DMG]                 },
+          [1646239170811] [72173:10220345] CHIP: [DMG]
+          [1646239170811] [72173:10220345] CHIP: [DMG]         ],
+          [1646239170811] [72173:10220345] CHIP: [DMG]
+          [1646239170811] [72173:10220345] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646239170811] [72173:10220345] CHIP: [DMG] },
+          [1646239170812] [72173:10220345] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1646239170812] [72173:10220345] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1646239170813] [72173:10220345] CHIP: [TOO]   ArmFailSafeResponse: {
+          [1646239170813] [72173:10220345] CHIP: [TOO]     errorCode: 0
+          [1646239170813] [72173:10220345] CHIP: [TOO]     debugText:
+          [1646239170813] [72173:10220345] CHIP: [TOO]    }
+      disabled: true
 
     - label:
           "TH sends the Invoke Request Message to the DUT with a valid

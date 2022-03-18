@@ -20,28 +20,28 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Commission DUT to TH"
-    verification: |
+    - label: "Commission DUT to TH"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads Occupancy attribute from DUT"
-    verification: |
-        ./chip-tool occupancysensing read occupancy  1 1
+    - label: "TH reads Occupancy attribute from DUT"
+      verification: |
+          ./chip-tool occupancysensing read occupancy  1 1
 
-         Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
-        [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 0
-    disabled: true
+           Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
+          [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 0
+      disabled: true
 
-  - label: "Operate on DUT to change the occupancy status"
-    verification: |
+    - label: "Operate on DUT to change the occupancy status"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "after a few seconds, TH reads Occupancy attribute from DUT"
-    verification: |
-        ./chip-tool occupancysensing read occupancy  1 1
+    - label: "after a few seconds, TH reads Occupancy attribute from DUT"
+      verification: |
+          ./chip-tool occupancysensing read occupancy  1 1
 
-         Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
-        [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 1
-    disabled: true
+           Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
+          [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 1
+      disabled: true

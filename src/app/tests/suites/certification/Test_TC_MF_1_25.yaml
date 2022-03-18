@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 22.1.25. [TC-MF-1.25] Open commissioning window - durations max and max+1 [BCM] [DUT - Commissionee]
+name:
+    22.1.25. [TC-MF-1.25] Open commissioning window - durations max and max+1
+    [BCM] [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -20,38 +22,42 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Reset DUT_CE to factory defaults"
-    verification: |
+    - label: "Reset DUT_CE to factory defaults"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
-    verification: |
-        1. Provision the device using 1st controller chip tool(use above instructions) ,
-    disabled: true
+    - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
+      verification: |
+          1. Provision the device using 1st controller chip tool(use above instructions) ,
+      disabled: true
 
-  - label: "TH_CR1 opens a commissioning window on DUT_CE with a value of 15 minutes"
-    verification: |
-        On 1st controller chip tool, open commissioning window
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE with a value of 15
+          minutes"
+      verification: |
+          On 1st controller chip tool, open commissioning window
 
-        For BCM,
-        ./chip-tool administratorcommissioning open-basic-commissioning-window 900 1 0
-    disabled: true
+          For BCM,
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 900 1 0
+      disabled: true
 
-  - label: "Wait for commissioning Window to Timeout"
-    verification: |
-        Wait for commissioning Window to Timeout
-    disabled: true
+    - label: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
+      disabled: true
 
-  - label: "TH_CR1 opens a commissioning window on DUT_CE with a value of 901 seconds"
-    verification: |
-        On 1st controller chip tool, open commissioning window
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
+          seconds"
+      verification: |
+          On 1st controller chip tool, open commissioning window
 
-        For BCM,
-        ./chip-tool administratorcommissioning open-basic-commissioning-window 901 1 0
-    disabled: true
+          For BCM,
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 1 0
+      disabled: true
 
-  - label: "Wait for commissioning Window to Timeout"
-    verification: |
-        Wait for commissioning Window to Timeout
-    disabled: true
+    - label: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
+      disabled: true
