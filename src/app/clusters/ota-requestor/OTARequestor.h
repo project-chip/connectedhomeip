@@ -130,7 +130,6 @@ public:
             mUpdateToken = updateToken;
         }
 
-
         // Schedule the initializations that needs to be performed in the CHIP context
         DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
 
@@ -333,7 +332,10 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
+    // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
+    // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
+    // in the OTARequestorDriver on reboot.
+    Optional<ProviderLocationType> mProviderLocation;
 };
 
 } // namespace chip
