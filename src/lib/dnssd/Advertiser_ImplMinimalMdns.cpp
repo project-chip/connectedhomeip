@@ -160,13 +160,13 @@ public:
 
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to setup commissionable responder: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Discovery, "Failed to set up commissionable responder: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
         err = mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to setup commissioner responder: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Discovery, "Failed to set up commissioner responder: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     ~AdvertiserMinMdns() override {}
