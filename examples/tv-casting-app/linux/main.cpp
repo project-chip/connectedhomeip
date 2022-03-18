@@ -273,7 +273,7 @@ public:
 
     bool IsInitialized() { return mInitialized; }
 
-    EndpointId GetEndpointId() { return mEndpointId; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     void PrintInfo()
     {
@@ -300,7 +300,7 @@ class TargetVideoPlayerInfo
 public:
     bool IsInitialized() { return mInitialized; }
 
-    void Initialize(NodeId nodeId, chip::FabricIndex fabricIndex)
+    CHIP_ERROR Initialize(NodeId nodeId, FabricIndex fabricIndex)
     {
         mNodeId      = nodeId;
         mFabricIndex = fabricIndex;
@@ -308,13 +308,43 @@ public:
         {
             endpointInfo.Reset();
         }
+
+        Server * server           = &(chip::Server::GetInstance());
+        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
+        if (fabric == nullptr)
+        {
+            ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
+            return CHIP_ERROR_INVALID_FABRIC_ID;
+        }
+
+        chip::DeviceProxyInitParams initParams = {
+            .sessionManager = &(server->GetSecureSessionManager()),
+            .exchangeMgr    = &(server->GetExchangeManager()),
+            .idAllocator    = &(server->GetSessionIDAllocator()),
+            .fabricTable    = &(server->GetFabricTable()),
+            .clientPool     = &gCASEClientPool,
+        };
+
+        PeerId peerID           = fabric->GetPeerIdForNode(nodeId);
+        mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        if (mOperationalDeviceProxy == nullptr)
+        {
+            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(nodeId);
+        mOperationalDeviceProxy->SetConnectedSession(handle);
+
         mInitialized = true;
+        return CHIP_NO_ERROR;
     }
 
-    NodeId GetNodeId() { return mNodeId; }
-    chip::FabricIndex GetFabricIndex() { return mFabricIndex; }
+    NodeId GetNodeId() const { return mNodeId; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    OperationalDeviceProxy * GetOperationalDeviceProxy() const { return mOperationalDeviceProxy; }
 
-    TargetEndpointInfo * GetAddEndpoint(EndpointId endpointId)
+    TargetEndpointInfo * GetOrAddEndpoint(EndpointId endpointId)
     {
         if (!mInitialized)
         {
@@ -385,12 +415,14 @@ private:
     static constexpr size_t kMaxNumberOfEndpoints = 5;
     TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
     NodeId mNodeId;
-    chip::FabricIndex mFabricIndex;
+    FabricIndex mFabricIndex;
+    OperationalDeviceProxy * mOperationalDeviceProxy;
+
     bool mInitialized = false;
 };
 TargetVideoPlayerInfo gTargetVideoPlayerInfo;
 
-void OnDescriptorReadSuccessResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList)
+void OnDescriptorReadSuccessResponse(void * context, const app::DataModel::DecodableList<ClusterId> & responseList)
 {
     TargetEndpointInfo * endpointInfo = static_cast<TargetEndpointInfo *>(context);
 
@@ -402,6 +434,8 @@ void OnDescriptorReadSuccessResponse(void * context, const chip::app::DataModel:
         auto & clusterId = iter.GetValue();
         endpointInfo->AddCluster(clusterId);
     }
+    // Always print the target info after handling descriptor read response
+    // Even when we get nothing back for any reasons
     gTargetVideoPlayerInfo.PrintInfo();
 }
 
@@ -412,32 +446,12 @@ void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error)
 
 void ReadServerClusters(EndpointId endpointId)
 {
-    Server * server           = &(chip::Server::GetInstance());
-    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(gTargetVideoPlayerInfo.GetFabricIndex());
-    if (fabric == nullptr)
-    {
-        ChipLogError(AppServer, "Did not find fabric for index %d", gTargetVideoPlayerInfo.GetFabricIndex());
-        return;
-    }
-
-    chip::DeviceProxyInitParams initParams = {
-        .sessionManager = &(server->GetSecureSessionManager()),
-        .exchangeMgr    = &(server->GetExchangeManager()),
-        .idAllocator    = &(server->GetSessionIDAllocator()),
-        .fabricTable    = &(server->GetFabricTable()),
-        .clientPool     = &gCASEClientPool,
-    };
-
-    PeerId peerID                                         = fabric->GetPeerIdForNode(gTargetVideoPlayerInfo.GetNodeId());
-    chip::OperationalDeviceProxy * operationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+    OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
     if (operationalDeviceProxy == nullptr)
     {
-        ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
         return;
     }
-
-    SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(gTargetVideoPlayerInfo.GetNodeId());
-    operationalDeviceProxy->SetConnectedSession(handle);
 
     chip::Controller::DescriptorCluster cluster;
     CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, endpointId);
@@ -447,7 +461,7 @@ void ReadServerClusters(EndpointId endpointId)
         return;
     }
 
-    TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetAddEndpoint(endpointId);
+    TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 
     if (cluster.ReadAttribute<app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
             endpointInfo, OnDescriptorReadSuccessResponse, OnDescriptorReadFailureResponse) != CHIP_NO_ERROR)
@@ -467,7 +481,7 @@ void ReadServerClustersForNode(NodeId nodeId)
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (nodeId == binding.nodeId)
+        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             if (!gTargetVideoPlayerInfo.HasEndpoint(binding.remote))
             {
@@ -494,35 +508,15 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             return;
         }
 
-        gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex);
+        ReturnOnFailure(gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId,
+                                                          event->CommissioningComplete.PeerFabricIndex));
 
-        Server * server           = &(chip::Server::GetInstance());
-        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(gTargetVideoPlayerInfo.GetFabricIndex());
-        if (fabric == nullptr)
-        {
-            ChipLogError(AppServer, "Did not find fabric for index %d", gTargetVideoPlayerInfo.GetFabricIndex());
-            return;
-        }
-
-        chip::DeviceProxyInitParams initParams = {
-            .sessionManager = &(server->GetSecureSessionManager()),
-            .exchangeMgr    = &(server->GetExchangeManager()),
-            .idAllocator    = &(server->GetSessionIDAllocator()),
-            .fabricTable    = &(server->GetFabricTable()),
-            .clientPool     = &gCASEClientPool,
-        };
-
-        PeerId peerID = fabric->GetPeerIdForNode(event->CommissioningComplete.PeerNodeId);
-        chip::OperationalDeviceProxy * operationalDeviceProxy =
-            chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
         if (operationalDeviceProxy == nullptr)
         {
-            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
             return;
         }
-
-        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(event->CommissioningComplete.PeerNodeId);
-        operationalDeviceProxy->SetConnectedSession(handle);
 
         ContentLauncherCluster cluster;
         CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
