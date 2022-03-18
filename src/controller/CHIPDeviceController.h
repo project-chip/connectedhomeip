@@ -734,6 +734,7 @@ private:
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     template <typename ClusterObjectT, typename RequestObjectT>

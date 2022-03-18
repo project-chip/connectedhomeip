@@ -540,6 +540,22 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
     return foundDevice;
 }
 
+CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Transport::PeerAddress & peerAddress)
+{
+    // Q: can we distinguish BLE sessions?
+    CommissioneeDeviceProxy * foundDevice = nullptr;
+    mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
+        if (deviceProxy->GetPeerAddress() == peerAddress)
+        {
+            foundDevice = deviceProxy;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+
+    return foundDevice;
+}
+
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
     mCommissioneeDevicePool.ReleaseObject(device);
@@ -640,6 +656,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
                                                   params.GetPeerAddress().GetInterface());
+    }
+
+    if (FindCommissioneeDevice(peerAddress) != nullptr)
+    {
+        // We already have an open connection to this device, call the callback immediately and early return.
+        if (mPairingDelegate)
+        {
+            mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
+        }
     }
 
     device = mCommissioneeDevicePool.CreateObject();
@@ -848,15 +874,12 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
+    ChipLogProgress(Controller, "OnPairingComplete");
+    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
         mDefaultCommissioner->StartCommissioning(this, device);
-    }
-    else
-    {
-        ChipLogProgress(Controller, "OnPairingComplete");
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 }
 
