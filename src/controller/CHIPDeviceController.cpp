@@ -1389,7 +1389,7 @@ CHIP_ERROR DeviceCommissioner::CloseBleConnection()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeout()
 {
-    // This is called from teh session establishment timer. Please see
+    // This is called from the session establishment timer. Please see https://github.com/project-chip/connectedhomeip/issues/14650
     VerifyOrReturn(mState == State::Initialized);
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
