@@ -253,10 +253,8 @@ def HostTargets():
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
-    builder.AppendVariant(name="tsan", requires=["clang"], conflicts=[
-                          'asan'], use_tsan=True),
-    builder.AppendVariant(name="asan", requires=["clang"], conflicts=[
-                          'tsan'], use_asan=True),
+    builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
+    builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
     builder.AppendVariant(name="clang", use_clang=True),
