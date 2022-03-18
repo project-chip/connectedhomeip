@@ -212,9 +212,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
         if (mDeviceType == ConnectivityManager::kThreadDeviceType_SleepyEndDevice && event->ThreadStateChange.RoleChanged)
         {
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
-            linkMode.mRxOnWhenIdle    = (otThreadGetDeviceRole(mOTInst) != OT_DEVICE_ROLE_CHILD); // Allow device to sleep only when it's connected to the thread network
+            linkMode.mRxOnWhenIdle    = (otThreadGetDeviceRole(mOTInst) !=
+                                      OT_DEVICE_ROLE_CHILD); // Allow device to sleep only when it's connected to the thread network
 
-            ChipLogProgress(DeviceLayer, "Role change for sleepy device - %s ", linkMode.mRxOnWhenIdle ? "It CANNOT sleep" : "It CAN sleep");
+            ChipLogProgress(DeviceLayer, "Role change for sleepy device - %s ",
+                            linkMode.mRxOnWhenIdle ? "It CANNOT sleep" : "It CAN sleep");
             otThreadSetLinkMode(mOTInst, linkMode);
         }
 
