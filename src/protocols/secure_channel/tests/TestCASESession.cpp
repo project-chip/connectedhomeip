@@ -374,7 +374,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), 
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
 #if CONFIG_NETWORK_LAYER_BLE
                                                                 nullptr,
 #endif
