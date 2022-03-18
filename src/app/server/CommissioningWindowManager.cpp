@@ -108,9 +108,9 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 #endif
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
-        // If the number of commissioning attempts have not exceeded maximum retries, let's reopen
-        // the pairing window.
-        err = OpenCommissioningWindow();
+        // If the number of commissioning attempts have not exceeded maximum retries, continue listening
+        // for PASE connections, but don't restart the commissioning window timer.
+        err = ListenForPASE();
     }
 
     // If the commissioning attempts limit exceeded, or reopening the commissioning window failed.
@@ -154,22 +154,28 @@ void CommissioningWindowManager::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    StopAdvertisement(/* aShuttingDown = */ false);
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
+
+    // Restart the PASE session in case something happens to the commissioner and it needs to re-establish
+    ListenForPASE();
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 {
-    uint16_t keyID = 0;
-    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
-
-    mPairingSession.Clear();
-
+    ReturnErrorOnFailure(ListenForPASE());
     if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mCommissioningTimeoutSeconds),
                                                                    HandleCommissioningWindowTimeout, this));
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommissioningWindowManager::ListenForPASE()
+{
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+    mPairingSession.Clear();
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));

@@ -96,6 +96,8 @@ private:
 
     CHIP_ERROR OpenCommissioningWindow();
 
+    CHIP_ERROR ListenForPASE();
+
     // Helper for Shutdown and Cleanup.  Does not do anything with
     // advertisements, because Shutdown and Cleanup want to handle those
     // differently.
