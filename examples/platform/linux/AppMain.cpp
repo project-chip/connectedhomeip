@@ -60,6 +60,10 @@
 #include <CommonRpc.h>
 #endif
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 #include <signal.h>
 
 #include "AppMain.h"
@@ -290,6 +294,10 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 #endif // defined(PW_RPC_ENABLED)
 
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::InitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
