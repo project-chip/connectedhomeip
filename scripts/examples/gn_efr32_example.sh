@@ -154,7 +154,7 @@ else
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
     # Generate bootloader file
-    if [ {"$BUILD_DIR:2" == "./"}; then
+    if [ {"$BUILD_DIR:0:2" == "./"}; then
         BUILD_DIR_TRIMMED="${BUILD_DIR:2}" 
     else
         BUILD_DIR_TRIMMED="${BUILD_DIR#*/}"
