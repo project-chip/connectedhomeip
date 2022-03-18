@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "Reset DUT_CE to factory defaults"
     verification: |
@@ -27,7 +27,7 @@ tests:
 
   - label: "TH_CR1 starts a commissioning process with DUT_CE"
     verification: |
-        1. Provision the device using 1st controller chip tool(use above instructions) , 
+        1. Provision the device using 1st controller chip tool(use above instructions) ,
     disabled: true
 
   - label: "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of PIXIT_COMM_WIN
@@ -90,7 +90,7 @@ tests:
     verification: |
         On 2nd controller, using chip-tool write attribute, Verify read attribute returns the updated value written.
 
-        ./chip-tool basic write user-label te5new 1 0 
+        ./chip-tool basic write user-label te5new 1 0
 
         [1635862117.716433][3691:3696] CHIP:DMG: WriteResponse =
         [1635862117.716467][3691:3696] CHIP:DMG: {
@@ -105,16 +105,16 @@ tests:
         [1635862117.716827][3691:3696] CHIP:DMG:                                 ClusterId = 0x28,
         [1635862117.716871][3691:3696] CHIP:DMG:                                 EndpointId = 0x0,
         [1635862117.716914][3691:3696] CHIP:DMG:                         }
-        [1635862117.716962][3691:3696] CHIP:DMG:                                 
+        [1635862117.716962][3691:3696] CHIP:DMG:
         [1635862117.717002][3691:3696] CHIP:DMG:                         StatusIB =
         [1635862117.717044][3691:3696] CHIP:DMG:                         {
         [1635862117.717087][3691:3696] CHIP:DMG:                                 status = 0x0,
         [1635862117.717130][3691:3696] CHIP:DMG:                         },
-        [1635862117.717173][3691:3696] CHIP:DMG:                         
+        [1635862117.717173][3691:3696] CHIP:DMG:
         [1635862117.717212][3691:3696] CHIP:DMG:                 },
-        [1635862117.717256][3691:3696] CHIP:DMG:                 
+        [1635862117.717256][3691:3696] CHIP:DMG:
         [1635862117.717288][3691:3696] CHIP:DMG:         ],
-        [1635862117.717330][3691:3696] CHIP:DMG:         
+        [1635862117.717330][3691:3696] CHIP:DMG:
         [1635862117.717362][3691:3696] CHIP:DMG: }
         [1635862117.717462][3691:3696] CHIP:ZCL: WriteResponse:
         [1635862117.717493][3691:3696] CHIP:ZCL:   status: Success                (0x0000)
@@ -134,13 +134,13 @@ tests:
         [1635862186.735220][3701:3706] CHIP:DMG:                                 ClusterId = 0x28,
         [1635862186.735291][3701:3706] CHIP:DMG:                                 FieldTag = 0x0000_0005,
         [1635862186.735335][3701:3706] CHIP:DMG:                         }
-        [1635862186.735383][3701:3706] CHIP:DMG:                                 
-        [1635862186.735431][3701:3706] CHIP:DMG:                         Data = "te5new", 
+        [1635862186.735383][3701:3706] CHIP:DMG:
+        [1635862186.735431][3701:3706] CHIP:DMG:                         Data = "te5new",
         [1635862186.735473][3701:3706] CHIP:DMG:                         DataElementVersion = 0x0,
         [1635862186.735533][3701:3706] CHIP:DMG:                 },
-        [1635862186.735581][3701:3706] CHIP:DMG:                 
+        [1635862186.735581][3701:3706] CHIP:DMG:
         [1635862186.735617][3701:3706] CHIP:DMG:         ],
-        [1635862186.735657][3701:3706] CHIP:DMG:         
+        [1635862186.735657][3701:3706] CHIP:DMG:
         [1635862186.735691][3701:3706] CHIP:DMG: }
         [1635862186.735799][3701:3706] CHIP:ZCL: ReadAttributesResponse:
         [1635862186.735832][3701:3706] CHIP:ZCL:   ClusterId: 0x0000_0028

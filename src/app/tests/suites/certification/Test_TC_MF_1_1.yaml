@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "TH_CR1 starts a commissioning process with TH_CE"
     verification: |
@@ -30,7 +30,7 @@ tests:
     verification: |
         On 1st controller using chip tool, open commissioning window using ECM
 
-        ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3840 
+        ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3840
 
         Controller:
 
@@ -74,35 +74,35 @@ tests:
         [1635690007.805763][3613:3618] CHIP:DMG:                                 ClusterId = 0x3e,
         [1635690007.805826][3613:3618] CHIP:DMG:                                 FieldTag = 0x0000_0001,
         [1635690007.805881][3613:3618] CHIP:DMG:                         }
-        [1635690007.805931][3613:3618] CHIP:DMG:                                 
+        [1635690007.805931][3613:3618] CHIP:DMG:
         [1635690007.805987][3613:3618] CHIP:DMG:                         Data = [
-        [1635690007.806032][3613:3618] CHIP:DMG:                                 
+        [1635690007.806032][3613:3618] CHIP:DMG:
         [1635690007.806085][3613:3618] CHIP:DMG:                                 {
-        [1635690007.806136][3613:3618] CHIP:DMG:                                         0x0 = 1, 
+        [1635690007.806136][3613:3618] CHIP:DMG:                                         0x0 = 1,
         [1635690007.806201][3613:3618] CHIP:DMG:                                         0x1 = [
-        [1635690007.806283][3613:3618] CHIP:DMG:                                                 0x4, 0x5d, 0x4, 0xcb, 0xc5, 0xe2, 0x30, 0xb2, 0x3b, 0xee, 0x54, 0xc7, 0xff, 0x3d, 0xdc, 0x65, 0x31, 0x67, 0x69, 0xa8, 0x90, 0x58, 0x5b, 0x83, 0x19, 0x85, 0x8d, 0x1d, 0x3a, 0x63, 0xba, 0x62, 0x54, 0xf8, 0x30, 0x18, 0xb3, 0x68, 0x7b, 0x66, 0x9, 0x94, 
+        [1635690007.806283][3613:3618] CHIP:DMG:                                                 0x4, 0x5d, 0x4, 0xcb, 0xc5, 0xe2, 0x30, 0xb2, 0x3b, 0xee, 0x54, 0xc7, 0xff, 0x3d, 0xdc, 0x65, 0x31, 0x67, 0x69, 0xa8, 0x90, 0x58, 0x5b, 0x83, 0x19, 0x85, 0x8d, 0x1d, 0x3a, 0x63, 0xba, 0x62, 0x54, 0xf8, 0x30, 0x18, 0xb3, 0x68, 0x7b, 0x66, 0x9, 0x94,
         [1635690007.806359][3613:3618] CHIP:DMG:                                         ]
-        [1635690007.806412][3613:3618] CHIP:DMG:                                         0x2 = 54600, 
-        [1635690007.806474][3613:3618] CHIP:DMG:                                         0x3 = 0, 
-        [1635690007.806530][3613:3618] CHIP:DMG:                                         0x4 = 1, 
-        [1635690007.806597][3613:3618] CHIP:DMG:                                         0x5 = "", 
+        [1635690007.806412][3613:3618] CHIP:DMG:                                         0x2 = 54600,
+        [1635690007.806474][3613:3618] CHIP:DMG:                                         0x3 = 0,
+        [1635690007.806530][3613:3618] CHIP:DMG:                                         0x4 = 1,
+        [1635690007.806597][3613:3618] CHIP:DMG:                                         0x5 = "",
         [1635690007.806661][3613:3618] CHIP:DMG:                                 },
         [1635690007.806706][3613:3618] CHIP:DMG:                                 {
-        [1635690007.806763][3613:3618] CHIP:DMG:                                         0x0 = 2, 
+        [1635690007.806763][3613:3618] CHIP:DMG:                                         0x0 = 2,
         [1635690007.806817][3613:3618] CHIP:DMG:                                         0x1 = [
         [1635690007.806902][3613:3618] CHIP:DMG:                                                 0x4, 0xc1, 0x79, 0xcc, 0x1d, 0xc3, 0xdc, 0x71, 0x74, 0xd8, 0x99, 0xcb, 0xef, 0x54, 0xa0, 0xb6, 0xb9, 0x91, 0x37, 0x6d, 0x5d, 0xf1, 0x80, 0x12, 0xa6, 0x4e, 0xc9, 0x7e, 0x34, 0x6a, 0x8d, 0x6b, 0x7a, 0x8e, 0xe2, 0xee, 0x7c, 0xd0, 0x24, 0xa2, 0x62, 0x1d
         [1635690007.806980][3613:3618] CHIP:DMG:                                         ]
-        [1635690007.807131][3613:3618] CHIP:DMG:                                         0x2 = 0, 
-        [1635690007.807222][3613:3618] CHIP:DMG:                                         0x3 = 0, 
-        [1635690007.807287][3613:3618] CHIP:DMG:                                         0x4 = 1, 
-        [1635690007.807361][3613:3618] CHIP:DMG:                                         0x5 = "", 
+        [1635690007.807131][3613:3618] CHIP:DMG:                                         0x2 = 0,
+        [1635690007.807222][3613:3618] CHIP:DMG:                                         0x3 = 0,
+        [1635690007.807287][3613:3618] CHIP:DMG:                                         0x4 = 1,
+        [1635690007.807361][3613:3618] CHIP:DMG:                                         0x5 = "",
         [1635690007.807437][3613:3618] CHIP:DMG:                                 },
         [1635690007.807503][3613:3618] CHIP:DMG:                         ],
         [1635690007.807586][3613:3618] CHIP:DMG:                         DataElementVersion = 0x0,
         [1635690007.807636][3613:3618] CHIP:DMG:                 },
-        [1635690007.807720][3613:3618] CHIP:DMG:                 
+        [1635690007.807720][3613:3618] CHIP:DMG:
         [1635690007.807765][3613:3618] CHIP:DMG:         ],
-        [1635690007.807846][3613:3618] CHIP:DMG:         
+        [1635690007.807846][3613:3618] CHIP:DMG:
         [1635690007.807887][3613:3618] CHIP:DMG: }
         [1635690007.808091][3613:3618] CHIP:ZCL: ReadAttributesResponse:
         [1635690007.808148][3613:3618] CHIP:ZCL:   ClusterId: 0x0000_003E
@@ -116,21 +116,21 @@ tests:
         [1635690007.808805][3613:3618] CHIP:TOO:   vendorId: 54600
         [1635690007.808843][3613:3618] CHIP:TOO:   fabricId: 0
         [1635690007.808879][3613:3618] CHIP:TOO:   nodeId: 1
-        [1635690007.808930][3613:3618] CHIP:ZCL:   Label: 
+        [1635690007.808930][3613:3618] CHIP:ZCL:   Label:
         [1635690007.808984][3613:3618] CHIP:TOO: FabricDescriptor[2]:
         [1635690007.809040][3613:3618] CHIP:TOO:   fabricIndex: 2
         [1635690007.809078][3613:3618] CHIP:ZCL:   RootPublicKey: 65
         [1635690007.809115][3613:3618] CHIP:TOO:   vendorId: 0
         [1635690007.809168][3613:3618] CHIP:TOO:   fabricId: 0
         [1635690007.809206][3613:3618] CHIP:TOO:   nodeId: 1
-        [1635690007.809242][3613:3618] CHIP:ZCL:   Label: 
+        [1635690007.809242][3613:3618] CHIP:ZCL:   Label:
         [1635690007.809382][3613:3618] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 8901i
         [1635690007.809494][3613:3618] CHIP:IN: Prepared encrypted message 0xaaaae7c60d10 to 0x0000000000000001 of type 0x1 and protocolId (0, 1) on exchange 8901i with MessageCounter:1.
     disabled: true
 
   - label: "DUT_CR2 starts a commissioning process with TH_CE"
     verification: |
-        On 2nd controller, using chip-tool connect using manual code. 
+        On 2nd controller, using chip-tool connect using manual code.
         Below is the example when using chip tool as controller (considering 35998938564 as the manual code generated by 1st controller)
         ./chip-tool pairing manualcode 2 35998938564
     disabled: true
@@ -158,16 +158,16 @@ tests:
         [1635692170347] [30464:4576577] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635692170347] [30464:4576577] CHIP: [DMG]                                 EndpointId = 0x0,
         [1635692170347] [30464:4576577] CHIP: [DMG]                         }
-        [1635692170347] [30464:4576577] CHIP: [DMG]                                 
+        [1635692170347] [30464:4576577] CHIP: [DMG]
         [1635692170347] [30464:4576577] CHIP: [DMG]                         StatusIB =
         [1635692170347] [30464:4576577] CHIP: [DMG]                         {
         [1635692170347] [30464:4576577] CHIP: [DMG]                                 status = 0x0,
         [1635692170347] [30464:4576577] CHIP: [DMG]                         },
-        [1635692170347] [30464:4576577] CHIP: [DMG]                         
+        [1635692170347] [30464:4576577] CHIP: [DMG]
         [1635692170347] [30464:4576577] CHIP: [DMG]                 },
-        [1635692170347] [30464:4576577] CHIP: [DMG]                 
+        [1635692170347] [30464:4576577] CHIP: [DMG]
         [1635692170347] [30464:4576577] CHIP: [DMG]         ],
-        [1635692170347] [30464:4576577] CHIP: [DMG]         
+        [1635692170347] [30464:4576577] CHIP: [DMG]
         [1635692170347] [30464:4576577] CHIP: [DMG] }
         [1635692170347] [30464:4576577] CHIP: [ZCL] WriteResponse:
         [1635692170347] [30464:4576577] CHIP: [ZCL]   status: Success                (0x0000)
@@ -195,13 +195,13 @@ tests:
         [1635692600286] [30469:4578600] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635692600286] [30469:4578600] CHIP: [DMG]                                 FieldTag = 0x0000_0005,
         [1635692600286] [30469:4578600] CHIP: [DMG]                         }
-        [1635692600286] [30469:4578600] CHIP: [DMG]                                 
-        [1635692600286] [30469:4578600] CHIP: [DMG]                         Data = "te5new", 
+        [1635692600286] [30469:4578600] CHIP: [DMG]
+        [1635692600286] [30469:4578600] CHIP: [DMG]                         Data = "te5new",
         [1635692600286] [30469:4578600] CHIP: [DMG]                         DataElementVersion = 0x0,
         [1635692600286] [30469:4578600] CHIP: [DMG]                 },
-        [1635692600286] [30469:4578600] CHIP: [DMG]                 
+        [1635692600286] [30469:4578600] CHIP: [DMG]
         [1635692600286] [30469:4578600] CHIP: [DMG]         ],
-        [1635692600286] [30469:4578600] CHIP: [DMG]         
+        [1635692600286] [30469:4578600] CHIP: [DMG]
         [1635692600286] [30469:4578600] CHIP: [DMG] }
         [1635692600286] [30469:4578600] CHIP: [ZCL] ReadAttributesResponse:
         [1635692600286] [30469:4578600] CHIP: [ZCL]   ClusterId: 0x0000_0028
@@ -233,14 +233,14 @@ tests:
         [1635692672664] [30472:4578967] CHIP: [TOO]   vendorId: 62792
         [1635692672664] [30472:4578967] CHIP: [TOO]   fabricId: 0
         [1635692672664] [30472:4578967] CHIP: [TOO]   nodeId: 1
-        [1635692672664] [30472:4578967] CHIP: [ZCL]   Label: 
+        [1635692672664] [30472:4578967] CHIP: [ZCL]   Label:
         [1635692672664] [30472:4578967] CHIP: [TOO] FabricDescriptor[2]:
         [1635692672664] [30472:4578967] CHIP: [TOO]   fabricIndex: 2
         [1635692672664] [30472:4578967] CHIP: [ZCL]   RootPublicKey: 65
         [1635692672664] [30472:4578967] CHIP: [TOO]   vendorId: 0
         [1635692672664] [30472:4578967] CHIP: [TOO]   fabricId: 0
         [1635692672664] [30472:4578967] CHIP: [TOO]   nodeId: 1
-        [1635692672664] [30472:4578967] CHIP: [ZCL]   Label: 
+        [1635692672664] [30472:4578967] CHIP: [ZCL]   Label:
         [1635692672664] [30472:4578967] CHIP: [EM] Piggybacking Ack for MessageCounter:1 on exchange: 42395i
     disabled: true
 
@@ -264,16 +264,16 @@ tests:
         [1635693016.169549][3871:3876] CHIP:DMG:                                 ClusterId = 0x28,
         [1635693016.169596][3871:3876] CHIP:DMG:                                 EndpointId = 0x0,
         [1635693016.169646][3871:3876] CHIP:DMG:                         }
-        [1635693016.169695][3871:3876] CHIP:DMG:                                 
+        [1635693016.169695][3871:3876] CHIP:DMG:
         [1635693016.169736][3871:3876] CHIP:DMG:                         StatusIB =
         [1635693016.169787][3871:3876] CHIP:DMG:                         {
         [1635693016.169831][3871:3876] CHIP:DMG:                                 status = 0x0,
         [1635693016.169877][3871:3876] CHIP:DMG:                         },
-        [1635693016.169928][3871:3876] CHIP:DMG:                         
+        [1635693016.169928][3871:3876] CHIP:DMG:
         [1635693016.169967][3871:3876] CHIP:DMG:                 },
-        [1635693016.170014][3871:3876] CHIP:DMG:                 
+        [1635693016.170014][3871:3876] CHIP:DMG:
         [1635693016.170049][3871:3876] CHIP:DMG:         ],
-        [1635693016.170092][3871:3876] CHIP:DMG:         
+        [1635693016.170092][3871:3876] CHIP:DMG:
         [1635693016.170125][3871:3876] CHIP:DMG: }
         [1635693016.170199][3871:3876] CHIP:ZCL: WriteResponse:
         [1635693016.170232][3871:3876] CHIP:ZCL:   status: Success                (0x0000)
@@ -297,13 +297,13 @@ tests:
         [1635693045.342142][3879:3884] CHIP:DMG:                                 ClusterId = 0x28,
         [1635693045.342187][3879:3884] CHIP:DMG:                                 FieldTag = 0x0000_0005,
         [1635693045.342238][3879:3884] CHIP:DMG:                         }
-        [1635693045.342289][3879:3884] CHIP:DMG:                                 
-        [1635693045.342339][3879:3884] CHIP:DMG:                         Data = "te5new", 
+        [1635693045.342289][3879:3884] CHIP:DMG:
+        [1635693045.342339][3879:3884] CHIP:DMG:                         Data = "te5new",
         [1635693045.342386][3879:3884] CHIP:DMG:                         DataElementVersion = 0x0,
         [1635693045.342429][3879:3884] CHIP:DMG:                 },
-        [1635693045.342473][3879:3884] CHIP:DMG:                 
+        [1635693045.342473][3879:3884] CHIP:DMG:
         [1635693045.342509][3879:3884] CHIP:DMG:         ],
-        [1635693045.342551][3879:3884] CHIP:DMG:         
+        [1635693045.342551][3879:3884] CHIP:DMG:
         [1635693045.342584][3879:3884] CHIP:DMG: }
         [1635693045.342688][3879:3884] CHIP:ZCL: ReadAttributesResponse:
         [1635693045.342720][3879:3884] CHIP:ZCL:   ClusterId: 0x0000_0028
@@ -337,16 +337,16 @@ tests:
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 EndpointId = 0x0,
         [1635693100458] [30494:4580771] CHIP: [DMG]                         }
-        [1635693100458] [30494:4580771] CHIP: [DMG]                                 
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]                         StatusIB =
         [1635693100458] [30494:4580771] CHIP: [DMG]                         {
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 status = 0x0,
         [1635693100458] [30494:4580771] CHIP: [DMG]                         },
-        [1635693100458] [30494:4580771] CHIP: [DMG]                         
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]                 },
-        [1635693100458] [30494:4580771] CHIP: [DMG]                 
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]         ],
-        [1635693100458] [30494:4580771] CHIP: [DMG]         
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG] }
         [1635693100458] [30494:4580771] CHIP: [ZCL] WriteResponse:
         [1635693100458] [30494:4580771] CHIP: [ZCL]   status: Success                (0x0000)
@@ -373,13 +373,13 @@ tests:
         [1635693130217] [30496:4581003] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635693130217] [30496:4581003] CHIP: [DMG]                                 FieldTag = 0x0000_0005,
         [1635693130217] [30496:4581003] CHIP: [DMG]                         }
-        [1635693130217] [30496:4581003] CHIP: [DMG]                                 
-        [1635693130217] [30496:4581003] CHIP: [DMG]                         Data = "te5new", 
+        [1635693130217] [30496:4581003] CHIP: [DMG]
+        [1635693130217] [30496:4581003] CHIP: [DMG]                         Data = "te5new",
         [1635693130217] [30496:4581003] CHIP: [DMG]                         DataElementVersion = 0x0,
         [1635693130217] [30496:4581003] CHIP: [DMG]                 },
-        [1635693130217] [30496:4581003] CHIP: [DMG]                 
+        [1635693130217] [30496:4581003] CHIP: [DMG]
         [1635693130217] [30496:4581003] CHIP: [DMG]         ],
-        [1635693130217] [30496:4581003] CHIP: [DMG]         
+        [1635693130217] [30496:4581003] CHIP: [DMG]
         [1635693130217] [30496:4581003] CHIP: [DMG] }
         [1635693130217] [30496:4581003] CHIP: [ZCL] ReadAttributesResponse:
         [1635693130217] [30496:4581003] CHIP: [ZCL]   ClusterId: 0x0000_0028
@@ -435,16 +435,16 @@ tests:
         [1635693494791] [30525:4583596] CHIP: [DMG]                                 ClusterId = 0x3c,
         [1635693494791] [30525:4583596] CHIP: [DMG]                                 CommandId = 0x2,
         [1635693494791] [30525:4583596] CHIP: [DMG]                         },
-        [1635693494791] [30525:4583596] CHIP: [DMG]                         
+        [1635693494791] [30525:4583596] CHIP: [DMG]
         [1635693494791] [30525:4583596] CHIP: [DMG]                         StatusIB =
         [1635693494791] [30525:4583596] CHIP: [DMG]                         {
         [1635693494791] [30525:4583596] CHIP: [DMG]                                 status = 0x0,
         [1635693494791] [30525:4583596] CHIP: [DMG]                         },
-        [1635693494791] [30525:4583596] CHIP: [DMG]                         
+        [1635693494791] [30525:4583596] CHIP: [DMG]
         [1635693494791] [30525:4583596] CHIP: [DMG]                 },
-        [1635693494791] [30525:4583596] CHIP: [DMG]                 
+        [1635693494791] [30525:4583596] CHIP: [DMG]
         [1635693494791] [30525:4583596] CHIP: [DMG]         ],
-        [1635693494791] [30525:4583596] CHIP: [DMG]         
+        [1635693494791] [30525:4583596] CHIP: [DMG]
         [1635693494791] [30525:4583596] CHIP: [DMG] }
         [1635693494791] [30525:4583596] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0002 Status=0x0
         [1635693494791] [30525:4583596] CHIP: [TOO] Default Success Response
@@ -455,8 +455,8 @@ tests:
 
   - label: "TH_CR3 attempts to execute a PASE to starts a commissioning process with TH_CE"
     verification: |
-        On 3rd controller using chip-tool connect using manual code generated from 1st controller. This attempt should fail, i.e 
-        ./chip-tool pairing manualcode 1  34995354639  
+        On 3rd controller using chip-tool connect using manual code generated from 1st controller. This attempt should fail, i.e
+        ./chip-tool pairing manualcode 1  34995354639
     disabled: true
 
   - label: "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel mandatory attribute of TH_CE"
@@ -482,16 +482,16 @@ tests:
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 EndpointId = 0x0,
         [1635693100458] [30494:4580771] CHIP: [DMG]                         }
-        [1635693100458] [30494:4580771] CHIP: [DMG]                                 
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]                         StatusIB =
         [1635693100458] [30494:4580771] CHIP: [DMG]                         {
         [1635693100458] [30494:4580771] CHIP: [DMG]                                 status = 0x0,
         [1635693100458] [30494:4580771] CHIP: [DMG]                         },
-        [1635693100458] [30494:4580771] CHIP: [DMG]                         
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]                 },
-        [1635693100458] [30494:4580771] CHIP: [DMG]                 
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG]         ],
-        [1635693100458] [30494:4580771] CHIP: [DMG]         
+        [1635693100458] [30494:4580771] CHIP: [DMG]
         [1635693100458] [30494:4580771] CHIP: [DMG] }
         [1635693100458] [30494:4580771] CHIP: [ZCL] WriteResponse:
         [1635693100458] [30494:4580771] CHIP: [ZCL]   status: Success                (0x0000)
@@ -518,13 +518,13 @@ tests:
         [1635693130217] [30496:4581003] CHIP: [DMG]                                 ClusterId = 0x28,
         [1635693130217] [30496:4581003] CHIP: [DMG]                                 FieldTag = 0x0000_0005,
         [1635693130217] [30496:4581003] CHIP: [DMG]                         }
-        [1635693130217] [30496:4581003] CHIP: [DMG]                                 
-        [1635693130217] [30496:4581003] CHIP: [DMG]                         Data = "te5new", 
+        [1635693130217] [30496:4581003] CHIP: [DMG]
+        [1635693130217] [30496:4581003] CHIP: [DMG]                         Data = "te5new",
         [1635693130217] [30496:4581003] CHIP: [DMG]                         DataElementVersion = 0x0,
         [1635693130217] [30496:4581003] CHIP: [DMG]                 },
-        [1635693130217] [30496:4581003] CHIP: [DMG]                 
+        [1635693130217] [30496:4581003] CHIP: [DMG]
         [1635693130217] [30496:4581003] CHIP: [DMG]         ],
-        [1635693130217] [30496:4581003] CHIP: [DMG]         
+        [1635693130217] [30496:4581003] CHIP: [DMG]
         [1635693130217] [30496:4581003] CHIP: [DMG] }
         [1635693130217] [30496:4581003] CHIP: [ZCL] ReadAttributesResponse:
         [1635693130217] [30496:4581003] CHIP: [ZCL]   ClusterId: 0x0000_0028

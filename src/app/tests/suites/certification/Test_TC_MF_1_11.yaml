@@ -19,7 +19,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-  
+
 tests:
   - label: "TH_CR2 starts a commissioning process with TH_CE"
     verification: |
@@ -31,7 +31,7 @@ tests:
     verification: |
         On the 2nd controller using chip tool, open commissioning window using ECM
 
-        ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840 
+        ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840
 
         Controller:
 
@@ -56,13 +56,13 @@ tests:
         [1635687658.687201][3792:3792] CHIP:DIS: Broadcasting mDns reply for query from 192.168.0.225
 
 
-        The setup pin code is extracted from the manual pairing code in the log and that will be used when pairing the 2nd admin controller.  
+        The setup pin code is extracted from the manual pairing code in the log and that will be used when pairing the 2nd admin controller.
     disabled: true
 
   - label: "Set up a DUT_CR1 to start attempting to do PASE to TH_CE and failing 20 times. This can be
         done using an invalid passcode"
     verification: |
-        1. On your DUT controller connect using wrong manual code. Repeat the step for 20 times. 
+        1. On your DUT controller connect using wrong manual code. Repeat the step for 20 times.
 
         Below the example when using chip tool as controller
         ./chip-tool pairing manualcode 1 36177160937  (With wrong passcode)

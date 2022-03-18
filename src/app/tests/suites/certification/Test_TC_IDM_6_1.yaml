@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "TH sends Read Request Message to DUT with EventRequests set to a specific event from a specific
         cluster on a specific endpoint on a specific node i.e. [Node = Specific, Endpoint = Specific,
@@ -26,7 +26,7 @@ tests:
     verification: |
         First launch DUT and do commissioning with TH and kill DUT by passing pid
         Then read the event by id
-        ./chip-tool softwarediagnostics read-by-id 0x0 1 0 
+        ./chip-tool softwarediagnostics read-by-id 0x0 1 0
     disabled: true
 
   - label: "TH sends Read Request Message to DUT with EventRequests set to all events from a specific

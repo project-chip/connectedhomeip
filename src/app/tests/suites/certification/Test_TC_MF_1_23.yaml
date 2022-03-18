@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "Reset DUT_CR1 to factory defaults"
     verification: |
@@ -27,7 +27,7 @@ tests:
 
   - label: "DUT_CR1 starts a commissioning process with TH_CE"
     verification: |
-        1. Provision the device using your DUT controller(use above instructions) , 
+        1. Provision the device using your DUT controller(use above instructions) ,
     disabled: true
 
   - label: "DUT_CR1 opens a commissioning window on TH_CE using a commissioning timeout of PIXIT_COMM_WIN

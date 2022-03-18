@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "Get the name of a bridged device: Read the NodeLabel attribute of the Bridged Device Basic
         Information cluster on the applicable endpoint"

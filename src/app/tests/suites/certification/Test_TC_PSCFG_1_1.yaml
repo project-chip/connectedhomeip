@@ -30,7 +30,7 @@ tests:
           ./chip-tool powersourceconfiguration read cluster-revision 1234 0
 
 
-          The response should look like this: 
+          The response should look like this:
 
           [1641813555.191189][38097:38102] CHIP:DMG: ReportDataMessage =
           [1641813555.191325][38097:38102] CHIP:DMG: {
@@ -64,7 +64,7 @@ tests:
       verification: |
           ./chip-tool powersourceconfiguration read attribute-list 1234 0
 
-          The response should look like this: 
+          The response should look like this:
 
           [CHIP:DMG:        SuppressResponse = true,
           [CHIP:DMG: }
@@ -78,7 +78,7 @@ tests:
 
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
       verification: |
-          ./chip-tool powersourceconfiguration read AcceptedCommandList 1234 0
+          ./chip-tool powersourceconfiguration read client-generated-command-list 1234 0
 
           [...]
           [1646048092.858800][36301:36306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_FFF9DataVersion: 502821112

@@ -18,11 +18,11 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-    
+
 tests:
   - label: "DUT sends Read Request Message to the TH for a supported event."
     verification: |
         In case of chip tool, here is an example command to use
-         
+
         sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
     disabled: true

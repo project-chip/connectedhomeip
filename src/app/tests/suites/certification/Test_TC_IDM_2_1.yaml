@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-   
+
 tests:
   - label: "DUT sends the Read Request Message to the TH to read one attribute on a given cluster and
         endpoint. The Message should contain one valid CommandDataIB, which has the specific Endpoint,
@@ -42,7 +42,7 @@ tests:
         bool."
     verification: |
         In case of chip tool, here is an example command to use
-         
+
         sudo ./chip-tool onoff read on-off 1 1
     disabled: true
 
@@ -206,6 +206,6 @@ tests:
         DUT."
     verification: |
         In case of chip tool, here is an example command to use
-         
+
         sudo ./chip-tool levelcontrol read min-level   1 1
     disabled: true
