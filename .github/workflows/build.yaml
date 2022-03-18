@@ -340,7 +340,7 @@ jobs:
                           "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done

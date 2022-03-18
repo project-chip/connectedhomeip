@@ -279,7 +279,7 @@ def main(
     context.obj = ClangTidyRunner()
 
     for name in compile_database:
-      context.obj.AddDatabase(name)
+        context.obj.AddDatabase(name)
 
     if file_include_regex:
         r = re.compile(file_include_regex)
