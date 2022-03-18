@@ -52,6 +52,11 @@ def TestFail(message):
     os._exit(1)
 
 
+def FailIfTrue(cond, message):
+    if cond:
+        TestFail(message)
+
+
 def FailIfNot(cond, message):
     if not cond:
         TestFail(message)
@@ -204,11 +209,14 @@ class BaseTestHelper:
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
-        if self.devCtrl.EstablishPASESessionIP(
-                ip.encode("utf-8"), setuppin, nodeid) is not None:
+        try:
+            self.devCtrl.EstablishPASESessionIP(
+                ip.encode("utf-8"), setuppin, nodeid)
+        except:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
+
         self.logger.info(
             "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         return True
