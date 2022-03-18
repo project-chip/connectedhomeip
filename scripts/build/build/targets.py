@@ -229,6 +229,7 @@ def HostTargets():
     # builds is exponential here
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
+    builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(

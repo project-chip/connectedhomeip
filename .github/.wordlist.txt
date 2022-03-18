@@ -1415,6 +1415,12 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+ClusterObjectTests
+TestTimedRequestTimeout
+datamodel
+appliable
+commissionee
+configs
 NAMESERVER
 UTF
 localedef
