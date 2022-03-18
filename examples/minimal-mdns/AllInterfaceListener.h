@@ -95,28 +95,29 @@ private:
             return false; // nothing to try.
         }
 
-        if (!mIterator.IsUp()) {
+        if (!mIterator.IsUp())
         {
-            return true; // not a usable interface
+            {
+                return true; // not a usable interface
+            }
+
+            char name[chip::Inet::InterfaceId::kMaxIfNameLength];
+            if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
+            {
+                printf("!!!! FAILED TO GET INTERFACE NAME\n");
+                return true;
+            }
+
+            if (strncmp(name, "lo", 2) == 0)
+            {
+                printf("Skipping interface '%s' (assume local loopback)\n", name);
+                return true;
+            }
+
+            printf("Usable interface: %s\n", name);
+
+            return false;
         }
-
-        char name[chip::Inet::InterfaceId::kMaxIfNameLength];
-        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-        {
-            printf("!!!! FAILED TO GET INTERFACE NAME\n");
-            return true;
-        }
-
-        if (strncmp(name, "lo", 2) == 0)
-        {
-            printf("Skipping interface '%s' (assume local loopback)\n", name);
-            return true;
-        }
-
-        printf("Usable interface: %s\n", name);
-
-        return false;
-    }
-};
+    };
 
 } // namespace MdnsExample
