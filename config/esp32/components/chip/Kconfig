@@ -96,11 +96,11 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
-        config DISABLE_IPV4
-            bool "Disable IPv4 functionality in the CHIP stack"
+        config ENABLE_IPV4
+            bool "Enable IPv4 functionality in the CHIP stack"
             default "n"
             help
-                Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
+                Matter spec is based on IPv6 communication only, IPv4 is disabled by default
 
         # TODO: add log level selection
 
