@@ -16565,6 +16565,11 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue length], 32);
+        }
+
         [expectation fulfill];
     }];
 
@@ -16583,11 +16588,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
         NSLog(@"Reads the VendorID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 0U);
-        }
 
         [expectation fulfill];
     }];

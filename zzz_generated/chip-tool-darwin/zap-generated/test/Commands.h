@@ -21413,6 +21413,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("vendorName", [value length], 32));
             NextTest();
         }];
 
@@ -21431,11 +21432,6 @@ private:
             NSLog(@"Reads the VendorID attribute Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("VendorID", actualValue, 0U));
-            }
 
             VerifyOrReturn(CheckConstraintType("vendorID", "", "vendor-id"));
             NextTest();
