@@ -13,5 +13,3 @@
 # limitations under the License.
 
 chip_device_platform = "telink"
-
-chip_inet_config_enable_ipv4 = false

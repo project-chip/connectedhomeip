@@ -118,7 +118,7 @@ class Esp32Builder(Builder):
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
-                 enable_ipv4: bool = True
+                 enable_ipv4: bool = False
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
@@ -158,9 +158,9 @@ class Esp32Builder(Builder):
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
-        if not self.enable_ipv4:
+        if self.enable_ipv4:
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+                ['bash', '-c', 'echo -e "\\nCONFIG_ENABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
 
         cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
             defaults=shlex.quote(defaults_out),

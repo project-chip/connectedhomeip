@@ -150,8 +150,8 @@ endif
 	if [[ "$(CONFIG_USE_MINIMAL_MDNS)" = "n" ]]; then \
 	  echo "chip_mdns = platform" >> $(OUTPUT_DIR)/args.gn ;\
 	fi
-	if [[ "$(CONFIG_DISABLE_IPV4)" = "y" ]]; then \
-	  echo "chip_inet_config_enable_ipv4 = false" >> $(OUTPUT_DIR)/args.gn ;\
+	if [[ "$(CONFIG_ENABLE_IPV4)" = "y" ]]; then \
+	  echo "chip_inet_config_enable_ipv4 = true" >> $(OUTPUT_DIR)/args.gn ;\
 	fi
 	echo "Written file $(OUTPUT_DIR)/args.gn"
 	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen --check --fail-on-unused-args $(OUTPUT_DIR)

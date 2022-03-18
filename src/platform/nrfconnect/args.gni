@@ -14,4 +14,3 @@
 
 chip_device_platform = "nrfconnect"
 
-chip_inet_config_enable_ipv4 = false

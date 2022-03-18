@@ -74,8 +74,8 @@ else()
 chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
-if(CONFIG_DISABLE_IPV4)
-    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+if(CONFIG_ENABLE_IPV4)
+    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "true")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)

@@ -153,7 +153,7 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
+    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=False,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
                  test_group=False, use_libfuzzer=False, use_clang=False,
                  use_platform_mdns=False):
@@ -165,8 +165,8 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
 
-        if not enable_ipv4:
-            self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
+        if enable_ipv4:
+            self.extra_gn_options.append('chip_inet_config_enable_ipv4=true')
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')

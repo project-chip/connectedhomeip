@@ -28,8 +28,6 @@ openthread_external_platform =
 
 lwip_platform = "cc13x2_26x2"
 
-chip_inet_config_enable_ipv4 = false
-
 chip_build_tests = false
 
 openthread_project_core_config_file = "openthread-core-cc13x2_26x2-config.h"
