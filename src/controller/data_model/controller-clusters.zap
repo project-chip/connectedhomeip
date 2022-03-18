@@ -136,7 +136,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -151,7 +151,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -330,7 +330,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -345,7 +345,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -653,7 +653,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -668,7 +668,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -889,7 +889,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -904,7 +904,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -1031,7 +1031,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -1046,7 +1046,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -1433,7 +1433,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -1448,7 +1448,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -1680,7 +1680,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -1695,7 +1695,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -1852,7 +1852,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -1867,7 +1867,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -1979,7 +1979,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -1994,7 +1994,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -2121,7 +2121,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -2136,7 +2136,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -2375,7 +2375,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -2390,7 +2390,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -2772,7 +2772,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -2787,7 +2787,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -3173,7 +3173,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -3188,7 +3188,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -3314,7 +3314,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -3329,7 +3329,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -3522,7 +3522,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -3537,7 +3537,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -4084,7 +4084,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -4099,7 +4099,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -4321,7 +4321,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -4336,7 +4336,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -4642,7 +4642,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -4657,7 +4657,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -4756,7 +4756,7 @@
           ],
           "attributes": [
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -4771,7 +4771,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -4988,7 +4988,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -5003,7 +5003,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -5184,7 +5184,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -5199,7 +5199,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -6265,7 +6265,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -6280,7 +6280,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -6596,7 +6596,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -6611,7 +6611,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -6867,7 +6867,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -6882,7 +6882,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -7204,7 +7204,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -7219,7 +7219,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -7346,7 +7346,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -7361,7 +7361,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -7528,7 +7528,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -7543,7 +7543,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -7836,7 +7836,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -7851,7 +7851,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8058,7 +8058,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8073,7 +8073,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8185,7 +8185,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8200,7 +8200,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8296,7 +8296,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8311,7 +8311,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8423,7 +8423,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8438,7 +8438,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8619,7 +8619,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8634,7 +8634,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -9639,7 +9639,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -9654,7 +9654,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -10138,7 +10138,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -10153,7 +10153,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -10417,7 +10417,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -10432,7 +10432,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -10904,7 +10904,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -10919,7 +10919,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -11455,7 +11455,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -11470,7 +11470,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -11612,7 +11612,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -11627,7 +11627,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -12657,7 +12657,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -12672,7 +12672,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -12844,7 +12844,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -12859,7 +12859,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -13285,7 +13285,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -13300,7 +13300,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -13442,7 +13442,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -13457,7 +13457,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -13734,7 +13734,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -13749,7 +13749,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14029,7 +14029,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14044,7 +14044,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14220,7 +14220,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14235,7 +14235,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14395,7 +14395,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14410,7 +14410,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14725,7 +14725,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14740,7 +14740,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14915,7 +14915,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14930,7 +14930,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15051,7 +15051,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -15066,7 +15066,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15196,7 +15196,7 @@
           ],
           "attributes": [
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -15211,7 +15211,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15379,7 +15379,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -15394,7 +15394,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15553,7 +15553,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -15568,7 +15568,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15744,7 +15744,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -15759,7 +15759,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -15991,7 +15991,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -16006,7 +16006,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -16152,7 +16152,7 @@
           ],
           "attributes": [
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -16167,7 +16167,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -17704,7 +17704,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -17719,7 +17719,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -17981,7 +17981,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -17996,7 +17996,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",

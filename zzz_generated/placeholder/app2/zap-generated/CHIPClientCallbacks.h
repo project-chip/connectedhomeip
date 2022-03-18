@@ -36,15 +36,15 @@ void ApplicationBasicClusterAllowedVendorListListAttributeFilter(chip::TLV::TLVR
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & data);
-void ApplicationBasicClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void ApplicationBasicClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                           chip::Callback::Cancelable * onSuccessCallback,
                                                                           chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ApplicationBasicServerGeneratedCommandListListAttributeCallback)(
+typedef void (*ApplicationBasicGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void ApplicationBasicClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void ApplicationBasicClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                           chip::Callback::Cancelable * onSuccessCallback,
                                                                           chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ApplicationBasicClientGeneratedCommandListListAttributeCallback)(
+typedef void (*ApplicationBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void ApplicationBasicClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                              chip::Callback::Cancelable * onSuccessCallback,
@@ -56,45 +56,45 @@ void ContentLauncherClusterAcceptHeaderListAttributeFilter(chip::TLV::TLVReader 
                                                            chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-void ContentLauncherClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void ContentLauncherClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ContentLauncherServerGeneratedCommandListListAttributeCallback)(
+typedef void (*ContentLauncherGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void ContentLauncherClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void ContentLauncherClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ContentLauncherClientGeneratedCommandListListAttributeCallback)(
+typedef void (*ContentLauncherAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void ContentLauncherClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ContentLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void GeneralCommissioningClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void GeneralCommissioningClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                                               chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GeneralCommissioningServerGeneratedCommandListListAttributeCallback)(
+typedef void (*GeneralCommissioningGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void GeneralCommissioningClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void GeneralCommissioningClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                                               chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GeneralCommissioningClientGeneratedCommandListListAttributeCallback)(
+typedef void (*GeneralCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void GeneralCommissioningClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GeneralCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void KeypadInputClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void KeypadInputClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                      chip::Callback::Cancelable * onSuccessCallback,
                                                                      chip::Callback::Cancelable * onFailureCallback);
-typedef void (*KeypadInputServerGeneratedCommandListListAttributeCallback)(
+typedef void (*KeypadInputGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void KeypadInputClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void KeypadInputClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                      chip::Callback::Cancelable * onSuccessCallback,
                                                                      chip::Callback::Cancelable * onFailureCallback);
-typedef void (*KeypadInputClientGeneratedCommandListListAttributeCallback)(
+typedef void (*KeypadInputAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void KeypadInputClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                         chip::Callback::Cancelable * onFailureCallback);
@@ -118,15 +118,15 @@ void TargetNavigatorClusterTargetListListAttributeFilter(chip::TLV::TLVReader * 
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
-void TargetNavigatorClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void TargetNavigatorClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*TargetNavigatorServerGeneratedCommandListListAttributeCallback)(
+typedef void (*TargetNavigatorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void TargetNavigatorClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+void TargetNavigatorClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*TargetNavigatorClientGeneratedCommandListListAttributeCallback)(
+typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void TargetNavigatorClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,

@@ -150,8 +150,8 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -353,8 +353,8 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 }

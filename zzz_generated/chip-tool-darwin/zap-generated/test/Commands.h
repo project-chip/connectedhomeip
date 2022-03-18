@@ -38733,12 +38733,12 @@ public:
             err = TestReadAttributeThatReturnsClusterSpecificStatusOnRead_477();
             break;
         case 478:
-            ChipLogProgress(chipTool, " ***** Test Step 478 : read ClientGeneratedCommandList attribute\n");
-            err = TestReadClientGeneratedCommandListAttribute_478();
+            ChipLogProgress(chipTool, " ***** Test Step 478 : read AcceptedCommandList attribute\n");
+            err = TestReadAcceptedCommandListAttribute_478();
             break;
         case 479:
-            ChipLogProgress(chipTool, " ***** Test Step 479 : read ServerGeneratedCommandList attribute\n");
-            err = TestReadServerGeneratedCommandListAttribute_479();
+            ChipLogProgress(chipTool, " ***** Test Step 479 : read GeneratedCommandList attribute\n");
+            err = TestReadGeneratedCommandListAttribute_479();
             break;
         case 480:
             ChipLogProgress(chipTool, " ***** Test Step 480 : Write struct-typed attribute\n");
@@ -49832,21 +49832,21 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadClientGeneratedCommandListAttribute_478()
+    CHIP_ERROR TestReadAcceptedCommandListAttribute_478()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ClientGeneratedCommandList attribute Error: %@", err);
+            readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"read AcceptedCommandList attribute Error: %@", err);
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
                 {
                     id actualValue = value;
-                    VerifyOrReturn(CheckValue("ClientGeneratedCommandList", [actualValue count], static_cast<uint32_t>(18)));
+                    VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(18)));
                     VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
                     VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
                     VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
@@ -49873,21 +49873,21 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadServerGeneratedCommandListAttribute_479()
+    CHIP_ERROR TestReadGeneratedCommandListAttribute_479()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ServerGeneratedCommandList attribute Error: %@", err);
+            readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"read GeneratedCommandList attribute Error: %@", err);
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
                 {
                     id actualValue = value;
-                    VerifyOrReturn(CheckValue("ServerGeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
+                    VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
                     VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
                     VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
                     VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
