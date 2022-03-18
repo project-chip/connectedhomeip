@@ -35,11 +35,7 @@
 #define INET_CONFIG_ERROR_MAX 1000999
 
 #ifndef INET_CONFIG_ENABLE_IPV4
-#ifdef SL_WIFI
-#define INET_CONFIG_ENABLE_IPV4 1
-#else /* For Thread only devices */
 #define INET_CONFIG_ENABLE_IPV4 0
-#endif
 #endif
 
 // ========== Platform-specific Configuration Overrides =========

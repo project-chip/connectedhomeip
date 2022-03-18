@@ -2196,7 +2196,7 @@ PREDEFINED             = DOXYGEN=1 \
                          CONFIG_NETWORK_LAYER_BLE=1 \
                          CHIP_SYSTEM_CONFIG_USE_SOCKETS=1 \
                          CHIP_SYSTEM_CONFIG_USE_LWIP=1 \
-                         INET_CONFIG_ENABLE_IPV4=1 \
+                         INET_CONFIG_ENABLE_IPV4=0 \
                          CHIP_CONFIG_SECURITY_TEST_MODE=1 \
                          DEPRECATED_MSG_ATTRIBUTE(x)=
 
