@@ -39,13 +39,12 @@ class App:
 
     def start(self, discriminator):
         if not self.process:
-            self.process = None
-            process, outpipe, errpipe = self.__startServer(
+            # Make sure to assign self.process before we do any operations that
+            # might fail, so attempts to kill us on failure actually work.
+            self.process, self.outpipe, errpipe = self.__startServer(
                 self.runner, self.command, discriminator)
-            self.waitForAnyAdvertisement(process, outpipe)
-            self.__updateSetUpCode(outpipe)
-            self.process = process
-            self.outpipe = outpipe
+            self.waitForAnyAdvertisement()
+            self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
                 self.cv_stopped.notify()
@@ -78,8 +77,8 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self, process, outpipe):
-        self.__waitFor("mDNS service published:", process, outpipe)
+    def waitForAnyAdvertisement(self):
+        self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
     def waitForCommissionableAdvertisement(self):
         self.__waitFor("mDNS service published: _matterc._udp",
@@ -135,8 +134,8 @@ class App:
 
         logging.debug('Success waiting for: %s' % waitForString)
 
-    def __updateSetUpCode(self, outpipe):
-        qrLine = outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
+    def __updateSetUpCode(self):
+        qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
         if not qrLine:
             raise Exception("Unable to find QR code")
         self.setupCode = qrLine.group(1)
@@ -232,11 +231,13 @@ class TestDefinition:
                     os.unlink(f)
 
             app = App(runner, app_cmd)
+            # Add the App to the register immediately, so if it fails during
+            # start() we will be able to clean things up properly.
+            apps_register.add("default", app)
             # Remove server application storage (factory reset),
             # so it will be commissionable again.
             app.factoryReset()
             app.start(str(randrange(1, 4096)))
-            apps_register.add("default", app)
 
             runner.RunSubprocess(
                 tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
