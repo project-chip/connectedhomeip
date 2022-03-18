@@ -88,16 +88,6 @@ private:
         }
     }
 
-    template <typename T>
-    inline bool MulticastOk(T & iterator)
-    {
-        return iterator.SupportsMulticast()
-#if INET_CONFIG_ENABLE_IPV4
-            || iterator.HasBroadcastAddress()
-#endif
-            ;
-    }
-
     bool SkipCurrentInterface()
     {
         if (!mIterator.HasCurrent())
@@ -105,7 +95,7 @@ private:
             return false; // nothing to try.
         }
 
-        if (!mIterator.IsUp() || !MulticastOk(mIterator))
+        if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
         {
             return true; // not a usable interface
         }

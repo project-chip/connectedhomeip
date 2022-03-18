@@ -24,22 +24,12 @@
 namespace chip {
 namespace Dnssd {
 
-template <typename T>
-inline bool MulticastOk(T & iterator)
-{
-    return iterator.SupportsMulticast()
-#if INET_CONFIG_ENABLE_IPV4
-        || iterator.HasBroadcastAddress()
-#endif
-        ;
-}
-
 /// Checks if the current interface is powered on
 /// and not local loopback.
 template <typename T>
 bool IsCurrentInterfaceUsable(T & iterator)
 {
-    if (!iterator.IsUp() || !MulticastOk(iterator))
+    if (!iterator.IsUp() || !iterator.SupportsMulticast())
     {
         return false; // not a usable interface
     }
