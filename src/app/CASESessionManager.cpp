@@ -38,9 +38,15 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
         false;
 #endif
 
+    ChipLogDetail(CASESessionManager,
+                  "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64 ", NodeIdWasResolved = %d",
+                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), nodeIDWasResolved);
+
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
+
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
         if (nodeIDWasResolved)
         {
@@ -109,17 +115,17 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
+OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
 {
     return mConfig.devicePool->FindDevice(session);
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId)
+OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
+void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session) const
 {
     if (session != nullptr)
     {

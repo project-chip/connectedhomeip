@@ -126,7 +126,7 @@ public:
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
-    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
+    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
@@ -145,12 +145,12 @@ public:
     bool CheckEventClean(EventManagement & aEventManager);
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() { return mIsChunkedReport; }
-    bool IsPriming() { return mIsPrimingReports; }
+    bool IsChunkedReport() const { return mIsChunkedReport; }
+    bool IsPriming() const { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
     void SetDirty()
     {
@@ -161,7 +161,7 @@ public:
         mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
-    bool IsDirty() { return mDirty; }
+    bool IsDirty() const { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
@@ -175,7 +175,7 @@ public:
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
-    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:

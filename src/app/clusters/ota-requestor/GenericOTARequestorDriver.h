@@ -68,7 +68,7 @@ public:
     void ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void SendQueryImage() override;
-    bool GetNextProviderLocation(ProviderLocationType & providerLocation) override;
+    bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) override;
 
 protected:
     void StartDefaultProviderTimer();
@@ -82,6 +82,9 @@ protected:
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelaySec                   = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
+    // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
+    static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
+    uint8_t mProviderRetryCount; // Track retry count for the current provider
 };
 
 } // namespace DeviceLayer

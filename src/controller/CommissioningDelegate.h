@@ -51,6 +51,8 @@ enum CommissioningStage : uint8_t
     kCleanup,
 };
 
+const char * StageToString(CommissioningStage stage);
+
 struct WiFiCredentials
 {
     ByteSpan ssid;

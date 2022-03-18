@@ -93,8 +93,7 @@ class TestPythonController(CHIPVirtualHome):
 
         command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {}".format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"),
-            ethernet_ip)
+                CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"), ethernet_ip)
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

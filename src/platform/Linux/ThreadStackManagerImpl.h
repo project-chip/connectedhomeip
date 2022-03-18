@@ -69,7 +69,7 @@ public:
 
     bool _IsThreadEnabled();
 
-    bool _IsThreadAttached();
+    bool _IsThreadAttached() const;
 
     CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
 
