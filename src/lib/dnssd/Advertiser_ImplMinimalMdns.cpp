@@ -169,7 +169,7 @@ public:
             ChipLogError(Discovery, "Failed to set up commissioner responder: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
-    ~AdvertiserMinMdns() override {}
+    ~AdvertiserMinMdns() override { RemoveServices(); }
 
     // Service advertiser
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
