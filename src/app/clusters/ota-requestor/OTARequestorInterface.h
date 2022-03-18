@@ -142,7 +142,8 @@ private:
 class OTARequestorInterface
 {
 public:
-    using OTAUpdateStateEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
     // Return value for various trigger-type APIs
     enum OTATriggerResult
@@ -177,7 +178,7 @@ public:
     virtual void ApplyUpdate() = 0;
 
     // Initiate the session to send NotifyUpdateApplied command
-    virtual void NotifyUpdateApplied(uint32_t version) = 0;
+    virtual void NotifyUpdateApplied() = 0;
 
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
@@ -195,17 +196,15 @@ public:
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-
     // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
 
-    // Clear the provider location to indicate that no OTA update may be in progress
-    virtual void ClearCurrentProviderLocation() = 0;
+    // If there is an OTA update in progress, returns the provider location for the current OTA update, otherwise, returns the
+    // provider location that was last used
+    virtual void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) = 0;
 
     // Add a default OTA provider to the cached list
-    virtual CHIP_ERROR
-    AddDefaultOtaProvider(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
+    virtual CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) = 0;
 
     // Retrieve an iterator to the cached default OTA provider list
     virtual ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) = 0;

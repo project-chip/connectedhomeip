@@ -49,17 +49,18 @@ declare_args() {
   enable_sleepy_device = false
 
   # OTA timeout in seconds
-  OTA_periodic_query_timeout = 10
+  OTA_periodic_query_timeout = 86400
 
-  # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-}
 
-show_qr_code = true
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
+}
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
@@ -148,12 +149,15 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
 
   deps = [
     ":sdk",

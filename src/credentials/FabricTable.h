@@ -32,6 +32,7 @@
 #endif
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
@@ -48,11 +49,6 @@ static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UI
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
-
-// KVS store is sensitive to length of key strings, based on the underlying
-// platform. Keeping them short.
-constexpr char kFabricTableKeyPrefix[] = "Fabric";
-constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
 /**
  * Defines state of a pairing established by a fabric.
@@ -145,7 +141,7 @@ public:
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId);
+                                     MutableByteSpan & destinationId) const;
 
     CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
                                   size_t ipkListEntries);
@@ -212,7 +208,21 @@ public:
 
     friend class FabricTable;
 
+    // Test-only, build a fabric using given root cert and NOC
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                   ByteSpan nodePrivateKey);
+
 private:
+    static constexpr size_t MetadataTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(VendorId), kFabricLabelMaxLengthInBytes);
+    }
+
+    static constexpr size_t OpKeyTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
+    }
+
     PeerId mOperationalId;
 
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
@@ -230,10 +240,6 @@ private:
     MutableByteSpan mNOCCert;
 
     FabricId mFabricId = 0;
-
-    static constexpr size_t kKeySize = sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
-
-    static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage);
     CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage);

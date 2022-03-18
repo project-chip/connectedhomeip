@@ -93,6 +93,7 @@
             if (!xpcConnection) {
                 CHIP_LOG_ERROR("Cannot connect to XPC server for remote controller");
                 completion(self.workQueue, nil);
+                return;
             }
             xpcConnection.remoteObjectInterface = self.remoteDeviceServerProtocol;
             xpcConnection.exportedInterface = self.remoteDeviceClientProtocol;
@@ -120,7 +121,7 @@
 
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller
                                      nodeId:(NSUInteger)nodeId
-                                    handler:(void (^)(id _Nullable value, NSError * _Nullable error))handler
+                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler
 {
     dispatch_async(_workQueue, ^{
         BOOL shouldRetainProxyForReport = ([self.reportRegistry count] == 0);
@@ -169,7 +170,7 @@
 
 - (void)handleReportWithController:(id)controller
                             nodeId:(NSUInteger)nodeId
-                             value:(id _Nullable)value
+                            values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
     dispatch_async(_workQueue, ^{
@@ -182,8 +183,8 @@
         if (!nodeArray) {
             return;
         }
-        for (void (^handler)(id _Nullable value, NSError * _Nullable error) in nodeArray) {
-            handler(value, error);
+        for (void (^handler)(id _Nullable values, NSError * _Nullable error) in nodeArray) {
+            handler(values, error);
         }
     });
 }

@@ -30,7 +30,6 @@ public:
         {{~#*inline "field"}}m{{asUpperCamelCase label}}{{/inline~}}
         {{#if isArray}}
         {{else if isStruct}}
-        {{else if (isOctetString type)}}
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}

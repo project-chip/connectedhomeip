@@ -54,13 +54,15 @@ class K32WBuilder(GnBuilder):
                  runner,
                  app: K32WApp = K32WApp.LIGHT,
                  release: bool = False,
-                 low_power: bool = False):
+                 low_power: bool = False,
+                 tokenizer: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
         self.code_root = root
         self.app = app
         self.low_power = low_power
+        self.tokenizer = tokenizer
         self.release = release
 
     def GnBuildArgs(self):
@@ -72,6 +74,9 @@ class K32WBuilder(GnBuilder):
             args.append('chip_with_low_power=1')
         else:
             args.append('chip_with_low_power=0')
+            
+        if self.tokenizer:
+            args.append('chip_pw_tokenizer_logging=true')
 
         if self.release:
             args.append('is_debug=false')

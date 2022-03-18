@@ -155,8 +155,9 @@ int main(void)
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#else  // CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     if (ret != CHIP_NO_ERROR)
     {

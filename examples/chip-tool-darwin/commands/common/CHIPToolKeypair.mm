@@ -4,6 +4,7 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/Base64.h>
 #include <stddef.h>
 #include <string>
@@ -108,11 +109,8 @@ std::string Base64ToString(const std::string & b64Value)
     effectiveTime.Day = 1;
     ReturnErrorOnFailure(chip::Credentials::ASN1ToChipEpochTime(effectiveTime, _mNow));
 
-    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
-
     value = [storage CHIPGetKeyValue:kOperationalCredentialsIssuerKeypairStorage];
     err = [self decodeNSStringWithValue:value serializedKey:serializedKey];
-    serializedKey.SetLength(keySize);
 
     if (err != CHIP_NO_ERROR) {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
@@ -121,9 +119,8 @@ std::string Base64ToString(const std::string & b64Value)
         }
         ReturnErrorOnFailure([self Serialize:serializedKey]);
 
-        keySize = static_cast<uint16_t>(serializedKey.Capacity());
-        std::string serializeString(serializedKey.Bytes(), serializedKey.Bytes() + serializedKey.Capacity());
-        std::string base64Value = StringToBase64(serializeString);
+        std::string serializedString(chip::Uint8::to_const_char(serializedKey.Bytes()), serializedKey.Length());
+        std::string base64Value = StringToBase64(serializedString);
         NSString * valueString = [NSString stringWithUTF8String:base64Value.c_str()];
         [storage CHIPSetKeyValue:kOperationalCredentialsIssuerKeypairStorage value:valueString];
     } else {
@@ -134,30 +131,19 @@ std::string Base64ToString(const std::string & b64Value)
 
 - (CHIP_ERROR)decodeNSStringWithValue:(NSString *)value serializedKey:(chip::Crypto::P256SerializedKeypair &)serializedKey
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
-    if (value != nil) {
-        std::string decoded = Base64ToString([value UTF8String]);
-
-        if (decoded.length() > UINT16_MAX) {
-            err = CHIP_ERROR_BUFFER_TOO_SMALL;
-        } else {
-            if (serializedKey != nullptr) {
-                memcpy(serializedKey, decoded.data(), std::min<size_t>(decoded.length(), keySize));
-                if (keySize < decoded.length()) {
-                    err = CHIP_ERROR_BUFFER_TOO_SMALL;
-                }
-            } else {
-                err = CHIP_ERROR_NO_MEMORY;
-            }
-            keySize = static_cast<uint16_t>(decoded.length());
-        }
-    } else {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    if (value == nil) {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    serializedKey.SetLength(keySize);
-    return err;
+    std::string decoded = Base64ToString([value UTF8String]);
+
+    if (serializedKey.Capacity() < decoded.length()) {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(serializedKey.Bytes(), decoded.data(), decoded.length());
+    serializedKey.SetLength(decoded.length());
+    return CHIP_NO_ERROR;
 }
 
 @end

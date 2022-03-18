@@ -156,6 +156,7 @@ BTP
 btvirt
 buildwithmatter
 burndown
+ButtonIsr
 BytesMain
 bz
 bzip
@@ -300,6 +301,7 @@ cxx
 CY
 CYW
 DAC
+dadbdcdddedf
 DAP
 DAPLINK
 DataFrame
@@ -326,7 +328,8 @@ DefaultSuccess
 definedValue
 DehumidificationControl
 DelayedActionTime
-delayedActionTimeSec
+delayedApplyActionTimeSec
+delayedQueryActionTimeSec
 delayQuery
 demangle
 deployable
@@ -334,6 +337,8 @@ depottools
 deps
 desc
 descheduled
+detokenization
+detokenizer
 dev
 devcontainer
 devCtrl
@@ -355,6 +360,7 @@ DevKitC
 DevKitM
 devtype
 df
+dfe
 dfu
 DgDxsfHx
 dhclient
@@ -539,6 +545,7 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupsettings
 gtk
 GUA
 Gv
@@ -598,6 +605,7 @@ Infineon
 ini
 init
 inlined
+InputLoop
 installDebug
 instantiation
 integrations
@@ -643,10 +651,12 @@ kBusy
 kCase
 Kconfig
 KeypadInput
+keyset
 kGroup
 kInvalidCommandId
 KitProg
 kManage
+kNewButton
 kNodeIdNotSpecified
 knownissues
 kOperate
@@ -696,6 +706,7 @@ LinkSoftwareAndDocumentationPack
 LinuxOTAImageProcessor
 LinuxOTARequestorDriver
 LocalConfigDisabled
+localedef
 localhost
 LocalizationConfiguration
 localstatedir
@@ -802,6 +813,8 @@ MX
 mydir
 MyPASSWORD
 MySSID
+NAMESERVER
+nameserver
 namespacing
 nano
 natively
@@ -822,6 +835,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+nmcli
 noc
 NodeId
 nongnu
@@ -1031,6 +1045,7 @@ RGB
 riscv
 rloc
 rmw
+rodata
 Rollershade
 rootfs
 RPC
@@ -1068,6 +1083,8 @@ sdl
 SED
 SEGGER
 semver
+SendButton
+SendNewInputEvent
 sendto
 SERIALDEVICE
 SerialNumber
@@ -1174,7 +1191,9 @@ TestCluster
 TestConstraints
 TestEmptyString
 TestGenExample
+TestGroupDemoConfig
 TestMultiRead
+TestName
 TESTPASSWD
 TestPICS
 TESTSSID
@@ -1207,6 +1226,7 @@ tngvndl
 TODO
 toJson
 tokenized
+tokenizer
 toolchain
 toolchains
 topologies
@@ -1268,6 +1288,7 @@ USERINTERFACE
 UserLabel
 usermod
 usr
+UTF
 util
 utils
 UUID
@@ -1285,11 +1306,13 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vn
 vnc
 vous
 VPN
 VSC
 VSCode
+WaitNewInputEvent
 WakeOnLan
 WantedBy
 webpage
@@ -1314,6 +1337,7 @@ WS
 WSL
 WSTK
 xa
+xAAAA
 xab
 xaver
 xb
@@ -1346,6 +1370,8 @@ xfffff
 xFFFFFFFD
 xffffffffe
 xfffffffff
+xffffffffffff
+xffffffffffffXXXX
 xtensa
 xwayland
 XXXX
@@ -1389,3 +1415,14 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+ClusterObjectTests
+TestTimedRequestTimeout
+datamodel
+appliable
+commissionee
+configs
+NAMESERVER
+UTF
+localedef
+nameserver
+nmcli

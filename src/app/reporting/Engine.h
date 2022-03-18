@@ -120,7 +120,7 @@ public:
         }
     }
 
-    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+    uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
 
     uint64_t GetDirtyTick() const { return mDirtyTick; }
 

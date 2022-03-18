@@ -39,7 +39,17 @@ class Server;
 class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
 {
 public:
-    CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
+    CommissioningWindowManager() {}
+
+    CHIP_ERROR Init(Server * server)
+    {
+        if (server == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mServer = server;
+        return CHIP_NO_ERROR;
+    }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 
@@ -56,8 +66,7 @@ public:
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                               PasscodeId passcodeID);
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
 
     void CloseCommissioningWindow();
 
@@ -100,9 +109,6 @@ private:
 
     bool mIsBLE = true;
 
-    bool mOriginalDiscriminatorCached = false;
-    uint16_t mOriginalDiscriminator   = 0;
-
     SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
@@ -113,7 +119,6 @@ private:
     bool mUseECM = false;
     Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
-    PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
     // mListeningForPASE is true only when we are listening for
     // PBKDFParamRequest messages.
     bool mListeningForPASE  = false;

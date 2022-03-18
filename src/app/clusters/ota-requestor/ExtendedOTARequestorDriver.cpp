@@ -68,15 +68,16 @@ void ExtendedOTARequestorDriver::PollUserConsentState()
 CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserConsentSubject & subject,
                                                              const UpdateDescription & update)
 {
-    if (mLastUsedProvider.HasValue())
+    Optional<ProviderLocationType> lastUsedProvider;
+    mRequestor->GetProviderLocation(lastUsedProvider);
+    if (lastUsedProvider.HasValue())
     {
-        // mLastUsedProvider has the provider fabric index and endpoint id
-        subject.fabricIndex        = mLastUsedProvider.Value().fabricIndex;
-        subject.providerEndpointId = mLastUsedProvider.Value().endpoint;
+        subject.fabricIndex        = lastUsedProvider.Value().fabricIndex;
+        subject.providerEndpointId = lastUsedProvider.Value().endpoint;
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "mLastProvider is empty");
+        ChipLogError(SoftwareUpdate, "Last used provider is empty");
         return CHIP_ERROR_INTERNAL;
     }
 

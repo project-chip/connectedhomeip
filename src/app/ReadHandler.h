@@ -98,7 +98,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    ~ReadHandler();
+    ~ReadHandler() override;
 
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
@@ -126,7 +126,7 @@ public:
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
-    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
+    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
@@ -146,15 +146,15 @@ public:
     bool CheckEventClean(EventManagement & aEventManager);
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() { return mIsChunkedReport; }
+    bool IsChunkedReport() const { return mIsChunkedReport; }
     // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
     // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
-    bool IsReporting() { return mIsChunkedReport; }
-    bool IsPriming() { return mIsPrimingReports; }
+    bool IsReporting() const { return mIsChunkedReport; }
+    bool IsPriming() const { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /**
@@ -163,6 +163,7 @@ public:
     void SetDirty(const ClusterInfo & apAttributeChanged);
     bool IsDirty() const { return (mDirtyTick > mPreviousReportsBeginTick) || mOverrideDirty; }
     void ClearDirty() { mOverrideDirty = false; }
+
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
@@ -176,7 +177,7 @@ public:
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
-    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:

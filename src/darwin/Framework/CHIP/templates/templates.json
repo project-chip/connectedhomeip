@@ -88,6 +88,16 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"
         },
         {
+            "path": "../../../../../examples/chip-tool-darwin/templates/CHIPTestClustersObjc.zapt",
+            "name": "Test Objc API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"
+        },
+        {
+            "path": "../../../../../examples/chip-tool-darwin/templates/CHIPTestClustersObjc-src.zapt",
+            "name": "Test Objc API",
+            "output": "src/darwin/Framework/CHIP/zap-generated//CHIPTestClustersObjc.mm"
+        },
+        {
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
             "name": "Decode TLV attribute values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPAttributeTLVValueDecoder.mm"

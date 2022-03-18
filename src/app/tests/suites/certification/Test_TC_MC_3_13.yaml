@@ -26,7 +26,7 @@ tests:
       verification:
           "./chip-tool mediainput read input-list 1 1 [1646140193572]
           [83167:3718213] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0507 Attribute
-          0x0000_0000DataVersion: 645543558 [1646140193572] [83167:3718213]
+          0x0000_0000 DataVersion: 645543558 [1646140193572] [83167:3718213]
           CHIP: [TOO] InputList: 2 entries [1646140193572] [83167:3718213] CHIP:
           [TOO] [1]: { [1646140193572] [83167:3718213] CHIP: [TOO] Index: 1
           [1646140193573] [83167:3718213] CHIP: [TOO] InputType: 4
@@ -88,7 +88,7 @@ tests:
       verification:
           "./chip-tool mediainput read input-list 1 1 [1646140289219]
           [83463:3720087] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0507 Attribute
-          0x0000_0000DataVersion: 645543558 [1646140289219] [83463:3720087]
+          0x0000_0000 DataVersion: 645543558 [1646140289219] [83463:3720087]
           CHIP: [TOO] InputList: 2 entries [1646140289219] [83463:3720087] CHIP:
           [TOO] [1]: { [1646140289219] [83463:3720087] CHIP: [TOO] Index: 1
           [1646140289219] [83463:3720087] CHIP: [TOO] InputType: 4

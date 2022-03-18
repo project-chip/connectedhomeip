@@ -695,6 +695,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Timed Request Message";
         break;
+    case CHIP_ERROR_BUSY.AsInteger():
+        desc = "The Resource is busy and cannot process the request";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

@@ -68,7 +68,7 @@ public:
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                     ExchangeDelegate * delegate);
 
-    ~ExchangeContext();
+    ~ExchangeContext() override;
 
     /**
      *  Determine whether the context is the initiator of the exchange.

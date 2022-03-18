@@ -110,7 +110,7 @@ void ActiveResolveAttempts::MarkPending(const ScheduledAttempt & attempt)
             entryToUse = entry;
             continue;
         }
-        else if (entryToUse->attempt.IsEmpty())
+        if (entryToUse->attempt.IsEmpty())
         {
             continue;
         }

@@ -33,8 +33,12 @@ public:
     // This method returns kGranted unless explicitly set by the user by calling SetUserConsentState()
     UserConsentState GetUserConsentState(const UserConsentSubject & subject) override
     {
+        UserConsentState curUserConsentState = mUserConsentState;
+
         subject.Log();
-        return mUserConsentState;
+        mUserConsentState = chip::ota::UserConsentState::kGranted;
+
+        return curUserConsentState;
     }
 
     UserConsentState CheckDeferredUserConsentState() override { return mUserConsentState; }

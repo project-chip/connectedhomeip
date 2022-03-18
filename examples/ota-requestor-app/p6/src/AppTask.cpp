@@ -65,7 +65,6 @@ using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::System::Layer;
 
@@ -204,7 +203,7 @@ CHIP_ERROR AppTask::Init()
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
         {
-            requestor->NotifyUpdateApplied(savedSoftwareVersion);
+            requestor->NotifyUpdateApplied();
         }
     }
 

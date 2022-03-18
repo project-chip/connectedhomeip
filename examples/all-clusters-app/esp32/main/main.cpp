@@ -84,10 +84,8 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
-namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-} // namespace
 
 class AppCallbacks : public AppDelegate
 {

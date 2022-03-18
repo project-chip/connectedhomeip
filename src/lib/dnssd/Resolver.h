@@ -40,32 +40,6 @@ struct ResolvedNodeData
     // TODO: use pool to allow dynamic
     static constexpr unsigned kMaxIPAddresses = 5;
 
-    static bool IsIpLess(const Inet::IPAddress & a, const Inet::IPAddress & b)
-    {
-        // Link-local last
-        if (a.IsIPv6LinkLocal() && !b.IsIPv6LinkLocal())
-        {
-            return false;
-        }
-        if (!a.IsIPv6LinkLocal() && b.IsIPv6LinkLocal())
-        {
-            return true;
-        }
-
-        // IPv6 before IPv4
-        if (a.IsIPv6() && !b.IsIPv6())
-        {
-            return false;
-        }
-        if (!a.IsIPv6() && b.IsIPv6())
-        {
-            return true;
-        }
-
-        // no ordering, do not care
-        return false;
-    }
-
     void LogNodeIdResolved() const
     {
 #if CHIP_PROGRESS_LOGGING
@@ -73,32 +47,14 @@ struct ResolvedNodeData
 
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
         for (unsigned i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
             ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
-    }
-
-    /// Sorts IP addresses in a consistent order. Specifically places
-    /// Link-local IPv6 addresses at the end (e.g. mDNS reflector services in Unify will
-    /// return link-local addresses that will not work) and prioritizes global IPv6 addresses
-    /// before IPv4 ones.
-    void PrioritizeAddresses()
-    {
-        // Slow sort, however we have maximum kMaxIPAddreses, so this is good enough for now
-        for (unsigned i = 0; i + 1 < mNumIPs; i++)
-        {
-            for (unsigned j = i + 1; i < mNumIPs; i++)
-            {
-                if (IsIpLess(mAddress[j], mAddress[i]))
-                {
-                    std::swap(mAddress[i], mAddress[j]);
-                }
-            }
-        }
     }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
@@ -318,10 +274,8 @@ struct DiscoveryFilter
         {
             return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
         }
-        else
-        {
-            return code == other.code;
-        }
+
+        return code == other.code;
     }
 };
 enum class DiscoveryType
@@ -411,17 +365,6 @@ public:
      * `OnNodeIdResolutionFailed` method, respectively.
      */
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
-     * Explicit attempt to resolve a NodeID without performing network operations.
-     *
-     * If the required entry exists in an internal cache, this will call the
-     * underlying delegate `OnNodeIdResolved` and will return true;
-     *
-     * Returns false if the corresponding entry does not exist in the internal cache.
-     * This will NEVER call `OnNodeIdResolutionFailed` and this method does not block.
-     */
-    virtual bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

@@ -727,7 +727,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull discriminator;
 @property (strong, nonatomic) NSNumber * _Nonnull iterations;
 @property (strong, nonatomic) NSData * _Nonnull salt;
-@property (strong, nonatomic) NSNumber * _Nonnull passcodeID;
 - (instancetype)init;
 @end
 

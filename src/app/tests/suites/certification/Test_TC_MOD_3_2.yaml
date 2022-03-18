@@ -50,7 +50,7 @@ tests:
           [1645777708.406700][4841:4846] CHIP:DMG: InteractionModelRevision = 1
           [1645777708.406725][4841:4846] CHIP:DMG: }
           [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster:
-          0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
+          0x0000_0050 Attribute 0x0000_0003 DataVersion: 3781469721
           [1645777708.406933][4841:4846] CHIP:TOO: StartUpMode: 0"
       disabled: true
 
@@ -84,7 +84,7 @@ tests:
           [1645778146.171262][4876:4881] CHIP:DMG: InteractionModelRevision = 1
           [1645778146.171290][4876:4881] CHIP:DMG: }
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster:
-          0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
+          0x0000_0050 Attribute 0x0000_0000 DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO: CurrentMode: 7"
       disabled: true
 
@@ -189,6 +189,6 @@ tests:
           [1645778146.171262][4876:4881] CHIP:DMG: InteractionModelRevision = 1
           [1645778146.171290][4876:4881] CHIP:DMG: }
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster:
-          0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
+          0x0000_0050 Attribute 0x0000_0000 DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO: CurrentMode: 0"
       disabled: true
