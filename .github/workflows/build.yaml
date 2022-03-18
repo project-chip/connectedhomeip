@@ -340,10 +340,19 @@ jobs:
                           "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
-                      scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      scripts/run_in_build_env.sh "ninja -C ./out"
-                      scripts/tests/gn_tests.sh
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Clang-tidy validation
+              timeout-minutes: 20
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/clang/compile_commands.json \
+                       check \
+                    "
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
