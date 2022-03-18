@@ -132,7 +132,7 @@ efr32-brd4304a-window-covering (NOGLOB: only user requested)
 efr32-brd4304a-window-covering-with-ota-requestor (NOGLOB: only user requested)
 esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters
-esp32-devkitc-all-clusters-ipv6only
+esp32-devkitc-all-clusters-ipv4
 esp32-devkitc-bridge
 esp32-devkitc-light
 esp32-devkitc-lock
@@ -140,9 +140,9 @@ esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-devkitc-temperature-measurement-rpc
 esp32-m5stack-all-clusters
-esp32-m5stack-all-clusters-ipv6only
+esp32-m5stack-all-clusters-ipv4
 esp32-m5stack-all-clusters-rpc
-esp32-m5stack-all-clusters-rpc-ipv6only
+esp32-m5stack-all-clusters-rpc-ipv4
 esp32-qemu-tests
 infineon-p6-all-clusters
 infineon-p6-light

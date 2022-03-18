@@ -536,18 +536,18 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
 
-# Generating esp32-devkitc-all-clusters-ipv6only
-mkdir -p {out}/esp32-devkitc-all-clusters-ipv6only
+# Generating esp32-devkitc-all-clusters-ipv4
+mkdir -p {out}/esp32-devkitc-all-clusters-ipv4
 
-cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-ipv4/sdkconfig.defaults
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_ENABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv4/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv4 reconfigure'
 
 # Generating esp32-devkitc-bridge
 mkdir -p {out}/esp32-devkitc-bridge
@@ -626,18 +626,18 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
 
-# Generating esp32-m5stack-all-clusters-ipv6only
-mkdir -p {out}/esp32-m5stack-all-clusters-ipv6only
+# Generating esp32-m5stack-all-clusters-ipv4
+mkdir -p {out}/esp32-m5stack-all-clusters-ipv4
 
-cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-ipv4/sdkconfig.defaults
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_ENABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv4/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv4 reconfigure'
 
 # Generating esp32-m5stack-all-clusters-rpc
 mkdir -p {out}/esp32-m5stack-all-clusters-rpc
@@ -650,18 +650,18 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc reconfigure'
 
-# Generating esp32-m5stack-all-clusters-rpc-ipv6only
-mkdir -p {out}/esp32-m5stack-all-clusters-rpc-ipv6only
+# Generating esp32-m5stack-all-clusters-rpc-ipv4
+mkdir -p {out}/esp32-m5stack-all-clusters-rpc-ipv4
 
-cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5stack-all-clusters-rpc-ipv4/sdkconfig.defaults
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_ENABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv4/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv4 reconfigure'
 
 # Generating esp32-qemu-tests
 mkdir -p {out}/esp32-qemu-tests
@@ -1469,10 +1469,10 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters bu
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-# Building esp32-devkitc-all-clusters-ipv6only
+# Building esp32-devkitc-all-clusters-ipv4
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv4 build'
 
 rm -f examples/bridge-app/esp32/sdkconfig
 
@@ -1525,10 +1525,10 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters bu
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-# Building esp32-m5stack-all-clusters-ipv6only
+# Building esp32-m5stack-all-clusters-ipv4
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv4 build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
@@ -1539,10 +1539,10 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-# Building esp32-m5stack-all-clusters-rpc-ipv6only
+# Building esp32-m5stack-all-clusters-rpc-ipv4
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv4/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv4 build'
 
 rm -f src/test_driver/esp32/sdkconfig
 
