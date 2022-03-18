@@ -259,7 +259,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, 
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
