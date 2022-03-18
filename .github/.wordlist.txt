@@ -156,6 +156,7 @@ BTP
 btvirt
 buildwithmatter
 burndown
+ButtonIsr
 BytesMain
 bz
 bzip
@@ -604,6 +605,7 @@ Infineon
 ini
 init
 inlined
+InputLoop
 installDebug
 instantiation
 integrations
@@ -654,6 +656,7 @@ kGroup
 kInvalidCommandId
 KitProg
 kManage
+kNewButton
 kNodeIdNotSpecified
 knownissues
 kOperate
@@ -1080,6 +1083,8 @@ sdl
 SED
 SEGGER
 semver
+SendButton
+SendNewInputEvent
 sendto
 SERIALDEVICE
 SerialNumber
@@ -1307,6 +1312,7 @@ vous
 VPN
 VSC
 VSCode
+WaitNewInputEvent
 WakeOnLan
 WantedBy
 webpage
