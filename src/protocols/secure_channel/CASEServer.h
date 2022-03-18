@@ -64,7 +64,7 @@ private:
     uint16_t mSessionKeyId           = 0;
     SessionManager * mSessionManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer        = nullptr;
+    Ble::BleLayer * mBleLayer = nullptr;
 #endif
 
     FabricTable * mFabrics = nullptr;
