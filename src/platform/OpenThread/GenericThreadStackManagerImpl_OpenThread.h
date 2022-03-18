@@ -156,6 +156,8 @@ private:
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
+    ConnectivityManager::ThreadDeviceType mDeviceType;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDPollingConfig mPollingConfig;
     ConnectivityManager::SEDPollingMode mPollingMode = ConnectivityManager::SEDPollingMode::Idle;
