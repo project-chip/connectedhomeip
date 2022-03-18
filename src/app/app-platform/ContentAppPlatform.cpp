@@ -452,11 +452,11 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
         }
 
         bindings.push_back(Binding::Structs::TargetStruct::Type{
-            .fabricIndex = kUndefinedFabricIndex,
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
             .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .fabricIndex = kUndefinedFabricIndex,
         });
     }
 
@@ -467,11 +467,11 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
         ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
         bindings.push_back(Binding::Structs::TargetStruct::Type{
-            .fabricIndex = kUndefinedFabricIndex,
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalSpeakerEndpointId),
             .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .fabricIndex = kUndefinedFabricIndex,
         });
     }
 
@@ -495,11 +495,11 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                     ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
                     bindings.push_back(Binding::Structs::TargetStruct::Type{
-                        .fabricIndex = kUndefinedFabricIndex,
                         .node        = MakeOptional(localNodeId),
                         .group       = NullOptional,
                         .endpoint    = MakeOptional(app->GetEndpointId()),
                         .cluster     = MakeOptional(kNoClusterIdSpecified),
+                        .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
             }

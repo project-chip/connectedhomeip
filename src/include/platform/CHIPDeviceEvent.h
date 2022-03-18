@@ -444,6 +444,8 @@ struct ChipDeviceEvent final
             CHIP_ERROR Status;
             uint64_t PeerNodeId;
             FabricIndex PeerFabricIndex;
+            bool AddNocCommandHasBeenInvoked;
+            bool UpdateNocCommandHasBeenInvoked;
         } CommissioningComplete;
 
         struct

@@ -76,7 +76,7 @@ public:
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
-    virtual ~WriteHandler() = default;
+    ~WriteHandler() override = default;
 
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);

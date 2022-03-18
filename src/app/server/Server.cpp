@@ -197,6 +197,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr);
     SuccessOrExit(err);
 
+    chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
+
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
     {

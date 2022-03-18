@@ -206,6 +206,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
+    // Ignore nodes with closed comissioning window
+    VerifyOrReturn(nodeData.commissioningMode != 0);
+
     const uint16_t port = nodeData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];
     nodeData.ipAddress[0].ToString(buf);

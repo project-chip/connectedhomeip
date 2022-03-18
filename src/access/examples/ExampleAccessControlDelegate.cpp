@@ -129,7 +129,7 @@ public:
     }
 
 public:
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
+    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
@@ -193,7 +193,7 @@ public:
     }
 
 public:
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
+    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const
     {
         ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), mCluster));
         return writer.Put(chip::TLV::AnonymousTag(), mDeviceType);
@@ -870,7 +870,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        else if (auto * storage = EntryStorage::Find(nullptr))
+        if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;

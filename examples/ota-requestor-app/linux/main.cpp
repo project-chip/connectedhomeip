@@ -181,8 +181,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 void ApplicationInit()
 {
-    chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-
     // Initialize all OTA download components
     InitOTARequestor();
 }

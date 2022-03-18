@@ -63,7 +63,7 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
             {
                 return IpScore::kGlobalUnicastWithSharedPrefix;
             }
-            else if (ip.IsIPv6ULA())
+            if (ip.IsIPv6ULA())
             {
                 return IpScore::kUniqueLocalWithSharedPrefix;
             }
@@ -85,10 +85,8 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 
         return IpScore::kOtherIpv6;
     }
-    else
-    {
-        return IpScore::kIpv4;
-    }
+
+    return IpScore::kIpv4;
 }
 
 } // namespace
@@ -142,7 +140,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMinLookupTime() - elapsed;
     }
-    else if (elapsed < mRequest.GetMaxLookupTime())
+    if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
     }
@@ -183,10 +181,35 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId(), Inet::IPAddressType::kAny));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)
+{
+    VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
+    mActiveLookups.Remove(&handle);
+
+    // Adjust any timing updates.
+    ReArmTimer();
+
+    if (cancel_method == FailureCallback::Call)
+    {
+        handle.GetListener()->OnNodeAddressResolutionFailed(handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
+    }
+
+    // TODO: There should be some form of cancel into Dnssd::Resolver::Instance()
+    //       to stop any resolution mechanism if applicable.
+    //
+    // Current code just removes the internal list and any callbacks of resolution will
+    // be ignored. This works from the perspective of the caller of this method,
+    // but may be wasteful by letting dnssd still work in the background.
+
     return CHIP_NO_ERROR;
 }
 
@@ -195,6 +218,31 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
     mSystemLayer = systemLayer;
     Dnssd::Resolver::Instance().SetOperationalDelegate(this);
     return CHIP_NO_ERROR;
+}
+
+void Resolver::Shutdown()
+{
+    while (mActiveLookups.begin() != mActiveLookups.end())
+    {
+        auto current = mActiveLookups.begin();
+
+        const PeerId peerId     = current->GetRequest().GetPeerId();
+        NodeListener * listener = current->GetListener();
+
+        mActiveLookups.Erase(current);
+
+        // Failure callback only called after iterator was cleared:
+        // This allows failure handlers to deallocate structures that may
+        // contain the active lookup data as a member (intrusive lists members)
+        listener->OnNodeAddressResolutionFailed(peerId, CHIP_ERROR_SHUT_DOWN);
+    }
+
+    // Re-arm of timer is expected to cancel any active timer as the
+    // internal list of active lookups is empty at this point.
+    ReArmTimer();
+
+    mSystemLayer = nullptr;
+    Dnssd::Resolver::Instance().SetOperationalDelegate(nullptr);
 }
 
 void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)

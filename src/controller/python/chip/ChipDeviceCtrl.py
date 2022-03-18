@@ -248,6 +248,7 @@ class ChipDeviceController():
 
     def Commission(self, nodeid):
         self.CheckIsActive()
+        self._ChipStack.commissioningCompleteEvent.clear()
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_Commission(

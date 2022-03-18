@@ -95,7 +95,7 @@ private:
             return false; // nothing to try.
         }
 
-        if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
+        if (!mIterator.IsUp())
         {
             return true; // not a usable interface
         }

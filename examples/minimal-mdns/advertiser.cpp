@@ -45,7 +45,7 @@ struct Options
     // commissionable node / commissioner params
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
-    Optional<uint16_t> deviceType;
+    Optional<uint32_t> deviceType;
     Optional<const char *> deviceName;
 
     // commissionable node params
@@ -134,7 +134,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         return true;
     case kOptionCommissioningDeviceType:
-        gOptions.deviceType = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
+        gOptions.deviceType = Optional<uint32_t>::Value(static_cast<uint32_t>(atoi(aValue)));
         return true;
     case kOptionCommissioningDeviceName:
         gOptions.deviceName = Optional<const char *>::Value(static_cast<const char *>(aValue));
