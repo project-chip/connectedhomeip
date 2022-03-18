@@ -65,6 +65,8 @@ public:
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+
+    void SetMaxAttributesPerChunk(uint32_t aMaxAttributesPerChunk) { mMaxAttributesPerChunk = aMaxAttributesPerChunk; }
 #endif
 
     /**
@@ -220,7 +222,8 @@ private:
     uint64_t mDirtyTick = 1;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    uint32_t mReservedSize = 0;
+    uint32_t mReservedSize          = 0;
+    uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
 };
 

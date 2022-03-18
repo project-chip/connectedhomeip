@@ -757,19 +757,12 @@ void ReadHandler::SetDirty(const ClusterInfo & apAttributeChanged)
 {
     ConcreteAttributePath path;
 
-    /*
-     * Since we reset the iterator to the beginning of the current cluster instead of the beginning of the whole report, we might
-     * miss the change and regard this ReadHandler as a clean ReadHandler by mistake. So we record the time when this ReadHandler
-     * was marked as a dirty ReadHandler, and another time when the Readhandler reports attribute change, then we can tell if the
-     * ReadHandler is clean by checking these timestamps.
-     * The timestamp are represented by a ticker which will be bumped by 1 everytime when the ReportingEnging is noticed for an
-     * attribute change.
-     */
     mDirtyTick     = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtyTick();
     mOverrideDirty = true;
 
     // We won't reset the path iterator for every SetDirty call to reduce the number of full report data.
     // The iterator will be reset after finished each report session.
+    // For the following reports, we only reset the current
     if ((mAttributePathExpandIterator.Get(path) && path.mEndpointId == apAttributeChanged.mEndpointId &&
          path.mClusterId == apAttributeChanged.mClusterId) ||
         apAttributeChanged.HasAttributeWildcard())

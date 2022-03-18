@@ -119,6 +119,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             apReadHandler->ResetPathIterator();
         }
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        uint32_t attributeCounts = 0;
+#endif
+
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
@@ -155,7 +159,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 }
             }
 
-            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+            attributeCounts++;
+            if (attributeCounts > mMaxAttributesPerChunk)
+            {
+                ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            }
+#endif
+
+            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty
+            // paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
@@ -683,7 +696,7 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
             if ((path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path)) &&
-                aReadHandler.mPreviousReportsBeginTick < path->mTickTouched)
+                path->mTickTouched > aReadHandler.mPreviousReportsBeginTick)
             {
                 intersected = true;
                 return Loop::Break;

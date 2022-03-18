@@ -31,13 +31,16 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <functional>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <map>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
+#include <utility>
 
 using TestContext = chip::Test::AppContext;
 using namespace chip;
@@ -58,6 +61,7 @@ constexpr EndpointId kTestEndpointId = 2;
 constexpr EndpointId kTestEndpointId3 = 3;
 // Another endpoint, for adding / enabling during running.
 constexpr EndpointId kTestEndpointId4    = 4;
+constexpr EndpointId kTestEndpointId5    = 5;
 constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
 
@@ -69,6 +73,7 @@ public:
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext);
+    static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -100,6 +105,16 @@ DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
+
+// Unlike endpoint 1, we can modify the values for values in endpoint 5
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint5)
+DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x00000002, INT8U, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(0x00000003, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint5Clusters)
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint5, testEndpoint5Clusters);
 
 //clang-format on
 
@@ -184,6 +199,46 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
 
 void TestReadCallback::OnDone() {}
 
+class TestMutableAttrAccess
+{
+public:
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder);
+
+    void SetDirty(AttributeId attr)
+    {
+        app::ClusterInfo path;
+        path.mEndpointId  = kTestEndpointId5;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = attr;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+
+    // These setters
+    void SetVal(uint8_t attribute, uint8_t newVal)
+    {
+        uint8_t index = attribute - 1;
+        if (index < 3 && val[index] != newVal)
+        {
+            val[index] = newVal;
+            SetDirty(attribute);
+        }
+    }
+
+    void Reset() { val[0] = val[1] = val[2] = 0; }
+
+    uint8_t val[3] = { 0, 0, 0 };
+};
+
+CHIP_ERROR TestMutableAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && aPath.mAttributeId > 0 && aPath.mAttributeId <= ArraySize(val),
+                        CHIP_ERROR_NOT_FOUND);
+    uint8_t index = static_cast<uint8_t>(aPath.mAttributeId - 1);
+    return aEncoder.Encode(val[index]);
+}
+
+TestMutableAttrAccess gMutableAttrAccess;
+
 class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
@@ -201,6 +256,12 @@ TestAttrAccess gAttrAccess;
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = gMutableAttrAccess.Read(aPath, aEncoder);
+    if (err != CHIP_ERROR_NOT_FOUND)
+    {
+        return err;
+    }
+
     switch (aPath.mAttributeId)
     {
     case kTestListAttribute:
@@ -225,6 +286,58 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
 CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+class TestMutableReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestMutableReadCallback() : mBufferedCallback(*this) {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
+
+    void OnDone() override {}
+
+    void OnReportBegin() override { mAttributeCount = 0; }
+
+    void OnReportEnd() override { mOnReportEnd = true; }
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+
+    uint32_t mAttributeCount = 0;
+    // We record every dataversion field from every attribute IB.
+    std::map<std::pair<EndpointId, AttributeId>, DataVersion> mDataVersions;
+    std::map<std::pair<EndpointId, AttributeId>, uint8_t> mValues;
+    std::map<std::pair<EndpointId, AttributeId>, std::function<void(EndpointId, AttributeId)>> mActions;
+    bool mOnReportEnd               = false;
+    bool mOnSubscriptionEstablished = false;
+    app::BufferedReadCallback mBufferedCallback;
+};
+
+void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                              const app::StatusIB & aStatus)
+{
+    VerifyOrReturn(apData != nullptr);
+    NL_TEST_ASSERT(gSuite, aPath.mClusterId == TestCluster::Id);
+
+    mAttributeCount++;
+    if (aPath.mAttributeId <= 5)
+    {
+        uint8_t v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        mValues[std::make_pair(aPath.mEndpointId, aPath.mAttributeId)] = v;
+
+        auto action = mActions.find(std::make_pair(aPath.mEndpointId, aPath.mAttributeId));
+        if (action != mActions.end() && action->second)
+        {
+            action->second(aPath.mEndpointId, aPath.mAttributeId);
+        }
+    }
+
+    if (aPath.mDataVersion.HasValue())
+    {
+        mDataVersions[std::make_pair(aPath.mEndpointId, aPath.mAttributeId)] = aPath.mDataVersion.Value();
+    }
+    // Ignore all other attributes, we don't care above the global attributes.
 }
 
 /*
@@ -509,6 +622,232 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
     emberAfClearDynamicEndpoint(0);
 }
 
+/*
+ * The tests below are for testing deatiled bwhavior when the attributes are modified between two chunks. In this test, we only care
+ * above whether we will receive correct attribute values in reasonable messages with reduced reporting traffic.
+ */
+void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(2);
+
+    DataVersion dataVersionStorage1[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage5[ArraySize(testEndpoint5Clusters)];
+
+    gMutableAttrAccess.Reset();
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage1));
+    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, 0, 0, Span<DataVersion>(dataVersionStorage5));
+
+// The ReadHandler uses ScheduleWork to kick the report engine without a network traffic, which cannot be handled by DriveIO
+// directly. Also, we want the event loop to stop when we fully received one report. But DrainAndServiceIO cannot be stopped by some
+// conditions.
+#define DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(timeoutSeconds)                                                                          \
+    readCallback.mOnReportEnd = false;                                                                                             \
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(timeoutSeconds), [&]() { return readCallback.mOnReportEnd; });        \
+    NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+
+    {
+        app::AttributePathParams attributePath;
+        app::ReadPrepareParams readParams(sessionHandle);
+
+        readParams.mpAttributePathParamsList    = &attributePath;
+        readParams.mAttributePathParamsListSize = 1;
+        readParams.mMinIntervalFloorSeconds     = 0;
+        readParams.mMaxIntervalCeilingSeconds   = 2;
+
+        //// TEST 1 -- Read using wildcard paths
+        {
+            TestMutableReadCallback readCallback;
+
+            gIterationCount = 1;
+
+            // When the report engine starts to report attributes in endpoint 5, mark cluster 1 as dirty.
+            // The report engine should NOT include it in initial report to reduce traffic.
+            readCallback.mActions[std::make_pair(kTestEndpointId5, 1)] = [](EndpointId, AttributeId) {
+                app::ClusterInfo path;
+                path.mEndpointId  = kTestEndpointId;
+                path.mClusterId   = TestCluster::Id;
+                path.mAttributeId = 1;
+                gIterationCount   = 2;
+                app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            };
+
+            app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                       app::ReadClient::InteractionType::Subscribe);
+
+            NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+            // Wait for next reporting session.
+            ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() { return readCallback.mOnSubscriptionEstablished; });
+
+            NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+            NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
+
+            // We are expected to miss attributes on kTestEndpointId during initial reports.
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId, 1)] == 1);
+
+            readCallback.mActions.clear();
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            // The missing attribute should be reported now.
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId, 1)] == 2);
+
+            readCallback.mActions.clear();
+            readCallback.mDataVersions.clear();
+            readCallback.mActions[std::make_pair(kTestEndpointId5, 2)] = [](EndpointId, AttributeId) {
+                gMutableAttrAccess.SetVal(3, 3);
+            };
+            gMutableAttrAccess.SetVal(1, 2);
+            gMutableAttrAccess.SetVal(2, 2);
+            gMutableAttrAccess.SetVal(3, 2);
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 1)] == 2);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 2)] == 2);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 3)] == 3);
+            // It should report attribute 1 and attribute 2 since that are under the same cluster as cluster 3.
+            // We should see unique data versions from the same report session if they comes from the same attribute path params.
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 2)]);
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 3)]);
+
+            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
+
+            readCallback.mOnReportEnd = false;
+            readCallback.mActions.clear();
+            readCallback.mDataVersions.clear();
+            readCallback.mActions[std::make_pair(kTestEndpointId5, 2)] = [](EndpointId, AttributeId) {
+                gMutableAttrAccess.SetVal(3, 4);
+            };
+            gMutableAttrAccess.SetVal(1, 4);
+            gMutableAttrAccess.SetVal(2, 4);
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 1)] == 4);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 2)] == 4);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 3)] == 4);
+            // It should report attribute 1 and attribute 2 since that are under the same cluster as cluster 3.
+            // We should see unique data versions from the same report session.
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 2)]);
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 3)]);
+            // We have received all report data.
+            NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+
+            readCallback.mOnReportEnd = false;
+            readCallback.mActions.clear();
+            readCallback.mDataVersions.clear();
+            readCallback.mActions[std::make_pair(kTestEndpointId5, 2)] = [](EndpointId, AttributeId) {
+                gMutableAttrAccess.SetVal(1, 5);
+            };
+            gMutableAttrAccess.SetVal(2, 5);
+            gMutableAttrAccess.SetVal(3, 5);
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 1)] == 5);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 2)] == 5);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 3)] == 5);
+            // It should report attribute 1 and attribute 2 since that are under the same cluster as cluster 3.
+            // We should see unique data versions from the same report session.
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 2)]);
+            NL_TEST_ASSERT(apSuite,
+                           readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 1)] ==
+                               readCallback.mDataVersions[std::make_pair(kTestEndpointId5, 3)]);
+            // We have received all report data.
+            NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+        }
+    }
+    // The read client is destructed, server will shutdown the corresponding subscription later.
+
+    {
+        app::AttributePathParams attributePath[3];
+        app::ReadPrepareParams readParams(sessionHandle);
+
+        attributePath[0] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, 1);
+        attributePath[1] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, 2);
+        attributePath[2] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, 3);
+
+        readParams.mpAttributePathParamsList    = attributePath;
+        readParams.mAttributePathParamsListSize = 3;
+        readParams.mMinIntervalFloorSeconds     = 0;
+        readParams.mMaxIntervalCeilingSeconds   = 2;
+        gMutableAttrAccess.Reset();
+
+        //// TEST 2 -- Read using concrete paths
+        {
+            TestMutableReadCallback readCallback;
+
+            app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                       app::ReadClient::InteractionType::Subscribe);
+
+            NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+            readCallback.mOnReportEnd = false;
+            ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnSubscriptionEstablished; });
+            NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+            NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
+
+            readCallback.mActions.clear();
+            readCallback.mDataVersions.clear();
+            readCallback.mActions[std::make_pair(kTestEndpointId5, 2)] = [](EndpointId, AttributeId) {
+                gMutableAttrAccess.SetVal(3, 4);
+            };
+            gMutableAttrAccess.SetVal(1, 3);
+            gMutableAttrAccess.SetVal(2, 3);
+            gMutableAttrAccess.SetVal(3, 3);
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
+            // In this case, we won't reset the path iterator.
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 1)] == 3);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 2)] == 3);
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 3)] == 3);
+
+            readCallback.mActions.clear();
+
+            DRIVE_IO_UNTIL_END_OF_NEXT_REPORT(2);
+
+            // The attribute failed to catch last report will be picked by this report.
+            NL_TEST_ASSERT(apSuite, readCallback.mValues[std::make_pair(kTestEndpointId5, 3)] == 4);
+        }
+    }
+
+#undef DRIVE_IO_UNTIL_END_OF_NEXT_REPORT
+
+    chip::test_utils::SleepMillis(secondsToMilliseconds(3));
+
+    // Destroying the read client will terminate the subscription transaction.
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(1);
+    emberAfClearDynamicEndpoint(0);
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(UINT32_MAX);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -516,6 +855,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
     NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),
+    NL_TEST_DEF("TestSetDirtyBetweenChunks", TestCommandInteraction::TestSetDirtyBetweenChunks),
     NL_TEST_SENTINEL()
 };
 

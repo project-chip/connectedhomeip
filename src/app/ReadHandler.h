@@ -268,12 +268,7 @@ private:
     // waiting for the min reporting interval to elapse.  If we have to send a
     // report immediately due to an urgent event being queued,
     // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
-    bool mHoldReport = false;
-    // The timestamp when this read handler was marked as a dirty read handler.
-    uint64_t mDirtyTick = 0;
-    // This flag is used for generating urgent events, in this case, we use an override dirty flag so ReportEngine can generate
-    // report data for this read handler.
-    bool mOverrideDirty      = false;
+    bool mHoldReport         = false;
     bool mActiveSubscription = false;
     // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
     // last chunked message.
@@ -287,6 +282,16 @@ private:
     // subscription alive on the client.
     bool mHoldSync = false;
 
+    // The timestamp when this read handler was marked as a dirty read handler.
+    // In SetDirty(), we reset the iterator to the beginning of the current cluster instead of the beginning of the whole report, we
+    // might miss the change and regard this ReadHandler as a clean ReadHandler by mistake. So we record the time when this
+    // ReadHandler was marked as a dirty ReadHandler, and another time when the Readhandler reports attribute change, then we can
+    // tell if the ReadHandler is clean by checking these timestamps. The timestamp is represented by a counter which will increment
+    // by 1 every time an attribute is marked dirty by the reporting engine.
+    uint64_t mDirtyTick = 0;
+    // Emitting new events won't notify the report enging except for the urgent events, we use a OverrideDirty flag to indicate this
+    // state that we have something to report for this ReadHandler.
+    bool mOverrideDirty = false;
     // For subscriptions, we record the timestamp when we started to generate the last report.
     // The mCurrentReportsBeginTick records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
