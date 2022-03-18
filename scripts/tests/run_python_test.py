@@ -16,7 +16,7 @@
 
 import pty
 import subprocess
-import click
+import argparse
 import os
 import pathlib
 import typing
@@ -80,14 +80,23 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
                                            (f"[{tag}][\33[31mSTDERR\33[0m]").encode(), queue))
 
 
-@click.command()
-@click.option("--app", type=str, default=None, help='Local application to use, omit to use external apps, use a path for a specific binary or use a filename to search under the current matter checkout.')
-@click.option("--factoryreset", is_flag=True, help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
-@click.option("--app-params", type=str, default='', help='The extra parameters passed to the device.')
-@click.option("--script", type=click.Path(exists=True), default=FindBinaryPath("mobile-device-test.py"), help='Test script to use.')
-@click.argument("script-args", nargs=-1, type=str)
-def main(app: str, factoryreset: bool, app_params: str, script: str, script_args: typing.List[str]):
-    if factoryreset:
+def main():
+    parser = argparse.ArgumentParser(description='Run REPL Python Tests')
+
+    parser.add_argument('--app', type=str, default=None,
+                        help='Local application to use, omit to use external apps, use a path for a specific binary or use a filename to search under the current matter checkout.')
+    parser.add_argument('--factoryreset', action="store_true",
+                        help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
+    parser.add_argument('--app-args', type=str, default='',
+                        help='The extra parameters passed to the device side app.')
+    parser.add_argument('--script', type=str, default=None,
+                        help='Test script to use.')
+    parser.add_argument('--script-args', type=str, default='',
+                        help='Arguments for the REPL test script')
+
+    args = parser.parse_args()
+
+    if args.factoryreset:
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
@@ -95,21 +104,28 @@ def main(app: str, factoryreset: bool, app_params: str, script: str, script_args
     log_queue = queue.Queue()
     log_cooking_threads = []
 
+    if (args.script == None):
+        args.script = os.path.dirname(os.path.realpath(
+            __file__)) + '/../../src/controller/python/test/test_scripts/mobile-device-test.py'
+
     app_process = None
-    if app:
-        if not os.path.exists(app):
-            app = FindBinaryPath(app)
-            if app is None:
+
+    if args.app:
+        if not os.path.exists(args.app):
+            args.app = FindBinaryPath(args.app)
+            if args.app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_args = [app] + shlex.split(app_params)
+        app_args = [args.app] + shlex.split(args.app_args)
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         DumpProgramOutputToQueue(
             log_cooking_threads, "\33[34mAPP \33[0m", app_process, log_queue)
 
-    script_command = ["/usr/bin/env", "python3", script,
-                      '--log-format', '%(message)s'] + [v for v in script_args]
+    tokenized_script_args = args.script_args.split()
+
+    script_command = ["/usr/bin/env", "python3", args.script,
+                      '--log-format', '%(message)s'] + [v for v in tokenized_script_args]
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
         script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
