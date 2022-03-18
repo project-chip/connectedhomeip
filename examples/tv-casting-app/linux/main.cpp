@@ -327,11 +327,16 @@ public:
 
         PeerId peerID           = fabric->GetPeerIdForNode(nodeId);
         mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+
+        // TODO: figure out why this doesn't work so that we can remove OperationalDeviceProxy creation above,
+        // and remove the FindSecureSessionForNode and SetConnectedSession calls below
+        // mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(nodeId);
         if (mOperationalDeviceProxy == nullptr)
         {
             ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
+        ChipLogError(AppServer, "Created an instance of OperationalDeviceProxy");
 
         SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(nodeId);
         mOperationalDeviceProxy->SetConnectedSession(handle);
@@ -493,7 +498,7 @@ void ReadServerClustersForNode(NodeId nodeId)
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChanged)
+    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
         if (gTargetVideoPlayerInfo.IsInitialized())
         {

@@ -214,7 +214,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 {
     DeviceLayer::ChipDeviceEvent event;
-    event.Type = DeviceLayer::DeviceEventType::kBindingsChanged;
+    event.Type = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 

@@ -233,7 +233,7 @@ enum PublicEventTypes
     /**
      * Signals that bindings were updated.
      */
-    kBindingsChanged,
+    kBindingsChangedViaCluster,
 };
 
 /**
