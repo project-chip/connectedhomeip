@@ -1268,8 +1268,9 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
-    case OperationalCertStatus::kInsufficientPrivilege:
     case OperationalCertStatus::kFabricConflict:
+        return CHIP_ERROR_FABRIC_EXISTS;
+    case OperationalCertStatus::kInsufficientPrivilege:
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:

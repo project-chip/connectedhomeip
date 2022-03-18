@@ -203,7 +203,8 @@ class {{filename}}Suite: public TestCommand
           {{~else if (isString type)}}"{{definedValue}}"
           {{else}}{{definedValue}}
           {{~/if~}}
-          {{/chip_tests_item_parameters}});
+          {{/chip_tests_item_parameters}}
+          {{additionalArguments}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
