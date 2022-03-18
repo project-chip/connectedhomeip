@@ -20,27 +20,27 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Commission TH to DUT"
-    verification: |
+    - label: "Commission TH to DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "DUT reads the NOCs attribute from TH"
-    verification: |
-        ./chip-tool operationalcredentials read nocs 1 0
-    disabled: true
+    - label: "DUT reads the NOCs attribute from TH"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+      disabled: true
 
-  - label: "DUT reads the Fabrics attribute from TH"
-    verification: |
-        ./chip-tool operationalcredentials read fabrics 1 0
-    disabled: true
+    - label: "DUT reads the Fabrics attribute from TH"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0
+      disabled: true
 
-  - label: "DUT reads the SupportedFabrics attribute from TH"
-    verification: |
-        ./chip-tool operationalcredentials read supported-fabrics 1 0
-    disabled: true
+    - label: "DUT reads the SupportedFabrics attribute from TH"
+      verification: |
+          ./chip-tool operationalcredentials read supported-fabrics 1 0
+      disabled: true
 
-  - label: "DUT reads the CommissionedFabrics attribute from TH"
-    verification: |
-        ./chip-tool operationalcredentials read commissioned-fabrics 1 0
-    disabled: true
+    - label: "DUT reads the CommissionedFabrics attribute from TH"
+      verification: |
+          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+      disabled: true

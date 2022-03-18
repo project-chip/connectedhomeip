@@ -20,164 +20,164 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Commission DUT to TH"
-    verification: |
+    - label: "Commission DUT to TH"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH sends On command to DUT"
-    verification: |
-        ./chip-tool onoff on 1 1
+    - label: "TH sends On command to DUT"
+      verification: |
+          ./chip-tool onoff on 1 1
 
-        StatusIB =
-        {
-                status = 0x00,
-        },
-    disabled: true
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+      disabled: true
 
-  - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
-    verification: |
-        ./chip-tool onoff write start-up-on-off 0 1 1
+    - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
+      verification: |
+          ./chip-tool onoff write start-up-on-off 0 1 1
 
-        StatusIB =
-        {
-                status = 0x00,
-        },
-    disabled: true
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: FALSE
-    disabled: true
+          OnOff: FALSE
+      disabled: true
 
-  - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
-    verification: |
-        ./chip-tool onoff write start-up-on-off 1 1 1
+    - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
+      verification: |
+          ./chip-tool onoff write start-up-on-off 1 1 1
 
-        StatusIB =
-        {
-                status = 0x00,
-        },
-    disabled: true
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: TRUE
-    disabled: true
+          OnOff: TRUE
+      disabled: true
 
-  - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
-    verification: |
-        ./chip-tool onoff write start-up-on-off 2 1 1
+    - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
+      verification: |
+          ./chip-tool onoff write start-up-on-off 2 1 1
 
-        StatusIB =
-        {
-                status = 0x00,
-        },
-    disabled: true
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: FALSE
-    disabled: true
+          OnOff: FALSE
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: TRUE
-    disabled: true
+          OnOff: TRUE
+      disabled: true
 
-  - label: "TH writes NULL to StartUpOnOff attribute of DUT"
-    verification: |
-        (how to perform this in chip-tool?)
-    disabled: true
+    - label: "TH writes NULL to StartUpOnOff attribute of DUT"
+      verification: |
+          (how to perform this in chip-tool?)
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: TRUE
-    disabled: true
+          OnOff: TRUE
+      disabled: true
 
-  - label: "TH sends Off command to DUT"
-    verification: |
-        ./chip-tool onoff off 1 1
+    - label: "TH sends Off command to DUT"
+      verification: |
+          ./chip-tool onoff off 1 1
 
-        StatusIB =
-        {
-                status = 0x00,
-        },
-    disabled: true
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+      disabled: true
 
-  - label: "Power off DUT"
-    verification: |
+    - label: "Power off DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "Power on DUT"
-    verification: |
+    - label: "Power on DUT"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the OnOff attribute from the DUT"
-    verification: |
-        ./chip-tool onoff read on-off 1 1
+    - label: "TH reads the OnOff attribute from the DUT"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
 
-        OnOff: FALSE
-    disabled: true
+          OnOff: FALSE
+      disabled: true

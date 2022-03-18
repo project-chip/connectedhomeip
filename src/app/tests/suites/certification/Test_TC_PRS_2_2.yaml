@@ -20,23 +20,23 @@ config:
     endpoint: 0
 
 tests:
-  - label: "Commission DUT to TH"
-    verification: |
+    - label: "Commission DUT to TH"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads MeasuredValue attribute from DUT"
-    verification: |
-        ./chip-tool pressuremeasurement read measured-value 1 1
-        Verify response: cluster id: 0x0403 Attribute: 0
-    disabled: true
+    - label: "TH reads MeasuredValue attribute from DUT"
+      verification: |
+          ./chip-tool pressuremeasurement read measured-value 1 1
+          Verify response: cluster id: 0x0403 Attribute: 0
+      disabled: true
 
-  - label: "Operate on device to change the pressure significantly"
-    verification: |
+    - label: "Operate on device to change the pressure significantly"
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "after a few seconds, TH reads MeasuredValue attribute from DUT"
-    verification: |
+    - label: "after a few seconds, TH reads MeasuredValue attribute from DUT"
+      verification: |
 
-    disabled: true
+      disabled: true

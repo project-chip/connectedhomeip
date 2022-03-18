@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
+name:
+    19.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
 
 config:
     nodeId: 0x12344321
@@ -20,40 +21,49 @@ config:
     endpoint: 0
 
 tests:
-  - label: "DUT sends the Invoke Request Message to the TH. The Message should contain one valid CommandDataIB,
-        which has the specific Endpoint, Specific Cluster and Specific Command."
-    verification: |
-        In case of chip tool, here is an example command to use
+    - label:
+          "DUT sends the Invoke Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the specific Endpoint,
+          Specific Cluster and Specific Command."
+      verification: |
+          In case of chip tool, here is an example command to use
 
-        sudo ./chip-tool identify  identify 0 1 1
-    disabled: true
+          sudo ./chip-tool identify  identify 0 1 1
+      disabled: true
 
-  - label: "DUT sends the Invoke Request Message to the TH. The Message should contain the wildcard for
-        Endpoint, specific Cluster and Specific Command in the CommandDataIB."
-    verification: |
-        Out of Scope for V1.0
-    disabled: true
+    - label:
+          "DUT sends the Invoke Request Message to the TH. The Message should
+          contain the wildcard for Endpoint, specific Cluster and Specific
+          Command in the CommandDataIB."
+      verification: |
+          Out of Scope for V1.0
+      disabled: true
 
-  - label: "DUT sends the Invoke Request Message to the TH. The Message should contain multiple paths
-        Path = [[ Endpoint = Endpoint1, Cluster = ClusterID, Command = Command1 ], [ Endpoint = Endpoint1,
-        Cluster = ClusterID, Command = Command2 ] ]"
-    verification: |
-        Out of Scope for V1.0
-    disabled: true
+    - label:
+          "DUT sends the Invoke Request Message to the TH. The Message should
+          contain multiple paths Path = [[ Endpoint = Endpoint1, Cluster =
+          ClusterID, Command = Command1 ], [ Endpoint = Endpoint1, Cluster =
+          ClusterID, Command = Command2 ] ]"
+      verification: |
+          Out of Scope for V1.0
+      disabled: true
 
-  - label: "DUT sends the Invoke Request Message to the TH. The Message should contain one valid CommandDataIB,
-        which has the specific Endpoint, Specific Cluster and Specific Command. Send 2 more Invoke Request
-        Messages to the TH."
-    verification: |
-        In case of chip tool, here is an example command to use
-        sudo ./chip-tool  identify identify 10 1 1
-        sudo ./chip-tool  identify identify 10 1 1
-    disabled: true
+    - label:
+          "DUT sends the Invoke Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the specific Endpoint,
+          Specific Cluster and Specific Command. Send 2 more Invoke Request
+          Messages to the TH."
+      verification: |
+          In case of chip tool, here is an example command to use
+          sudo ./chip-tool  identify identify 10 1 1
+          sudo ./chip-tool  identify identify 10 1 1
+      disabled: true
 
-  - label: "DUT sends the Invoke Request Message to the TH. The message should contain a command that
-        will return a data type of list as a response."
-    verification: |
-        In case of chip tool, here is an example command to use
+    - label:
+          "DUT sends the Invoke Request Message to the TH. The message should
+          contain a command that will return a data type of list as a response."
+      verification: |
+          In case of chip tool, here is an example command to use
 
-        sudo ./chip-tool modeselect read  supported-modes 1 1
-    disabled: true
+          sudo ./chip-tool modeselect read  supported-modes 1 1
+      disabled: true
