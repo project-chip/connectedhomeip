@@ -79,9 +79,8 @@ inline bool extract(const std::basic_string<CharT> & value, T & dst) {
 		dst = result;
 		return true;
 	}
-	else {
-		return false;
-	}
+			return false;
+
 }
 
 template <typename CharT>
@@ -135,7 +134,7 @@ public:
 				if (front == char_comment) {
 					continue;
 				}
-				else if (front == char_section_start) {
+				if (front == char_section_start) {
 					if (line.back() == char_section_end)
 						section = line.substr(1, length - 2);
 					else

@@ -61,7 +61,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
     // Initialize Group Data
-    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider());
+    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider(mDefaultStorage));
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
         chip::FabricInfo * fabric = it->second->GetFabricInfo();

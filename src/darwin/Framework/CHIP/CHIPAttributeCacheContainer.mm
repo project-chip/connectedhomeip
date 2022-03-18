@@ -21,6 +21,7 @@
 #import "CHIPDeviceControllerOverXPC+AttributeCache.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
 
 #include <app/InteractionModelEngine.h>
@@ -152,30 +153,20 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     if (err == CHIP_NO_ERROR) {
         id obj = NSObjectFromCHIPTLV(&reader);
         if (obj) {
-            [array addObject:@{
-                @"endpointId" : [NSNumber numberWithUnsignedShort:path.mEndpointId],
-                @"clusterId" : [NSNumber numberWithUnsignedLong:path.mClusterId],
-                @"attributeId" : [NSNumber numberWithUnsignedLong:path.mAttributeId],
-                @"status" : @0,
-                @"data" : obj
-            }];
+            [array addObject:@ { kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:path], kCHIPDataKey : obj }];
             return CHIP_NO_ERROR;
         }
         CHIP_LOG_ERROR("Error: Cached value could not be converted to generic NSObject");
         [array addObject:@ {
-            @"endpointId" : [NSNumber numberWithUnsignedShort:path.mEndpointId],
-            @"clusterId" : [NSNumber numberWithUnsignedLong:path.mClusterId],
-            @"attributeId" : [NSNumber numberWithUnsignedLong:path.mAttributeId],
-            @"status" : [NSNumber numberWithInteger:CHIP_ERROR_DECODE_FAILED.AsInteger()]
+            kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:path],
+            kCHIPErrorKey : [CHIPError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED]
         }];
         return CHIP_ERROR_DECODE_FAILED;
     }
     CHIP_LOG_ERROR("Error: Failed to read from attribute cache: %s", err.AsString());
     [array addObject:@ {
-        @"endpointId" : [NSNumber numberWithUnsignedShort:path.mEndpointId],
-        @"clusterId" : [NSNumber numberWithUnsignedLong:path.mClusterId],
-        @"attributeId" : [NSNumber numberWithUnsignedLong:path.mAttributeId],
-        @"status" : [NSNumber numberWithInteger:err.AsInteger()]
+        kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:path],
+        kCHIPErrorKey : [CHIPError errorForCHIPErrorCode:err]
     }];
     return err;
 }

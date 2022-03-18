@@ -48,7 +48,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession()
+    ~IncomingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG
@@ -92,7 +92,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;
@@ -113,7 +113,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~OutgoingGroupSession()
+    ~OutgoingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG
@@ -153,7 +153,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;

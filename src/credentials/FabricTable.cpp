@@ -434,7 +434,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
 }
 
 CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                             MutableByteSpan & destinationId)
+                                             MutableByteSpan & destinationId) const
 {
     constexpr uint16_t kSigmaParamRandomNumberSize = 32;
     constexpr size_t kDestinationMessageLen =
@@ -807,6 +807,29 @@ CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, cons
         return CHIP_ERROR_NO_MEMORY;
     }
     return err;
+}
+
+CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                           ByteSpan nodePrivateKey)
+{
+    Reset();
+
+    ReturnErrorOnFailure(SetRootCert(rootCert));
+    ReturnErrorOnFailure(SetICACert(icacCert));
+    ReturnErrorOnFailure(SetNOCCert(nocCert));
+
+    // NOTE: this requres ENABLE_HSM_CASE_OPS_KEY is not defined
+    P256SerializedKeypair opKeysSerialized;
+    memcpy(static_cast<uint8_t *>(opKeysSerialized), nodePubKey.data(), nodePubKey.size());
+    memcpy(static_cast<uint8_t *>(opKeysSerialized) + nodePubKey.size(), nodePrivateKey.data(), nodePrivateKey.size());
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(nodePubKey.size() + nodePrivateKey.size()));
+
+    P256Keypair opKey;
+    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
+    ReturnErrorOnFailure(SetOperationalKeypair(&opKey));
+
+    // NOTE: mVendorId and mFabricLabel are not initialize, because they are not used in tests.
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

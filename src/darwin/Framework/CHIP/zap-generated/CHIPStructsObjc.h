@@ -62,11 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPBindingClusterTargetStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nullable node;
 @property (strong, nonatomic) NSNumber * _Nullable group;
 @property (strong, nonatomic) NSNumber * _Nullable endpoint;
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
@@ -78,17 +78,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPAccessControlClusterAccessControlEntry : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull privilege;
 @property (strong, nonatomic) NSNumber * _Nonnull authMode;
 @property (strong, nonatomic) NSArray * _Nullable subjects;
 @property (strong, nonatomic) NSArray * _Nullable targets;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPAccessControlClusterExtensionEntry : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull data;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
@@ -251,34 +251,34 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPOperationalCredentialsClusterFabricDescriptor : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull rootPublicKey;
 @property (strong, nonatomic) NSNumber * _Nonnull vendorId;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricId;
 @property (strong, nonatomic) NSNumber * _Nonnull nodeId;
 @property (strong, nonatomic) NSString * _Nonnull label;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPOperationalCredentialsClusterNOCStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull noc;
 @property (strong, nonatomic) NSData * _Nullable icac;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPGroupKeyManagementClusterGroupInfoMapStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSArray * _Nonnull endpoints;
 @property (strong, nonatomic) NSString * _Nullable groupName;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPGroupKeyManagementClusterGroupKeyMapStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
@@ -448,7 +448,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTestClusterClusterTestFabricScoped : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricSensitiveInt8u;
 @property (strong, nonatomic) NSNumber * _Nullable optionalFabricSensitiveInt8u;
 @property (strong, nonatomic) NSNumber * _Nullable nullableFabricSensitiveInt8u;
@@ -456,6 +455,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull fabricSensitiveCharString;
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
 @property (strong, nonatomic) NSArray * _Nonnull fabricSensitiveInt8uList;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 

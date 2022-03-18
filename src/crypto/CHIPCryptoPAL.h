@@ -362,7 +362,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    virtual ~P256Keypair();
+    ~P256Keypair() override;
 
     /**
      * @brief Initialize the keypair.
@@ -552,15 +552,15 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @param aad_length Length of additional authentication data
  * @param key Encryption key
  * @param key_length Length of encryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -579,15 +579,15 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param tag_length Length of tag
  * @param key Decryption key
  * @param key_length Length of Decryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
-                           size_t iv_length, uint8_t * plaintext);
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           size_t nonce_length, uint8_t * plaintext);
 
 /**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.

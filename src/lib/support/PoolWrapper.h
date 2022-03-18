@@ -74,27 +74,26 @@ public:
     static_assert(std::is_base_of<U, T>::value, "Interface type is not derived from Pool type");
 
     PoolProxy() {}
-    virtual ~PoolProxy() override {}
+    ~PoolProxy() override {}
 
-    virtual U * CreateObject(ConstructorArguments... args) override { return Impl().CreateObject(std::move(args)...); }
+    U * CreateObject(ConstructorArguments... args) override { return Impl().CreateObject(std::move(args)...); }
 
-    virtual void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
+    void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
 
-    virtual void ReleaseAll() override { Impl().ReleaseAll(); }
+    void ReleaseAll() override { Impl().ReleaseAll(); }
 
-    virtual void ResetObject(U * element, ConstructorArguments... args) override
+    void ResetObject(U * element, ConstructorArguments... args) override
     {
         return Impl().ResetObject(static_cast<T *>(element), std::move(args)...);
     }
 
 protected:
-    virtual Loop ForEachActiveObjectInner(void * context,
-                                          typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
+    Loop ForEachActiveObjectInner(void * context, typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
     {
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
-    virtual Loop ForEachActiveObjectInner(void * context,
-                                          typename PoolInterface<U, ConstructorArguments...>::LambdaConst lambda) const override
+    Loop ForEachActiveObjectInner(void * context,
+                                  typename PoolInterface<U, ConstructorArguments...>::LambdaConst lambda) const override
     {
         return Impl().ForEachActiveObject([&](const T * target) { return lambda(context, static_cast<const U *>(target)); });
     }
@@ -120,11 +119,11 @@ class PoolImpl : public PoolProxy<T, N, M, Interfaces>...
 {
 public:
     PoolImpl() {}
-    virtual ~PoolImpl() override {}
+    ~PoolImpl() override {}
 
 protected:
-    virtual ObjectPool<T, N, M> & Impl() override { return mImpl; }
-    virtual const ObjectPool<T, N, M> & Impl() const override { return mImpl; }
+    ObjectPool<T, N, M> & Impl() override { return mImpl; }
+    const ObjectPool<T, N, M> & Impl() const override { return mImpl; }
 
 private:
     ObjectPool<T, N, M> mImpl;

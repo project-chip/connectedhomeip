@@ -35,15 +35,23 @@ namespace NetworkCommissioning {
 // load the network config from thread persistent info, and loads it into both mSavedNetwork and mStagingNetwork. When updating the
 // networks, all changes are made on the staging network. When validated we can commit it and save it to the persistent info
 
-CHIP_ERROR GenericThreadDriver::Init()
+CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
     ByteSpan currentProvision;
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
+
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     mSavedNetwork.Init(currentProvision);
     mStagingNetwork.Init(currentProvision);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenericThreadDriver::Shutdown()
+{
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -150,7 +158,13 @@ void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
     if (err != CHIP_NO_ERROR)
     {
+        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+    else
+    {
+        // OpenThread's "scan" will always success once started, so we can set the value of scan result here.
+        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 

@@ -150,12 +150,10 @@ public:
                                                               requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
                                                               aDataVersion);
         }
-        else
-        {
-            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
-                                                              attributeId, requestData, onSuccessCb, onFailureCb,
-                                                              aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
-        }
+
+        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                          requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
+                                                          aDataVersion);
     }
 
     template <typename AttributeInfo>

@@ -17,6 +17,7 @@
  */
 
 #include "LogCommands.h"
+#include <iostream>
 
 CHIP_ERROR LogCommands::Log(const char * message)
 {
@@ -24,8 +25,20 @@ CHIP_ERROR LogCommands::Log(const char * message)
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR LogCommands::UserPrompt(const char * message)
+CHIP_ERROR LogCommands::UserPrompt(const char * message, const char * expectedValue)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    std::string line;
     ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
-    return ContinueOnChipMainThread(CHIP_NO_ERROR);
+    if (expectedValue == nullptr)
+    {
+        return ContinueOnChipMainThread(err);
+    }
+
+    std::getline(std::cin, line);
+    if (line != expectedValue)
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return ContinueOnChipMainThread(err);
 }

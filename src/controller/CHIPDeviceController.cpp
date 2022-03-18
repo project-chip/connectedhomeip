@@ -745,6 +745,11 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
     mCommissioneeDevicePool.ReleaseObject(device);
+    // Make sure that there will be no dangling pointer
+    if (mDeviceBeingCommissioned == device)
+    {
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -887,7 +892,6 @@ exit:
         if (device != nullptr)
         {
             ReleaseCommissioneeDevice(device);
-            mDeviceBeingCommissioned = nullptr;
         }
     }
 
@@ -972,7 +976,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
     }
 
     if (mPairingDelegate != nullptr)
@@ -1109,17 +1112,15 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
             commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED, report);
             return;
         }
-        else
-        {
-            ChipLogError(Controller,
-                         "Failed in verifying 'Attestation Information' command received from the device: err %hu. Look at "
-                         "AttestationVerificationResult enum to understand the errors",
-                         static_cast<uint16_t>(result));
-            // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
-            // understand the errors.
-            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
-            return;
-        }
+
+        ChipLogError(Controller,
+                     "Failed in verifying 'Attestation Information' command received from the device: err %hu. Look at "
+                     "AttestationVerificationResult enum to understand the errors",
+                     static_cast<uint16_t>(result));
+        // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
+        // understand the errors.
+        commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+        return;
     }
 
     ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
@@ -1243,8 +1244,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.caseAdminNode = adminSubject;
     request.adminVendorId = mVendorId;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(mDeviceBeingCommissioned, request,
-                                                                    OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
+    ReturnErrorOnFailure(
+        SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1466,7 +1467,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     {
         // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
         // In this case, we should call back the commissioning complete and call session error
-        if (mPairingDelegate != nullptr)
+        if (mPairingDelegate != nullptr && mDeviceBeingCommissioned != nullptr)
         {
             mPairingDelegate->OnCommissioningComplete(mDeviceBeingCommissioned->GetDeviceId(), status);
         }
@@ -1487,7 +1488,6 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
             // Let's release the device that's being paired, if pairing was successful,
             // and the device is available on the operational network.
             commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-            commissioner->mDeviceBeingCommissioned = nullptr;
             if (commissioner->mCommissioningDelegate != nullptr)
             {
                 CommissioningDelegate::CommissioningReport report;
@@ -1544,7 +1544,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         //
         // Run the above cases under valgrind/asan to validate no additional leaks.
         commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-        commissioner->mDeviceBeingCommissioned = nullptr;
     }
 }
 
@@ -1754,6 +1753,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
+    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                    params.GetCompletionStatus().AsString());
+
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
     mCommissioningStage    = step;
@@ -1998,12 +2000,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Sending operational certificate chain to the device");
         SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value());
-        break;
-    case CommissioningStage::kConfigACL:
-        // TODO: Implement
         break;
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.GetWiFiCredentials().HasValue())
@@ -2013,7 +2011,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
 
-        ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
@@ -2028,7 +2025,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Adding thread network");
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
         request.breadcrumb         = breadcrumb;
@@ -2042,7 +2038,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID  = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb = breadcrumb;
@@ -2060,7 +2055,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        ChipLogProgress(Controller, "Enabling thread network");
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID  = extendedPanId;
         request.breadcrumb = breadcrumb;
@@ -2078,14 +2072,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendComplete: {
-        ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint,
                                                  timeout);
     }
     break;
     case CommissioningStage::kCleanup:
-        ChipLogProgress(Controller, "Rendezvous cleanup");
         if (mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnCommissioningComplete(proxy->GetDeviceId(), params.GetCompletionStatus());
