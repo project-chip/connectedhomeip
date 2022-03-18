@@ -88,7 +88,7 @@ private:
     // TODO:: Track the state of what was mutated during fail-safe.
 
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
-    void CommissioningFailedTimerComplete();
+    void FailSafeTimerExpired();
 };
 
 } // namespace DeviceLayer

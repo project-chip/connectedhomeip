@@ -40,12 +40,8 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricI
 
     ChipDeviceEvent event;
 
-    event.Type                                                 = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerNodeId                     = peerNodeId;
-    event.CommissioningComplete.PeerFabricIndex                = accessingFabricIndex;
-    event.CommissioningComplete.AddNocCommandHasBeenInvoked    = mFailSafeContext.AddNocCommandHasBeenInvoked();
-    event.CommissioningComplete.UpdateNocCommandHasBeenInvoked = mFailSafeContext.UpdateNocCommandHasBeenInvoked();
-    event.CommissioningComplete.Status                         = CHIP_NO_ERROR;
+    event.Type                             = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerNodeId = peerNodeId;
 
     return PlatformMgr().PostEvent(&event);
 }
