@@ -157,7 +157,7 @@ else
     if [ ${BUILD_DIR:0:2} == "./"]; then
         BUILD_DIR_TRIMMED="${BUILD_DIR:2}" 
     else
-        BUILD_DIR_TRIMMED="${BUILD_DIR#*/}"
+        BUILD_DIR_TRIMMED="${BUILD_DIR}"
     fi
     S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
     if [ -z "$S37_PATH" ]; then
