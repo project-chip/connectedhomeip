@@ -33,8 +33,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 #if CONFIG_NETWORK_LAYER_BLE
                                                      Ble::BleLayer * bleLayer,
 #endif
-                                                     SessionManager * sessionManager,
-                                                     FabricTable * fabrics)
+                                                     SessionManager * sessionManager, FabricTable * fabrics)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
