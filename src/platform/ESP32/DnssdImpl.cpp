@@ -16,11 +16,11 @@
  */
 
 #include "lib/dnssd/platform/Dnssd.h"
+#include "DnssdImpl.h"
 
 #include <esp_err.h>
 #include <lwip/ip4_addr.h>
 #include <lwip/ip6_addr.h>
-#include <mdns.h>
 
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CHIPMem.h>
@@ -36,6 +36,82 @@ static constexpr size_t kMaxResults     = 20;
 
 namespace chip {
 namespace Dnssd {
+
+struct MdnsQuery
+{
+    GenericContext * ctx;
+    MdnsQuery * next;
+};
+
+static MdnsQuery * sQueryList = nullptr;
+void MdnsQueryNotifier(mdns_search_once_t * searchHandle);
+
+CHIP_ERROR AddQueryList(GenericContext * ctx)
+{
+    MdnsQuery * ret = static_cast<MdnsQuery *>(chip::Platform::MemoryAlloc(sizeof(MdnsQuery)));
+    if (ret == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to alloc memory for MdnsQuery");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    ret->ctx = ctx;
+    ret->next = sQueryList;
+    sQueryList = ret;
+    return CHIP_NO_ERROR;
+}
+
+GenericContext * FindMdnsQuery(mdns_search_once_t * searchHandle)
+{
+    MdnsQuery * current = sQueryList;
+    while (current)
+    {
+        if (current->ctx && current->ctx->mSearchHandle == searchHandle)
+        {
+            return current->ctx;
+        }
+        current = current->next;
+    }
+    return nullptr;
+}
+
+CHIP_ERROR RemoveMdnsQuery(GenericContext * ctx)
+{
+    MdnsQuery * current = sQueryList;
+    MdnsQuery * front = nullptr;
+
+    VerifyOrReturnError(ctx != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    while (current)
+    {
+        if (current->ctx == ctx)
+        {
+            break;
+        }
+        front = current;
+        current = current->next;
+    }
+    if (!current)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    if (front)
+    {
+        front->next = current->next;
+    }
+    else
+    {
+        sQueryList = current->next;
+    }
+    if (current->ctx->mContextType == ContextType::Browse)
+    {
+        chip::Platform::Delete(reinterpret_cast<BrowseContext *>(current->ctx));
+    }
+    else if (ctx->mContextType == ContextType::Resolve)
+    {
+        chip::Platform::Delete(reinterpret_cast<ResolveContext *>(current->ctx));
+    }
+    chip::Platform::MemoryFree(current);
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -149,22 +225,22 @@ TextEntry * GetTextEntry(mdns_txt_item_t * txt_array, uint8_t * txt_value_len, s
     return ret;
 }
 
-CHIP_ERROR GetIPAddress(Inet::IPAddress & outIPAddress, mdns_ip_addr_t * MdnsIPAddr)
+CHIP_ERROR GetIPAddress(Inet::IPAddress & outIPAddress, mdns_ip_addr_t * mdnsIPAddr)
 {
-    if (!MdnsIPAddr)
+    if (!mdnsIPAddr)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (MdnsIPAddr->addr.type == ESP_IPADDR_TYPE_V6)
+    if (mdnsIPAddr->addr.type == ESP_IPADDR_TYPE_V6)
     {
-        memcpy(outIPAddress.Addr, MdnsIPAddr->addr.u_addr.ip6.addr, sizeof(MdnsIPAddr->addr.u_addr.ip6.addr));
+        memcpy(outIPAddress.Addr, mdnsIPAddr->addr.u_addr.ip6.addr, sizeof(mdnsIPAddr->addr.u_addr.ip6.addr));
     }
-    else if (MdnsIPAddr->addr.type == ESP_IPADDR_TYPE_V4)
+    else if (mdnsIPAddr->addr.type == ESP_IPADDR_TYPE_V4)
     {
         outIPAddress.Addr[0] = 0;
         outIPAddress.Addr[1] = 0;
         outIPAddress.Addr[2] = htonl(0xFFFF);
-        outIPAddress.Addr[3] = MdnsIPAddr->addr.u_addr.ip4.addr;
+        outIPAddress.Addr[3] = mdnsIPAddr->addr.u_addr.ip4.addr;
     }
     else
     {
@@ -173,78 +249,244 @@ CHIP_ERROR GetIPAddress(Inet::IPAddress & outIPAddress, mdns_ip_addr_t * MdnsIPA
     return CHIP_NO_ERROR;
 }
 
+size_t GetResultSize(mdns_result_t * result)
+{
+    size_t ret = 0;
+    while (result)
+    {
+        ret++;
+        result = result->next;
+    }
+    return ret;
+}
+
+CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mdns_result_t * currentResult = nullptr;
+    size_t servicesIndex = 0;
+    VerifyOrExit(ctx && ctx->mBrowseCb, error = CHIP_ERROR_INVALID_ARGUMENT);
+    if (ctx->mResult)
+    {
+        ctx->mServiceSize = GetResultSize(ctx->mResult);
+        if (ctx->mServiceSize > 0)
+        {
+            ctx->mServices =
+                static_cast<DnssdService *>(chip::Platform::MemoryCalloc(ctx->mServiceSize, sizeof(DnssdService)));
+            if (!ctx->mServices)
+            {
+                ChipLogError(DeviceLayer, "Failed to alloc memory for Dnssd services");
+                ctx->mServiceSize = 0;
+                error = CHIP_ERROR_NO_MEMORY;
+                ExitNow();
+            }
+            currentResult = ctx->mResult;
+            servicesIndex = 0;
+            while (currentResult)
+            {
+                strncpy(ctx->mServices[servicesIndex].mName, currentResult->instance_name,
+                    strnlen(currentResult->instance_name, Common::kInstanceNameMaxLength));
+                strncpy(ctx->mServices[servicesIndex].mHostName, currentResult->hostname,
+                    strnlen(currentResult->hostname, kHostNameMaxLength));
+                strncpy(ctx->mServices[servicesIndex].mType, currentResult->service_type,
+                    strnlen(currentResult->service_type, kDnssdTypeMaxSize));
+                ctx->mServices[servicesIndex].mProtocol      = ctx->mProtocol;
+                ctx->mServices[servicesIndex].mAddressType   = MapAddressType(currentResult->ip_protocol);
+                ctx->mServices[servicesIndex].mTransportType = ctx->mAddressType;
+                ctx->mServices[servicesIndex].mPort          = currentResult->port;
+                ctx->mServices[servicesIndex].mInterface     = ctx->mInterfaceId;
+                ctx->mServices[servicesIndex].mTextEntries =
+                    GetTextEntry(currentResult->txt, currentResult->txt_value_len, currentResult->txt_count);
+                ctx->mServices[servicesIndex].mTextEntrySize = currentResult->txt_count;
+                ctx->mServices[servicesIndex].mSubTypes      = NULL;
+                ctx->mServices[servicesIndex].mSubTypeSize   = 0;
+                if (currentResult->addr)
+                {
+                    Inet::IPAddress IPAddr;
+                    error = GetIPAddress(IPAddr, currentResult->addr);
+                    SuccessOrExit(error);
+                    ctx->mServices[servicesIndex].mAddress.SetValue(IPAddr);
+                }
+                currentResult = currentResult->next;
+                servicesIndex++;
+            }
+        }
+    }
+exit:
+    ctx->mBrowseCb(ctx->mCbContext, ctx->mServices, ctx->mServiceSize, error);
+    return RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
+}
+
+size_t GetExtraIPsSize(mdns_ip_addr_t * addr)
+{
+    size_t ret = 0;
+    while (addr)
+    {
+        ret++;
+        addr = addr->next;
+    }
+    return ret;
+}
+
+CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mdns_ip_addr_t * extraAddr = nullptr;
+    size_t extraIPIndex = 0;
+
+    VerifyOrExit(ctx && ctx->mResolveCb, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ctx->mService == nullptr && ctx->mResolveState == ResolveContext::ResolveState::QuerySrv,
+                 error = CHIP_ERROR_INCORRECT_STATE);
+    if (ctx->mResult)
+    {
+        ctx->mService = static_cast<DnssdService *>(chip::Platform::MemoryAlloc(sizeof(DnssdService)));
+        VerifyOrExit(ctx->mService != nullptr, error = CHIP_ERROR_NO_MEMORY);
+        strncpy(ctx->mService->mName, ctx->mResult->instance_name,
+                strnlen(ctx->mResult->instance_name, Common::kInstanceNameMaxLength));
+        strncpy(ctx->mService->mHostName, ctx->mResult->hostname,
+                strnlen(ctx->mResult->hostname, kHostNameMaxLength));
+        strncpy(ctx->mService->mType, ctx->mResult->service_type,
+                strnlen(ctx->mResult->service_type, kDnssdTypeMaxSize));
+        ctx->mService->mProtocol      = ctx->mProtocol;
+        ctx->mService->mAddressType   = MapAddressType(ctx->mResult->ip_protocol);
+        ctx->mService->mTransportType = ctx->mService->mAddressType;
+        ctx->mService->mPort          = ctx->mResult->port;
+        ctx->mService->mInterface     = ctx->mInterfaceId;
+        ctx->mService->mSubTypes      = nullptr;
+        ctx->mService->mSubTypeSize   = 0;
+
+        if (ctx->mResult->addr)
+        {
+            Inet::IPAddress IPAddr;
+            GetIPAddress(IPAddr, ctx->mResult->addr);
+            ctx->mService->mAddress.SetValue(IPAddr);
+            extraAddr = ctx->mResult->addr->next;
+            ctx->mExtraIPSize = GetExtraIPsSize(extraAddr);
+            if (ctx->mExtraIPSize > 0)
+            {
+                ctx->mExtraIPs =
+                    static_cast<Inet::IPAddress *>(chip::Platform::MemoryCalloc(ctx->mExtraIPSize, sizeof(Inet::IPAddress)));
+                if (ctx->mExtraIPs == nullptr)
+                {
+                    ChipLogError(DeviceLayer, "Failed to alloc memory for ExtraIPs");
+                    error = CHIP_ERROR_NO_MEMORY;
+                    ctx->mExtraIPSize = 0;
+                    ExitNow();
+                }
+                while (extraAddr)
+                {
+                    GetIPAddress(ctx->mExtraIPs[extraIPIndex], extraAddr);
+                    extraIPIndex++;
+                    extraAddr = extraAddr->next;
+                }
+            }
+            else
+            {
+                ctx->mExtraIPs = nullptr;
+                ctx->mExtraIPSize = 0;
+            }
+        }
+    }
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        ctx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), error);
+        RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
+        return error;
+    }
+    mdns_query_results_free(ctx->mResult);
+    mdns_query_async_delete(ctx->mSearchHandle);
+    ctx->mResult = nullptr;
+    ctx->mResolveState = ResolveContext::ResolveState::QueryTxt;
+    // then query the text entries
+    ctx->mSearchHandle = mdns_query_async_new(ctx->mInstanceName, ctx->mType, GetProtocolString(ctx->mProtocol),
+                                              MDNS_TYPE_TXT, kTimeoutMilli, kMaxResults, MdnsQueryNotifier);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnResolveQueryTxtDone(ResolveContext * ctx)
+{
+    CHIP_ERROR error               = CHIP_NO_ERROR;
+
+    VerifyOrExit(ctx && ctx->mResolveCb, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ctx->mService && ctx->mResolveState == ResolveContext::ResolveState::QueryTxt,
+                 error = CHIP_ERROR_INCORRECT_STATE);
+    if (ctx->mResult)
+    {
+        ctx->mService->mTextEntries =
+            GetTextEntry(ctx->mResult->txt, ctx->mResult->txt_value_len, ctx->mResult->txt_count);
+        ctx->mService->mTextEntrySize = ctx->mResult->txt_count;
+    }
+    else
+    {
+        ctx->mService->mTextEntries = nullptr;
+        ctx->mService->mTextEntrySize = 0;
+    }
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        ctx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), error);
+    }
+    else
+    {
+        ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mExtraIPs, ctx->mExtraIPSize), error);
+    }
+    RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
+    return error;
+}
+
+void MdnsQueryDone(intptr_t context)
+{
+    if (!context)
+    {
+        return;
+    }
+    mdns_search_once_t * searchHandle = reinterpret_cast<mdns_search_once_t *>(context);
+    GenericContext * ctx = FindMdnsQuery(searchHandle);
+    if (mdns_query_async_get_results(searchHandle, 0, &(ctx->mResult)))
+    {
+        if (ctx->mContextType == ContextType::Browse)
+        {
+            OnBrowseDone(reinterpret_cast<BrowseContext *>(ctx));
+        }
+        else if (ctx->mContextType == ContextType::Resolve)
+        {
+            ResolveContext * resolveCtx = reinterpret_cast<ResolveContext *>(ctx);
+            if(resolveCtx->mResolveState == ResolveContext::ResolveState::QuerySrv)
+            {
+                OnResolveQuerySrvDone(resolveCtx);
+            }
+            else if (resolveCtx->mResolveState == ResolveContext::ResolveState::QueryTxt)
+            {
+                OnResolveQueryTxtDone(resolveCtx);
+            }
+        }
+    }
+}
+
+void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(MdnsQueryDone, reinterpret_cast<intptr_t>(searchHandle));
+}
+
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
 {
-    CHIP_ERROR error               = CHIP_NO_ERROR;
-    esp_err_t espError             = ESP_OK;
-    mdns_result_t * browse_results = NULL;
-    mdns_result_t * current_result = NULL;
-    DnssdService * ServicesArray   = NULL;
-    size_t ServicesArraySize       = 0;
-    size_t ServicesArrayIndex      = 0;
-
-    VerifyOrExit(type != NULL && callback != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    espError = mdns_query_ptr(type, GetProtocolString(protocol), kTimeoutMilli, kMaxResults, &browse_results);
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
-    current_result = browse_results;
-    while (current_result)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mdns_search_once_t * searchHandle = mdns_query_async_new(NULL, type, GetProtocolString(protocol), MDNS_TYPE_PTR,
+                                                             kTimeoutMilli, kMaxResults, MdnsQueryNotifier);
+    BrowseContext * ctx = chip::Platform::New<BrowseContext>(type, protocol, interface, searchHandle, addressType,
+                                                             callback, context);
+    if (!ctx)
     {
-        ServicesArraySize++;
-        current_result = current_result->next;
+        ChipLogError(DeviceLayer, "Failed to alloc memory for browse context");
+        mdns_query_async_delete(searchHandle);
+        return CHIP_ERROR_NO_MEMORY;
     }
-    if (ServicesArraySize > 0)
+    error = AddQueryList(reinterpret_cast<GenericContext *>(ctx));
+    if (error != CHIP_NO_ERROR)
     {
-        ServicesArray = static_cast<DnssdService *>(chip::Platform::MemoryCalloc(ServicesArraySize, sizeof(DnssdService)));
-        VerifyOrExit(ServicesArray != NULL, error = CHIP_ERROR_NO_MEMORY);
-        current_result     = browse_results;
-        ServicesArrayIndex = 0;
-        while (current_result)
-        {
-            strncpy(ServicesArray[ServicesArrayIndex].mName, current_result->instance_name,
-                    strnlen(current_result->instance_name, Common::kInstanceNameMaxLength));
-            strncpy(ServicesArray[ServicesArrayIndex].mHostName, current_result->hostname,
-                    strnlen(current_result->hostname, kHostNameMaxLength));
-            strncpy(ServicesArray[ServicesArrayIndex].mType, current_result->service_type,
-                    strnlen(current_result->service_type, kDnssdTypeMaxSize));
-            ServicesArray[ServicesArrayIndex].mProtocol      = protocol;
-            ServicesArray[ServicesArrayIndex].mAddressType   = MapAddressType(current_result->ip_protocol);
-            ServicesArray[ServicesArrayIndex].mTransportType = addressType;
-            ServicesArray[ServicesArrayIndex].mPort          = current_result->port;
-            ServicesArray[ServicesArrayIndex].mInterface     = interface;
-            ServicesArray[ServicesArrayIndex].mTextEntries =
-                GetTextEntry(current_result->txt, current_result->txt_value_len, current_result->txt_count);
-            ServicesArray[ServicesArrayIndex].mTextEntrySize = current_result->txt_count;
-            ServicesArray[ServicesArrayIndex].mSubTypes      = NULL;
-            ServicesArray[ServicesArrayIndex].mSubTypeSize   = 0;
-            if (current_result->addr)
-            {
-                Inet::IPAddress IPAddr;
-                error = GetIPAddress(IPAddr, current_result->addr);
-                SuccessOrExit(error);
-                ServicesArray[ServicesArrayIndex].mAddress.SetValue(IPAddr);
-            }
-            current_result = current_result->next;
-            ServicesArrayIndex++;
-        }
-    }
-    callback(context, ServicesArray, ServicesArraySize, CHIP_NO_ERROR);
-
-exit:
-    if (ServicesArray)
-    {
-        for (ServicesArrayIndex = 0; ServicesArrayIndex < ServicesArraySize; ++ServicesArrayIndex)
-        {
-            if (ServicesArray[ServicesArrayIndex].mTextEntries)
-            {
-                chip::Platform::MemoryFree(ServicesArray[ServicesArrayIndex].mTextEntries);
-            }
-        }
-        chip::Platform::MemoryFree(ServicesArray);
-    }
-    if (browse_results)
-    {
-        mdns_query_results_free(browse_results);
+        chip::Platform::Delete(ctx);
     }
     return error;
 }
@@ -252,78 +494,21 @@ exit:
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
-    CHIP_ERROR error               = CHIP_NO_ERROR;
-    esp_err_t espError             = ESP_OK;
-    mdns_result_t * resolve_result = NULL;
-    mdns_ip_addr_t * resolve_addr  = NULL;
-    mdns_ip_addr_t * extra_addr    = NULL;
-    Inet::IPAddress * extraIPs     = NULL;
-    size_t extraIPsSize            = 0;
-    size_t extraIPsIndex           = 0;
-
-    VerifyOrExit(service != NULL && callback != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    // query_srv to obtain IPAddress
-    espError =
-        mdns_query_srv(service->mName, service->mType, GetProtocolString(service->mProtocol), kTimeoutMilli, &resolve_result);
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
-    if (resolve_result)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mdns_search_once_t * searchHandle = mdns_query_async_new(service->mName, service->mType,
+                                                             GetProtocolString(service->mProtocol), MDNS_TYPE_SRV,
+                                                             kTimeoutMilli, kMaxResults, MdnsQueryNotifier);
+    ResolveContext * ctx = chip::Platform::New<ResolveContext>(service, interface, searchHandle, callback, context);
+    if (!ctx)
     {
-        if (resolve_result->addr)
-        {
-            Inet::IPAddress IPAddr;
-            resolve_addr = resolve_result->addr;
-            error        = GetIPAddress(IPAddr, resolve_addr);
-            SuccessOrExit(error);
-            service->mAddress.SetValue(IPAddr);
-            service->mPort = resolve_result->port;
-            // fill the extra IP address
-            extra_addr = resolve_addr->next;
-            while (extra_addr)
-            {
-                extraIPsSize++;
-                extra_addr = extra_addr->next;
-            }
-            if (extraIPsSize > 0)
-            {
-                extra_addr = resolve_addr->next;
-                extraIPs   = (Inet::IPAddress *) chip::Platform::MemoryCalloc(extraIPsSize, sizeof(Inet::IPAddress));
-                VerifyOrExit(extraIPs != NULL, error = CHIP_ERROR_NO_MEMORY);
-                while (extra_addr)
-                {
-                    error = GetIPAddress(extraIPs[extraIPsIndex], extra_addr);
-                    SuccessOrExit(error);
-                    extra_addr = extra_addr->next;
-                    extraIPsIndex++;
-                }
-            }
-        }
-        strncpy(service->mHostName, resolve_result->hostname, strnlen(resolve_result->hostname, kHostNameMaxLength));
-        mdns_query_results_free(resolve_result);
-        resolve_result = NULL;
+        ChipLogError(DeviceLayer, "Failed to alloc memory for resolve context");
+        mdns_query_async_delete(searchHandle);
+        return CHIP_ERROR_NO_MEMORY;
     }
-    // query_txt to obtain text entries
-    espError =
-        mdns_query_txt(service->mName, service->mType, GetProtocolString(service->mProtocol), kTimeoutMilli, &resolve_result);
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
-    if (resolve_result)
+    error = AddQueryList(reinterpret_cast<GenericContext *>(ctx));
+    if (error != CHIP_NO_ERROR)
     {
-        service->mTextEntries   = GetTextEntry(resolve_result->txt, resolve_result->txt_value_len, resolve_result->txt_count);
-        service->mTextEntrySize = resolve_result->txt_count;
-    }
-
-    callback(context, service, Span<Inet::IPAddress>(extraIPs, extraIPsSize), CHIP_NO_ERROR);
-exit:
-    if (extraIPs)
-    {
-        chip::Platform::MemoryFree(extraIPs);
-    }
-    if (service->mTextEntries)
-    {
-        chip::Platform::MemoryFree(service->mTextEntries);
-    }
-    if (resolve_result)
-    {
-        mdns_query_results_free(resolve_result);
+        chip::Platform::Delete(ctx);
     }
     return error;
 }
