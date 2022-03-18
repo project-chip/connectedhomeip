@@ -26,6 +26,7 @@ static_library("transport") {
     "CryptoContext.h",
     "GroupPeerMessageCounter.cpp",
     "GroupPeerMessageCounter.h",
+    "GroupSession.cpp",
     "GroupSession.h",
     "MessageCounter.cpp",
     "MessageCounter.h",
