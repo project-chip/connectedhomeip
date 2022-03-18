@@ -374,7 +374,10 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), 
+#if CONFIG_NETWORK_LAYER_BLE
+                     nullptr,
+#endif
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);

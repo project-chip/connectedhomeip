@@ -30,7 +30,10 @@ using namespace ::chip::Credentials;
 namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                                     Ble::BleLayer * bleLayer, SessionManager * sessionManager,
+#if CONFIG_NETWORK_LAYER_BLE
+                                                     Ble::BleLayer * bleLayer,
+#endif
+                                                     SessionManager * sessionManager,
                                                      FabricTable * fabrics)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -38,7 +41,9 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CONFIG_NETWORK_LAYER_BLE
     mBleLayer        = bleLayer;
+#endif
     mSessionManager  = sessionManager;
     mFabrics         = fabrics;
     mExchangeManager = exchangeManager;

@@ -51,7 +51,9 @@ using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 using chip::Inet::IPAddressType;
+#if CONFIG_NETWORK_LAYER_BLE
 using chip::Transport::BleListenParameters;
+#endif
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
@@ -255,7 +257,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, 
+#if CONFIG_NETWORK_LAYER_BLE
+        chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+#endif
                                                     &mSessions, &mFabrics);
     SuccessOrExit(err);
 
