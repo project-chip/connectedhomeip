@@ -453,6 +453,7 @@ struct ChipDeviceEvent final
         struct
         {
             uint64_t PeerNodeId;
+            FabricIndex PeerFabricIndex;
         } CommissioningComplete;
 
         struct
