@@ -71,7 +71,10 @@ static_library("ESP32") {
       "NetworkCommissioningWiFiDriver.cpp",
     ]
     if (chip_mdns == "platform") {
-      sources += [ "DnssdImpl.cpp" ]
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+    ]
     }
   }
 
