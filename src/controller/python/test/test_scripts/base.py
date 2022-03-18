@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 from dataclasses import dataclass
 from inspect import Attribute
+import inspect
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -53,6 +55,67 @@ def TestFail(message):
 def FailIfNot(cond, message):
     if not cond:
         TestFail(message)
+
+
+_configurable_tests = set()
+_configurable_test_sets = set()
+_enabled_tests = []
+_disabled_tests = []
+
+
+def SetTestSet(enabled_tests, disabled_tests):
+    global _enabled_tests, _disabled_tests
+    _enabled_tests = enabled_tests[:]
+    _disabled_tests = disabled_tests[:]
+
+
+def TestIsEnabled(test_name: str):
+    enabled_len = -1
+    disabled_len = -1
+    if 'all' in _enabled_tests:
+        enabled_len = 0
+    if 'all' in _disabled_tests:
+        disabled_len = 0
+
+    for test_item in _enabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > enabled_len):
+            enabled_len = len(test_item)
+
+    for test_item in _disabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > disabled_len):
+            disabled_len = len(test_item)
+
+    return enabled_len > disabled_len
+
+
+def test_set(cls):
+    _configurable_test_sets.add(cls.__qualname__)
+    return cls
+
+
+def test_case(func):
+    test_name = func.__qualname__
+    _configurable_tests.add(test_name)
+
+    def CheckEnableBeforeRun(*args, **kwargs):
+        if TestIsEnabled(test_name=test_name):
+            return func(*args, **kwargs)
+        elif inspect.iscoroutinefunction(func):
+            # noop, so users can use await as usual
+            return asyncio.sleep(0)
+    return CheckEnableBeforeRun
+
+
+def configurable_tests():
+    res = [v for v in _configurable_test_sets]
+    res.sort()
+    return res
+
+
+def configurable_test_cases():
+    res = [v for v in _configurable_tests]
+    res.sort()
+    return res
 
 
 class TestTimeout(threading.Thread):
@@ -135,6 +198,16 @@ class BaseTestHelper:
             return False
         self.logger.info(f"Found device at {res}")
         return res
+
+    def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Conducting key exchange with device {}".format(discriminator))
+        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(discriminator))
+            return False
+        self.logger.info("Device finished key exchange.")
+        return True
 
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))

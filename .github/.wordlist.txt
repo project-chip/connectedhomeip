@@ -156,6 +156,7 @@ BTP
 btvirt
 buildwithmatter
 burndown
+ButtonIsr
 BytesMain
 bz
 bzip
@@ -300,6 +301,7 @@ cxx
 CY
 CYW
 DAC
+dadbdcdddedf
 DAP
 DAPLINK
 DataFrame
@@ -358,6 +360,7 @@ DevKitC
 DevKitM
 devtype
 df
+dfe
 dfu
 DgDxsfHx
 dhclient
@@ -542,6 +545,7 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupsettings
 gtk
 GUA
 Gv
@@ -601,6 +605,7 @@ Infineon
 ini
 init
 inlined
+InputLoop
 installDebug
 instantiation
 integrations
@@ -646,10 +651,12 @@ kBusy
 kCase
 Kconfig
 KeypadInput
+keyset
 kGroup
 kInvalidCommandId
 KitProg
 kManage
+kNewButton
 kNodeIdNotSpecified
 knownissues
 kOperate
@@ -1076,6 +1083,8 @@ sdl
 SED
 SEGGER
 semver
+SendButton
+SendNewInputEvent
 sendto
 SERIALDEVICE
 SerialNumber
@@ -1184,6 +1193,7 @@ TestEmptyString
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead
+TestName
 TESTPASSWD
 TestPICS
 TESTSSID
@@ -1302,6 +1312,7 @@ vous
 VPN
 VSC
 VSCode
+WaitNewInputEvent
 WakeOnLan
 WantedBy
 webpage
@@ -1326,6 +1337,7 @@ WS
 WSL
 WSTK
 xa
+xAAAA
 xab
 xaver
 xb
@@ -1358,6 +1370,8 @@ xfffff
 xFFFFFFFD
 xffffffffe
 xfffffffff
+xffffffffffff
+xffffffffffffXXXX
 xtensa
 xwayland
 XXXX
@@ -1401,3 +1415,14 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+ClusterObjectTests
+TestTimedRequestTimeout
+datamodel
+appliable
+commissionee
+configs
+NAMESERVER
+UTF
+localedef
+nameserver
+nmcli

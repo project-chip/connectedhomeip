@@ -141,7 +141,7 @@ public:
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId);
+                                     MutableByteSpan & destinationId) const;
 
     CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
                                   size_t ipkListEntries);

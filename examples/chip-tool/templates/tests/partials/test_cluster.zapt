@@ -318,8 +318,17 @@ class {{filename}}Suite: public TestCommand
     {
         chip::app::StatusIB status(error);
         {{#if response.error}}
+          {{#if optional}}
+          if (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute){
+            {{#unless async}}NextTest();{{/unless}}
+          } else {
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+            {{#unless async}}NextTest();{{/unless}}
+          }
+          {{else}}
           VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
           {{#unless async}}NextTest();{{/unless}}
+          {{/if}}
         {{else}}
           {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse();
         {{/if}}

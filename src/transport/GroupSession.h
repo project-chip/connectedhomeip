@@ -92,7 +92,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;
@@ -153,7 +153,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;

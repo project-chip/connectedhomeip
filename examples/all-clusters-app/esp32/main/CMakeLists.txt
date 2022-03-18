@@ -253,6 +253,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_LOCKING_SERVICE=1"
                        "-DPW_RPC_TRACING_SERVICE=1"
-                       "-DPW_RPC_WIFI_SERVICE=1")
+                       "-DPW_RPC_WIFI_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
 
 endif (CONFIG_ENABLE_PW_RPC)
