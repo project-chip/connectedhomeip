@@ -216,9 +216,15 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Commissioning has completed either through timer expiry or by a call to the general commissioning cluster command.
+     * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
+
+    /**
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
+     * successfully invoked.
+     */
+    kFailSafeTimerExpired,
 
     /**
      *
@@ -446,12 +452,16 @@ struct ChipDeviceEvent final
 
         struct
         {
-            CHIP_ERROR Status;
             uint64_t PeerNodeId;
+            FabricIndex PeerFabricIndex;
+        } CommissioningComplete;
+
+        struct
+        {
             FabricIndex PeerFabricIndex;
             bool AddNocCommandHasBeenInvoked;
             bool UpdateNocCommandHasBeenInvoked;
-        } CommissioningComplete;
+        } FailSafeTimerExpired;
 
         struct
         {
