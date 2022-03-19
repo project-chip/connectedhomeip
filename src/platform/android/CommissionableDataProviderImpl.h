@@ -18,19 +18,18 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <vector>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <platform/CommissionableDataProvider.h>
-#include <jni.h>
+#include <stdint.h>
+#include <vector>
 
 class CommissionableDataProviderImpl : public chip::DeviceLayer::CommissionableDataProvider
 {
 public:
-    CHIP_ERROR Update(JNIEnv * env, jstring spake2pVerifierBase64,
-                    jstring Spake2pSaltBase64, jint spake2pIterationCount,
-                    jlong setupPasscode, jint discriminator);
+    CHIP_ERROR Update(JNIEnv * env, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64, jint spake2pIterationCount,
+                      jlong setupPasscode, jint discriminator);
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override
     {

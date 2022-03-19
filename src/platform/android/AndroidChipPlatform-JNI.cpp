@@ -259,13 +259,13 @@ exit:
 #endif
 
 // for CommissionableDataProvider
-JNI_METHOD(jboolean, updateCommissionableDataProviderData)(JNIEnv * env, jclass self,jstring spake2pVerifierBase64,
-                    jstring Spake2pSaltBase64, jint spake2pIterationCount,
-                    jlong setupPasscode, jint discriminator)
+JNI_METHOD(jboolean, updateCommissionableDataProviderData)
+(JNIEnv * env, jclass self, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64, jint spake2pIterationCount,
+ jlong setupPasscode, jint discriminator)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CommissionableDataProviderMgrImpl().Update(env, spake2pVerifierBase64, Spake2pSaltBase64,
-                                                            spake2pIterationCount, setupPasscode, discriminator);
+                                                                spake2pIterationCount, setupPasscode, discriminator);
 
     return err == CHIP_NO_ERROR;
 }
