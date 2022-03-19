@@ -221,7 +221,7 @@ enum PublicEventTypes
     kCommissioningComplete,
 
     /**
-     * Signals that the fail-safe timer expires before the CommissioningComplete command is
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
      * successfully invoked.
      */
     kFailSafeTimerExpired,

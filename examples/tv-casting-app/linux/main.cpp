@@ -507,12 +507,6 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Commissioning is not successfully Complete");
-            return;
-        }
-
         ReturnOnFailure(gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId,
                                                           event->CommissioningComplete.PeerFabricIndex));
 
