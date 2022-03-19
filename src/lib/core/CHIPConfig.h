@@ -1383,7 +1383,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 9
 #endif
 
 /**
