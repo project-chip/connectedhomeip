@@ -33,6 +33,10 @@ const char * StageToString(CommissioningStage stage)
         return "SecurePairing";
         break;
 
+    case kReadCommissioningInfo:
+        return "ReadCommissioningInfo";
+        break;
+
     case kArmFailsafe:
         return "ArmFailSafe";
         break;
