@@ -334,10 +334,10 @@ jobs:
               # the examples-linux-standalone.yaml tests on darwin without too
               # much code duplication.
               run: |
-                  for BUILD_TYPE  in clang_mac clang_ios python_lib; do
+                  for BUILD_TYPE  in mac ios python_lib; do
                       case $BUILD_TYPE in
-                          "clang_mac") GN_ARGS='is_clang=true target_os="mac" is_asan=true';;
-                          "clang_ios") GN_ARGS='is_clang=true target_os="ios" is_asan=true';;
+                          "mac") GN_ARGS='is_clang=true target_os="mac" is_asan=true';;
+                          "ios") GN_ARGS='target_os="ios" is_asan=true';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
@@ -350,8 +350,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --no-log-timestamps \
-                       --compile-database out/clang_mac/compile_commands.json \
-                       --compile-database out/clang_ios/compile_commands.json \
+                       --compile-database out/mac/compile_commands.json \
                        check \
                     "
             - name: Uploading diagnostic logs
