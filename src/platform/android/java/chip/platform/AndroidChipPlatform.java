@@ -92,5 +92,10 @@ public final class AndroidChipPlatform {
 
   private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
 
-  public native boolean updateCommissionableDataProviderData(String spake2pVerifierBase64, String Spake2pSaltBase64, int spake2pIterationCount, long setupPasscode, int discriminator);
+  public native boolean updateCommissionableDataProviderData(
+      String spake2pVerifierBase64,
+      String Spake2pSaltBase64,
+      int spake2pIterationCount,
+      long setupPasscode,
+      int discriminator);
 }
