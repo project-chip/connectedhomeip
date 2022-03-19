@@ -50,6 +50,8 @@ CHIP_ERROR LayerImplLwIP::Shutdown()
 
 CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    ChipLogError(LayerImplLwIP, "yujuan:LayerImplSelect::StartTimer");
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::kZero);

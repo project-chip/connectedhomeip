@@ -165,6 +165,8 @@ void LayerImplLibevent::Signal()
 
 CHIP_ERROR LayerImplLibevent::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    ChipLogError(LayerImplLwIP, "yujuan:LayerImplLibevent::StartTimer");
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     std::lock_guard<Mutex> lock(mTimerListMutex);

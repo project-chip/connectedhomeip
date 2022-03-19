@@ -42,6 +42,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       "${chip_root}/src/lib/support",
       "${chip_root}/src/platform",
       "${chip_root}/src/system",
+      "${chip_root}/src/transport/raw/tests:helpers",
       "${nlunit_test_root}:nlunit-test",
     ]
 
@@ -87,7 +88,9 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     }
 
     if (chip_device_platform == "linux") {
-      test_sources += [ "TestConnectivityMgr.cpp" ]
+      test_sources += [ 
+        "TestConnectivityMgr.cpp",
+        "TestFailSafeContext.cpp" ]
     }
   }
 } else {

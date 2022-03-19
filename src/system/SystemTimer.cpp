@@ -40,6 +40,7 @@ namespace System {
 
 TimerList::Node * TimerList::Add(TimerList::Node * add)
 {
+    ChipLogError(chipSystemLayer, "yujuan:TimerList::Add");
     VerifyOrDie(add != mEarliestTimer);
     if (mEarliestTimer == nullptr || (add->AwakenTime() < mEarliestTimer->AwakenTime()))
     {

@@ -117,6 +117,8 @@ void LayerImplSelect::Signal()
 
 CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    ChipLogError(chipSystemLayer, "yujuan:LayerImplSelect::StartTimer");
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::kZero);
