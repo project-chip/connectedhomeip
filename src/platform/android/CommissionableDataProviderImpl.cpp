@@ -22,11 +22,11 @@
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/JniTypeWrappers.h>
-#include <lib/support/Base64.h>
 #include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
@@ -45,20 +45,23 @@ CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & spake2pSaltVector)
 
 CommissionableDataProviderImpl CommissionableDataProviderImpl::sInstance;
 
-CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pVerifierBase64,
-                    jstring Spake2pSaltBase64, jint spake2pIterationCount,
-                    jlong setupPasscode, jint discriminator)
+CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64,
+                                                  jint spake2pIterationCount, jlong setupPasscode, jint discriminator)
 {
-    if (!mIsUpdate) {
+    if (!mIsUpdate)
+    {
         DeviceLayer::SetCommissionableDataProvider(this);
     }
 
     VerifyOrReturnLogError(discriminator <= chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
-    if(spake2pIterationCount == 0) {
+    if (spake2pIterationCount == 0)
+    {
         spake2pIterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
     }
-    VerifyOrReturnLogError(static_cast<uint32_t>(spake2pIterationCount) >= kSpake2p_Min_PBKDF_Iterations, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnLogError(static_cast<uint32_t>(spake2pIterationCount) <= kSpake2p_Max_PBKDF_Iterations, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(static_cast<uint32_t>(spake2pIterationCount) >= kSpake2p_Min_PBKDF_Iterations,
+                           CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(static_cast<uint32_t>(spake2pIterationCount) <= kSpake2p_Max_PBKDF_Iterations,
+                           CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err;
     Spake2pVerifier providedVerifier;
@@ -69,9 +72,11 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
         chip::JniUtfString utfSpake2pVerifierBase64(env, spake2pVerifierBase64);
 
         size_t maxBase64Size = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
-        VerifyOrReturnLogError(static_cast<unsigned>(utfSpake2pVerifierBase64.size()) <= maxBase64Size, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnLogError(static_cast<unsigned>(utfSpake2pVerifierBase64.size()) <= maxBase64Size,
+                               CHIP_ERROR_INVALID_ARGUMENT);
 
-        size_t decodedLen = chip::Base64Decode32(utfSpake2pVerifierBase64.c_str(), utfSpake2pVerifierBase64.size(), reinterpret_cast<uint8_t *>(serializedSpake2pVerifier.data()));
+        size_t decodedLen = chip::Base64Decode32(utfSpake2pVerifierBase64.c_str(), utfSpake2pVerifierBase64.size(),
+                                                 reinterpret_cast<uint8_t *>(serializedSpake2pVerifier.data()));
         VerifyOrReturnLogError(decodedLen == chip::Crypto::kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
         chip::MutableByteSpan verifierSpan{ serializedSpake2pVerifier.data(), decodedLen };
@@ -85,18 +90,24 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     VerifyOrReturnLogError(!havePaseVerifier || (havePaseVerifier && havePaseSalt), CHIP_ERROR_INVALID_ARGUMENT);
     std::vector<uint8_t> spake2pSalt(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
 
-    if (!havePaseSalt) {
-        ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");\
+    if (!havePaseSalt)
+    {
+        ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");
         err = GeneratePaseSalt(spake2pSalt);
         VerifyOrReturnLogError(err == CHIP_NO_ERROR, err);
-    } else {
+    }
+    else
+    {
         chip::JniUtfString utfSpake2pSaltBase64(env, Spake2pSaltBase64);
 
         size_t maxBase64Size = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
         VerifyOrReturnLogError(static_cast<unsigned>(utfSpake2pSaltBase64.size()) <= maxBase64Size, CHIP_ERROR_INVALID_ARGUMENT);
 
-        size_t decodedLen = chip::Base64Decode32(utfSpake2pSaltBase64.c_str(), utfSpake2pSaltBase64.size(), reinterpret_cast<uint8_t *>(spake2pSalt.data()));
-        VerifyOrReturnLogError(decodedLen >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length && decodedLen <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
+        size_t decodedLen = chip::Base64Decode32(utfSpake2pSaltBase64.c_str(), utfSpake2pSaltBase64.size(),
+                                                 reinterpret_cast<uint8_t *>(spake2pSalt.data()));
+        VerifyOrReturnLogError(decodedLen >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length &&
+                                   decodedLen <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length,
+                               CHIP_ERROR_INVALID_ARGUMENT);
         spake2pSalt.resize(decodedLen);
     }
 
@@ -107,7 +118,7 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     if (havePasscode)
     {
         uint32_t u32SetupPasscode = static_cast<uint32_t>(setupPasscode);
-        err = passcodeVerifier.Generate(spake2pIterationCount, saltSpan, u32SetupPasscode);
+        err                       = passcodeVerifier.Generate(spake2pIterationCount, saltSpan, u32SetupPasscode);
         VerifyOrReturnLogError(err == CHIP_NO_ERROR, err);
 
         chip::MutableByteSpan verifierSpan{ serializedPasscodeVerifier.data(), serializedPasscodeVerifier.size() };
