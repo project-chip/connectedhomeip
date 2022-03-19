@@ -85,12 +85,6 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SoftwareVersion:
         return 1;
-
-      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupPinCode:
-        return 20202021;
-
-      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupDiscriminator:
-        return 0xF00;
     }
 
     if (preferences.contains(key)) {
