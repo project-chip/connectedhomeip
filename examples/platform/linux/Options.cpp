@@ -239,7 +239,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         else
         {
-            LinuxDeviceOptions::GetInstance().discriminator.SetValue(value) ;
+            LinuxDeviceOptions::GetInstance().discriminator.SetValue(value);
         }
         break;
     }

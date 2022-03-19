@@ -188,10 +188,10 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
         VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
 
         ChipLogError(Support,
-                    "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
-                    "given on command line. This is temporary and will disappear. Please update your scripts "
-                    "to explicitly configure discriminator. ***",
-                    static_cast<unsigned>(defaultTestDiscriminator));
+                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure discriminator. ***",
+                     static_cast<unsigned>(defaultTestDiscriminator));
         options.payload.discriminator = defaultTestDiscriminator;
     }
 
