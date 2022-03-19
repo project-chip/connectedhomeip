@@ -91,4 +91,6 @@ public final class AndroidChipPlatform {
       ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 
   private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
+
+  public native boolean updateCommissionableDataProviderData(String spake2pVerifierBase64, String Spake2pSaltBase64, int spake2pIterationCount, long setupPasscode, int discriminator);
 }
