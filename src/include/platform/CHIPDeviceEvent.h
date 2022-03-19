@@ -229,6 +229,11 @@ enum PublicEventTypes
      * Signals that DNS-SD platform layer was initialized and is ready to operate.
      */
     kDnssdPlatformInitialized,
+
+    /**
+     * Signals that bindings were updated.
+     */
+    kBindingsChangedViaCluster,
 };
 
 /**
