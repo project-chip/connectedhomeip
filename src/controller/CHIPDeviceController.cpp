@@ -1556,13 +1556,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     }
 }
 
-void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint,
-                                      Optional<System::Clock::Timeout> timeout)
-{
-    base.Associate(proxy, endpoint);
-    base.SetCommandTimeout(timeout);
-}
-
 // AttributeCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
