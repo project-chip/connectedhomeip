@@ -54,7 +54,6 @@ tests:
     - label:
           "Writes a value of greater than 1 to TemperatureDisplayMode attribute
           of DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "temperature display mode"
       PICS: A_TEMPERATURE_DISPLAY_MODE
@@ -132,7 +131,6 @@ tests:
     #Disabled as write was successful
     - label:
           "Writes a value of greater than 5 to KeypadLockout attribute of DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "keypad lockout"
       PICS: A_KEYPAD_LOCKOUT
@@ -173,7 +171,6 @@ tests:
     - label:
           "Writes a value of greater than 1 to ScheduleProgrammingVisibility
           attribute of DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "schedule programming visibility"
       PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY

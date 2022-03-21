@@ -122,3 +122,211 @@ tests:
       attribute: "occupancy sensor type bitmap"
       response:
           value: 1
+
+    #disabled due to issue #15377
+    - label: "Reads optional attribute: PIROccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+      response:
+          value: 0
+
+    - label: "Reads optional attribute constrains: PIROccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PIROccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+      arguments:
+          value: 0
+
+    - label: "Reads back optional attribute: PIROccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+      response:
+          value: 0
+
+    - label: "Reads optional attribute: PIRUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+      response:
+          value: 0
+
+    - label: "Reads optional attribute constrains: PIRUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PIRUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+      arguments:
+          value: 0
+
+    - label: "Reads back optional attribute: PIRUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+      response:
+          value: 0
+
+    - label: "Reads optional attribute: PIRUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+      response:
+          value: 1
+
+    - label:
+          "Reads optional attribute constrains: PIRUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+      response:
+          constraints:
+              type: uint8
+              minValue: 1
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PIRUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+      arguments:
+          value: 1
+
+    - label: "Reads back optional attribute: PIRUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+      response:
+          value: 1
+
+    - label:
+          "Reads optional attribute: PhysicalContactOccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      response:
+          value: 0
+
+    - label:
+          "Reads optional attribute constrains:
+          PhysicalContactOccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PhysicalContactOccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      arguments:
+          value: 0
+
+    - label:
+          "Reads back optional attribute:
+          PhysicalContactOccupiedToUnoccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      response:
+          value: 0
+
+    - label:
+          "Reads optional attribute: PhysicalContactUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      response:
+          value: 0
+
+    - label:
+          "Reads optional attribute constrains:
+          PhysicalContactUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PhysicalContactUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      arguments:
+          value: 0
+
+    - label:
+          "Reads back optional attribute:
+          PhysicalContactUnoccupiedToOccupiedDelay"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      response:
+          value: 0
+
+    - label:
+          "Reads optional attribute:
+          PhysicalContactUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      response:
+          value: 1
+
+    - label:
+          "Reads optional attribute constrains:
+          PhysicalContactUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      response:
+          constraints:
+              type: uint8
+              minValue: 1
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attribute:
+          PhysicalContactUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      arguments:
+          value: 1
+
+    - label:
+          "Reads back optional attribute:
+          PhysicalContactUnoccupiedToOccupiedThreshold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      response:
+          value: 1
