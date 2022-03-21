@@ -209,7 +209,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 #endif
         Impl()->LockThreadStack();
 
-        if (mDeviceType == ConnectivityManager::kThreadDeviceType_SleepyEndDevice && event->ThreadStateChange.RoleChanged)
+        if (mInitialDeviceType == ConnectivityManager::kThreadDeviceType_SleepyEndDevice && event->ThreadStateChange.RoleChanged)
         {
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
             linkMode.mRxOnWhenIdle    = (otThreadGetDeviceRole(mOTInst) !=
@@ -432,15 +432,35 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 template <class ImplClass>
 ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType(void)
 {
-    return mDeviceType;
+    ConnectivityManager::ThreadDeviceType deviceType;
+
+    Impl()->LockThreadStack();
+
+    const otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    if (linkMode.mDeviceType && otThreadIsRouterEligible(mOTInst))
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_Router);
+    if (linkMode.mDeviceType)
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_FullEndDevice);
+#endif
+    if (mInitialDeviceType != ConnectivityManager::kThreadDeviceType_SleepyEndDevice && linkMode.mRxOnWhenIdle)
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+
+    ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return deviceType;
 }
 
 template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mDeviceType    = deviceType;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    mInitialDeviceType = deviceType;
 
     otLinkModeConfig linkMode;
 
