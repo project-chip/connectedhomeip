@@ -315,7 +315,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
         !HasActiveRead())
     {
-        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        ChipLogDetail(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
         return CHIP_NO_ERROR;
     }
@@ -474,8 +474,8 @@ exit:
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(ec));
+    ChipLogError(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(ec));
 }
 
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
