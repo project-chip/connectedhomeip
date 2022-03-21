@@ -35,7 +35,6 @@
 
 #endif // DeviceFamily_CC13X2_CC26X2
 
-
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_APP
 
 // When operating in a less than ideal RF environment, having a more forgiving configuration
