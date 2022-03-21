@@ -177,8 +177,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
@@ -188,8 +188,8 @@
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 4 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 4 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
@@ -199,8 +199,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 14 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 14 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (client) */ \
@@ -210,8 +210,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
@@ -221,8 +221,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 17 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 17 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
@@ -232,8 +232,8 @@
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
     },\
 }
 

@@ -73,18 +73,18 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ClientGeneratedCommandList"
+    - label: "Read the global attribute: AcceptedCommandList"
       disabled: true
       command: "readAttribute"
-      attribute: "ClientGeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ServerGeneratedCommandList"
+    - label: "Read the global attribute: GeneratedCommandList"
       disabled: true
       command: "readAttribute"
-      attribute: "ServerGeneratedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list

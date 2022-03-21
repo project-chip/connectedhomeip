@@ -28,8 +28,8 @@ namespace app {
  * metadata to save space.  These _must_ appear in order.
  */
 constexpr AttributeId GlobalAttributesNotInMetadata[] = {
-    Clusters::Globals::Attributes::ServerGeneratedCommandList::Id,
-    Clusters::Globals::Attributes::ClientGeneratedCommandList::Id,
+    Clusters::Globals::Attributes::GeneratedCommandList::Id,
+    Clusters::Globals::Attributes::AcceptedCommandList::Id,
     Clusters::Globals::Attributes::AttributeList::Id,
 };
 
