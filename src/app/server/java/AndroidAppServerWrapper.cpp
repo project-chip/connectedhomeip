@@ -67,6 +67,3 @@ void ChipAndroidAppShutdown(void)
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
 }
-
-// this is only for compile, the real impl of this function is in the example project.
-void __attribute__((weak)) ApplicationInit() {}
