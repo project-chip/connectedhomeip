@@ -64,7 +64,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
         break;
 
-    case DeviceEventType::kCommissioningComplete:
+    case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
         ESP_LOGI(TAG, "Free heap: %d", esp_get_free_heap_size());
@@ -78,7 +78,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         vTaskDelay(100);
         ESP_LOGI(TAG, "Free heap after BLE deinit: %d", esp_get_free_heap_size());
 #endif
-        break;
+    }
+    break;
 
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
