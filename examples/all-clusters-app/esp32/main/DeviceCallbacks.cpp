@@ -120,17 +120,20 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-        esp_err_t err = ESP_OK;
-        int ret       = nimble_port_stop();
+        int ret = nimble_port_stop();
         if (ret == 0)
         {
             nimble_port_deinit();
-            err = esp_nimble_hci_and_controller_deinit();
-            err = esp_bt_mem_release(ESP_BT_MODE_BLE);
+            esp_err_t err = esp_nimble_hci_and_controller_deinit();
+            err += esp_bt_mem_release(ESP_BT_MODE_BLE);
+            if (err == ESP_OK)
+            {
+                ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
+            }
         }
-        if (err == ESP_OK)
+        else
         {
-            ESP_LOGI(TAG, "BLE deinit successful");
+            ESP_LOGW(TAG, "nimble_port_stop() failed");
         }
 #endif
     }
