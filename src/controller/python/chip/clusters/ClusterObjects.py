@@ -19,6 +19,7 @@ from dataclasses import dataclass, asdict, field, make_dataclass
 from typing import ClassVar, List, Dict, Any, Mapping, Type, Union, ClassVar
 import enum
 import typing
+import inspect
 from chip import tlv, ChipUtility
 from chip.clusters.Types import Nullable, NullValue
 from dacite import from_dict
@@ -243,6 +244,76 @@ class Cluster(ClusterObject):
 
     def SetDataVersion(self, version: int) -> None:
         self._data_version = version
+
+    @classmethod
+    def _generate_doc_for_namespace(cls, C, namespace_name, formatter):
+        namespace = C.__dict__.get(namespace_name, None)
+        if not namespace:
+            return None
+        res = []
+        for item in namespace.__dict__.values():
+            if inspect.isclass(item) and item.__module__ == 'chip.clusters.Objects':
+                res.append(formatter(item))
+        namespace.__doc__ = "\n".join(res)
+        return namespace.__doc__
+
+    def __init_subclass__(cls):
+        def formatter_for_attribute(item):
+            field = item.__dataclass_fields__["value"]
+            if item.must_use_timed_write:
+                return f'\t{item.attribute_id}: (Require Timed Write) {item.__name__} {field.type}'
+            return f'\t{item.attribute_id}: {item.__name__} {field.type}'
+
+        attr_doc = Cluster._generate_doc_for_namespace(
+            cls, 'Attributes', formatter_for_attribute)
+
+        def formatter_for_command(item):
+            if item.must_use_timed_invoke:
+                return f'\t{item.command_id}: (Require Timed Invoke) {item.__doc__}'
+            else:
+                return f'\t{item.command_id}: {item.__doc__}'
+
+        command_doc = Cluster._generate_doc_for_namespace(
+            cls, 'Commands', formatter_for_command)
+
+        event_doc = Cluster._generate_doc_for_namespace(
+            cls, 'Events', lambda item: f'\t{item.event_id}: {item.__doc__}')
+
+        struct_doc = Cluster._generate_doc_for_namespace(
+            cls, 'Structs', lambda item: f'\t{item.__doc__}')
+
+        enums_doc = Cluster._generate_doc_for_namespace(
+            cls, 'Enums', lambda item: f'\t{item.__name__}')
+
+        cls.__doc__ = ""
+
+        if attr_doc is not None:
+            cls.__doc__ += "Attributes:\n"
+            cls.__doc__ += attr_doc
+            cls.__doc__ += "\n"
+
+        if command_doc is not None:
+            cls.__doc__ += "Commands: \n"
+            cls.__doc__ += command_doc
+            cls.__doc__ += "\n"
+
+        if event_doc is not None:
+            cls.__doc__ += "Events: \n"
+            cls.__doc__ += event_doc
+            cls.__doc__ += "\n"
+
+        if struct_doc is not None:
+            cls.__doc__ += "Structs: \n"
+            cls.__doc__ += struct_doc
+            cls.__doc__ += "\n"
+
+        if enums_doc is not None:
+            cls.__doc__ += "Enums: \n"
+            cls.__doc__ += enums_doc
+            cls.__doc__ += "\n"
+
+        if not cls.__doc__:
+            cls.__doc__ = None
 
 
 class ClusterAttributeDescriptor:

@@ -26,7 +26,7 @@ from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32, 
 import construct
 from rich.pretty import pprint
 
-from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent, ClusterObject
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
@@ -293,7 +293,7 @@ def _BuildAttributeIndex():
     This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
     '''
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+        if inspect.isclass(obj) and obj.__module__ == 'chip.clusters.Objects' and issubclass(obj, Cluster):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Attributes') in str(subclass)):
                     for attributeName, attribute in inspect.getmembers(subclass):
@@ -314,7 +314,7 @@ def _BuildClusterIndex():
     ''' Build internal cluster index for locating the corresponding cluster object by path in the future.
     '''
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+        if inspect.isclass(obj) and obj.__module__ == 'chip.clusters.Objects' and issubclass(obj, Cluster):
             _ClusterIndex[obj.id] = obj
 
 
