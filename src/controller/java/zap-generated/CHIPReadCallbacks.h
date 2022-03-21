@@ -5556,6 +5556,35 @@ private:
     bool keepAlive;
 };
 
+class CHIPOnOffStartUpOnOffAttributeCallback : public chip::Callback::Callback<CHIPOnOffClusterStartUpOnOffAttributeCallbackType>
+{
+public:
+    CHIPOnOffStartUpOnOffAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPOnOffStartUpOnOffAttributeCallback();
+
+    static void maybeDestroy(CHIPOnOffStartUpOnOffAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPOnOffStartUpOnOffAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPOnOffStartUpOnOffAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPOnOffGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPOnOffClusterGeneratedCommandListAttributeCallbackType>
 {

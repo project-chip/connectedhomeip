@@ -5710,7 +5710,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readStartUpOnOffAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readStartUpOnOffAttribute(
+                      (ChipClusters.OnOffCluster.StartUpOnOffAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffStartUpOnOffCommandParams);

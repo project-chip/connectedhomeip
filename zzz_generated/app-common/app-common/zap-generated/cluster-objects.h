@@ -3154,9 +3154,9 @@ struct TypeInfo
 namespace StartUpOnOff {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
@@ -3236,7 +3236,7 @@ struct TypeInfo
         Attributes::GlobalSceneControl::TypeInfo::DecodableType globalSceneControl = static_cast<bool>(0);
         Attributes::OnTime::TypeInfo::DecodableType onTime                         = static_cast<uint16_t>(0);
         Attributes::OffWaitTime::TypeInfo::DecodableType offWaitTime               = static_cast<uint16_t>(0);
-        Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff             = static_cast<uint8_t>(0);
+        Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

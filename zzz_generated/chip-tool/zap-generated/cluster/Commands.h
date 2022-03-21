@@ -2603,7 +2603,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 /*----------------------------------------------------------------------------*\

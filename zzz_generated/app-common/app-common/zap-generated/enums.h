@@ -348,10 +348,9 @@ enum EmberAfSetpointAdjustMode : uint8_t
 // Enum for StartUpOnOffValue
 enum EmberAfStartUpOnOffValue : uint8_t
 {
-    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_OFF      = 0,
-    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_ON       = 1,
-    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE   = 2,
-    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_PREVIOUS = 255,
+    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_OFF    = 0,
+    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_ON     = 1,
+    EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE = 2,
 };
 
 // Enum for StatusCode
