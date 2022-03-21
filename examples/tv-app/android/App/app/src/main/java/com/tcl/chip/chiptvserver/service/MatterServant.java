@@ -94,14 +94,6 @@ public class MatterServant {
 
     chipPlatform.updateCommissionableDataProviderData(null, null, 0, 20202021, 0xF00);
 
-    //    String testSalt = "U1BBS0UyUCBLZXkgU2FsdA==";
-    //    String testVerifier =
-    // "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/" + "NH6Rmzw==";
-    //    chipPlatform.updateCommissionableDataProviderData(testVerifier,testSalt,1000,0,0xF00);
-    //
-    //
-    // chipPlatform.updateCommissionableDataProviderData(testVerifier,testSalt,1000,20202021,0xF00);
-
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
   }

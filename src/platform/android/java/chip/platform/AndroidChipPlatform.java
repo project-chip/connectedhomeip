@@ -92,6 +92,12 @@ public final class AndroidChipPlatform {
 
   private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
 
+  /**
+   * update commission info
+   * @param spake2pVerifierBase64 base64 encoded spake2p verifier, ref CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+   * @param Spake2pSaltBase64 base64 encoded spake2p salt, ref CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+   * @return true on success of false on failed
+   */
   public native boolean updateCommissionableDataProviderData(
       String spake2pVerifierBase64,
       String Spake2pSaltBase64,
