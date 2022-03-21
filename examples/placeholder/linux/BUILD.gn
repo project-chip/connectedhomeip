@@ -36,10 +36,10 @@ config("includes") {
 }
 
 executable("chip-${chip_tests_zap_config}") {
-  sources = [ 
+  sources = [
     "main.cpp",
     "static-supported-modes-manager.cpp",
-   ]
+  ]
 
   deps = [
     ":configuration",
