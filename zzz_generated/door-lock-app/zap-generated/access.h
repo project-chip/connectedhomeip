@@ -126,50 +126,50 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
-    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
-    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
