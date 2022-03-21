@@ -143,8 +143,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
-    CHIP_ERROR err =
-        chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
+    CHIP_ERROR err = chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
     chip::Spake2pVerifier verifier;
