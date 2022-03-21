@@ -24,7 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation CHIPDeviceControllerOverXPC (AttributeCache)
 
-- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId completion:(void (^)(NSError * _Nullable error))completion
+- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId
+                                   params:(CHIPSubscribeParams * _Nullable)params
+                               completion:(void (^)(NSError * _Nullable error))completion
 {
     dispatch_async(self.workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
@@ -56,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                     if (handle) {
                         [handle.proxy subscribeAttributeCacheWithController:self.controllerId
                                                                      nodeId:nodeId
+                                                                     params:[CHIPDeviceController encodeXPCSubscribeParams:params]
                                                                  completion:^(NSError * _Nullable error) {
                                                                      if (error) {
                                                                          CHIP_LOG_ERROR("Attribute cache subscription for "
@@ -84,9 +87,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)readAttributeCacheWithNodeId:(uint64_t)nodeId
-                          endpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+                          endpointId:(NSNumber * _Nullable)endpointId
+                           clusterId:(NSNumber * _Nullable)clusterId
+                         attributeId:(NSNumber * _Nullable)attributeId
                           completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     dispatch_async(self.workQueue, ^{
