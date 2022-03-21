@@ -475,7 +475,6 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
     if (mode != chip::Dnssd::CommissioningMode::kDisabled)
     {
         err = AdvertiseCommissionableNode(mode);
@@ -503,7 +502,6 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         ScheduleExtendedDiscoveryExpiration();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = AdvertiseCommissioner();
