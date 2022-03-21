@@ -143,7 +143,7 @@ The client will send a single command packet and then exit.
 4. Bind Key to group
     ```
     $ chip-tool groupkeymanagement write group-key-map
-    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 1}]' 1234 0
+    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
     ```
 
 ## Configuring the client for Group Commands
