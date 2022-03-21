@@ -110,6 +110,12 @@ public:
      */
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
+    /**
+     * Expire active transactions and release related objects for the given fabric index.
+     * This is used for releasing transactions that won't be closed when a fabric is removed.
+     */
+    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
+
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
 
@@ -123,7 +129,7 @@ public:
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
-    uint32_t GetMagicNumber() { return mMagic; }
+    uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
@@ -177,6 +183,12 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
+
+    /**
+     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
+     * transaction is in the middle of processing the chunked value of the given path.)
+     */
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //

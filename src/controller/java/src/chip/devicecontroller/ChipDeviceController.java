@@ -22,6 +22,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
+import java.util.List;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -316,7 +317,7 @@ public class ChipDeviceController {
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
-      ChipAttributePath attributePath,
+      List<ChipAttributePath> attributePaths,
       int minInterval,
       int maxInterval) {
     ReportCallbackJni jniCallback =
@@ -325,19 +326,28 @@ public class ChipDeviceController {
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
-        attributePath,
+        attributePaths,
         minInterval,
         maxInterval);
   }
 
   /** Read the given attribute path. */
-  public void readPath(ReportCallback callback, long devicePtr, ChipAttributePath attributePath) {
+  public void readPath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
-    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePath);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
   }
 
   /**
-   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use
@@ -356,7 +366,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
-      ChipAttributePath attributePath,
+      List<ChipAttributePath> attributePaths,
       int minInterval,
       int maxInterval);
 
@@ -364,7 +374,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
-      ChipAttributePath attributePath);
+      List<ChipAttributePath> attributePaths);
 
   private native long newDeviceController();
 

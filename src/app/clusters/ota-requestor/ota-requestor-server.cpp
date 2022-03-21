@@ -22,15 +22,16 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
+using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
 namespace {
 
@@ -87,7 +88,16 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(Attribu
         return aEncoder.EncodeEmptyList();
     }
 
-    return requestor->GetDefaultOtaProviderList(aEncoder);
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto iterator = requestor->GetDefaultOTAProviderListIterator();
+        while (iterator.Next())
+        {
+            ProviderLocation::Type pl = iterator.GetValue();
+            ReturnErrorOnFailure(encoder.Encode(pl));
+        }
+
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
@@ -185,12 +195,12 @@ EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpoint
     return Attributes::UpdateStateProgress::Get(endpointId, value);
 }
 
-void OtaRequestorServerOnStateTransition(DataModel::Nullable<OTAUpdateStateEnum> previousState, OTAUpdateStateEnum newState,
-                                         OTAChangeReasonEnum reason, DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                                         DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {
-    if (!previousState.IsNull() && previousState.Value() == newState)
+    if (previousState == newState)
     {
-        ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
+        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
         return;
     }
 

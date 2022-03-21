@@ -892,7 +892,7 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
 
     NL_TEST_ASSERT(inSuite,
                    NewNodeOperationalX509Cert(noc_params, noc_keypair.Pubkey(), keypair, signed_cert_span1) ==
-                       CHIP_ERROR_WRONG_CERT_TYPE);
+                       CHIP_ERROR_WRONG_CERT_DN);
 
     // Test error case: issuer cert DN type is Node certificate
     noc_params.SubjectDN.Clear();
@@ -1196,7 +1196,7 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
 
         FabricId fabricId;
         err = ExtractFabricIdFromCert(cert, &fabricId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
     }
 
     // Test extraction from the parsed form of ICA Cert that doesn't have FabricId.
@@ -1209,7 +1209,7 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
 
         FabricId fabricId;
         err = ExtractFabricIdFromCert(certSet.GetCertSet()[0], &fabricId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
         certSet.Release();
     }
 }

@@ -36,9 +36,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
-
 // For convenience, enable Chip Security Test Mode and disable the requirement for
 // authentication in various protocols.
 //
@@ -51,7 +48,7 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xFFF1: Test vendor
+ * 0xFFF1: Test vendor.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 

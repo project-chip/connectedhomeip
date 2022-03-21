@@ -25,6 +25,10 @@
 #include "pigweed/rpc_services/Attributes.h"
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+#include "pigweed/rpc_services/Descriptor.h"
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 #include "pigweed/rpc_services/Device.h"
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -45,6 +49,10 @@ namespace {
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+Descriptor descriptor_service;
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 Device device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -58,6 +66,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+    server.RegisterService(descriptor_service);
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);

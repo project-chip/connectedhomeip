@@ -31,23 +31,22 @@ const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
 const { Variables }                = require('./variables/Variables.js');
 
-const kIdentityName           = 'identity';
-const kClusterName            = 'cluster';
-const kEndpointName           = 'endpoint';
-const kGroupId                = 'groupId';
-const kCommandName            = 'command';
-const kWaitCommandName        = 'wait';
-const kIndexName              = 'index';
-const kValuesName             = 'values';
-const kConstraintsName        = 'constraints';
-const kArgumentsName          = 'arguments';
-const kResponseName           = 'response';
-const kDisabledName           = 'disabled';
-const kResponseErrorName      = 'error';
-const kResponseWrongErrorName = 'errorWrongValue';
-const kPICSName               = 'PICS';
-const kSaveAsName             = 'saveAs';
-const kFabricFiltered         = 'fabricFiltered';
+const kIdentityName      = 'identity';
+const kClusterName       = 'cluster';
+const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
+const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
+const kIndexName         = 'index';
+const kValuesName        = 'values';
+const kConstraintsName   = 'constraints';
+const kArgumentsName     = 'arguments';
+const kResponseName      = 'response';
+const kDisabledName      = 'disabled';
+const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
+const kFabricFiltered    = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -242,11 +241,10 @@ function setDefaultResponse(test)
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
-  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+  const hasResponseError = (kResponseErrorName in test[kResponseName]);
 
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
-  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
 
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
@@ -275,7 +273,6 @@ function setDefaultResponse(test)
   }
 
   ensureValidError(test[kResponseName], kResponseErrorName);
-  ensureValidError(test[kResponseName], kResponseWrongErrorName);
 
   // Step that waits for a particular event does not requires constraints nor expected values.
   if (test.isWait) {
@@ -389,7 +386,6 @@ function parse(filename)
   });
 
   yaml.filename   = filename;
-  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
@@ -738,12 +734,9 @@ function octetStringEscapedForCLiteral(value)
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
   return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
-    let code = ch.charCodeAt(0);
-    code     = code.toString(16);
-    if (code.length == 1) {
-      code = "0" + code;
-    }
-    return "\\x" + code;
+    var code = ch.charCodeAt(0).toString(8)
+    return "\\" +
+        "0".repeat(3 - code.length) + code;
   });
 }
 
@@ -771,11 +764,38 @@ function ensureIsArray(value, options)
   }
 }
 
+function chip_tests_item_has_list(options)
+{
+  function hasList(args)
+  {
+    for (let i = 0; i < args.length; i++) {
+      if (args[i].isArray) {
+        return true;
+      }
+
+      if (args[i].isStruct && hasList(args[i].items)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return assertCommandOrAttributeOrEvent(this).then(item => {
+    if (this.isWriteAttribute || this.isCommand) {
+      return hasList(item.arguments);
+    }
+
+    return false;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
+exports.chip_tests_item_has_list            = chip_tests_item_has_list;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;

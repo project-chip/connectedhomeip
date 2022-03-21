@@ -40,32 +40,6 @@ struct ResolvedNodeData
     // TODO: use pool to allow dynamic
     static constexpr unsigned kMaxIPAddresses = 5;
 
-    static bool IsIpLess(const Inet::IPAddress & a, const Inet::IPAddress & b)
-    {
-        // Link-local last
-        if (a.IsIPv6LinkLocal() && !b.IsIPv6LinkLocal())
-        {
-            return false;
-        }
-        if (!a.IsIPv6LinkLocal() && b.IsIPv6LinkLocal())
-        {
-            return true;
-        }
-
-        // IPv6 before IPv4
-        if (a.IsIPv6() && !b.IsIPv6())
-        {
-            return false;
-        }
-        if (!a.IsIPv6() && b.IsIPv6())
-        {
-            return true;
-        }
-
-        // no ordering, do not care
-        return false;
-    }
-
     void LogNodeIdResolved() const
     {
 #if CHIP_PROGRESS_LOGGING
@@ -73,32 +47,14 @@ struct ResolvedNodeData
 
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
         for (unsigned i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
             ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
-    }
-
-    /// Sorts IP addresses in a consistent order. Specifically places
-    /// Link-local IPv6 addresses at the end (e.g. mDNS reflector services in Unify will
-    /// return link-local addresses that will not work) and prioritizes global IPv6 addresses
-    /// before IPv4 ones.
-    void PrioritizeAddresses()
-    {
-        // Slow sort, however we have maximum kMaxIPAddreses, so this is good enough for now
-        for (unsigned i = 0; i + 1 < mNumIPs; i++)
-        {
-            for (unsigned j = i + 1; i < mNumIPs; i++)
-            {
-                if (IsIpLess(mAddress[j], mAddress[i]))
-                {
-                    std::swap(mAddress[i], mAddress[j]);
-                }
-            }
-        }
     }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
@@ -267,6 +223,22 @@ struct DiscoveredNodeData
             ChipLogDetail(Discovery, "\tPort: %u", port);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        if (mrpRetryIntervalIdle.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
+        }
+        if (mrpRetryIntervalActive.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
+        }
     }
 };
 
@@ -285,12 +257,26 @@ enum class DiscoveryFilterType : uint8_t
 struct DiscoveryFilter
 {
     DiscoveryFilterType type;
-    uint64_t code;
-    const char * instanceName;
+    uint64_t code             = 0;
+    const char * instanceName = nullptr;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
-    DiscoveryFilter(DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+    DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
+    DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
+    {}
+    bool operator==(const DiscoveryFilter & other) const
+    {
+        if (type != other.type)
+        {
+            return false;
+        }
+        if (type == DiscoveryFilterType::kInstanceName)
+        {
+            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
+        }
+
+        return code == other.code;
+    }
 };
 enum class DiscoveryType
 {
@@ -299,20 +285,43 @@ enum class DiscoveryType
     kCommissionableNode,
     kCommissionerNode
 };
-/// Groups callbacks for CHIP service resolution requests
-class ResolverDelegate
+
+/// Callbacks for resolving operational node resolution
+class OperationalResolveDelegate
 {
 public:
-    virtual ~ResolverDelegate() = default;
+    virtual ~OperationalResolveDelegate() = default;
 
-    /// Called when a requested CHIP node ID has been successfully resolved
-    virtual void OnNodeIdResolved(const ResolvedNodeData & nodeData) = 0;
+    /// Called within the CHIP event loop after a successful node resolution.
+    ///
+    /// May be called multiple times: implementations may call this once per
+    /// received packet and MDNS packets may arrive over different interfaces
+    /// which will make nodeData have different content.
+    virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
 
-    /// Called when a CHIP node ID resolution has failed
-    virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+    /// Notify a final failure for a node operational resolution.
+    ///
+    /// Called within the chip event loop if node resolution could not be performed.
+    /// This may be due to internal errors or timeouts.
+    ///
+    /// This will be called only if 'OnOperationalNodeResolved' is never called.
+    virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+};
 
-    // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
-    virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
+/// Callbacks for discovering nodes advertising non-operational status:
+///   - Commissioners
+///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
+///     connected to thread/wifi or devices with a commissioning window open)
+class CommissioningResolveDelegate
+{
+public:
+    virtual ~CommissioningResolveDelegate() = default;
+
+    /// Called within the CHIP event loop once a node is discovered.
+    ///
+    /// May be called multiple times as more nodes send their answer to a
+    /// multicast discovery query
+    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
 /**
@@ -337,10 +346,14 @@ public:
     virtual void Shutdown() = 0;
 
     /**
-     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
-     * is unregistered.
+     * If nullptr is passed, the previously registered delegate is unregistered.
      */
-    virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
+    virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
+
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
 
     /**
      * Requests resolution of the given operational node service.
@@ -352,17 +365,6 @@ public:
      * `OnNodeIdResolutionFailed` method, respectively.
      */
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
-     * Explicit attempt to resolve a NodeID without performing network operations.
-     *
-     * If the required entry exists in an internal cache, this will call the
-     * underlying delegate `OnNodeIdResolved` and will return true;
-     *
-     * Returns false if the corresponding entry does not exist in the internal cache.
-     * This will NEVER call `OnNodeIdResolutionFailed` and this method does not block.
-     */
-    virtual bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

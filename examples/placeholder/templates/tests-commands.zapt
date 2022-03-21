@@ -5,7 +5,7 @@
 #include "TestCommand.h"
 
 {{#if (getTests)}}
-{{>test_cluster tests=(getTests) credsIssuerConfigArg=false}}
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=false needsWaitDuration=false}}
 {{/if}}
 
 std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
@@ -14,7 +14,7 @@ std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
   {{#chip_tests (getTests)}}
   if (testName == "{{filename}}")
   {
-      return std::unique_ptr<{{filename}}>(new {{filename}}());
+      return std::unique_ptr<{{filename}}Suite>(new {{filename}}Suite());
   }
   {{/chip_tests}}
   {{/if}}

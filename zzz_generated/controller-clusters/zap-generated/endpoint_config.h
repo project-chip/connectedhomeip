@@ -79,7 +79,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 63
+#define GENERATED_CLUSTER_COUNT 64
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -535,6 +535,17 @@
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
+      /* Endpoint: 1, Cluster: Fan Control (client) */ \
+      .clusterId = 0x00000202,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
       /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */ \
       .clusterId = 0x00000204,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -787,7 +798,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 63, 0 },                                                                                           \
+        { ZAP_CLUSTER_INDEX(0), 64, 0 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers

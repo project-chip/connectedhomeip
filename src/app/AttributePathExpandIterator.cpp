@@ -205,7 +205,7 @@ bool AttributePathExpandIterator::Next()
                     // Return true will skip the increment of mClusterIndex, mEndpointIndex and mpClusterInfo.
                     return true;
                 }
-                else if (mGlobalAttributeIndex < mGlobalAttributeEndIndex)
+                if (mGlobalAttributeIndex < mGlobalAttributeEndIndex)
                 {
                     // Return a path pointing to the next global attribute.
                     mOutputPath.mAttributeId = GlobalAttributesNotInMetadata[mGlobalAttributeIndex];

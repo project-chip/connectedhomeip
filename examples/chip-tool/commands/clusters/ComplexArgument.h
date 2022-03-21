@@ -45,7 +45,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        request = static_cast<T>(value.asUInt());
+        request = static_cast<T>(value.asLargestUInt());
         return CHIP_NO_ERROR;
     }
 
@@ -58,7 +58,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        request = static_cast<T>(value.asInt());
+        request = static_cast<T>(value.asLargestInt());
         return CHIP_NO_ERROR;
     }
 

@@ -118,14 +118,6 @@ int main(void)
     }
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 
-    EFR32_LOG("Starting Platform Manager Event Loop");
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
-        appError(err);
-    }
-
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     err = ThreadStackMgr().InitThreadStack();
@@ -140,8 +132,9 @@ int main(void)
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#else  // CHIP_DEVICE_CONFIG_ENABLE_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     if (err != CHIP_NO_ERROR)
     {
@@ -149,8 +142,20 @@ int main(void)
         appError(err);
     }
 
-    EFR32_LOG("Starting OpenThread task");
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Init ZCL Data Model
+    chip::Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    EFR32_LOG("Starting Platform Manager Event Loop");
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
+        appError(err);
+    }
+
+    EFR32_LOG("Starting OpenThread task");
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
     if (err != CHIP_NO_ERROR)
@@ -172,12 +177,17 @@ int main(void)
     chip::startShellTask();
 #endif
 #ifdef EFR32_OTA_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     OTAConfig::Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 #endif // EFR32_OTA_ENABLED
     WindowApp & app = WindowApp::Instance();
 
     EFR32_LOG("Starting App");
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = app.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("App Init failed");

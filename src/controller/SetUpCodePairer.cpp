@@ -33,9 +33,10 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode)
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
     SetupPayload payload;
+    mConnectionType = commission;
 
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     ReturnErrorOnFailure(isQRCode ? QRCodeSetupPayloadParser(setUpCode).populatePayload(payload)
@@ -85,6 +86,10 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 {
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCommissioner->ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     return mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,
                                                       OnDiscoveredDeviceOverBleError);
@@ -105,22 +110,16 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     currentFilter.type = payload.isShortDiscriminator ? Dnssd::DiscoveryFilterType::kShortDiscriminator
                                                       : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code =
         payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
     return mCommissioner->DiscoverCommissionableNodes(currentFilter);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 }
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     currentFilter.type = Dnssd::DiscoveryFilterType::kNone;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     return CHIP_NO_ERROR;
 }
 
@@ -136,7 +135,14 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
-    LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    if (mConnectionType == SetupCodePairerBehaviour::kCommission)
+    {
+        LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
+    else
+    {
+        LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -147,9 +153,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
-    // We don't have network credentials, so can't do the entire pairing flow.  Just establish a PASE session to the
-    //  device and let our consumer deal with the rest.
-    LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    OnDeviceDiscovered(params);
 }
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
@@ -163,9 +167,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
-bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData)
+bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
     if (nodeData.commissioningMode == 0)
     {
@@ -199,7 +201,6 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
     OnDeviceDiscovered(params);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 } // namespace Controller
 } // namespace chip

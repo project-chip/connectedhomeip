@@ -28,11 +28,11 @@ server cluster AccessControl = 31 {
   }
 
   struct AccessControlEntry {
-    fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
     nullable INT64U subjects[] = 3;
     nullable Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   struct Target {
@@ -42,24 +42,24 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<254> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -96,7 +96,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -142,24 +141,16 @@ server cluster Basic = 40 {
 }
 
 server cluster Binding = 30 {
+  struct TargetStruct {
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
+    FABRIC_IDX fabricIndex = 254;
+  }
+
+  attribute TargetStruct binding[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 client cluster ColorControl = 768 {
@@ -472,7 +463,8 @@ server cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -487,8 +479,8 @@ server cluster GeneralCommissioning = 48 {
 
   attribute int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute enum8 regulatoryConfig = 2;
-  readonly attribute enum8 locationCapability = 3;
+  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationType locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -616,31 +608,117 @@ server cluster GeneralDiagnostics = 51 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-client cluster Groups = 4 {
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicy : ENUM8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
+  }
+
+  struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    INT16U groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupInfoMapStruct {
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional CHAR_STRING<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupKeySetStruct {
+    INT16U groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable OCTET_STRING<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable OCTET_STRING<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable OCTET_STRING<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  command KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+}
+
+server cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
-  readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
+  }
+
+  response struct AddGroupResponse {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  response struct GetGroupMembershipResponse {
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  response struct ViewGroupResponse {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+    CHAR_STRING groupName = 2;
   }
 
   command AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -949,13 +1027,13 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   struct ProviderLocation {
-    fabric_idx fabricIndex = 0;
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   info event StateTransition = 0 {
-    nullable OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum previousState = 0;
     OTAUpdateStateEnum newState = 1;
     OTAChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
@@ -1010,6 +1088,10 @@ client cluster OnOff = 6 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
   readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
@@ -1039,18 +1121,18 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
     nullable OCTET_STRING icac = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -1447,6 +1529,33 @@ server cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -1527,6 +1636,7 @@ endpoint 0 {
   server  cluster FixedLabel;
   server  cluster GeneralCommissioning;
   server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
   server  cluster LocalizationConfiguration;
   server  cluster NetworkCommissioning;
   binding cluster OtaSoftwareUpdateProvider;
@@ -1535,6 +1645,7 @@ endpoint 0 {
   server  cluster SoftwareDiagnostics;
   server  cluster Switch;
   server  cluster ThreadNetworkDiagnostics;
+  server  cluster TimeFormatLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }
@@ -1543,7 +1654,7 @@ endpoint 1 {
   server  cluster Binding;
   binding cluster ColorControl;
   server  cluster Descriptor;
-  binding cluster Groups;
+  server  cluster Groups;
   binding cluster Identify;
   server  cluster Identify;
   binding cluster OnOff;

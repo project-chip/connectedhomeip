@@ -396,6 +396,12 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx = apExchangeContext;
 
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    // This is only relevant for reports during post-subscription.
+    //
+    mpExchangeCtx->SetDelegate(this);
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
@@ -419,8 +425,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     System::PacketBufferTLVReader reader;
 
     reader.Init(std::move(aPayload));
-    reader.Next();
-
     err = report.Init(reader);
     SuccessOrExit(err);
 
@@ -514,6 +518,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
             mIsInitialReport = true;
         }
     }
+
+    SuccessOrExit(err = report.ExitContainer());
 
 exit:
     if (IsSubscriptionType())
@@ -637,19 +643,36 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         EventReportIB::Parser report;
         EventDataIB::Parser data;
         EventHeader header;
+        StatusIB statusIB; // Default value for statusIB is success.
 
         TLV::TLVReader reader = aEventReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        ReturnErrorOnFailure(report.GetEventData(&data));
+        err = report.GetEventData(&data);
 
-        header.mTimestamp = mEventTimestamp;
-        ReturnErrorOnFailure(data.DecodeEventHeader(header));
-        mEventTimestamp = header.mTimestamp;
-        mEventMin       = header.mEventNumber + 1;
-        ReturnErrorOnFailure(data.GetData(&dataReader));
+        if (err == CHIP_NO_ERROR)
+        {
+            header.mTimestamp = mEventTimestamp;
+            ReturnErrorOnFailure(data.DecodeEventHeader(header));
+            mEventTimestamp = header.mTimestamp;
+            mEventMin       = header.mEventNumber + 1;
+            ReturnErrorOnFailure(data.GetData(&dataReader));
 
-        mpCallback.OnEventData(header, &dataReader, nullptr);
+            mpCallback.OnEventData(header, &dataReader, nullptr);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            EventStatusIB::Parser status;
+            EventPathIB::Parser pathIB;
+            StatusIB::Parser statusIBParser;
+            ReturnErrorOnFailure(report.GetEventStatus(&status));
+            ReturnErrorOnFailure(status.GetPath(&pathIB));
+            ReturnErrorOnFailure(pathIB.GetEventPath(&header.mPath));
+            ReturnErrorOnFailure(status.GetErrorStatus(&statusIBParser));
+            ReturnErrorOnFailure(statusIBParser.DecodeStatusIB(statusIB));
+
+            mpCallback.OnEventData(header, nullptr, &statusIB);
+        }
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -670,7 +693,10 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     System::Clock::Timeout timeout =
         System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
-    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
+    ChipLogProgress(
+        DataManagement,
+        "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x" ChipLogFormatX64 " Peer = %02x:" ChipLogFormatX64,
+        static_cast<long unsigned>(timeout.count()), ChipLogValueX64(mSubscriptionId), mFabricIndex, ChipLogValueX64(mPeerNodeId));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
 
@@ -705,8 +731,9 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     //
     VerifyOrDie(_this->mpImEngine->InActiveReadClientList(_this));
 
-    ChipLogError(DataManagement, "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer node 0x%" PRIx64,
-                 _this->mSubscriptionId, _this->mPeerNodeId);
+    ChipLogError(DataManagement,
+                 "Subscription Liveness timeout with SubscriptionID = 0x" ChipLogFormatX64 ", Peer = %02x:" ChipLogFormatX64,
+                 ChipLogValueX64(_this->mSubscriptionId), _this->mFabricIndex, ChipLogValueX64(_this->mPeerNodeId));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -717,24 +744,35 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 {
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-    ReturnLogErrorOnFailure(reader.Next());
 
     SubscribeResponseMessage::Parser subscribeResponse;
-    ReturnLogErrorOnFailure(subscribeResponse.Init(reader));
+    ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnLogErrorOnFailure(subscribeResponse.CheckSchemaValidity());
+    ReturnErrorOnFailure(subscribeResponse.CheckSchemaValidity());
 #endif
 
     uint64_t subscriptionId = 0;
-    ReturnLogErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
-    VerifyOrReturnLogError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnLogErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
-    ReturnLogErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
+    ReturnErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
+    VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
+    ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
 
+    ChipLogProgress(DataManagement,
+                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %" PRIu16
+                    "s MaxInterval = %" PRIu16 "s Peer = %02x:" ChipLogFormatX64,
+                    ChipLogValueX64(mSubscriptionId), mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
+                    ChipLogValueX64(mPeerNodeId));
+
+    ReturnErrorOnFailure(subscribeResponse.ExitContainer());
     mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);
+
+    if (mReadPrepareParams.mResubscribePolicy != nullptr)
+    {
+        mNumRetries = 0;
+    }
 
     RefreshLivenessCheckTimer();
 
@@ -866,11 +904,11 @@ bool ReadClient::ResubscribeIfNeeded()
         ChipLogProgress(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    else
-    {
-        ChipLogProgress(DataManagement, "Will try to Resubscribe at retry index %" PRIu32 " after %" PRIu32 "ms", mNumRetries,
-                        intervalMsec);
-    }
+
+    ChipLogProgress(DataManagement,
+                    "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
+                    mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
+
     return true;
 }
 

@@ -78,15 +78,9 @@ template("chip_data_model") {
       "${_app_root}/clusters/ias-zone-server/ias-zone-server.h",
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
-      "${_app_root}/clusters/messaging-client/messaging-client.h",
-      "${_app_root}/clusters/messaging-server/messaging-server.h",
-      "${_app_root}/clusters/network-commissioning-old/network-commissioning.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
-      "${_app_root}/clusters/zll-level-control-server/zll-level-control-server.h",
-      "${_app_root}/clusters/zll-on-off-server/zll-on-off-server.h",
-      "${_app_root}/clusters/zll-scenes-server/zll-scenes-server.h",
       "${_app_root}/reporting/reporting.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
@@ -94,6 +88,7 @@ template("chip_data_model") {
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
       "${_app_root}/util/binding-table.cpp",
+      "${_app_root}/util/binding-table.h",
       "${_app_root}/util/client-api.cpp",
       "${_app_root}/util/ember-compatibility-functions.cpp",
       "${_app_root}/util/ember-print.cpp",
@@ -119,11 +114,6 @@ template("chip_data_model") {
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
-      } else if (cluster == "network-commissioning-old") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/network-commissioning-ember.cpp",
-          "${_app_root}/clusters/${cluster}/network-commissioning-old.cpp",
-        ]
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -141,7 +131,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsentProvider.h",
+          "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
+          "${_app_root}/clusters/${cluster}/GenericOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
+          "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
         ]
       } else if (cluster == "bindings") {
         sources += [

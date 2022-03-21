@@ -65,6 +65,14 @@ public:
     }
     uint64_t GetPort() const { return mPort; }
 
+    Derived & SetInterfaceId(Inet::InterfaceId interfaceId)
+    {
+        mInterfaceId = interfaceId;
+        return *reinterpret_cast<Derived *>(this);
+    }
+
+    Inet::InterfaceId GetInterfaceId() const { return mInterfaceId; }
+
     Derived & EnableIpV4(bool enable)
     {
         mEnableIPv4 = enable;
@@ -95,6 +103,7 @@ public:
 
 private:
     uint16_t mPort                   = CHIP_PORT;
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
     size_t mMacLength                = 0;
@@ -171,12 +180,12 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
-    CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
+    CommissionAdvertisingParameters & SetDeviceType(Optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
         return *this;
     }
-    Optional<uint16_t> GetDeviceType() const { return mDeviceType; }
+    Optional<uint32_t> GetDeviceType() const { return mDeviceType; }
 
     CommissionAdvertisingParameters & SetDeviceName(Optional<const char *> deviceName)
     {
@@ -253,7 +262,7 @@ private:
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
-    chip::Optional<uint16_t> mDeviceType;
+    chip::Optional<uint32_t> mDeviceType;
     chip::Optional<uint16_t> mPairingHint;
 
     char mDeviceName[kKeyDeviceNameMaxLength + 1];

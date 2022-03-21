@@ -129,13 +129,17 @@ try:
         # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
         # For now, let's just avoid that version.
         #
-        'ipython!=7.30.0',
+        # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+        #
+        #
+        'ipython!=8.1.0',
         'dacite',
         'rich',
         'stringcase',
         'pyyaml',
         'ipdb',
-        'ipykernel'
+        'ipykernel',
+        'deprecation'
     ]
 
     if platform.system() == "Darwin":

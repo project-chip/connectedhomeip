@@ -31,8 +31,7 @@
 #include <utility>
 
 namespace {
-constexpr uint8_t kVersionMask          = 0x0F;
-constexpr uint8_t kMaxFileDesignatorLen = 32;
+constexpr uint8_t kVersionMask = 0x0F;
 } // namespace
 
 using namespace chip;

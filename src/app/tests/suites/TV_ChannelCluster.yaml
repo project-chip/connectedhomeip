@@ -35,47 +35,58 @@ tests:
           value:
               [
                   {
-                      majorNumber: 1,
-                      minorNumber: 2,
-                      name: "exampleName",
-                      callSign: "exampleCSign",
-                      affiliateCallSign: "exampleASign",
+                      majorNumber: 6,
+                      minorNumber: 0,
+                      name: "ABC",
+                      callSign: "KAAL-TV",
+                      affiliateCallSign: "KAAL",
                   },
                   {
-                      majorNumber: 2,
+                      majorNumber: 9,
+                      minorNumber: 1,
+                      name: "PBS",
+                      callSign: "KCTS-TV",
+                      affiliateCallSign: "KCTS",
+                  },
+                  {
+                      majorNumber: 9,
+                      minorNumber: 2,
+                      name: "PBS Kids",
+                      callSign: "KCTS-TV",
+                      affiliateCallSign: "KCTS",
+                  },
+                  {
+                      majorNumber: 9,
                       minorNumber: 3,
-                      name: "exampleName",
-                      callSign: "exampleCSign",
-                      affiliateCallSign: "exampleASign",
+                      name: "World Channel",
+                      callSign: "KCTS-TV",
+                      affiliateCallSign: "KCTS",
                   },
               ]
-    # TODO: Enable once attribute struct is supported
+
     - label: "Read attribute channel lineup"
-      disabled: true
       command: "readAttribute"
       attribute: "Lineup"
       response:
           value:
               {
-                  operatorName: "operatorName",
-                  lineupName: "lineupName",
-                  postalCode: "postalCode",
+                  operatorName: "Comcast",
+                  lineupName: "Comcast King County",
+                  postalCode: "98052",
                   lineupInfoType: 0,
               }
 
-    # TODO: Enable once attribute struct is supported
     - label: "Read attribute current channel"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
           value:
               {
-                  majorNumber: 1,
+                  majorNumber: 6,
                   minorNumber: 0,
-                  name: "name",
-                  callSign: "callSign",
-                  affiliateCallSign: "affiliateCallSign",
+                  name: "ABC",
+                  callSign: "KAAL-TV",
+                  affiliateCallSign: "KAAL",
               }
 
     - label: "Change Channel Command"
@@ -83,29 +94,22 @@ tests:
       arguments:
           values:
               - name: "match"
-                value: "CNN"
+                value: "PBS"
       response:
           values:
-              - name: "errorType"
+              - name: "data"
+                value: "data response"
+              - name: "status"
                 value: 0
-              - name: "channelMatch"
-                value:
-                    {
-                        majorNumber: 1,
-                        minorNumber: 0,
-                        name: "name",
-                        callSign: "callSign",
-                        affiliateCallSign: "affiliateCallSign",
-                    }
 
     - label: "Change Channel By Number Command"
       command: "changeChannelByNumber"
       arguments:
           values:
               - name: "majorNumber"
-                value: 1
+                value: 6
               - name: "minorNumber"
-                value: 2
+                value: 0
 
     - label: "Skip Channel Command"
       command: "skipChannel"

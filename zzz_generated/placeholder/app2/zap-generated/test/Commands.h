@@ -21,17 +21,18 @@
 
 #include "TestCommand.h"
 
-class Test_TC_DM_1_3_Simulated : public TestCommand
+class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_1_3_SimulatedSuite() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_1_3_Simulated() {}
+    ~Test_TC_DM_1_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -158,8 +159,9 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 
@@ -397,17 +399,18 @@ private:
     }
 };
 
-class Test_TC_DM_3_3_Simulated : public TestCommand
+class Test_TC_DM_3_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_3_3_Simulated() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_3_3_SimulatedSuite() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_3_3_Simulated() {}
+    ~Test_TC_DM_3_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -489,8 +492,9 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 
@@ -578,17 +582,18 @@ private:
     }
 };
 
-class Test_TC_DM_2_3_Simulated : public TestCommand
+class Test_TC_DM_2_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_2_3_Simulated() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_2_3_SimulatedSuite() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_2_3_Simulated() {}
+    ~Test_TC_DM_2_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -671,8 +676,9 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 
@@ -818,15 +824,15 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_DM_1_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_1_3_Simulated>(new Test_TC_DM_1_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_1_3_SimulatedSuite>(new Test_TC_DM_1_3_SimulatedSuite());
     }
     if (testName == "Test_TC_DM_3_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_3_3_Simulated>(new Test_TC_DM_3_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_3_3_SimulatedSuite>(new Test_TC_DM_3_3_SimulatedSuite());
     }
     if (testName == "Test_TC_DM_2_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_2_3_Simulated>(new Test_TC_DM_2_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_2_3_SimulatedSuite>(new Test_TC_DM_2_3_SimulatedSuite());
     }
 
     return nullptr;

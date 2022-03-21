@@ -52,7 +52,7 @@ public:
     // It is recommended that this index track the fabric index within which this issuer is operating.
     //
     ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
-    virtual ~ExampleOperationalCredentialsIssuer() {}
+    ~ExampleOperationalCredentialsIssuer() override {}
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
                                 const ByteSpan & PAI, const ByteSpan & PAA,
@@ -117,7 +117,7 @@ private:
     PersistentStorageDelegate * mStorage = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 0;
+    FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
     uint64_t mIndex             = 0;
 };

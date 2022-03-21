@@ -111,50 +111,50 @@ uint32_t ConfigurationManagerImpl::GetBootReason(void)
 #if defined(_SILICON_LABS_32B_SERIES_1)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::PowerOnReboot;
     }
     else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::BrownOutReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::SoftwareReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::SoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::Unspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #elif defined(_SILICON_LABS_32B_SERIES_2)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::PowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
              rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::BrownOutReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::SoftwareReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::SoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::Unspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #else
-    matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+    matterBootCause = BootReasonType::Unspecified;
 #endif
 
     return matterBootCause;

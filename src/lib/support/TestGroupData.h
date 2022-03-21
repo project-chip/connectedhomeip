@@ -27,13 +27,12 @@ constexpr uint16_t kMaxGroupsPerFabric    = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
 static chip::TestPersistentStorageDelegate sDeviceStorage;
-static chip::Credentials::GroupDataProviderImpl sGroupsProvider(sDeviceStorage, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+static chip::Credentials::GroupDataProviderImpl sGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
-static const chip::FabricIndex kFabric1 = 1;
-static const chip::GroupId kGroup1      = 0x0101;
-static const chip::GroupId kGroup2      = 0x0102;
-static const chip::KeysetId kKeySet1    = 0x01a1;
-static const chip::KeysetId kKeySet2    = 0x01a2;
+static const chip::GroupId kGroup1   = 0x0101;
+static const chip::GroupId kGroup2   = 0x0102;
+static const chip::KeysetId kKeySet1 = 0x01a1;
+static const chip::KeysetId kKeySet2 = 0x01a2;
 
 } // namespace
 
@@ -41,47 +40,60 @@ namespace chip {
 
 namespace GroupTesting {
 
-CHIP_ERROR InitGroupData()
+CHIP_ERROR InitProvider()
 {
+    sGroupsProvider.SetStorageDelegate(&sDeviceStorage);
     ReturnErrorOnFailure(sGroupsProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR InitProvider(chip::PersistentStorageDelegate & storageDelegate)
+{
+    sGroupsProvider.SetStorageDelegate(&storageDelegate);
+    ReturnErrorOnFailure(sGroupsProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
+{
     // Groups
 
     const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");
-    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(kFabric1, group1));
-    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(kFabric1, group1.group_id, 1));
+    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(fabric_index, group1));
+    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(fabric_index, group1.group_id, 1));
 
     const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2");
-    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(kFabric1, group2));
-    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(kFabric1, group2.group_id, 0));
+    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(fabric_index, group2));
+    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(fabric_index, group2.group_id, 0));
 
     // Key Sets
 
-    chip::Credentials::GroupDataProvider::KeySet keyset1(kKeySet1, chip::Credentials::GroupDataProvider::SecurityPolicy::kStandard,
-                                                         3);
+    chip::Credentials::GroupDataProvider::KeySet keyset1(kKeySet1,
+                                                         chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync, 3);
     const chip::Credentials::GroupDataProvider::EpochKey epoch_keys1[] = {
         { 1110000, { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf } },
         { 1110001, { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf } },
         { 1110002, { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf } },
     };
     memcpy(keyset1.epoch_keys, epoch_keys1, sizeof(epoch_keys1));
-    CHIP_ERROR err = sGroupsProvider.SetKeySet(kFabric1, keyset1);
+    CHIP_ERROR err = sGroupsProvider.SetKeySet(fabric_index, compressed_fabric_id, keyset1);
     ReturnErrorOnFailure(err);
 
-    chip::Credentials::GroupDataProvider::KeySet keyset2(kKeySet2, chip::Credentials::GroupDataProvider::SecurityPolicy::kStandard,
-                                                         3);
+    chip::Credentials::GroupDataProvider::KeySet keyset2(kKeySet2,
+                                                         chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync, 3);
     const chip::Credentials::GroupDataProvider::EpochKey epoch_keys2[] = {
         { 2220000, { 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf } },
         { 2220001, { 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef } },
         { 2220002, { 0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff } },
     };
     memcpy(keyset2.epoch_keys, epoch_keys2, sizeof(epoch_keys2));
-    err = sGroupsProvider.SetKeySet(kFabric1, keyset2);
+    err = sGroupsProvider.SetKeySet(fabric_index, compressed_fabric_id, keyset2);
     ReturnErrorOnFailure(err);
 
-    sGroupsProvider.SetGroupKeyAt(kFabric1, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
-    sGroupsProvider.SetGroupKeyAt(kFabric1, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
+    sGroupsProvider.SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
+    sGroupsProvider.SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
 
     return CHIP_NO_ERROR;
 }

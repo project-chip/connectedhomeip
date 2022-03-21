@@ -155,8 +155,9 @@ int main(void)
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#else  // CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     if (ret != CHIP_NO_ERROR)
     {
@@ -164,6 +165,11 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Init ZCL Data Model
+    chip::Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
@@ -192,8 +198,11 @@ int main(void)
 #endif                           // SL_WFX_USE_SECURE_LINK
 #endif                           /* WF200_WIFI */
 #ifdef EFR32_OTA_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     OTAConfig::Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 #endif // EFR32_OTA_ENABLED
+
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)

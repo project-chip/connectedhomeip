@@ -26,8 +26,8 @@ namespace chip {
 namespace app {
 struct EventPathParams
 {
-    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
+    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aUrgentEvent = false) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgentEvent(aUrgentEvent)
     {}
     EventPathParams() {}
     bool IsSamePath(const EventPathParams & other) const
@@ -47,6 +47,7 @@ struct EventPathParams
     EndpointId mEndpointId = kInvalidEndpointId;
     ClusterId mClusterId   = kInvalidClusterId;
     EventId mEventId       = kInvalidEventId;
+    bool mIsUrgentEvent    = false;
 };
 } // namespace app
 } // namespace chip

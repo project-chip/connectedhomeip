@@ -33,7 +33,7 @@ qpg_sdk("sdk") {
   ]
 }
 
-qpg_executable("persistent_storage") {
+qpg_executable("persistent_storage_app") {
   include_dirs = [ "${qpg_project_dir}/.." ]
   output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
 
@@ -65,7 +65,7 @@ qpg_executable("persistent_storage") {
 }
 
 group("qpg") {
-  deps = [ ":persistent_storage" ]
+  deps = [ ":persistent_storage_app" ]
 }
 
 group("default") {

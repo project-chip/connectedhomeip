@@ -95,7 +95,6 @@ ReadHandler::~ReadHandler()
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
     }
-
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpDataVersionFilterList);
@@ -150,18 +149,14 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     case HandlerState::AwaitingReportResponse:
         if (IsChunkedReport())
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             MoveToState(HandlerState::GeneratingReports);
-            if (mpExchangeCtx)
-            {
-                mpExchangeCtx->WillSendMessage();
-            }
+            mpExchangeCtx->WillSendMessage();
+
             // Trigger ReportingEngine run for sending next chunk of data.
             SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
         else if (IsType(InteractionType::Subscribe))
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsPriming())
             {
                 err           = SendSubscribeResponse();
@@ -211,7 +206,6 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
 
     return StatusResponse::Send(aStatus, mpExchangeCtx,
                                 /* aExpectResponse = */ false);
@@ -229,8 +223,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
-        mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
+
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mIsChunkedReport        = aMoreChunks;
     bool noResponseExpected = IsType(InteractionType::Read) && !mIsChunkedReport;
@@ -238,6 +232,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         MoveToState(HandlerState::AwaitingReportResponse);
     }
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     CHIP_ERROR err =
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                    Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
@@ -278,7 +273,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     return err;
 }
 
-bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
+bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const
 {
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
@@ -312,7 +307,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     reader.Init(std::move(aPayload));
 
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
@@ -359,17 +353,12 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
-
+    ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
 
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+    mpExchangeCtx->WillSendMessage();
 
     // There must be no code after the WillSendMessage() call that can cause
     // this method to return a failure.
@@ -526,6 +515,13 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         }
         ReturnErrorOnFailure(err);
 
+        err = path.GetIsUrgent(&(clusterInfo.mIsUrgentEvent));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo));
     }
 
@@ -579,6 +575,11 @@ const char * ReadHandler::GetStateStr() const
 
 void ReadHandler::MoveToState(const HandlerState aTargetState)
 {
+    if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
@@ -628,7 +629,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     mIsPrimingReports = false;
     MoveToState(HandlerState::GeneratingReports);
-
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
@@ -637,7 +637,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
 
-    ReturnErrorOnFailure(reader.Next());
     SubscribeRequestMessage::Parser subscribeRequestParser;
     ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -693,16 +692,13 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
-
+    ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+
+    mpExchangeCtx->WillSendMessage();
+
     return CHIP_NO_ERROR;
 }
 

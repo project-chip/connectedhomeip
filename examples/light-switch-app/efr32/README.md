@@ -13,6 +13,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -103,13 +105,17 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/light-switch-app/efr32
           $ rm -rf out/
 
+*   Build the example with Matter shell
+
+          ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/efr32/ out/light-switch-app BRD4161A chip_build_libshell=true
+
 *   Build the example as Sleepy End Device (SED)
 
           $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false chip_build_libshell=true'
 
 *   Build the example with pigweed RCP
 
@@ -251,19 +257,63 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1**
 
-    -   Sends a Toggle command to bound light app
+        -   Sends a Toggle command to bound light app
+
+    **Matter shell**
+
+    **_OnOff Cluster_**
+
+        -  'switch onoff on'            : Sends unicast On command to bound device
+        -  'switch onoff off'           : Sends unicast Off command to bound device
+        -  'switch onoff toggle'        : Sends unicast Toggle command to bound device
+
+        -  'switch groups onoff on'     : Sends On group command to bound group
+        -  'switch groups onoff off'    : Sends On group command to bound group
+        -  'switch groups onoff toggle' : Sends On group command to bound group
+
+    **_Binding Cluster_**
+
+        - 'switch binding unicast  <fabric index> <node id> <endpoint>' : Creates a unicast binding
+        - 'switch binding group <fabric index> <group id>'              : Creates a group binding
 
 *   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
-
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+    standalone, Android or iOS app
 
-    Here is an example with the CHIPTool:
+    Here is an example with the CHIPTool for unicast commands only:
 
     ```
-    chip-tool pairing ble-thread 1 hex:<operationalDataset> 73141520 3840
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-    chip-tool binding bind <light nodeid> 0 1 6 1 1
+    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null }{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
+
+    chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
+    ```
+
+    Here is an example with the CHIPTool for groups commands only:
+
+    ```
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+
+    chip-tool tests TestGroupDemoConfig --nodeId 1
+
+    chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
+
+    chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 1 1
+    ```
+
+    To run the example with unicast and groups commands, run the group
+    configuration commands and replace the last one with binding this command
+
+    ```
+    chip-tool binding write binding '[{"fabricIndex": 1, "group": 257},{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6} ]' 1 1
+    ```
+
+    To acquire the chip-tool node id, read the acl table right after
+    commissioning
+
+    ```
+    ./connectedhomeip/out/chip-tool/chip-tool accesscontrol read acl <nodeid> 0
     ```
 
 ### Notes
@@ -326,3 +376,9 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)

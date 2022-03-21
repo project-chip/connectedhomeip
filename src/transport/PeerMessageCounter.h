@@ -96,92 +96,28 @@ public:
      * considered duplicate if the corresponding bit offset is set to true.
      *
      */
-    CHIP_ERROR VerifyGroupCounter(uint32_t counter)
+    CHIP_ERROR VerifyGroup(uint32_t counter) const
     {
         if (mStatus != Status::Synced)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        // 1. Check whether the new counter value falls in the spec's "valid future counter value" window.
-        uint32_t counterIncrease          = counter - mSynced.mMaxCounter;
-        uint32_t groupFutureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
-        if (counterIncrease >= 1 && counterIncrease <= (groupFutureCounterWindow))
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        // 2. Counter Window check
-        uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-        {
-            if ((offset == 0) || mSynced.mWindow.test(offset))
-            {
-                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
-            }
-        }
-        else
-        {
-            return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW;
-        }
-
-        return CHIP_NO_ERROR;
+        Position pos = ClassifyWithRollover(counter);
+        return VerifyPositionEncrypted(pos, counter);
     }
 
-    CHIP_ERROR VerifyUnicast(uint32_t counter) const
-    {
-        if (mStatus != Status::Synced)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        if (counter <= mSynced.mMaxCounter)
-        {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-
-            if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
-            }
-
-            if (mSynced.mWindow.test(offset))
-            {
-                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
-            }
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Verify(uint32_t counter, bool useGroupAlgorithm = false)
-    {
-        if (useGroupAlgorithm)
-        {
-            return VerifyGroupCounter(counter);
-        }
-        return VerifyUnicast(counter);
-    }
-
-    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter, bool useGroupAlgorithm = false)
+    CHIP_ERROR VerifyOrTrustFirstGroup(uint32_t counter)
     {
         switch (mStatus)
         {
-        case Status::NotSynced:
+        case Status::NotSynced: {
             // Trust and set the counter when not synced
             SetCounter(counter);
             return CHIP_NO_ERROR;
+        }
         case Status::Synced: {
-            CHIP_ERROR err = Verify(counter, useGroupAlgorithm);
-            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !useGroupAlgorithm)
-            {
-                // According to chip spec, when global unencrypted message
-                // counter is out of window, the peer may have reset and is
-                // using another randomize initial value. Trust the new
-                // counter here.
-                SetCounter(counter);
-                err = CHIP_NO_ERROR;
-            }
-            return err;
+            return VerifyGroup(counter);
         }
         default:
             VerifyOrDie(false);
@@ -191,33 +127,22 @@ public:
 
     /**
      * @brief
-     *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
-     *    counter states including possible Rollover for Groups communications.
+     *    With the group counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
+     *    counter states.
      *
-     * @pre Verify(counter) == CHIP_NO_ERROR
+     * @pre counter has been verified via VerifyGroup or VerifyOrTrustFirstGroup
      */
-    void CommitWithRollOver(uint32_t counter)
+    void CommitGroup(uint32_t counter) { CommitWithRollover(counter); }
+
+    CHIP_ERROR VerifyEncryptedUnicast(uint32_t counter) const
     {
-        uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        if (mStatus != Status::Synced)
         {
-            mSynced.mWindow.set(offset);
+            return CHIP_ERROR_INCORRECT_STATE;
         }
-        else
-        {
-            // Not a bit inside the window.  Since we are committing, this is a new mMaxCounter value.
-            mSynced.mMaxCounter = counter;
-            uint32_t shift      = -offset;
-            if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                mSynced.mWindow.reset();
-            }
-            else
-            {
-                mSynced.mWindow <<= shift;
-            }
-            mSynced.mWindow.set(0);
-        }
+
+        Position pos = ClassifyWithoutRollover(counter);
+        return VerifyPositionEncrypted(pos, counter);
     }
 
     /**
@@ -225,31 +150,38 @@ public:
      *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
      *    counter states.
      *
-     * @pre Verify(counter) == CHIP_NO_ERROR
+     * @pre counter has been verified via VerifyEncryptedUnicast
      */
-    void Commit(uint32_t counter)
+    void CommitEncryptedUnicast(uint32_t counter) { CommitWithoutRollover(counter); }
+
+    CHIP_ERROR VerifyUnencrypted(uint32_t counter)
     {
-        if (counter <= mSynced.mMaxCounter)
+        switch (mStatus)
         {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-            mSynced.mWindow.set(offset);
+        case Status::NotSynced: {
+            // Trust and set the counter when not synced
+            SetCounter(counter);
+            return CHIP_NO_ERROR;
         }
-        else
-        {
-            uint32_t offset = counter - mSynced.mMaxCounter;
-            // advance max counter by `offset`
-            mSynced.mMaxCounter = counter;
-            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                mSynced.mWindow <<= offset;
-            }
-            else
-            {
-                mSynced.mWindow.reset();
-            }
-            mSynced.mWindow.set(0);
+        case Status::Synced: {
+            Position pos = ClassifyWithRollover(counter);
+            return VerifyPositionUnencrypted(pos, counter);
+        }
+        default: {
+            VerifyOrDie(false);
+            return CHIP_ERROR_INTERNAL;
+        }
         }
     }
+
+    /**
+     * @brief
+     *    With the unencrypted counter verified we can trust the packet and adjust
+     *    counter states.
+     *
+     * @pre counter has been verified via VerifyUnencrypted
+     */
+    void CommitUnencrypted(uint32_t counter) { CommitWithRollover(counter); }
 
     void SetCounter(uint32_t value)
     {
@@ -260,9 +192,178 @@ public:
         mSynced.mWindow.reset();
     }
 
-    uint32_t GetCounter() { return mSynced.mMaxCounter; }
+    uint32_t GetCounter() const { return mSynced.mMaxCounter; }
 
 private:
+    // Counter position indicator with respect to our current
+    // mSynced.mMaxCounter.
+    enum class Position
+    {
+        BeforeWindow,
+        InWindow,
+        MaxCounter,
+        FutureCounter,
+    };
+
+    // Classify an incoming counter value's position.  Must be used only if
+    // mStatus is Status::Synced.
+    Position ClassifyWithoutRollover(uint32_t counter) const
+    {
+        if (counter > mSynced.mMaxCounter)
+        {
+            return Position::FutureCounter;
+        }
+
+        return ClassifyNonFutureCounter(counter);
+    }
+
+    /**
+     * Classify an incoming counter value's position for the cases when counters
+     * are allowed to roll over.  Must be used only if mStatus is
+     * Status::Synced.
+     *
+     * This can be used as the basis for implementing section 4.5.4.2 in the
+     * spec:
+     *
+     * For encrypted messages of Group Session Type, any arriving message with a counter in the range
+     * [(max_message_counter + 1) to (max_message_counter + 2^31 - 1)] (modulo 2^32) SHALL be considered
+     * new, and cause the max_message_counter value to be updated. Messages with counters from
+     * [(max_message_counter - 2^31) to (max_message_counter - MSG_COUNTER_WINDOW_SIZE - 1)] (modulo 2^
+     * 32) SHALL be considered duplicate. Message counters within the range of the bitmap SHALL be
+     * considered duplicate if the corresponding bit offset is set to true.
+     */
+    Position ClassifyWithRollover(uint32_t counter) const
+    {
+        uint32_t counterIncrease               = counter - mSynced.mMaxCounter;
+        constexpr uint32_t futureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
+
+        if (counterIncrease >= 1 && counterIncrease <= futureCounterWindow)
+        {
+            return Position::FutureCounter;
+        }
+
+        return ClassifyNonFutureCounter(counter);
+    }
+
+    /**
+     * Classify a counter that's known to not be future counter.  This works
+     * identically whether we are doing rollover or not.
+     */
+    Position ClassifyNonFutureCounter(uint32_t counter) const
+    {
+        if (counter == mSynced.mMaxCounter)
+        {
+            return Position::MaxCounter;
+        }
+
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
+            return Position::InWindow;
+        }
+
+        return Position::BeforeWindow;
+    }
+
+    /**
+     * Given an encrypted (group or unicast) counter position and the counter
+     * value, verify whether we should accept it.
+     */
+    CHIP_ERROR VerifyPositionEncrypted(Position position, uint32_t counter) const
+    {
+        switch (position)
+        {
+        case Position::FutureCounter:
+            return CHIP_NO_ERROR;
+        case Position::InWindow: {
+            uint32_t offset = mSynced.mMaxCounter - counter;
+            if (mSynced.mWindow.test(offset - 1))
+            {
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+            }
+            return CHIP_NO_ERROR;
+        }
+        default: {
+            // Equal to max counter, or before window.
+            return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+        }
+        }
+    }
+
+    /**
+     * Given an unencrypted counter position and value, verify whether we should
+     * accept it.
+     */
+    CHIP_ERROR VerifyPositionUnencrypted(Position position, uint32_t counter) const
+    {
+        switch (position)
+        {
+        case Position::MaxCounter:
+            return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+        case Position::InWindow: {
+            uint32_t offset = mSynced.mMaxCounter - counter;
+            if (mSynced.mWindow.test(offset - 1))
+            {
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+            }
+            return CHIP_NO_ERROR;
+        }
+        default: {
+            // Future counter or before window; all of these are accepted.  The
+            // before-window case is accepted because the peer may have reset
+            // and is using a new randomized initial value.
+            return CHIP_NO_ERROR;
+        }
+        }
+    }
+
+    void CommitWithRollover(uint32_t counter)
+    {
+        Position pos = ClassifyWithRollover(counter);
+        CommitWithPosition(pos, counter);
+    }
+
+    void CommitWithoutRollover(uint32_t counter)
+    {
+        Position pos = ClassifyWithoutRollover(counter);
+        CommitWithPosition(pos, counter);
+    }
+
+    /**
+     * Commit a counter value that is known to be at the given position with
+     * respect to our max counter.
+     */
+    void CommitWithPosition(Position position, uint32_t counter)
+    {
+        switch (position)
+        {
+        case Position::InWindow: {
+            uint32_t offset = mSynced.mMaxCounter - counter;
+            mSynced.mWindow.set(offset - 1);
+            break;
+        }
+        case Position::MaxCounter: {
+            // Nothing to do
+            break;
+        }
+        default: {
+            // Since we are committing, this becomes a new max-counter value.
+            uint32_t shift      = counter - mSynced.mMaxCounter;
+            mSynced.mMaxCounter = counter;
+            if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
+                mSynced.mWindow.reset();
+            }
+            else
+            {
+                mSynced.mWindow <<= shift;
+                mSynced.mWindow.set(shift - 1);
+            }
+            break;
+        }
+        }
+    }
+
     enum class Status
     {
         NotSynced,     // No state associated
@@ -279,7 +380,7 @@ private:
     {
         /*
          *  Past <--                --> Future
-         *             MaxCounter
+         *          MaxCounter - 1
          *                 |
          *                 v
          *  | <-- mWindow -->|

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -1232,16 +1232,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_ACCESS_TOKEN                        CHIP_CORE_ERROR(0x58)
 
 /**
- *  @def CHIP_ERROR_WRONG_CERT_SUBJECT
+ *  @def CHIP_ERROR_WRONG_CERT_DN
  *
  *  @brief
- *    A certificate subject is wrong.
+ *    A certificate subject/issuer distinguished name is wrong.
  *
  */
-#define CHIP_ERROR_WRONG_CERT_SUBJECT                          CHIP_CORE_ERROR(0x59)
-
-// deprecated alias
-#define CHIP_ERROR_WRONG_CERTIFICATE_SUBJECT CHIP_ERROR_WRONG_CERT_SUBJECT
+#define CHIP_ERROR_WRONG_CERT_DN                               CHIP_CORE_ERROR(0x59)
 
 /**
  *  @def CHIP_ERROR_INVALID_PROVISIONING_BUNDLE
@@ -1469,8 +1466,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TOO_MANY_CONNECTIONS                        CHIP_CORE_ERROR(0x72)
 
-// unused                                                      CHIP_CORE_ERROR(0x73)
-// unused                                                      CHIP_CORE_ERROR(0x74)
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation cancelled because a shut down was initiated
+ */
+#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation has been cancelled, generally by calling a cancel/abort request.
+ */
+#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
 
 /**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
@@ -2402,6 +2412,14 @@ using CHIP_ERROR = ::chip::ChipError;
  *   has unexpected value.
  */
 #define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
+
+/**
+ * @def CHIP_ERROR_BUSY
+ *
+ * @brief
+ *   The Resource is busy and cannot process the request. Trying again might work.
+ */
+#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
 
 /**
  *  @}

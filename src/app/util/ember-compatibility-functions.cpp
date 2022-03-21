@@ -146,33 +146,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPath & commandPath)
-{
-    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
-
-    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
-    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
-    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
-    imCompatibilityEmberApsFrame.sequence =
-        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
-
-    if (commandExchangeCtx->IsGroupExchangeContext())
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
-    }
-    else
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_UNICAST;
-    }
-
-    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
-    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
-    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
-    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
-
-    emAfCurrentCommand = &imCompatibilityEmberAfCluster;
-}
-
 void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
@@ -509,10 +482,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
-            }
+
+            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
         }
     }
 
@@ -996,10 +967,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
         return false;
     }
-    else
-    {
-        return (*(version)) == aRequiredVersion;
-    }
+
+    return (*(version)) == aRequiredVersion;
 }
 
 } // namespace app
@@ -1028,14 +997,23 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 
     IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
-
-    // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context
-    // has completed. This ensures that we can 'gather up' multiple attribute changes that have occurred in the same execution
-    // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
     return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint)
+{
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    ClusterInfo info;
+    info.mEndpointId = endpoint;
+
+    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 }

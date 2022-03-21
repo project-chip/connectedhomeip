@@ -19,7 +19,7 @@ config:
     endpoint: 0
     discriminator:
         type: INT16U
-        defaultValue: GetUniqueDiscriminator()
+        defaultValue: 3840
     vendorId:
         type: INT16U
         defaultValue: 65521
@@ -55,10 +55,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 120
-
-    - label: "Wait Commissionable advertisement"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"
@@ -296,10 +292,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 120
-
-    - label: "Wait Commissionable advertisement"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"

@@ -94,12 +94,33 @@ public:
      *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
+     * apReadHandler can be non-null to indicate that the reset is due to a
+     * specific ReadHandler being deallocated.
      */
-    void ResetReadHandlerTracker() { mCurReadHandlerIdx = 0; }
+    void ResetReadHandlerTracker(ReadHandler * apReadHandlerBeingDeleted)
+    {
+        if (apReadHandlerBeingDeleted == mRunningReadHandler)
+        {
+            // Just decrement, so our increment after we finish running it will
+            // do the right thing.
+            --mCurReadHandlerIdx;
+        }
+        else
+        {
+            // No idea what to do here to make the indexing sane.  Just start at
+            // the beginning.  We need to do better here; see
+            // https://github.com/project-chip/connectedhomeip/issues/13809
+            mCurReadHandlerIdx = 0;
+        }
+    }
+
+    uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
+
+    void ScheduleUrgentEventDeliverySync();
 
 private:
     friend class TestReportingEngine;
@@ -143,7 +164,6 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
@@ -173,6 +193,11 @@ private:
      *
      */
     uint32_t mCurReadHandlerIdx = 0;
+
+    /**
+     * The read handler we're calling BuildAndSendSingleReportData on right now.
+     */
+    ReadHandler * mRunningReadHandler = nullptr;
 
     /**
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.

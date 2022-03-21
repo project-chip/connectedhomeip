@@ -122,8 +122,9 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [
-  'Identify',
+  'Bridged Device Basic',
   'Door Lock',
+  'Identify',
   'Pump Configuration and Control',
   'Window Covering',
 ];
@@ -424,7 +425,7 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
-  // Check for the case when were:
+  // Check for the case when we're:
   // 1. A single word (that's the regexp at the beginning, which matches the
   //    word-splitting regexp in string.toCamelCase).
   // 2. Starting with multiple capital letters in a row.
@@ -437,13 +438,13 @@ function asLowerCamelCase(label)
       && label.toUpperCase() != label) {
     str = str[0].toUpperCase() + str.substring(1);
   }
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asUpperCamelCase(label)
 {
   let str = string.toCamelCase(label, false);
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asMEI(prefix, suffix)
@@ -602,7 +603,11 @@ async function _zapTypeToPythonClusterObjectType(type, options)
       return 'bytes';
     }
 
-    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    if (type.toLowerCase() == 'single') {
+      return 'float32';
+    }
+
+    if (type.toLowerCase() == 'double') {
       return 'float';
     }
 
@@ -750,15 +755,6 @@ function isWeaklyTypedEnum(label)
     "ColorMode",
     "ContentLaunchStatus",
     "ContentLaunchStreamingType",
-    "DoorLockEventSource",
-    "DoorLockEventType",
-    "DoorLockOperatingMode",
-    "DoorLockOperationEventCode",
-    "DoorLockProgrammingEventCode",
-    "DoorLockState",
-    "DoorLockUserStatus",
-    "DoorLockUserType",
-    "DoorState",
     "EnhancedColorMode",
     "HardwareFaultType",
     "HueDirection",
@@ -789,9 +785,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "ThermostatControlSequence",
-    "ThermostatRunningMode",
-    "ThermostatSystemMode",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",

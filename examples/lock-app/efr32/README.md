@@ -12,6 +12,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -250,24 +252,14 @@ combination with JLinkRTTClient as follows:
 -   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-    Here is an example with the Python controller:
+    Here is an example with the CHIPTool:
 
     ```
-      chip-device-ctrl
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-      connect -ble 3840 73141520 1234
-
-      zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
-
-      zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
-
-      close-ble
-
-      resolve 1234
-
-      zcl OnOff Toggle 1234 1 0
+    chip-tool onoff toggle 1 1
     ```
 
 ### Notes
@@ -299,3 +291,9 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)

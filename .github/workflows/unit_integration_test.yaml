@@ -30,24 +30,28 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls]
+                type: [main, clang, mbedtls, rotating_device_id]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.58
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Bootstrap
               timeout-minutes: 10
               run: |
@@ -59,8 +63,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -75,12 +79,13 @@ jobs:
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
                      *) ;;
                   esac
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 30 
+              timeout-minutes: 30
               run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
               timeout-minutes: 30

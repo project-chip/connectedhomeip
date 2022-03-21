@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
@@ -34,10 +33,7 @@ qpg_sdk("sdk") {
     "${examples_plat_dir}",
   ]
 
-  defines = [
-    "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
-    "ENABLE_CHIP_SHELL",
-  ]
+  defines = [ "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE" ]
 }
 
 qpg_executable("shell_app") {
@@ -58,10 +54,7 @@ qpg_executable("shell_app") {
     "${examples_plat_dir}:qpg-matter-shell",
   ]
 
-  include_dirs = [
-    "include",
-    "${examples_plat_dir}/shell_common",
-  ]
+  include_dirs = [ "include" ]
 
   defines = []
 

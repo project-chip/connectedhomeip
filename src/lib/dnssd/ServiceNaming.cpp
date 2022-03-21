@@ -121,8 +121,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         requiredSize = snprintf(buffer, bufferLen, "_V%" PRIu16, static_cast<uint16_t>(subtype.code));
         break;
     case DiscoveryFilterType::kDeviceType:
-        // TODO: Not totally clear the size required here: see spec issue #3226
-        requiredSize = snprintf(buffer, bufferLen, "_T%" PRIu16, static_cast<uint16_t>(subtype.code));
+        requiredSize = snprintf(buffer, bufferLen, "_T%" PRIu32, static_cast<uint32_t>(subtype.code));
         break;
     case DiscoveryFilterType::kCommissioningMode:
         requiredSize = snprintf(buffer, bufferLen, "_CM");
@@ -136,8 +135,8 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kCompressedFabricId:
         requiredSize = snprintf(buffer, bufferLen, "_I");
-        return Encoding::BytesToHex(subtype.code, &buffer[requiredSize], bufferLen - requiredSize,
-                                    Encoding::HexFlags::kUppercaseAndNullTerminate);
+        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - requiredSize,
+                                     Encoding::HexFlags::kUppercaseAndNullTerminate);
         break;
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);

@@ -36,13 +36,13 @@ namespace Controller {
  *   to maintain a list of DiscoveredNodes and providing the implementation
  *   of the template GetDiscoveredNodes() function.
  */
-class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::ResolverDelegate
+class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::CommissioningResolveDelegate
 {
 public:
     AbstractDnssdDiscoveryController() {}
-    virtual ~AbstractDnssdDiscoveryController() {}
+    ~AbstractDnssdDiscoveryController() override {}
 
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
 protected:
     using DiscoveredNodeList = FixedSpan<Dnssd::DiscoveredNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;

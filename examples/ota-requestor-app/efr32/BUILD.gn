@@ -39,14 +39,15 @@ declare_args() {
   chip_print_memory_usage = false
 
   # PIN code for PASE session establishment.
-  setupPinCode = 73141520
+  setupPinCode = 20202021
   setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
-}
 
-show_qr_code = true
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
+}
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
@@ -89,12 +90,15 @@ efr32_executable("ota_requestor_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
 
   deps = [
     ":sdk",
@@ -129,6 +133,7 @@ efr32_executable("ota_requestor_app") {
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
     ]
@@ -146,6 +151,7 @@ efr32_executable("ota_requestor_app") {
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",

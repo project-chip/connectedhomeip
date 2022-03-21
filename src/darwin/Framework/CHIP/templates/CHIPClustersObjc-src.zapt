@@ -3,6 +3,7 @@
 {{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
+#import "CHIPAttributeCacheContainer_Internal.h"
 #import "CHIPCallbackBridge_internal.h"
 #import "CHIPCluster_internal.h"
 #import "CHIPClustersObjc_internal.h"
@@ -28,16 +29,7 @@ using namespace chip::app::Clusters;
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
-{{! zcl_command_arguments_count is unreliable when used in a conditional.  As
-    a workaround, just use iteration over the arguments directly to see if we
-    have any. }}
-{{#chip_cluster_command_arguments}}
-{{#first}}
-- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=parent}})completionHandler
-{{/first}}
-{{else}}
-- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:({{>command_completion_type command=parent}})completionHandler
-{{/chip_cluster_command_arguments}}
+- (void){{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler{{else}}CompletionHandler{{/if}}:({{>command_completion_type command=.}})completionHandler
 {
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
@@ -83,7 +75,13 @@ using namespace chip::app::Clusters;
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(CHIPReadParams * _Nullable)params completionHandler:
+{{~else~}}
+  CompletionHandler:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       {{! This treats completionHandler as taking an id for the data.  This is
@@ -93,7 +91,11 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
+          {{~#if_is_fabric_scoped_struct type~}}
+          , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
+          {{~/if_is_fabric_scoped_struct~}}
+          );
       });
 }
 
@@ -126,18 +128,51 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
+       params:(CHIPSubscribeParams * _Nullable)params
+subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
       reportHandler,
       ^(Cancelable * success, Cancelable * failure) {
+          if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+              // We don't support disabling auto-resubscribe.
+              return CHIP_ERROR_INVALID_ARGUMENT;
+          }
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished,
+              params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+              params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
+          );
       }, subscriptionEstablishedHandler);
+}
+
++ (void) read{{>attribute}}WithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIP{{>attribute_data_callback_name}}CallbackBridge(queue,
+      completionHandler,
+      ^(Cancelable * success, Cancelable * failure) {
+          if (attributeCacheContainer.cppAttributeCache) {
+              chip::app::ConcreteAttributePath path;
+              using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+              path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+              path.mClusterId = TypeInfo::GetClusterId();
+              path.mAttributeId = TypeInfo::GetAttributeId();
+              TypeInfo::DecodableType value;
+              CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+              auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
+              if (err == CHIP_NO_ERROR)
+              {
+                successFn->mCall(successFn->mContext, value);
+              }
+              return err;
+          }
+          return CHIP_ERROR_NOT_FOUND;
+      });
 }
 
 {{/if}}

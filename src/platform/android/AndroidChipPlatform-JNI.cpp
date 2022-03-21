@@ -35,6 +35,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
+#include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
 
 using namespace chip;
@@ -98,6 +99,7 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
 {
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
 }
@@ -213,12 +215,14 @@ JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject man
 JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject manager)
 {
     chip::DeviceLayer::StackLock lock;
-    chip::DeviceLayer::ConfigurationManagerImpl * configurationManagerImpl =
-        reinterpret_cast<chip::DeviceLayer::ConfigurationManagerImpl *>(&chip::DeviceLayer::ConfigurationMgr());
-    if (configurationManagerImpl != nullptr)
-    {
-        configurationManagerImpl->InitializeWithObject(manager);
-    }
+    chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().InitializeWithObject(manager);
+}
+
+// for DiagnosticDataProviderManager
+JNI_METHOD(void, setDiagnosticDataProviderManager)(JNIEnv * env, jclass self, jobject manager)
+{
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::DiagnosticDataProviderImpl::GetDefaultInstance().InitializeWithObject(manager);
 }
 
 // for ServiceResolver

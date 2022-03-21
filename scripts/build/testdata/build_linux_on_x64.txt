@@ -41,6 +41,26 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns-ipv6only'
 
+# Generating linux-arm64-ota-provider
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider'
+
+# Generating linux-arm64-ota-provider-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider-ipv6only'
+
+# Generating linux-arm64-ota-requestor
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor'
+
+# Generating linux-arm64-ota-requestor-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor-ipv6only'
+
 # Generating linux-arm64-shell
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -64,6 +84,9 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
 # Generating linux-fake-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake"' {out}/linux-fake-tests
 
+# Generating linux-x64-address-resolve-tool
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-address-resolve-tool
+
 # Generating linux-x64-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
@@ -72,9 +95,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-chip-cert
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_crypto="openssl"' {out}/linux-x64-chip-cert
-
-# Generating linux-x64-chip-cert-ipv6only
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_inet_config_enable_ipv4=false chip_crypto="openssl"' {out}/linux-x64-chip-cert-ipv6only
 
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
@@ -93,6 +113,18 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-minmdns-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-minmdns-ipv6only
+
+# Generating linux-x64-ota-provider
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux --args=chip_config_network_layer_ble=false {out}/linux-x64-ota-provider
+
+# Generating linux-x64-ota-provider-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false' {out}/linux-x64-ota-provider-ipv6only
+
+# Generating linux-x64-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux --args=chip_config_network_layer_ble=false {out}/linux-x64-ota-requestor
+
+# Generating linux-x64-ota-requestor-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false' {out}/linux-x64-ota-requestor-ipv6only
 
 # Generating linux-x64-rpc-console
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/common/pigweed/rpc_console {out}/linux-x64-rpc-console
@@ -142,6 +174,18 @@ ninja -C {out}/linux-arm64-minmdns
 # Building linux-arm64-minmdns-ipv6only
 ninja -C {out}/linux-arm64-minmdns-ipv6only
 
+# Building linux-arm64-ota-provider
+ninja -C {out}/linux-arm64-ota-provider
+
+# Building linux-arm64-ota-provider-ipv6only
+ninja -C {out}/linux-arm64-ota-provider-ipv6only
+
+# Building linux-arm64-ota-requestor
+ninja -C {out}/linux-arm64-ota-requestor
+
+# Building linux-arm64-ota-requestor-ipv6only
+ninja -C {out}/linux-arm64-ota-requestor-ipv6only
+
 # Building linux-arm64-shell
 ninja -C {out}/linux-arm64-shell
 
@@ -157,6 +201,9 @@ ninja -C {out}/linux-arm64-thermostat-ipv6only
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
 
+# Building linux-x64-address-resolve-tool
+ninja -C {out}/linux-x64-address-resolve-tool src/lib/address_resolve:address-resolve-tool
+
 # Building linux-x64-all-clusters
 ninja -C {out}/linux-x64-all-clusters
 
@@ -165,9 +212,6 @@ ninja -C {out}/linux-x64-all-clusters-ipv6only
 
 # Building linux-x64-chip-cert
 ninja -C {out}/linux-x64-chip-cert src/tools/chip-cert
-
-# Building linux-x64-chip-cert-ipv6only
-ninja -C {out}/linux-x64-chip-cert-ipv6only src/tools/chip-cert
 
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool
@@ -186,6 +230,18 @@ ninja -C {out}/linux-x64-minmdns
 
 # Building linux-x64-minmdns-ipv6only
 ninja -C {out}/linux-x64-minmdns-ipv6only
+
+# Building linux-x64-ota-provider
+ninja -C {out}/linux-x64-ota-provider
+
+# Building linux-x64-ota-provider-ipv6only
+ninja -C {out}/linux-x64-ota-provider-ipv6only
+
+# Building linux-x64-ota-requestor
+ninja -C {out}/linux-x64-ota-requestor
+
+# Building linux-x64-ota-requestor-ipv6only
+ninja -C {out}/linux-x64-ota-requestor-ipv6only
 
 # Building linux-x64-rpc-console
 ninja -C {out}/linux-x64-rpc-console

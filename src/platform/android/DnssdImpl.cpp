@@ -44,7 +44,7 @@ jmethodID sPublishMethod        = nullptr;
 jmethodID sRemoveServicesMethod = nullptr;
 } // namespace
 
-// Implemention of functions declared in lib/dnssd/platform/Dnssd.h
+// Implementation of functions declared in lib/dnssd/platform/Dnssd.h
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -220,7 +220,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr) {
         DeviceLayer::StackLock lock;
         DnssdResolveCallback callback = reinterpret_cast<DnssdResolveCallback>(callbackHandle);
-        callback(reinterpret_cast<void *>(contextHandle), service, error);
+        callback(reinterpret_cast<void *>(contextHandle), service, Span<Inet::IPAddress>(), error);
     };
 
     VerifyOrReturn(address != nullptr && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));

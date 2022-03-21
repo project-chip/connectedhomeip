@@ -26,11 +26,14 @@ class HostApp(Enum):
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
+    ADDRESS_RESOLVE = auto()
     TV_APP = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
     CERT_TOOL = auto()
+    OTA_PROVIDER = auto()
+    OTA_REQUESTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -43,6 +46,8 @@ class HostApp(Enum):
             return 'common/pigweed/rpc_console'
         elif self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            return '../'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
         elif self == HostApp.LOCK:
@@ -53,6 +58,10 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.CERT_TOOL:
             return '..'
+        elif self == HostApp.OTA_PROVIDER:
+            return 'ota-provider-app/linux'
+        elif self == HostApp.OTA_REQUESTOR:
+            return 'ota-requestor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -75,6 +84,9 @@ class HostApp(Enum):
             yield 'minimal-mdns-client.map'
             yield 'minimal-mdns-server'
             yield 'minimal-mdns-server.map'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            yield 'address-resolve-tool'
+            yield 'address-resolve-tool.map'
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
@@ -89,6 +101,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.OTA_PROVIDER:
+            yield 'chip-ota-provider-app'
+            yield 'chip-ota-provider-app.map'
+        elif self == HostApp.OTA_REQUESTOR:
+            yield 'chip-ota-requestor-app'
+            yield 'chip-ota-requestor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -136,8 +154,9 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False):
+                 enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
+                 test_group=False, use_libfuzzer=False, use_clang=False,
+                 use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -151,6 +170,9 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+
+        if not enable_wifi:
+            self.extra_gn_options.append('chip_enable_wifi=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
@@ -171,6 +193,9 @@ class HostBuilder(GnBuilder):
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
+        if use_platform_mdns:
+            self.extra_gn_options.append('chip_mdns="platform"')
+
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
@@ -183,6 +208,9 @@ class HostBuilder(GnBuilder):
                     "Cannot cross compile CERT TOOL: ssl library conflict")
             self.extra_gn_options.append('chip_crypto="openssl"')
             self.build_command = 'src/tools/chip-cert'
+
+        if app == HostApp.ADDRESS_RESOLVE:
+            self.build_command = 'src/lib/address_resolve:address-resolve-tool'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

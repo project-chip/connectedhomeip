@@ -25,6 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -590,7 +591,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     // If the device name is not specified, generate a CHIP-standard name based on the bottom digits of the Chip device id.
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
@@ -1034,20 +1035,23 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketBufferHandle bufferHandle;
-    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1] = {};
-    uint16_t lifetimeCounter                                            = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+
+    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
     SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
-#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
-                                                                         bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
     SuccessOrExit(err);
     p_data->msg_data.write.p_value = bufferHandle->Start();
     p_data->msg_data.write.len     = bufferHandle->DataLength();

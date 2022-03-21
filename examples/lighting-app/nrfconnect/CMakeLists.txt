@@ -16,7 +16,6 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -82,7 +81,6 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
-                           ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
@@ -94,9 +92,7 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
@@ -149,6 +145,17 @@ pw_proto_library(button_service
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
   PREFIX
     button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
@@ -224,14 +231,17 @@ target_include_directories(app PRIVATE
 target_compile_options(app PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1")
+                       "-DPW_RPC_TRACING_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
   thread_service.nanopb_rpc

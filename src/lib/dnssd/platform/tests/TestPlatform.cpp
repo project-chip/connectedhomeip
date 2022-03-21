@@ -86,7 +86,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
@@ -104,7 +104,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("D", "22")
                                                   .AddTxt("VP", "555+897")
                                                   .AddTxt("CM", "1")
-                                                  .AddTxt("DT", "25")
+                                                  .AddTxt("DT", "70000")
                                                   .AddTxt("DN", "testy-test")
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
@@ -115,7 +115,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")
-                                                  .AddSubtype("_T25")
+                                                  .AddSubtype("_T70000")
                                                   .AddSubtype("_CM");
 CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
     CommissionAdvertisingParameters()
@@ -124,7 +124,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
@@ -139,7 +139,7 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddTxt("D", "22")
                                                      .AddTxt("VP", "555+897")
                                                      .AddTxt("CM", "2")
-                                                     .AddTxt("DT", "25")
+                                                     .AddTxt("DT", "70000")
                                                      .AddTxt("DN", "testy-test")
                                                      .AddTxt("RI", "id_that_spins")
                                                      .AddTxt("PI", "Pair me")
@@ -147,7 +147,7 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddSubtype("_S2")
                                                      .AddSubtype("_L22")
                                                      .AddSubtype("_V555")
-                                                     .AddSubtype("_T25")
+                                                     .AddSubtype("_T70000")
                                                      .AddSubtype("_CM");
 void TestStub(nlTestSuite * inSuite, void * inContext)
 {
@@ -219,6 +219,17 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 }
 
+int TestSetup(void * inContext)
+{
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestStub", TestStub),                             //
     NL_TEST_DEF("TestOperational", TestOperational),               //
@@ -230,7 +241,7 @@ const nlTest sTests[] = {
 
 int TestDnssdPlatform(void)
 {
-    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

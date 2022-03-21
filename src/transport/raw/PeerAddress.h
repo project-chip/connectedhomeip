@@ -28,6 +28,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMemString.h>
 
 namespace chip {

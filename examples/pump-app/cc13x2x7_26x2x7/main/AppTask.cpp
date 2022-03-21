@@ -23,11 +23,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
-
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -36,6 +31,14 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -72,6 +75,26 @@ static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+static OTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static GenericOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(chip::Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
+
 int AppTask::StartAppTask()
 {
     int ret = 0;
@@ -103,7 +126,7 @@ int AppTask::Init()
     cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -146,12 +169,12 @@ int AppTask::Init()
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
 #endif
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    chip::Server::GetInstance().Init();
+    Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -192,8 +215,12 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+    InitializeOTARequestor();
+#endif
+
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     return 0;
 }
@@ -352,7 +379,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         break;
 

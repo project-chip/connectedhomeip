@@ -52,6 +52,13 @@ if (chip_enable_pw_rpc) {
     prefix = "device_service"
   }
 
+  pw_proto_library("descriptor_service") {
+    sources = [ "protos/descriptor_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "descriptor_service"
+  }
+
   pw_proto_library("button_service") {
     sources = [ "protos/button_service.proto" ]
     deps = [ "$dir_pw_protobuf:common_protos" ]

@@ -54,6 +54,7 @@ executable("chip-lighting-app") {
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
     ]
@@ -68,7 +69,6 @@ executable("chip-lighting-app") {
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_log",
       "$dir_pw_rpc:server",
-      "$dir_pw_rpc:synchronized_channel_output",
       "$dir_pw_rpc/system_server:facade",
       "$dir_pw_stream:socket_stream",
       "$dir_pw_stream:sys_io_stream",
@@ -76,6 +76,7 @@ executable("chip-lighting-app") {
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",

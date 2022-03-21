@@ -84,8 +84,6 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     AttributeStatusIBs::Parser attributeStatusesParser;
 
     reader.Init(std::move(payload));
-    err = reader.Next();
-    SuccessOrExit(err);
 
     err = writeResponse.Init(reader);
     SuccessOrExit(err);
@@ -117,6 +115,8 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    ReturnErrorOnFailure(writeResponse.ExitContainer());
 
 exit:
     return err;
@@ -240,6 +240,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
+    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
     mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
@@ -321,10 +322,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
-    else // We are writing a non-list attribute, or we are writing a single element of a list.
-    {
-        return PutSinglePreencodedAttributeWritePayload(attributePath, data);
-    }
+    // We are writing a non-list attribute, or we are writing a single element of a list.
+    return PutSinglePreencodedAttributeWritePayload(attributePath, data);
 }
 
 const char * WriteClient::GetStateStr() const

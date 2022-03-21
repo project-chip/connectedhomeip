@@ -23,6 +23,14 @@ tests:
     - label:
           "TH sends a Timed Request Message with the timeout value set. (Example
           - 200 milliseconds)."
+      verification:
+          "./chip-tool basic mfg-specific-ping 1 0 --commissioner-name alpha
+          --timedInteractionTimeoutMs -200 TimedRequestMessage =
+          [1641535747.977210][3603:3603] CHIP:DMG: {
+          [1641535747.977247][3603:3603] CHIP:DMG: TimeoutMs = 0xff38,
+          [1641535747.977294][3603:3603] CHIP:DMG: }
+          [1641535747.977334][3603:3603] CHIP:DMG: Got Timed Request with
+          timeout 65336: handler 0xaaaae9085698 exchange 25353r"
       disabled: true
 
     - label:
@@ -30,4 +38,6 @@ tests:
           - 200 milliseconds). Wait for the status response message to be
           received. Wait for 5 seconds and then send a Write Request Message to
           the DUT."
+      verification:
+          "Chip-tool yet to implement timed interaction for write request"
       disabled: true

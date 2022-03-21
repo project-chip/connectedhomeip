@@ -29,6 +29,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip;
@@ -95,10 +96,9 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & discriminator        = commandData.discriminator;
     auto & iterations           = commandData.iterations;
     auto & salt                 = commandData.salt;
-    auto & passcodeID           = commandData.passcodeID;
 
     Optional<StatusCode> status = Optional<StatusCode>::Missing();
-    PASEVerifier verifier;
+    Spake2pVerifier verifier;
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
@@ -109,13 +109,13 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
                      CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(iterations >= Crypto::kSpake2pPBKDFMinimumIterations,
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(iterations <= Crypto::kSpake2pPBKDFMaximumIterations,
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() >= Crypto::kSpake2pPBKDFMinimumSaltLen,
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() <= Crypto::kSpake2pPBKDFMaximumSaltLen,
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
@@ -124,7 +124,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
-                     commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
+                     commissioningTimeout, discriminator, verifier, iterations, salt) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 

@@ -77,11 +77,19 @@ public:
     /**
      * EncodeValue encodes the value field of the report, it should be called exactly once.
      */
-    template <typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, Ts &&... aArgs)
+    template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, T && item, Ts &&... aArgs)
     {
         return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
-                                 TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), std::forward<Ts>(aArgs)...);
+                                 TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), item, std::forward<Ts>(aArgs)...);
+    }
+
+    template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, FabricIndex accessingFabricIndex, T && item,
+                           Ts &&... aArgs)
+    {
+        return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
+                                        TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), accessingFabricIndex, item);
     }
 };
 
@@ -104,12 +112,14 @@ public:
         template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(T && aArg) const
         {
+            VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
                                     aArg.GetFabricIndex() == mAttributeValueEncoder.mAccessingFabricIndex,
                                 CHIP_NO_ERROR);
-            return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.mAccessingFabricIndex, std::forward<T>(aArg));
         }
 
         template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
@@ -327,8 +337,9 @@ public:
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
-        // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
-        // kUndefinedFabricIndex on PASE sessions.
+        // The WriteRequest comes with no fabric index, this will happen when receiving a write request on a PASE session before
+        // AddNOC.
+        VerifyOrReturnError(AccessingFabricIndex() != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
         ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
         aArg.SetFabricIndex(AccessingFabricIndex());
         return CHIP_NO_ERROR;

@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -93,7 +94,6 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
@@ -126,6 +126,15 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
 
     invokeRequests.GetReader(&invokeRequestsReader);
+
+    {
+        // We don't support handling multiple commands but the protocol is ready to support it in the future, reject all of them and
+        // IM Engine will send a status response.
+        size_t commandCount = 0;
+        TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+        VerifyOrReturnError(commandCount == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
@@ -147,7 +156,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeRequestMessage.ExitContainer();
 }
 
 void CommandHandler::Close()
@@ -344,7 +354,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement,
@@ -434,7 +444,7 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
                                              const Optional<ClusterStatus> & aClusterStatus)
 {
     StatusIB statusIB;
-    ReturnLogErrorOnFailure(PrepareStatus(aCommandPath));
+    ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
     ReturnErrorOnFailure(commandStatus.GetError());
@@ -546,10 +556,8 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
     {
         return nullptr;
     }
-    else
-    {
-        return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
-    }
+
+    return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
 }
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const

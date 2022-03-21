@@ -15,11 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-    <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
+    <domain name="CHIP"/>
     <cluster>
         <name>Bridged Device Basic</name>
         <domain>CHIP</domain>
-        <description>Attributes for determining basic information about a bridged device, and setting user device information such as location.</description>
+        <description>This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
+          the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
+          collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
+          such as the vendor name, the model name, or user-assigned name.</description>
         <code>0x0039</code>
         <define>BRIDGED_DEVICE_BASIC_CLUSTER</define>
         <client tick="false" init="false">true</client>
@@ -27,7 +30,7 @@ limitations under the License.
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
         <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                              optional="true">VendorName</attribute>
-        <attribute side="server" code="2"  define="VENDOR_ID"                 type="int16u"                                                             optional="true">VendorID</attribute>
+        <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                          optional="true">VendorID</attribute>
         <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                              optional="true">ProductName</attribute>
         <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true" optional="true">NodeLabel</attribute>
         <attribute side="server" code="7"  define="HARDWARE_VERSION"          type="int16u"                                 default="0"                 optional="true">HardwareVersion</attribute>
@@ -43,18 +46,19 @@ limitations under the License.
         <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
 
         <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">
-          <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-          <field id="0" name="SoftwareVersion" type="INT32U"/>
+            <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
+            <field id="0" name="SoftwareVersion" type="INT32U"/>
         </event>
         <event side="server" code="0x01" name="ShutDown" priority="critical" optional="true">
-          <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
+            <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
         </event>
         <event side="server" code="0x02" name="Leave" priority="info" optional="true">
-          <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
+            <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
         </event>
         <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="false">
-          <description>This event (when supported) SHALL be generated when there is a change in the Reachable attribute.</description>
-          <field id="0" name="ReachableNewValue" type="boolean"/>      
-        </event>   
+            <description>This event SHALL be generated when there is a change in the Reachable attribute.</description>
+            <field id="0" name="ReachableNewValue" type="boolean"/>
+        </event>
+
     </cluster>
 </configurator>

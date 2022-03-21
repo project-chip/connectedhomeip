@@ -25,8 +25,8 @@
 #include <lib/support/JniReferences.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -118,7 +118,6 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.systemLayer        = systemLayer;
     initParams.tcpEndPointManager = tcpEndPointManager;
     initParams.udpEndPointManager = udpEndPointManager;
-    initParams.fabricStorage      = wrapper.get();
 
     // move bleLayer into platform/android to share with app server
 #if CONFIG_NETWORK_LAYER_BLE
@@ -164,8 +163,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    *errInfoOnFailure =
-        opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcacSpan,
+                                                                       icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -329,19 +328,3 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer,
-                                                     uint16_t size)
-{
-    return SyncSetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
-{
-    return SyncGetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(chip::FabricIndex fabricIndex, const char * key)
-{
-    return SyncDeleteKeyValue(key);
-};

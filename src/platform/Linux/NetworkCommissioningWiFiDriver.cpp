@@ -50,7 +50,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 // NOTE: For now, the LinuxWiFiDriver only supports one network, this can be fixed by using the wpa_supplicant API directly (then
 // wpa_supplicant will manage the networks for us.)
 
-CHIP_ERROR LinuxWiFiDriver::Init()
+CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -73,6 +73,14 @@ CHIP_ERROR LinuxWiFiDriver::Init()
     mSavedNetwork.ssidLen        = ssidLen;
 
     mStagingNetwork = mSavedNetwork;
+
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxWiFiDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -166,7 +174,13 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
     {
+        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+    else
+    {
+        // On linux platform, once "scan" is started, we can say the result will always be success.
+        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 
@@ -186,12 +200,12 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    Network connectedNetwork;
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConnectedNetwork(connectedNetwork);
+    Network configuredNetwork;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        if (connectedNetwork.networkIDLen == item.networkIDLen &&
-            memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected() && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
             item.connected = true;
         }

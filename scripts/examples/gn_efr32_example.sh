@@ -61,10 +61,14 @@ if [ "$#" == "0" ]; then
             Location for an alternate or modified efr32 SDK
         enable_heap_monitoring
             Monitor & log memory usage at runtime. (Default false)
+        enable_openthread_cli
+            Enables openthread cli without matter shell. (Default true)
+        show_qr_code
+            Enables QR code on LCD for devices with an LCD
         setupDiscriminator
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
-            PIN code for PASE session establishment. (Default 73141520)
+            PIN code for PASE session establishment. (Default 20202021)
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
@@ -74,10 +78,12 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-
+        OTA_periodic_query_timeout
+            Periodic query timeout variable for OTA in seconds
         Presets
         --sed
-            enable sleepy end device and set thread mtd
+            enable sleepy end device, set thread mtd
+            For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
     "

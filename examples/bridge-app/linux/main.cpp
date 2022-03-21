@@ -34,6 +34,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -211,6 +212,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceTyp
             EmberAfStatus ret;
             while (1)
             {
+                dev->SetEndpointId(gCurrentEndpointId);
                 ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
                                                 dataVersionStorage);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
@@ -549,10 +551,10 @@ CHIP_ERROR PrintQRCodeContent()
     uint16_t productId;
     std::string result;
 
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+    err = GetCommissionableDataProvider()->GetSetupPasscode(setUpPINCode);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(setUpDiscriminator);
     SuccessOrExit(err);
 
     err = ConfigurationMgr().GetVendorId(vendorId);

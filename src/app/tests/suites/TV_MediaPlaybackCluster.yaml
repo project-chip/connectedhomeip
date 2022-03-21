@@ -44,11 +44,9 @@ tests:
       command: "readAttribute"
       attribute: "Duration"
       response:
-          value: 0
+          value: 80000
 
-    # TODO: Enable once attribute struct is supported
     - label: "Read attribute position"
-      disabled: true
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -64,7 +62,7 @@ tests:
       command: "readAttribute"
       attribute: "SeekRangeEnd"
       response:
-          value: 0
+          value: 80000
 
     - label: "Read attribute seek range start"
       command: "readAttribute"
@@ -76,6 +74,8 @@ tests:
       command: "play"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -83,6 +83,8 @@ tests:
       command: "pause"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -90,6 +92,8 @@ tests:
       command: "stopPlayback"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -97,6 +101,8 @@ tests:
       command: "startOver"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -104,6 +110,8 @@ tests:
       command: "previous"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -111,6 +119,8 @@ tests:
       command: "next"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -118,6 +128,8 @@ tests:
       command: "rewind"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -125,6 +137,8 @@ tests:
       command: "fastForward"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
@@ -133,11 +147,19 @@ tests:
       arguments:
           values:
               - name: "deltaPositionMilliseconds"
-                value: 100
+                value: 500
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
+
+    - label: "Read attribute position after skip forward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 500 }
 
     - label: "Media Playback Skip Backward Command"
       command: "skipBackward"
@@ -147,16 +169,32 @@ tests:
                 value: 100
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
+
+    - label: "Read attribute position after skip backward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 400 }
 
     - label: "Media Playback Seek Command"
       command: "seek"
       arguments:
           values:
               - name: "position"
-                value: 100
+                value: 1000
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
+
+    - label: "Read attribute position after seek"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 1000 }

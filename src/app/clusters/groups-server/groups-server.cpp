@@ -196,8 +196,8 @@ exit:
 
 struct GroupMembershipResponse
 {
-    // A capacity of 0xFF means that it is unknown if any further groups MAY be added.
-    static constexpr uint8_t kCapacityUnknown = 0xff;
+    // A null capacity means that it is unknown if any further groups MAY be added.
+    const chip::app::DataModel::Nullable<uint8_t> kCapacityUnknown;
 
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }

@@ -41,7 +41,7 @@ namespace NetworkCommissioning {
 // TODO: The otbr-posix does not actually maintains its own networking states, it will always persist the last network connected.
 // This should not be an issue for most cases, but we should implement the code for maintaining the states by ourselves.
 
-CHIP_ERROR LinuxThreadDriver::Init()
+CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     ByteSpan currentProvision;
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
@@ -50,6 +50,14 @@ CHIP_ERROR LinuxThreadDriver::Init()
     mSavedNetwork.Init(currentProvision);
     mStagingNetwork.Init(currentProvision);
 
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxThreadDriver::Shutdown()
+{
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -90,7 +98,7 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -108,7 +116,7 @@ Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -148,6 +156,7 @@ exit:
 void LinuxThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
+    // The ThreadScan callback will always be invoked in CHIP mainloop, which is strictly after this function
     if (err != CHIP_NO_ERROR)
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);

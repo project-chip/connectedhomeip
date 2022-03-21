@@ -23,38 +23,56 @@
 namespace chip {
 namespace Dnssd {
 
-class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>, public ResolverDelegate
+class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
+                              public OperationalResolveDelegate,
+                              public CommissioningResolveDelegate
+
 {
 public:
-    void SetDelegate(ResolverDelegate * delegate) { mDelegate = delegate; }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) { mOperationalDelegate = delegate; }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
 
-    /// ResolverDelegate interface
-    void OnNodeIdResolved(const ResolvedNodeData & nodeData) override
+    // OperationalResolveDelegate
+    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
     {
-        if (mDelegate != nullptr)
+        if (mOperationalDelegate != nullptr)
         {
-            mDelegate->OnNodeIdResolved(nodeData);
+            mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing operational delegate. Data discarded.");
         }
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
     {
-        if (mDelegate != nullptr)
+        if (mOperationalDelegate != nullptr)
         {
-            mDelegate->OnNodeIdResolutionFailed(peerId, error);
+            mOperationalDelegate->OnOperationalNodeResolutionFailed(peerId, error);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing operational delegate. Failure info discarded.");
         }
     }
 
-    void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) override
+    // CommissioningResolveDelegate
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
-        if (mDelegate != nullptr)
+        if (mCommissioningDelegate != nullptr)
         {
-            mDelegate->OnNodeDiscoveryComplete(nodeData);
+            mCommissioningDelegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded.");
         }
     }
 
 private:
-    ResolverDelegate * mDelegate = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
+    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
 };
 
 class ResolverProxy : public Resolver
@@ -68,19 +86,58 @@ public:
         ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(udpEndPoint));
         VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mDelegate = chip::Platform::New<ResolverDelegateProxy>();
+
+        if (mDelegate != nullptr)
+        {
+            if (mPreInitOperationalDelegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Setting operational delegate post init");
+                mDelegate->SetOperationalDelegate(mPreInitOperationalDelegate);
+                mPreInitOperationalDelegate = nullptr;
+            }
+
+            if (mPreInitCommissioningDelegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Setting commissioning delegate post init");
+                mDelegate->SetCommissioningDelegate(mPreInitCommissioningDelegate);
+                mPreInitCommissioningDelegate = nullptr;
+            }
+        }
+
         return mDelegate != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
-    void SetResolverDelegate(ResolverDelegate * delegate) override
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
     {
-        VerifyOrReturn(mDelegate != nullptr);
-        mDelegate->SetDelegate(delegate);
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetOperationalDelegate(delegate);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
+            mPreInitOperationalDelegate = delegate;
+        }
+    }
+
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetCommissioningDelegate(delegate);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Delaying proxy of commissioning discovery: missing delegate");
+            mPreInitCommissioningDelegate = delegate;
+        }
     }
 
     void Shutdown() override
     {
         VerifyOrReturn(mDelegate != nullptr);
-        mDelegate->SetDelegate(nullptr);
+        mDelegate->SetOperationalDelegate(nullptr);
+        mDelegate->SetCommissioningDelegate(nullptr);
         mDelegate->Release();
         mDelegate = nullptr;
     }
@@ -88,10 +145,11 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
 private:
-    ResolverDelegateProxy * mDelegate = nullptr;
+    ResolverDelegateProxy * mDelegate                            = nullptr;
+    OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
+    CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
 };
 
 } // namespace Dnssd

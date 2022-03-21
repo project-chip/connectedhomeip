@@ -23,8 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate,
-                                        public chip::Controller::DeviceAddressUpdateDelegate
+class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate
 {
 public:
     CHIPDevicePairingDelegateBridge();
@@ -39,8 +38,6 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
-
-    void OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error) override;
 
 private:
     id<CHIPDevicePairingDelegate> mDelegate;

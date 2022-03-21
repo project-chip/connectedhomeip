@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
@@ -699,7 +700,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kUseCustomDeviceName))
     {
@@ -1068,21 +1069,23 @@ void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
-    uint16_t lifetimeCounter = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
-    SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
-    SuccessOrExit(err);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
+    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
-#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
-                                                                         bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
     SuccessOrExit(err);
 
     os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());

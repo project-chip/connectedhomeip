@@ -48,8 +48,39 @@ public:
 
     Ble::BleLayer * GetBleLayer() const { return mLayer; }
 
+    /**
+     * PreserveExistingBleLayerTransport controls whether the BleBase transport
+     * initialized with these parameters should update the global BleLayer transport
+     * if it is already set.
+     *
+     * This is relevant when there is more than one TransportMgr,
+     * for example, when a device is both a commissioner (has a CHIPDeviceController)
+     * and a commissionee (has a Server) since each TransportMgr will have a BleBase
+     * which can override the global BleLayer transport to point to itself.
+     *
+     * The default value is true - don't override the global BleLayer transport if it is
+     * already set. In other words, the first BleBase to initialize (eg. Server) will be
+     * the active BleBase transport, and the second BleBase to initialize (eg. CHIPDeviceController)
+     * will need to call BleBase.SetBleLayerTransportToSelf if it needs to commission using BLE.
+     *
+     * Call SetPreserveExistingBleLayerTransport(false) to set the global
+     * BleLayer transport to the BleBase created with these parameters, even if it is already
+     * set to another BleBase.
+     *
+     * Use the BleBase.IsBleLayerTransportSetToSelf() and BleBase.SetBleLayerTransportToSelf
+     * methods to toggle between BleBase transports when there is more than one.
+     */
+    bool PreserveExistingBleLayerTransport() const { return mPreserveExistingBleLayerTransport; }
+    BleListenParameters & SetPreserveExistingBleLayerTransport(bool preserveExistingBleLayerTransport)
+    {
+        mPreserveExistingBleLayerTransport = preserveExistingBleLayerTransport;
+
+        return *this;
+    }
+
 private:
     Ble::BleLayer * mLayer;
+    bool mPreserveExistingBleLayerTransport = true;
 };
 
 /** Implements a transport using BLE.
@@ -90,6 +121,20 @@ public:
     }
 
     CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
+
+    /**
+     * Change BLE transport to this
+     *
+     * This is relevant when there is more than one TransportMgr,
+     * for example, when a device is both a commissioner (has a CHIPDeviceController)
+     * and a commissionee (has a Server) since each TransportMgr will set
+     * the global BleLayer transport to point to itself.
+     *
+     * In this scenario, the device will need the ability to toggle between a
+     * BleLayer transport for commissioner functionality and one for commissionee functionality.
+     */
+    void SetBleLayerTransportToSelf() { mBleLayer->mBleTransport = this; }
+    bool IsBleLayerTransportSetToSelf() { return mBleLayer->mBleTransport == this; }
 
 private:
     void ClearState();

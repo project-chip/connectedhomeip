@@ -101,7 +101,7 @@ protected:
         bool isUpperCase = true;
         for (size_t i = 0; i < strlen(current); i++)
         {
-            if (!isupper(current[i]))
+            if (!isdigit(current[i]) && !isupper(current[i]))
             {
                 isUpperCase = false;
                 break;
@@ -189,8 +189,8 @@ protected:
         return true;
     }
 
-    template <typename T>
-    bool CheckConstraintMinValue(const char * itemName, T current, T expected)
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * itemName, T current, U expected)
     {
         if (current < expected)
         {
@@ -199,6 +199,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMinValue(itemName, chip::to_underlying(current), expected);
     }
 
     template <typename T, typename U>
@@ -211,8 +217,8 @@ protected:
         return CheckConstraintMinValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
-    template <typename T>
-    bool CheckConstraintMaxValue(const char * itemName, T current, T expected)
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         if (current > expected)
         {
@@ -221,6 +227,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintMaxValue(itemName, chip::to_underlying(current), expected);
     }
 
     template <typename T, typename U>
@@ -239,6 +251,18 @@ protected:
         if (current == expected)
         {
             Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        if (current == expected)
+        {
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
             return false;
         }
 

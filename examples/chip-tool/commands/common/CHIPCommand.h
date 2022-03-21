@@ -55,6 +55,7 @@ public:
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
         Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
         AddArgument("commissioner-name", &mCommissionerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
@@ -90,7 +91,6 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
-    chip::SimpleFabricStorage mFabricStorage;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
@@ -102,12 +102,14 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
+                                      const chip::Credentials::AttestationTrustStore * trustStore);
     CHIP_ERROR ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
     chip::Optional<uint16_t> mBleAdapterId;
+    chip::Optional<char *> mPaaTrustStorePath;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

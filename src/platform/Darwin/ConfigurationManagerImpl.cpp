@@ -160,7 +160,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        ReturnErrorOnFailure(StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified));
+        ReturnErrorOnFailure(StoreBootReason(BootReasonType::Unspecified));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))

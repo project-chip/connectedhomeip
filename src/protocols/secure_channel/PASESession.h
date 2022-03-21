@@ -55,8 +55,6 @@ constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
 using namespace Crypto;
 
-constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
-
 struct PASESessionSerialized;
 
 struct PASESessionSerializable
@@ -68,17 +66,6 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
-struct PASEVerifier
-{
-    uint8_t mW0[kP256_FE_Length];
-    uint8_t mL[kP256_Point_Length];
-
-    CHIP_ERROR Serialize(MutableByteSpan & outSerialized);
-    CHIP_ERROR Deserialize(ByteSpan inSerialized);
-};
-
-typedef uint8_t PASEVerifierSerialized[Crypto::kSpake2pSerializedVerifierSize];
-
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
@@ -86,7 +73,7 @@ public:
     PASESession(PASESession &&)      = default;
     PASESession(const PASESession &) = delete;
 
-    virtual ~PASESession();
+    ~PASESession() override;
 
     // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
     // should not need to be told their peer node ID
@@ -99,13 +86,12 @@ public:
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for SPAKE2P operation
-     * @param passcodeID      Passcode ID assigned by the administrator to this PASE verifier
      * @param mySessionId     Session ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, PasscodeId passcodeID,
+    CHIP_ERROR WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                               uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
@@ -140,7 +126,7 @@ public:
      *
      * @return CHIP_ERROR      The result of PASE verifier generation
      */
-    static CHIP_ERROR GeneratePASEVerifier(PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+    static CHIP_ERROR GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                            bool useRandomPIN, uint32_t & setupPIN);
 
     /**
@@ -222,10 +208,7 @@ private:
     CHIP_ERROR Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle && msg);
-
-    static CHIP_ERROR ComputeWS(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t wsSize,
-                                uint8_t * ws);
+                                       const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SetupSpake2p();
 
@@ -262,9 +245,7 @@ private:
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 #endif
 
-    PASEVerifier mPASEVerifier;
-
-    PasscodeId mPasscodeID = kDefaultCommissioningPasscodeId;
+    Spake2pVerifier mPASEVerifier;
 
     uint32_t mSetupPINCode;
 

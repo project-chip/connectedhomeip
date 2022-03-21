@@ -54,6 +54,8 @@ public:
 
         bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
 
+        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+
     private:
         PendingNotificationMap * mMap;
         int16_t mIndex;

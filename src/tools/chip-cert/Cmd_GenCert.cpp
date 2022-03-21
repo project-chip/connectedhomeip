@@ -73,19 +73,21 @@ const char * const gCmdOptionHelp =
     "\n"
     "   -i, --subject-chip-id <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP Id attribute (in hex). For Node Certificate it is CHIP Node Id attribute.\n"
+    "       Subject DN CHIP Id attribute in hexadecimal format with upto 8 octets with or without '0x' prefix.\n"
     "          - for Root certificate it is ChipRootId\n"
     "          - for intermediate CA certificate it is ChipICAId\n"
-    "          - for Node certificate it is ChipNodeId\n"
+    "          - for Node certificate it is ChipNodeId. The value should be in a range [1, 0xFFFFFFEFFFFFFFFF]\n"
     "          - for Firmware Signing certificate it is ChipFirmwareSigningId\n"
     "\n"
     "   -f, --subject-fab-id <hex-digits>\n"
     "\n"
-    "       Subject DN Fabric Id attribute (in hex).\n"
+    "       Subject DN Fabric Id attribute in hexadecimal format with upto 8 octets with or without '0x' prefix.\n"
+    "       The value should be different from 0.\n"
     "\n"
     "   -a, --subject-cat <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP CASE Authentication Tag (in hex).\n"
+    "       Subject DN CHIP CASE Authentication Tag in hexadecimal format with upto 4 octets with or without '0x' prefix.\n"
+    "       The version subfield (lower 16 bits) should be different from 0.\n"
     "\n"
     "   -c, --subject-cn-u <string>\n"
     "\n"
@@ -236,6 +238,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         switch (gCertType)
         {
         case kCertType_Node:
+            if (!chip::IsOperationalNodeId(chip64bitAttr))
+            {
+                PrintArgError("%s: Invalid value specified for chip node-id attribute: %s\n", progName, arg);
+                return false;
+            }
             attrOID = kOID_AttributeType_ChipNodeId;
             break;
         case kCertType_FirmwareSigning:
@@ -261,9 +268,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'a':
-        if (!ParseInt(arg, chip32bitAttr, 16))
+        if (!ParseInt(arg, chip32bitAttr, 16) || chip::IsValidCASEAuthTag(chip32bitAttr))
         {
-            PrintArgError("%s: Invalid value specified for the subject authentication tag attribute: %s\n", progName, arg);
+            PrintArgError("%s: Invalid value specified for the subject CASE Authenticated Tag (CAT) attribute: %s\n", progName,
+                          arg);
             return false;
         }
         attrOID = kOID_AttributeType_ChipCASEAuthenticatedTag;
@@ -284,7 +292,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
     case 'f':
-        if (!ParseInt(arg, chip64bitAttr, 16))
+        if (!ParseInt(arg, chip64bitAttr, 16) || !chip::IsValidFabricId(chip64bitAttr))
         {
             PrintArgError("%s: Invalid value specified for subject fabric id attribute: %s\n", progName, arg);
             return false;

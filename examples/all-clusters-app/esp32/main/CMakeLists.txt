@@ -48,7 +48,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/barrier-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/window-covering-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning-old"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/color-control-server"
@@ -127,6 +126,9 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PUBLIC
+           "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
 
 if (CONFIG_ENABLE_PW_RPC)
 
@@ -155,6 +157,17 @@ pw_proto_library(button_service
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
   PREFIX
     button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
@@ -212,6 +225,7 @@ pw_proto_library(wifi_service
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
   locking_service.nanopb_rpc
@@ -234,10 +248,12 @@ target_link_options(${COMPONENT_LIB}
 target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_LOCKING_SERVICE=1"
                        "-DPW_RPC_TRACING_SERVICE=1"
-                       "-DPW_RPC_WIFI_SERVICE=1")
+                       "-DPW_RPC_WIFI_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

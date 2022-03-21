@@ -26,6 +26,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -119,11 +120,12 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
+     *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
-                const Optional<uint16_t> & aTimedWriteTimeoutMs) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
+        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mSuppressResponse(aSuppressResponse)
     {}
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
@@ -194,10 +196,8 @@ public:
                                           attributePath.mClusterId, attributePath.mAttributeId, aDataVersion),
                 value);
         }
-        else
-        {
-            return EncodeAttribute(attributePath, value.Value());
-        }
+
+        return EncodeAttribute(attributePath, value.Value());
     }
 
     /**
@@ -232,7 +232,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~WriteClient() { Abort(); }
+    ~WriteClient() override { Abort(); }
 
 private:
     friend class TestWriteInteraction;
@@ -260,7 +260,7 @@ private:
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
      */
-    template <class T>
+    template <class T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, int> = 0>
     CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
@@ -269,6 +269,20 @@ private:
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
             DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(FinishAttributeIB());
+
+        return CHIP_NO_ERROR;
+    }
+
+    template <class T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, int> = 0>
+    CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::EncodeForWrite(
+            *writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
@@ -376,6 +390,7 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
+    bool mSuppressResponse = false;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
