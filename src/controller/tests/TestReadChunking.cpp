@@ -216,8 +216,8 @@ public:
     // These setters
     void SetVal(uint8_t attribute, uint8_t newVal)
     {
-        uint8_t index = attribute - 1;
-        if (index < 3 && val[index] != newVal)
+        uint8_t index = static_cast<uint8_t>(attribute - 1);
+        if (index < ArraySize(val) && val[index] != newVal)
         {
             val[index] = newVal;
             SetDirty(attribute);
@@ -231,9 +231,8 @@ public:
 
 CHIP_ERROR TestMutableAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
-    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && aPath.mAttributeId > 0 && aPath.mAttributeId <= ArraySize(val),
-                        CHIP_ERROR_NOT_FOUND);
     uint8_t index = static_cast<uint8_t>(aPath.mAttributeId - 1);
+    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && index < ArraySize(val), CHIP_ERROR_NOT_FOUND);
     return aEncoder.Encode(val[index]);
 }
 
