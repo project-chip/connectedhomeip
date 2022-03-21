@@ -46,14 +46,17 @@ namespace Internal {
  * the template class (e.g. the ReadConfigValue() method).
  */
 
-// Silabs NVM3 objects use a 20-bit number, however User key range is
-// restricted to 16 bits i.e. 0x0000 -> 0xFFFF.
-// e.g. key = 0xA201
+// Silabs NVM3 objects use a 20-bit number,
+// NVM3 Key 19:16 Stack region
+// NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
+// e.g. key = 0x0AA201
+// '0A' = Matter nvm3 region
 // 'A2' = the nv group base offest (Factory, Config or Counter)
 // '01' = the id offset inside the group.
+constexpr uint32_t kMatterNvm3KeyDomain = 0x0A0000U;
 constexpr inline uint32_t EFR32ConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
-    return static_cast<uint32_t>(keyBaseOffset) << 8 | id;
+    return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
 }
 
 class EFR32Config
@@ -118,6 +121,7 @@ public:
         EFR32ConfigKey(kChipCounter_KeyBase, 0x1F); // Allows 32 Counters to be created.
 
     static CHIP_ERROR Init(void);
+    static void DeInit(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
