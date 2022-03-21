@@ -176,6 +176,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDEEDC
 CDVersionNumber
 ced
 cfg
@@ -342,6 +343,7 @@ detokenizer
 dev
 devcontainer
 devCtrl
+DevelopmentCerts
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -477,6 +479,7 @@ FC
 FDDE
 fddead
 fde
+fdx
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -650,6 +653,7 @@ kAdminister
 kBusy
 kCase
 Kconfig
+kDacPublicKey
 KeypadInput
 keyset
 kGroup
@@ -1252,7 +1256,7 @@ TXD
 txt
 uargument
 UART
-udc
+UDC
 udcport
 udhcpc
 UDP
@@ -1279,6 +1283,7 @@ ureverse
 URI
 urlrequest
 usbmodem
+usbserial
 USBtoUART
 uscif
 UserConsentNeeded
