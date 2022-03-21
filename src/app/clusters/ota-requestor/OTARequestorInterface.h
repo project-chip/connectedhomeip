@@ -153,6 +153,9 @@ public:
         kWrongState        = 2
     };
 
+    // Reset any relevant states
+    virtual void Reset(void) = 0;
+
     // Perform any clean up necessary
     virtual void Shutdown(void) = 0;
 

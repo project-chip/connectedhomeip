@@ -139,7 +139,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(CharSpan::fromCharString(gOtaDownloadPath));
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
@@ -223,9 +223,7 @@ int main(int argc, char * argv[])
             return -1;
         }
 
-        char execFilePathBuf[kMaxFilePathSize];
-        strncpy(execFilePathBuf, kImageExecPath, strlen(kImageExecPath));
-        argv[0] = execFilePathBuf;
+        argv[0] = kImageExecPath;
         execv(argv[0], argv);
 
         // If successfully executing the new iamge, execv should not return

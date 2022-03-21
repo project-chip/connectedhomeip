@@ -40,6 +40,7 @@ public:
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
+    void Reset(void) override;
     void Shutdown(void) override;
 
     EmberAfStatus HandleAnnounceOTAProvider(
@@ -263,11 +264,6 @@ private:
      * Load current update information to KVS
      */
     void LoadCurrentUpdateInfo();
-
-    /**
-     * Reset the states for the next OTA update
-     */
-    void Reset();
 
     /**
      * Session connection callbacks

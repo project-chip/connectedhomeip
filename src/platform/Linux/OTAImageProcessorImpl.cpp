@@ -27,7 +27,7 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mImageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -51,7 +51,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mImageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -127,10 +127,10 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    unlink(imageProcessor->mImageFile.data());
+    unlink(imageProcessor->mImageFile);
 
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mOfs.open(imageProcessor->mImageFile.data(), std::ofstream::out | std::ofstream::ate | std::ofstream::app);
+    imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
@@ -151,7 +151,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile.data());
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile);
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -162,9 +162,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     VerifyOrReturn(requestor != nullptr);
 
-    // Move the downloaded image to th location where the new image is to be executed from
+    // Move the downloaded image to the location where the new image is to be executed from
     unlink(kImageExecPath);
-    rename(imageProcessor->mImageFile.data(), kImageExecPath);
+    rename(imageProcessor->mImageFile, kImageExecPath);
     chmod(kImageExecPath, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
     // Shutdown the stack and expect to boot into the new image once shutdown is complete
@@ -180,7 +180,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     imageProcessor->mOfs.close();
-    unlink(imageProcessor->mImageFile.data());
+    unlink(imageProcessor->mImageFile);
     imageProcessor->ReleaseBlock();
 }
 
