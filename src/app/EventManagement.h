@@ -29,7 +29,7 @@
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
+#include <app/ObjectList.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
@@ -320,7 +320,7 @@ public:
      * specified by read/subscribe request.
      *
      * @param[in] aWriter     The writer to use for event storage
-     * @param[in] apClusterInfolist the interested cluster info list with event path inside
+     * @param[in] apEventPathList the interested EventPathParams list
      *
      * @param[in,out] aEventMin On input, the Event number is the one we're fetching.  On
      *                         completion, the event number of the next one we plan to fetch.
@@ -340,7 +340,7 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ObjectList<EventPathParams> * apEventPathList, EventNumber & aEventMin,
                                 size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**

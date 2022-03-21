@@ -18,7 +18,8 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
+#include <app/ObjectList.h>
+#include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -153,7 +154,7 @@ struct EventLoadOutContext
     Timestamp mCurrentTime;
     EventNumber mCurrentEventNumber      = 0;
     size_t mEventCount                   = 0;
-    ClusterInfo * mpInterestedEventPaths = nullptr;
+    ObjectList<EventPathParams> * mpInterestedEventPaths = nullptr;
     bool mFirst                          = true;
     Access::SubjectDescriptor mSubjectDescriptor;
 };
