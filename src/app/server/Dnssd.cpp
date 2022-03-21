@@ -84,8 +84,6 @@ bool DnssdServer::HaveOperationalCredentials()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-constexpr const char kExtendedDiscoveryTimeoutKeypairStorage[] = "ExtDiscKey";
-
 void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int16_t secs)
 {
     ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId16 "s", secs);
