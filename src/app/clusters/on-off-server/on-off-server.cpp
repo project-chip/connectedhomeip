@@ -229,7 +229,8 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         //            set the OnOff attribute to 1.If the previous value of the OnOff
         //            attribute is equal to 1, set the OnOff attribute to 0 (toggle).
         // 0x03-0xfe  These values are reserved.  No action.
-        // NULL/0xff       Set the OnOff attribute to its previous value.
+        // 0xff      This value cannot happen.
+        // null       Set the OnOff attribute to its previous value.
 
         // Initialize startUpOnOff to No action value 0xFE
         app::DataModel::Nullable<uint8_t> startUpOnOff;
@@ -256,8 +257,6 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
                         break;
                     default:
                         // All other values 0x03- 0xFE are reserved - no action.
-                        // When value is 0xFF - update with last value - that is as good as
-                        // no action.
                         break;
                     }
                 }

@@ -813,7 +813,6 @@ limitations under the License.
     <item name="SetToOn" value="0x01"/>
     <item name="SetToToggle" value="0x02"/>
     <!-- 0x03-0xFF reserved -->
-    <item name="SetToPrevious" value="0xFF"/>
   </enum>
   <enum name="LevelControlOptions" type="BITMAP8">
     <item name="ExecuteIfOff" value="0x1"/>
