@@ -28,5 +28,9 @@
 
 #pragma once
 
+#ifdef DeviceFamily_CC13X2_CC26X2
+
 /* Number of message buffers reduced to fit into CC26x2x3 RAM */
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
+
+#endif // DeviceFamily_CC13X2_CC26X2
