@@ -87,9 +87,9 @@ namespace app {
             switch (aPath.mAttributeId) {
             case AttributeList::Id:
                 FALLTHROUGH;
-            case ClientGeneratedCommandList::Id:
+            case AcceptedCommandList::Id:
                 FALLTHROUGH;
-            case ServerGeneratedCommandList::Id:
+            case GeneratedCommandList::Id:
                 FALLTHROUGH;
                 // When EventList is supported, include it here.
 #if 0

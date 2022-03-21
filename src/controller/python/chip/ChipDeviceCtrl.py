@@ -248,6 +248,7 @@ class ChipDeviceController():
 
     def Commission(self, nodeid):
         self.CheckIsActive()
+        self._ChipStack.commissioningCompleteEvent.clear()
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_Commission(
@@ -304,7 +305,7 @@ class ChipDeviceController():
 
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
-                ssid, credentials)
+                ssid.encode("utf-8"), credentials.encode("utf-8"))
         )
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):

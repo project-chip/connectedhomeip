@@ -273,7 +273,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     return err;
 }
 
-bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
+bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const
 {
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&

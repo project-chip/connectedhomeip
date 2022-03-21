@@ -328,7 +328,12 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
-    // We should be able to add up to 5 operational networks total
+    // We should be able to add several operational networks
+    // As these are platform::new allocated, there is no upper limit
+    // TODO: Responder still has an upper limit of responders, which gets checked
+    //       here but should be removed as part of #8000 as we want to not have an
+    //       upper bound on number of operational networks (or at least not memory
+    //       enforced but rather policy enforced)
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams3) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams4) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams5) == CHIP_NO_ERROR);

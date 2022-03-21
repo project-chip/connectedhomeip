@@ -71,6 +71,9 @@ enum class ExFlagValues : uint8_t
     /// Set when current message is requesting an acknowledgment from the recipient.
     kExchangeFlag_NeedsAck = 0x04,
 
+    /// Secured Extension block is present.
+    kExchangeFlag_SecuredExtension = 0x08,
+
     /// Set when a vendor id is prepended to the Message Protocol Id field.
     kExchangeFlag_VendorIdPresent = 0x10,
 };

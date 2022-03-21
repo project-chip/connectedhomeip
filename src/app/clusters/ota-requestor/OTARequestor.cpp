@@ -475,7 +475,8 @@ void OTARequestor::TriggerImmediateQueryInternal()
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
     ProviderLocationType providerLocation;
-    if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation) != true)
+    bool listExhausted = false;
+    if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation, listExhausted) != true)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
@@ -786,6 +787,8 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
+
+    mProviderLocation.ClearValue(); // Clearing the last used provider location to start afresh on reboot
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
 }

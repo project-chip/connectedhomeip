@@ -177,6 +177,24 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
         // properly to the commissioner later, PASE will succeed.
     }
 
+    if (options.discriminator.HasValue())
+    {
+        options.payload.discriminator = options.discriminator.Value();
+    }
+    else
+    {
+        uint16_t defaultTestDiscriminator = 0;
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
+
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure discriminator. ***",
+                     static_cast<unsigned>(defaultTestDiscriminator));
+        options.payload.discriminator = defaultTestDiscriminator;
+    }
+
     // Default to minimum PBKDF iterations
     uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
     if (options.spake2pIterations != 0)

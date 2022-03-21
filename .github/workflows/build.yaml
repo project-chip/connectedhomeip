@@ -265,6 +265,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
+
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 200

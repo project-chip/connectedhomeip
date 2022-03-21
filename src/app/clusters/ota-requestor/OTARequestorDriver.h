@@ -128,7 +128,9 @@ public:
     // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
     // the driver's internal logic such as, for example, traversing the default providers list.
     // Returns true if there is a Provider available for the next query, returns false otherwise.
-    virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation) = 0;
+    // [in] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
+    // back to the beginning.
+    virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) = 0;
 };
 
 } // namespace chip
