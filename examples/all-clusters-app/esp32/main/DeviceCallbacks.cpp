@@ -120,16 +120,18 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-        ESP_LOGI(TAG, "Free heap: %d", esp_get_free_heap_size());
-        int ret = nimble_port_stop();
+        esp_err_t err = ESP_OK;
+        int ret       = nimble_port_stop();
         if (ret == 0)
         {
             nimble_port_deinit();
-            esp_nimble_hci_and_controller_deinit();
-            esp_bt_mem_release(ESP_BT_MODE_BLE);
+            err = esp_nimble_hci_and_controller_deinit();
+            err = esp_bt_mem_release(ESP_BT_MODE_BLE);
         }
-        vTaskDelay(100);
-        ESP_LOGI(TAG, "Free heap after BLE deinit: %d", esp_get_free_heap_size());
+        if (err == ESP_OK)
+        {
+            ESP_LOGI(TAG, "BLE deinit successful");
+        }
 #endif
     }
     break;
