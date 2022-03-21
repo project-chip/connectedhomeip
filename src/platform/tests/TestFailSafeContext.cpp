@@ -31,9 +31,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceControlServer.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -69,7 +69,30 @@ static void TestFailSafeContext_ArmFailSafe(nlTestSuite * inSuite, void * inCont
 
     err = failSafeContext.DisarmFailSafe();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed() == false);       
+    NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed() == false);
+}
+
+static void TestFailSafeContext_NocCommandInvoked(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
+
+    failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
+    NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
+    NL_TEST_ASSERT(inSuite, failSafeContext.AddNocCommandHasBeenInvoked() == true);
+    NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex2);
+
+    failSafeContext.SetUpdateNocCommandInvoked(kTestAccessingFabricIndex1);
+    NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
+    NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
+    NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
+
+    err = failSafeContext.DisarmFailSafe();
 }
 
 /**
@@ -79,7 +102,7 @@ static const nlTest sTests[] = {
 
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
     NL_TEST_DEF("Test FailSafeContext::ArmFailSafe", TestFailSafeContext_ArmFailSafe),
-    NL_TEST_SENTINEL()
+    NL_TEST_DEF("Test FailSafeContext::NocCommandInvoked", TestFailSafeContext_NocCommandInvoked), NL_TEST_SENTINEL()
 };
 
 /**

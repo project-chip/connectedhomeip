@@ -35,8 +35,6 @@ void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 
 void FailSafeContext::FailSafeTimerExpired()
 {
-    ChipLogError(DeviceLayer, "yujuan: FailSafeTimerExpired");
-
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
     event.FailSafeTimerExpired.PeerFabricIndex                = mFabricIndex;
@@ -56,8 +54,6 @@ void FailSafeContext::FailSafeTimerExpired()
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
-    ChipLogError(DeviceLayer, "yujuan: ArmFailSafe");
-
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
     DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
@@ -66,8 +62,6 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
 CHIP_ERROR FailSafeContext::DisarmFailSafe()
 {
-    ChipLogError(DeviceLayer, "yujuan: DisarmFailSafe");
-
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;
     mUpdateNocCommandHasBeenInvoked = false;
