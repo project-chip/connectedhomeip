@@ -98,6 +98,10 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
         onFailure->mCall(onFailure->mContext, mPeerId, err);
+
+        DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+        DequeueConnectionFailureCallbacks(err, /* executeCallback */ true);
+        CloseCASESession();
     }
 
     return err;
