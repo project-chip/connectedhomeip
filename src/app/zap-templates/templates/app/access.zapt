@@ -18,7 +18,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -40,7 +40,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -51,7 +51,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -73,7 +73,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -84,7 +84,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -106,7 +106,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -119,7 +119,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -141,7 +141,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -152,7 +152,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -174,7 +174,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -185,7 +185,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#zcl_attributes}}
+    {{#chip_server_cluster_attributes}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -207,7 +207,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_attributes}}
+    {{/chip_server_cluster_attributes}}
     {{#last}}
 }
     {{/last}}
@@ -220,29 +220,29 @@
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
     {{/first}}
-    {{#zcl_commands_source_client}}
+    {{#all_incoming_commands_for_cluster name "server"}}
         {{#access entity="command"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "invoke")}}
                     {{#if hasRole}}
                         {{#if (isStrEqual role "view")}}
-    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{else if (isStrEqual role "operate")}}
-    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
-    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
                     {{else}}
-    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                     {{/if}}
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_commands_source_client}}
+    {{/all_incoming_commands_for_cluster}}
     {{#last}}
 }
     {{/last}}
@@ -253,29 +253,29 @@
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
     {{/first}}
-    {{#zcl_commands_source_client}}
+    {{#all_incoming_commands_for_cluster name "server"}}
         {{#access entity="command"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "invoke")}}
                     {{#if hasRole}}
                         {{#if (isStrEqual role "view")}}
-    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{else if (isStrEqual role "operate")}}
-    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
-    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
                     {{else}}
-    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                     {{/if}}
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_commands_source_client}}
+    {{/all_incoming_commands_for_cluster}}
     {{#last}}
 }
     {{/last}}
@@ -286,29 +286,29 @@
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
     {{/first}}
-    {{#zcl_commands_source_client}}
+    {{#all_incoming_commands_for_cluster name "server"}}
         {{#access entity="command"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "invoke")}}
                     {{#if hasRole}}
                         {{#if (isStrEqual role "view")}}
-    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{else if (isStrEqual role "operate")}}
-    /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Command: {{parent.name}}, Privilege: {{role}} */ \
+    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
-    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
                     {{else}}
-    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.name}} ]
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                     {{/if}}
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/zcl_commands_source_client}}
+    {{/all_incoming_commands_for_cluster}}
     {{#last}}
 }
     {{/last}}
