@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import "CHIPAttributeCacheContainer_Internal.h"
+#import "CHIPCluster.h"
 #import "CHIPDeviceControllerOverXPC+AttributeCache.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
@@ -80,6 +81,7 @@ void ContainerAttributeCacheCallback::OnDone()
 
 - (void)subscribeWithDeviceController:(CHIPDeviceController *)deviceController
                              deviceId:(uint64_t)deviceId
+                               params:(CHIPSubscribeParams * _Nullable)params
                           clientQueue:clientQueue
                            completion:(void (^)(NSError * _Nullable error))completion
 {
@@ -93,7 +95,7 @@ void ContainerAttributeCacheCallback::OnDone()
         self.deviceId = deviceId;
         CHIPDeviceControllerOverXPC * xpcDeviceController = (CHIPDeviceControllerOverXPC *) deviceController;
         self.xpcDeviceController = xpcDeviceController;
-        [xpcDeviceController subscribeAttributeCacheWithNodeId:deviceId completion:completionHandler];
+        [xpcDeviceController subscribeAttributeCacheWithNodeId:deviceId params:params completion:completionHandler];
         return;
     }
     [deviceController
@@ -129,10 +131,13 @@ void ContainerAttributeCacheCallback::OnDone()
              }
              self.deviceId = deviceId;
              app::ReadPrepareParams readParams([device internalDevice]->GetSecureSession().Value());
-             static app::AttributePathParams attributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
+             static app::AttributePathParams attributePath;
              readParams.mpAttributePathParamsList = &attributePath;
              readParams.mAttributePathParamsListSize = 1;
              readParams.mMaxIntervalCeilingSeconds = 43200;
+             readParams.mIsFabricFiltered = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
+             readParams.mKeepSubscriptions
+                 = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
              __auto_type err = readClient->SendAutoResubscribeRequest(std::move(readParams));
              if (err != CHIP_NO_ERROR) {
                  CHIP_LOG_ERROR("Error: attribute cache subscription failed for device %llu: %s", deviceId, ErrorStr(err));
@@ -171,9 +176,9 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     return err;
 }
 
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
                                         NSError * _Nullable error))completion
@@ -200,7 +205,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
         return;
     }
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        if (endpointId == chip::kInvalidEndpointId && clusterId == chip::kInvalidClusterId) {
+        if (endpointId == nil && clusterId == nil) {
             CHIP_LOG_ERROR("Error: currently read from attribute cache does not support wildcards for both endpoint and cluster");
             completionHandler(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeInvalidArgument userInfo:nil]);
             return;
@@ -214,38 +219,39 @@ static CHIP_ERROR AppendAttibuteValueToArray(
 
         NSMutableArray * result = [[NSMutableArray alloc] init];
         CHIP_ERROR err = CHIP_NO_ERROR;
-        if (endpointId == chip::kInvalidEndpointId) {
+        if (endpointId == nil) {
             err = self.cppAttributeCache->ForEachAttribute(
-                static_cast<chip::ClusterId>(clusterId), [&](const app::ConcreteAttributePath & path) {
-                    if (static_cast<chip::AttributeId>(attributeId) == chip::kInvalidAttributeId
-                        || static_cast<chip::AttributeId>(attributeId) == path.mAttributeId) {
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
+                    if (attributeId == nil
+                        || static_cast<chip::AttributeId>([attributeId unsignedLongValue]) == path.mAttributeId) {
                         (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
                     }
                     return CHIP_NO_ERROR;
                 });
-        } else if (clusterId == chip::kInvalidClusterId) {
-            err = self.cppAttributeCache->ForEachCluster(static_cast<chip::EndpointId>(endpointId), [&](chip::ClusterId clusterId) {
-                (void) self.cppAttributeCache->ForEachAttribute(
-                    static_cast<chip::EndpointId>(endpointId), clusterId, [&](const app::ConcreteAttributePath & path) {
-                        if (static_cast<chip::AttributeId>(attributeId) == chip::kInvalidAttributeId
-                            || static_cast<chip::AttributeId>(attributeId) == path.mAttributeId) {
-                            (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
-                        }
-                        return CHIP_NO_ERROR;
-                    });
-                return CHIP_NO_ERROR;
-            });
-        } else if (attributeId == chip::kInvalidAttributeId) {
-            err = self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>(endpointId),
-                static_cast<chip::ClusterId>(clusterId), [&](const app::ConcreteAttributePath & path) {
+        } else if (clusterId == nil) {
+            err = self.cppAttributeCache->ForEachCluster(
+                static_cast<chip::EndpointId>([endpointId unsignedShortValue]), [&](chip::ClusterId enumeratedClusterId) {
+                    (void) self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+                        enumeratedClusterId, [&](const app::ConcreteAttributePath & path) {
+                            if (attributeId == nil
+                                || static_cast<chip::AttributeId>([attributeId unsignedLongValue]) == path.mAttributeId) {
+                                (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
+                            }
+                            return CHIP_NO_ERROR;
+                        });
+                    return CHIP_NO_ERROR;
+                });
+        } else if (attributeId == nil) {
+            err = self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
                     (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
                     return CHIP_NO_ERROR;
                 });
         } else {
             app::ConcreteAttributePath path;
-            path.mEndpointId = static_cast<chip::EndpointId>(endpointId);
-            path.mClusterId = static_cast<chip::ClusterId>(clusterId);
-            path.mAttributeId = static_cast<chip::AttributeId>(attributeId);
+            path.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            path.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+            path.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
             err = AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
         }
         if (err == CHIP_NO_ERROR) {
