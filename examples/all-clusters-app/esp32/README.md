@@ -161,8 +161,9 @@ menuconfig).
 
 `idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
 
-NOTE: to avoid build error `undefined reference to 'chip::DevelopmentCerts::kDacPublicKey'`,
-set VID to 0xFFF1 and PID in range 0x8000..0x8005.
+NOTE: to avoid build error
+`undefined reference to 'chip::DevelopmentCerts::kDacPublicKey'`, set VID to
+0xFFF1 and PID in range 0x8000..0x8005.
 
 `idf.py menuconfig -> Component config -> CHIP Device Layer -> Device Identification Options`
 
