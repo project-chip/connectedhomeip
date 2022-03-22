@@ -138,6 +138,8 @@ private:
 
     Thread::OperationalDataset mDataset = {};
 
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+
     bool mIsAttached;
     bool mIsInitialized;
     thread_instance_h mThreadInstance;

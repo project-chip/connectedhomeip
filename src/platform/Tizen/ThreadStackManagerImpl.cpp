@@ -28,11 +28,13 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/Tizen/NetworkCommissioningDriver.h>
 
 #include "ThreadStackManagerImpl.h"
 #include <lib/dnssd/platform/Dnssd.h>
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace DeviceLayer {
@@ -442,6 +444,12 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+{
+    ChipLogError(DeviceLayer, "Not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
@@ -449,6 +457,18 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR
+ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
+                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(netInfo));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+    mpConnectCallback = callback;
+    return CHIP_NO_ERROR;
 }
 
 ThreadStackManager & ThreadStackMgr()

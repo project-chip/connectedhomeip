@@ -52,6 +52,7 @@ static_library("Tizen") {
     "MainLoop.cpp",
     "MainLoop.h",
     "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
