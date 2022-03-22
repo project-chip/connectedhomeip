@@ -24,6 +24,7 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "OnOffManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
@@ -129,4 +130,14 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
         JNIDACProvider * p = new JNIDACProvider(provider);
         chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
     }
+}
+
+JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    OnOffManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, SetOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return OnOffManager::SetOnOff(endpoint, value);
 }
