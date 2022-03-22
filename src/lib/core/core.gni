@@ -60,7 +60,8 @@ declare_args() {
   # Use "unlimited" to specify no limit as a more readable alternative to 0
   chip_config_max_operational_networks = 5
 
-  if ((current_os == "linux") || (current_os == "android") || (current_os == "darwin")) {
+  if (current_os == "linux" || current_os == "android" ||
+      current_os == "darwin") {
     # large platforms do not need operational network limits by default
     chip_config_max_operational_networks = "unlimited"
   }
