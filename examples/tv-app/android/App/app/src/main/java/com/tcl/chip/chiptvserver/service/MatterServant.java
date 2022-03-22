@@ -35,6 +35,7 @@ import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
+import com.tcl.chip.tvapp.OnOffManagerStub;
 import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
@@ -86,6 +87,8 @@ public class MatterServant {
                 case Clusters.ClusterId_Channel:
                   app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
                   break;
+                case Clusters.ClusterId_OnOff:
+                  app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
               }
             });
     tvApp.setDACProvider(new DACProviderStub());

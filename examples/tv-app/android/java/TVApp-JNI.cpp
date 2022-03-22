@@ -24,6 +24,7 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "OnOffManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/server/Dnssd.h>
@@ -143,4 +144,14 @@ JNI_METHOD(void, postInit)(JNIEnv *, jobject app)
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
 #endif
+}
+
+JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    OnOffManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, SetOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return OnOffManager::SetOnOff(endpoint, value);
 }

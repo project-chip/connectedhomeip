@@ -20,48 +20,20 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include "OnOffManager.h"
 
 using namespace chip;
 using namespace ::chip::app::Clusters;
 
-enum TvCommand
-{
-    PowerToggle,
-    MuteToggle
-};
-
-void runTvCommand(TvCommand command)
-{
-    switch (command)
-    {
-    case PowerToggle:
-        // TODO: Insert your code here to send power toggle command
-        break;
-    case MuteToggle:
-        // TODO: Insert your code here to send mute toggle command
-        break;
-
-    default:
-        break;
-    }
-}
-
-void MatterAfPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
                                          uint16_t size, uint8_t * value)
 {
     if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Received on/off command for cluster id: " ChipLogFormatMEI, ChipLogValueMEI(OnOff::Id));
+        bool onoff = static_cast<bool>(*value);
 
-        if (attributePath.mEndpointId == 0)
-        {
-            ChipLogProgress(Zcl, "Execute POWER_TOGGLE");
-            runTvCommand(PowerToggle);
-        }
-        else if (attributePath.mEndpointId == 1)
-        {
-            ChipLogProgress(Zcl, "Execute MUTE_TOGGLE");
-            runTvCommand(MuteToggle);
-        }
+        ChipLogProgress(Zcl, "Received on/off command endpoint %d value = %d", static_cast<int>(attributePath.mEndpointId), onoff);
+        
+        OnOffManager().PostOnOffChanged(attributePath.mEndpointId, onoff);
     }
 }
