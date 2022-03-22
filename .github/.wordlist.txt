@@ -1113,6 +1113,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
