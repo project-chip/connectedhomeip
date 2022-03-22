@@ -95,6 +95,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
