@@ -49,7 +49,7 @@ public:
 private:
     friend CommissionableDataProviderImpl & CommissionableDataProviderMgrImpl();
     static CommissionableDataProviderImpl sInstance;
-    bool mIsUpdate = false;
+    bool mIsInitialized = false;
     std::vector<uint8_t> mSerializedPaseVerifier;
     std::vector<uint8_t> mPaseSalt;
     uint32_t mPaseIterationCount = 0;
