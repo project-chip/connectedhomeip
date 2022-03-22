@@ -21,8 +21,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
+#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>

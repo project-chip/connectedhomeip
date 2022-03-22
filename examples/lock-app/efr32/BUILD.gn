@@ -160,7 +160,6 @@ efr32_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -220,8 +219,9 @@ efr32_executable("lock_app") {
 
   if (show_qr_code) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
     defines += [ "DISPLAY_ENABLED" ]
+
+    deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
   if (chip_enable_pw_rpc) {
