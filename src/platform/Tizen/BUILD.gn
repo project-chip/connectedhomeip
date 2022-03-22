@@ -77,4 +77,11 @@ static_library("Tizen") {
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+  }
 }
