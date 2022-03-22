@@ -48,12 +48,8 @@ CommissionableDataProviderImpl CommissionableDataProviderImpl::sInstance;
 CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64,
                                                   jint spake2pIterationCount, jlong setupPasscode, jint discriminator)
 {
-    if (!mIsUpdate)
-    {
-        DeviceLayer::SetCommissionableDataProvider(this);
-    }
-
     VerifyOrReturnLogError(discriminator <= chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
+
     if (spake2pIterationCount == 0)
     {
         spake2pIterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
@@ -63,10 +59,14 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     VerifyOrReturnLogError(static_cast<uint32_t>(spake2pIterationCount) <= kSpake2p_Max_PBKDF_Iterations,
                            CHIP_ERROR_INVALID_ARGUMENT);
 
+    const bool havePaseVerifier = (spake2pVerifierBase64 != nullptr);
+    const bool havePaseSalt = (Spake2pSaltBase64 != nullptr);
+    VerifyOrReturnLogError(!havePaseVerifier || (havePaseVerifier && havePaseSalt), CHIP_ERROR_INVALID_ARGUMENT);
+
     CHIP_ERROR err;
+    // read verifier from paramter is have
     Spake2pVerifier providedVerifier;
     std::vector<uint8_t> serializedSpake2pVerifier(kSpake2p_VerifierSerialized_Length);
-    bool havePaseVerifier = (spake2pVerifierBase64 != nullptr);
     if (havePaseVerifier)
     {
         chip::JniUtfString utfSpake2pVerifierBase64(env, spake2pVerifierBase64);
@@ -86,10 +86,8 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
         ChipLogProgress(Support, "Got externally provided verifier, using it.");
     }
 
-    bool havePaseSalt = (Spake2pSaltBase64 != nullptr);
-    VerifyOrReturnLogError(!havePaseVerifier || (havePaseVerifier && havePaseSalt), CHIP_ERROR_INVALID_ARGUMENT);
+    // read slat from paramter is have or generate one
     std::vector<uint8_t> spake2pSalt(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
-
     if (!havePaseSalt)
     {
         ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");
@@ -111,7 +109,8 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
         spake2pSalt.resize(decodedLen);
     }
 
-    bool havePasscode = (setupPasscode > kMinSetupPasscode && setupPasscode < kMaxSetupPasscode);
+    // generate verifier from passcode is have
+    const bool havePasscode = (setupPasscode > kMinSetupPasscode && setupPasscode < kMaxSetupPasscode);
     Spake2pVerifier passcodeVerifier;
     std::vector<uint8_t> serializedPasscodeVerifier(kSpake2p_VerifierSerialized_Length);
     chip::MutableByteSpan saltSpan{ spake2pSalt.data(), spake2pSalt.size() };
@@ -139,46 +138,49 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
 
     // External PASE verifier takes precedence when present (even though it is identical to passcode-based
     // one when the latter is present).
-    std::vector<uint8_t> finalSerializedVerifier(kSpake2p_VerifierSerialized_Length);
     if (havePaseVerifier)
     {
-        finalSerializedVerifier = serializedSpake2pVerifier;
+        mSerializedPaseVerifier = std::move(serializedSpake2pVerifier);
     }
     else
     {
-        finalSerializedVerifier = serializedPasscodeVerifier;
+        mSerializedPaseVerifier = std::move(serializedPasscodeVerifier);
     }
-
     mDiscriminator          = discriminator;
-    mSerializedPaseVerifier = std::move(finalSerializedVerifier);
     mPaseSalt               = std::move(spake2pSalt);
     mPaseIterationCount     = spake2pIterationCount;
     if (havePasscode)
     {
         mSetupPasscode.SetValue(setupPasscode);
     }
-    mIsUpdate = true;
+
+    // Set to global CommissionableDataProvider once success first time
+    if (!mIsInitialized)
+    {
+        DeviceLayer::SetCommissionableDataProvider(this);
+    }
+    mIsInitialized = true;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
-    VerifyOrReturnError(mIsUpdate == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     setupDiscriminator = mDiscriminator;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    VerifyOrReturnLogError(mIsUpdate == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     iterationCount = mPaseIterationCount;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
 {
-    VerifyOrReturnError(mIsUpdate == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(saltBuf.size() >= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), mPaseSalt.data(), mPaseSalt.size());
@@ -189,7 +191,7 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(chip::MutableByteSpan 
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen)
 {
-    VerifyOrReturnError(mIsUpdate == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // By now, serialized verifier from Init should be correct size
     VerifyOrReturnError(mSerializedPaseVerifier.size() == kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INTERNAL);
@@ -204,7 +206,7 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pVerifier(chip::MutableByteS
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 {
-    VerifyOrReturnError(mIsUpdate == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // Pretend not implemented if we don't have a passcode value externally set
     if (!mSetupPasscode.HasValue())

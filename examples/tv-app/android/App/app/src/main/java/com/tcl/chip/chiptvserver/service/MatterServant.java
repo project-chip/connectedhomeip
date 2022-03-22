@@ -40,6 +40,9 @@ import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
 
+  public int testSetupPasscode = 20202021;
+  public int testDiscriminator = 0xF00;
+
   private ChipAppServer chipAppServer;
 
   private MatterServant() {}
@@ -92,7 +95,7 @@ public class MatterServant {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    chipPlatform.updateCommissionableDataProviderData(null, null, 0, 20202021, 0xF00);
+    chipPlatform.updateCommissionableDataProviderData(null, null, 0, testSetupPasscode, testDiscriminator);
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
