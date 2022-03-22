@@ -28,7 +28,7 @@
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <CoreFoundation/CoreFoundation.h>
 
