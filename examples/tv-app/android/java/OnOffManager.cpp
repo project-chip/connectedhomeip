@@ -14,15 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include "TvApp-JNI.h"
 #include "OnOffManager.h"
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/af.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <app/util/af.h>
 
 using namespace chip;
 
@@ -44,7 +44,8 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfFindClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id);
-    VerifyOrReturn(ep != 0xFFFF && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT, ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
+    VerifyOrReturn(ep != 0xFFFF && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
+                   ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
     OnOffManager * mgr = new OnOffManager();
     mgr->InitializeWithObjects(manager);
@@ -95,7 +96,7 @@ void OnOffManager::HandleOnOffChanged(bool value)
 {
     ChipLogProgress(Zcl, "OnOffManager::HandleOnOffChanged");
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
     VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogProgress(Zcl, "mOnOffManagerObject null"));
     VerifyOrReturn(mHandleOnOffChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleOnOffChangedMethod null"));
