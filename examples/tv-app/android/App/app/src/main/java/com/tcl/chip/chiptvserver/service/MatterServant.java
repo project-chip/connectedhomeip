@@ -114,8 +114,7 @@ public class MatterServant {
   }
 
   public void toggleOnOff() {
-    mTvApp.SetOnOff(1,mOnOff);
+    mTvApp.SetOnOff(1, mOnOff);
     mOnOff = !mOnOff;
   }
-
 }
