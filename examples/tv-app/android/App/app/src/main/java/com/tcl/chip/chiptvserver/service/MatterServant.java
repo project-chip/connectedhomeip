@@ -100,7 +100,8 @@ public class MatterServant {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    chipPlatform.updateCommissionableDataProviderData(null, null, 0, testSetupPasscode, testDiscriminator);
+    chipPlatform.updateCommissionableDataProviderData(
+        null, null, 0, testSetupPasscode, testDiscriminator);
 
     tvApp.postInit();
 

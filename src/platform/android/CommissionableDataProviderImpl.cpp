@@ -60,7 +60,7 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
                            CHIP_ERROR_INVALID_ARGUMENT);
 
     const bool havePaseVerifier = (spake2pVerifierBase64 != nullptr);
-    const bool havePaseSalt = (Spake2pSaltBase64 != nullptr);
+    const bool havePaseSalt     = (Spake2pSaltBase64 != nullptr);
     VerifyOrReturnLogError(!havePaseVerifier || (havePaseVerifier && havePaseSalt), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err;
@@ -146,9 +146,9 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     {
         mSerializedPaseVerifier = std::move(serializedPasscodeVerifier);
     }
-    mDiscriminator          = discriminator;
-    mPaseSalt               = std::move(spake2pSalt);
-    mPaseIterationCount     = spake2pIterationCount;
+    mDiscriminator      = discriminator;
+    mPaseSalt           = std::move(spake2pSalt);
+    mPaseIterationCount = spake2pIterationCount;
     if (havePasscode)
     {
         mSetupPasscode.SetValue(setupPasscode);
