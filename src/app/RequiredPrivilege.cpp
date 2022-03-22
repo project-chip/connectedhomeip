@@ -28,20 +28,20 @@ constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
 
 int __attribute__((weak)) MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return kMatterAccessPrivilegeView;
+    return kMatterAccessPrivilegeAdminister;
 }
 
 int __attribute__((weak)) MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return kMatterAccessPrivilegeOperate;
+    return kMatterAccessPrivilegeAdminister;
 }
 
 int __attribute__((weak)) MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
 {
-    return kMatterAccessPrivilegeOperate;
+    return kMatterAccessPrivilegeAdminister;
 }
 
 int __attribute__((weak)) MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
 {
-    return kMatterAccessPrivilegeView;
+    return kMatterAccessPrivilegeAdminister;
 }
