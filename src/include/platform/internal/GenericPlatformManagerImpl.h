@@ -62,8 +62,12 @@ protected:
 
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label);
+    CHIP_ERROR
+    _GetUserLabelList(EndpointId endpoint,
+                      std::function<CHIP_ERROR(
+                          const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+                          fp);
     CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR _GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
@@ -91,8 +95,18 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
 }
 
 template <class ImplClass>
+inline CHIP_ERROR
+GenericPlatformManagerImpl<ImplClass>::_AppendUserLabelList(EndpointId endpoint,
+                                                            app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+    EndpointId endpoint,
+    std::function<CHIP_ERROR(const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+        fp)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

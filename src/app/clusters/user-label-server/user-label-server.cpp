@@ -58,11 +58,10 @@ UserLabelAttrAccess gAttrAccess;
 CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
 
-    if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
+    auto labelListEncoder = [&aEncoder](const DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type,
+                                                                         DeviceLayer::kMaxUserLabels> & labelList) -> CHIP_ERROR {
+        CHIP_ERROR error = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
             for (auto label : labelList)
             {
                 ReturnErrorOnFailure(encoder.Encode(label));
@@ -70,8 +69,11 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
             return CHIP_NO_ERROR;
         });
-    }
-    else
+
+        return error;
+    };
+
+    if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelListEncoder) != CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeEmptyList();
     }
@@ -102,11 +104,9 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
-        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
-        ReturnErrorOnFailure(DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList));
         ReturnErrorOnFailure(aDecoder.Decode(entry));
-        ReturnErrorOnFailure(labelList.add(entry));
-        return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
+
+        return DeviceLayer::PlatformMgr().AppendUserLabelList(endpoint, entry);
     }
     else
     {

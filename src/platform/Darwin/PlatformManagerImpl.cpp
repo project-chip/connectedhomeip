@@ -144,6 +144,12 @@ PlatformManagerImpl::_SetUserLabelList(
 }
 
 CHIP_ERROR
+PlatformManagerImpl::_AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
 PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.

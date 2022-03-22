@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <functional>
 #include <platform/AttributeList.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
@@ -196,8 +197,12 @@ public:
 
     CHIP_ERROR SetUserLabelList(EndpointId endpoint,
                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
-                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label);
+    CHIP_ERROR
+    GetUserLabelList(EndpointId endpoint,
+                     std::function<CHIP_ERROR(
+                         const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+                         fp);
     CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
@@ -460,11 +465,18 @@ PlatformManager::SetUserLabelList(EndpointId endpoint,
     return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
-inline CHIP_ERROR
-PlatformManager::GetUserLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+inline CHIP_ERROR PlatformManager::AppendUserLabelList(EndpointId endpoint,
+                                                       app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
 {
-    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
+    return static_cast<ImplClass *>(this)->_AppendUserLabelList(endpoint, label);
+}
+
+inline CHIP_ERROR PlatformManager::GetUserLabelList(
+    EndpointId endpoint,
+    std::function<CHIP_ERROR(const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+        fp)
+{
+    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, fp);
 }
 
 inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)

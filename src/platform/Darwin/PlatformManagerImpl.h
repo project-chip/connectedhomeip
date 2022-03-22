@@ -66,6 +66,7 @@ private:
 
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label);
     CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR _GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);

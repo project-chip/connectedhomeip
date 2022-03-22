@@ -251,9 +251,20 @@ PlatformManagerImpl::_SetUserLabelList(
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_GetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+PlatformManagerImpl::_AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
 {
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetUserLabelList(
+    EndpointId endpoint,
+    std::function<CHIP_ERROR(const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+        fp)
+{
+    DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+
     // In Linux simulation, return following hardcoded labelList on all endpoints.
     UserLabel::Structs::LabelStruct::Type room;
     UserLabel::Structs::LabelStruct::Type orientation;
@@ -277,7 +288,7 @@ PlatformManagerImpl::_GetUserLabelList(
     labelList.add(floor);
     labelList.add(direction);
 
-    return CHIP_NO_ERROR;
+    return fp(labelList);
 }
 
 CHIP_ERROR

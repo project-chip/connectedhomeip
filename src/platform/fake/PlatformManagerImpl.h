@@ -106,8 +106,11 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+    CHIP_ERROR
+    _GetUserLabelList(EndpointId endpoint,
+                      std::function<CHIP_ERROR(
+                          const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
+                          fp)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
