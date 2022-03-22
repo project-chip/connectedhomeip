@@ -53,7 +53,7 @@ public:
      *                                    PASE verifier if `serializedSpake2pVerifier` argument empty.
      * @param discriminator             - Discriminator to use for advertising.
      * @return CHIP_ERROR_OK on success, CHIP_ERROR_INVALID_ARGUMENT on any invalid argument combinations,
-     *         CHIP_ERROR_INVALID_STATE if already initialized, or other CHIP_ERROR values if inner
+     *         CHIP_ERROR_INCORRECT_STATE if already initialized, or other CHIP_ERROR values if inner
      *         implementation dependencies fail.
      */
     CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedSpake2pVerifier,
