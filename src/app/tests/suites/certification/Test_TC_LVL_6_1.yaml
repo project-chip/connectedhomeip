@@ -97,7 +97,6 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 3
           constraints:
               notValue: CurrentLevelValue
 

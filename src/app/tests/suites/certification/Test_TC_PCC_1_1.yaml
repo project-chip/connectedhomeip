@@ -77,7 +77,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -85,7 +84,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -106,7 +104,6 @@ tests:
               type: map32
 
     - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:
@@ -115,8 +112,9 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: map32
