@@ -29,6 +29,6 @@ public:
     void HandleOnOffChanged(bool value);
 
 private:
-    jobject mOnOffManagerObject      = nullptr;
-    jmethodID mHandleOnOffChangedMethod           = nullptr;
+    jobject mOnOffManagerObject         = nullptr;
+    jmethodID mHandleOnOffChangedMethod = nullptr;
 };

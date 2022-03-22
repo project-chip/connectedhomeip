@@ -39,6 +39,7 @@ shared_library("jni") {
     "include/target-navigator/TargetNavigatorManager.h",
     "java/ChannelManager.cpp",
     "java/ChannelManager.h",
+    "java/ClusterChangeAttribute.cpp",
     "java/ContentLauncherManager.cpp",
     "java/ContentLauncherManager.h",
     "java/JNIDACProvider.cpp",
@@ -51,12 +52,11 @@ shared_library("jni") {
     "java/MediaInputManager.h",
     "java/MediaPlaybackManager.cpp",
     "java/MediaPlaybackManager.h",
+    "java/OnOffManager.cpp",
+    "java/OnOffManager.h",
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
-    "java/OnOffManager.cpp",
-    "java/OnOffManager.h",
-    "java/ClusterChangeAttribute.cpp",
   ]
 
   deps = [
@@ -109,12 +109,12 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackPosition.java",
+    "java/src/com/tcl/chip/tvapp/OnOffManager.java",
+    "java/src/com/tcl/chip/tvapp/OnOffManagerStub.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
-    "java/src/com/tcl/chip/tvapp/OnOffManager.java",
-    "java/src/com/tcl/chip/tvapp/OnOffManagerStub.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
