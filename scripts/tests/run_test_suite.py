@@ -175,8 +175,13 @@ def cmd_list(context):
     '--tv-app',
     default=FindBinaryPath('chip-tv-app'),
     help='what tv app to use')
+@click.option(
+    '--pics-file',
+    type=click.Path(exists=True),
+    default=FindBinaryPath("ci-pics-values"),
+    help='PICS file to use for test runs.')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app):
+def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app, pics_file):
     runner = chiptest.runner.Runner()
 
     # Command execution requires an array
@@ -210,7 +215,7 @@ def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app):
         for test in context.obj.tests:
             test_start = time.time()
             try:
-                test.Run(runner, apps_register, paths)
+                test.Run(runner, apps_register, paths, pics_file)
                 test_end = time.time()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
