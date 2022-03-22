@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#import "CHIPDeviceControllerOverXPC+AttributeCache.h"
 #import "CHIPDeviceControllerOverXPC_Internal.h"
 
 #import "CHIPDeviceController+XPC.h"

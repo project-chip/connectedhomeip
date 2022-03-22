@@ -341,30 +341,54 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
     }
 }
 
-- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
-                                       nodeId:(uint64_t)nodeId
-                                       params:(NSDictionary<NSString *, id> * _Nullable)params
-                                   completion:(void (^)(NSError * _Nullable error))completion
+- (void)subscribeWithController:(id _Nullable)controller
+                         nodeId:(uint64_t)nodeId
+                    minInterval:(NSNumber *)minInterval
+                    maxInterval:(NSNumber *)maxInterval
+                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                    shouldCache:(BOOL)shouldCache
+                     completion:(void (^)(NSError * _Nullable error))completion
 {
     __auto_type sharedController = [CHIPDeviceController sharedController];
     if (sharedController) {
-        CHIPAttributeCacheContainer * attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-        [attributeCacheContainer
-            subscribeWithDeviceController:sharedController
-                                 deviceId:nodeId
-                                   params:[CHIPDeviceController decodeXPCSubscribeParams:params]
-                              clientQueue:dispatch_get_main_queue()
-                               completion:^(NSError * _Nullable error) {
-                                   NSNumber * nodeIdNumber = [NSNumber numberWithUnsignedLongLong:nodeId];
-                                   if (error) {
-                                       NSLog(@"Failed to have subscribe attribute by cache");
-                                       [self.attributeCacheDictionary removeObjectForKey:nodeIdNumber];
-                                   } else {
-                                       NSLog(@"Attribute cache for node %llu successfully subscribed attributes", nodeId);
-                                       [self.attributeCacheDictionary setObject:attributeCacheContainer forKey:nodeIdNumber];
-                                   }
+        CHIPAttributeCacheContainer * attributeCacheContainer;
+        if (shouldCache) {
+            attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+        }
+
+        [sharedController getConnectedDevice:nodeId
+                                       queue:dispatch_get_main_queue()
+                           completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                               if (error) {
+                                   NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@", nodeId, error);
                                    completion(error);
-                               }];
+                                   return;
+                               }
+                               NSMutableArray * established = [NSMutableArray arrayWithCapacity:1];
+                               [established addObject:@NO];
+                               [device subscribeWithQueue:dispatch_get_main_queue()
+                                   minInterval:[minInterval unsignedShortValue]
+                                   maxInterval:[maxInterval unsignedShortValue]
+                                   params:[CHIPDeviceController decodeXPCSubscribeParams:params]
+                                   cacheContainer:attributeCacheContainer
+                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                       NSLog(@"Report received: %@, error: %@", value, error);
+                                       if (error && ![established[0] boolValue]) {
+                                           established[0] = @YES;
+                                           completion(error);
+                                       }
+                                   }
+                                   subscriptionEstablished:^{
+                                       NSLog(@"Attribute cache subscription succeeded for device %llu", nodeId);
+                                       if (attributeCacheContainer) {
+                                           [self.attributeCacheDictionary setObject:attributeCacheContainer forKey:@(nodeId)];
+                                       }
+                                       if (![established[0] boolValue]) {
+                                           established[0] = @YES;
+                                           completion(nil);
+                                       }
+                                   }];
+                           }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion([NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
@@ -416,12 +440,6 @@ static CHIPDevice * GetConnectedDevice(void)
 {
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
-}
-
-static CHIPDeviceController * GetDeviceController(void)
-{
-    XCTAssertNotNil(mDeviceController);
-    return mDeviceController;
 }
 
 @interface CHIPRemoteDeviceSampleTestPairingDelegate : NSObject <CHIPDevicePairingDelegate>
@@ -1738,23 +1756,22 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    __auto_type * deviceController = GetDeviceController();
     CHIPAttributeCacheContainer * attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    NSLog(@"Setting up attribute cache...");
-    [attributeCacheContainer subscribeWithDeviceController:deviceController
-                                                  deviceId:kDeviceId
-                                                    params:nil
-                                               clientQueue:queue
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Attribute cache subscribed attributes");
-                                                    [expectation fulfill];
-                                                }];
-    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
-
-    // Wait for initial report to be collected. This can take very long.
+    NSLog(@"Setting up attribute cache subscription...");
+    [device subscribeWithQueue:queue
+        minInterval:1
+        maxInterval:60
+        params:nil
+        cacheContainer:attributeCacheContainer
+        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Report for attribute cache: %@, error: %@", value, error);
+        }
+        subscriptionEstablished:^{
+            NSLog(@"Attribute cache subscribed attributes");
+            [expectation fulfill];
+        }];
+    // Wait for subscription establishment. This can take very long to collect initial reports.
     NSLog(@"Waiting for initial report...");
-    expectation = [self expectationWithDescription:@"Must not jump out while waiting for initial report"];
-    expectation.inverted = YES;
     [self waitForExpectations:@[ expectation ] timeout:120];
 
     // Send command to reset attribute state

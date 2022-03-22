@@ -76,6 +76,61 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 }
 @end
 
+@interface CHIPAttributeCacheContainer (Test)
+// Obsolete method is moved to this test suite to keep tests compatible
+- (void)subscribeWithDeviceController:(CHIPDeviceController *)deviceController
+                             deviceId:(uint64_t)deviceId
+                               params:(CHIPSubscribeParams * _Nullable)params
+                          clientQueue:(dispatch_queue_t)clientQueue
+                           completion:(void (^)(NSError * _Nullable error))completion;
+@end
+
+@implementation CHIPAttributeCacheContainer (Test)
+- (void)subscribeWithDeviceController:(CHIPDeviceController *)deviceController
+                             deviceId:(uint64_t)deviceId
+                               params:(CHIPSubscribeParams * _Nullable)params
+                          clientQueue:clientQueue
+                           completion:(void (^)(NSError * _Nullable error))completion
+{
+    __auto_type workQueue = dispatch_get_main_queue();
+    __auto_type completionHandler = ^(NSError * _Nullable error) {
+        dispatch_async(clientQueue, ^{
+            completion(error);
+        });
+    };
+    [deviceController getConnectedDevice:deviceId
+                                   queue:workQueue
+                       completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                           if (error) {
+                               NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@", deviceId, error);
+                               completionHandler(error);
+                               return;
+                           }
+                           __auto_type established = [NSMutableArray arrayWithCapacity:1];
+                           [established addObject:@NO];
+                           [device subscribeWithQueue:clientQueue
+                               minInterval:1
+                               maxInterval:43200
+                               params:params
+                               cacheContainer:self
+                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                   NSLog(@"Report received for attribute cache: %@, error: %@", value, error);
+                                   if (![established[0] boolValue]) {
+                                       established[0] = @YES;
+                                       completionHandler(error);
+                                   }
+                               }
+                               subscriptionEstablished:^{
+                                   NSLog(@"Attribute cache subscription succeeded for device %llu", deviceId);
+                                   if (![established[0] boolValue]) {
+                                       established[0] = @YES;
+                                       completionHandler(nil);
+                                   }
+                               }];
+                       }];
+}
+@end
+
 @interface CHIPXPCProtocolTests<NSXPCListenerDelegate, CHIPRemoteDeviceProtocol> : XCTestCase
 
 @property (nonatomic, readwrite, strong) NSXPCListener * xpcListener;
@@ -103,8 +158,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * _Nullable clusterId, NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval,
     CHIPSubscribeParams * _Nullable params, void (^establishedHandler)(void));
 @property (readwrite, strong) void (^handleStopReports)(id controller, uint64_t nodeId, void (^completion)(void));
-@property (readwrite, strong) void (^handleSubscribeAttributeCache)
-    (id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error));
+@property (readwrite, strong) void (^handleSubscribeAll)(id controller, uint64_t nodeId, NSNumber * minInterval,
+    NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error))
+    ;
 @property (readwrite, strong) void (^handleReadAttributeCache)
     (id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
@@ -221,14 +277,18 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     });
 }
 
-- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
-                                       nodeId:(uint64_t)nodeId
-                                       params:(NSDictionary<NSString *, id> * _Nullable)params
-                                   completion:(void (^)(NSError * _Nullable error))completion
+- (void)subscribeWithController:(id _Nullable)controller
+                         nodeId:(uint64_t)nodeId
+                    minInterval:(NSNumber *)minInterval
+                    maxInterval:(NSNumber *)maxInterval
+                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                    shouldCache:(BOOL)shouldCache
+                     completion:(void (^)(NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        XCTAssertNotNil(self.handleSubscribeAttributeCache);
-        self.handleSubscribeAttributeCache(controller, nodeId, [CHIPDeviceController decodeXPCSubscribeParams:params], completion);
+        XCTAssertNotNil(self.handleSubscribeAll);
+        self.handleSubscribeAll(controller, nodeId, minInterval, maxInterval,
+            [CHIPDeviceController decodeXPCSubscribeParams:params], shouldCache, completion);
     });
 }
 
@@ -2231,15 +2291,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache
-        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
-              NSLog(@"Subscribe attribute cache called");
-              XCTAssertTrue([controller isEqualToString:uuid]);
-              XCTAssertEqual(nodeId, myNodeId);
-              XCTAssertNil(params);
-              [callExpectation fulfill];
-              completion(nil);
-          };
+    _handleSubscribeAll = ^(id controller, uint64_t nodeId, NSNumber * minInterval, NSNumber * maxInterval,
+        CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertNil(params);
+        [callExpectation fulfill];
+        completion(nil);
+    };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
@@ -2267,17 +2327,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache
-        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
-              NSLog(@"Subscribe attribute cache called");
-              XCTAssertTrue([controller isEqualToString:uuid]);
-              XCTAssertEqual(nodeId, myNodeId);
-              XCTAssertNotNil(params);
-              XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
-              XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
-              [callExpectation fulfill];
-              completion(nil);
-          };
+    _handleSubscribeAll = ^(id controller, uint64_t nodeId, NSNumber * minInterval, NSNumber * maxInterval,
+        CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertNotNil(params);
+        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+        [callExpectation fulfill];
+        completion(nil);
+    };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
@@ -2303,15 +2363,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache
-        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
-              NSLog(@"Subscribe attribute cache called");
-              XCTAssertTrue([controller isEqualToString:uuid]);
-              XCTAssertEqual(nodeId, myNodeId);
-              XCTAssertNil(params);
-              [callExpectation fulfill];
-              completion(myError);
-          };
+    _handleSubscribeAll = ^(id controller, uint64_t nodeId, NSNumber * minInterval, NSNumber * maxInterval,
+        CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertNil(params);
+        [callExpectation fulfill];
+        completion(myError);
+    };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
@@ -2347,14 +2407,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache
-        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
-              NSLog(@"Subscribe attribute cache called");
-              XCTAssertTrue([controller isEqualToString:uuid]);
-              XCTAssertEqual(nodeId, myNodeId);
-              XCTAssertNil(params);
-              completion(nil);
-          };
+    _handleSubscribeAll = ^(id controller, uint64_t nodeId, NSNumber * minInterval, NSNumber * maxInterval,
+        CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertNil(params);
+        completion(nil);
+    };
 
     _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
@@ -2409,14 +2469,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache
-        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
-              NSLog(@"Subscribe attribute cache called");
-              XCTAssertTrue([controller isEqualToString:uuid]);
-              XCTAssertEqual(nodeId, myNodeId);
-              XCTAssertNil(params);
-              completion(nil);
-          };
+    _handleSubscribeAll = ^(id controller, uint64_t nodeId, NSNumber * minInterval, NSNumber * maxInterval,
+        CHIPSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertNil(params);
+        completion(nil);
+    };
 
     _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
