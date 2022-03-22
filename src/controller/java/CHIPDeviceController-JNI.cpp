@@ -48,6 +48,7 @@
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
 #include <pthread.h>
+#include <system/SystemClock.h>
 #include <vector>
 
 #include <platform/android/AndroidChipPlatform-JNI.h>
@@ -571,7 +572,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    err = AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(), duration);
+    err = AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
+                                                                      System::Clock::Seconds16(duration));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -598,8 +600,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::SetupPayload setupPayload;
-    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(), duration,
-                                                                 iteration, discriminator,
+    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
+                                                                 System::Clock::Seconds16(duration), iteration, discriminator,
                                                                  MakeOptional(static_cast<uint32_t>(setupPinCode)), setupPayload);
 
     if (err != CHIP_NO_ERROR)

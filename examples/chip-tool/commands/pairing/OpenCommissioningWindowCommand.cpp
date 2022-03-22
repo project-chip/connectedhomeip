@@ -18,6 +18,8 @@
 
 #include "OpenCommissioningWindowCommand.h"
 
+#include <system/SystemClock.h>
+
 using namespace ::chip;
 
 CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
@@ -25,14 +27,15 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
     mWindowOpener = Platform::MakeUnique<Controller::CommissioningWindowOpener>(&CurrentCommissioner());
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
     {
-        return mWindowOpener->OpenBasicCommissioningWindow(mNodeId, mTimeout, &mOnOpenBasicCommissioningWindowCallback);
+        return mWindowOpener->OpenBasicCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout),
+                                                           &mOnOpenBasicCommissioningWindowCallback);
     }
 
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload ignored;
-        return mWindowOpener->OpenCommissioningWindow(mNodeId, mTimeout, mIteration, mDiscriminator, NullOptional,
-                                                      &mOnOpenCommissioningWindowCallback, ignored,
+        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout), mIteration, mDiscriminator,
+                                                      NullOptional, &mOnOpenCommissioningWindowCallback, ignored,
                                                       /* readVIDPIDAttributes */ true);
     }
 

@@ -67,6 +67,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -416,14 +417,16 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
     const auto option = static_cast<Controller::CommissioningWindowOpener::CommissioningWindowOption>(optionInt);
     if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
     {
-        return Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(devCtrl, nodeid, timeout).AsInteger();
+        return Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(devCtrl, nodeid,
+                                                                                       System::Clock::Seconds16(timeout))
+            .AsInteger();
     }
 
     if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload payload;
-        return Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(devCtrl, nodeid, timeout, iteration,
-                                                                                  discriminator, NullOptional, payload)
+        return Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
+                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, payload)
             .AsInteger();
     }
 

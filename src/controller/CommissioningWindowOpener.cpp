@@ -25,11 +25,17 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 using namespace chip::app::Clusters;
+using namespace chip::System::Clock;
+
+namespace {
+// TODO: What should the timed invoke timeout here be?
+constexpr uint16_t kTimedInvokeTimeoutMs = 10000;
+} // anonymous namespace
 
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId deviceId, uint16_t timeout,
+CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId deviceId, Seconds16 timeout,
                                                                    Callback::Callback<OnOpenBasicCommissioningWindow> * callback)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
@@ -47,7 +53,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
 
-CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration,
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, Seconds16 timeout, uint32_t iteration,
                                                               uint16_t discriminator, Optional<uint32_t> setupPIN,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
@@ -110,16 +116,14 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
         ReturnErrorOnFailure(mVerifier.Serialize(serializedVerifierSpan));
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout;
+        request.commissioningTimeout = mCommissioningWindowTimeout.count();
         request.PAKEVerifier         = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator;
         request.iterations           = mCommissioningWindowIteration;
         request.salt                 = GetSPAKE2Salt();
 
-        // TODO: What should the timed invoke timeout here be?
-        uint16_t timedInvokeTimeoutMs = 10000;
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                                                   OnOpenCommissioningWindowFailure, MakeOptional(timedInvokeTimeoutMs)));
+                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
 
         char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
 
@@ -134,11 +138,9 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
     else
     {
         AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout;
-        // TODO: What should the timed invoke timeout here be?
-        uint16_t timedInvokeTimeoutMs = 10000;
+        request.commissioningTimeout = mCommissioningWindowTimeout.count();
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                                                   OnOpenCommissioningWindowFailure, MakeOptional(timedInvokeTimeoutMs)));
+                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
     }
 
     return CHIP_NO_ERROR;
@@ -265,7 +267,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "%s", messageIfError);
+        ChipLogError(Controller, "%s: %" CHIP_ERROR_FORMAT, messageIfError, err.Format());
         OnOpenCommissioningWindowFailure(context, err);
     }
 }
@@ -290,7 +292,7 @@ AutoCommissioningWindowOpener::AutoCommissioningWindowOpener(DeviceController * 
 {}
 
 CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
-                                                                       uint16_t timeout)
+                                                                       Seconds16 timeout)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AutoCommissioningWindowOpener(controller);
@@ -309,7 +311,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
     return err;
 }
 
-CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, uint16_t timeout,
+CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, Seconds16 timeout,
                                                                   uint32_t iteration, uint16_t discriminator,
                                                                   Optional<uint32_t> setupPIN, SetupPayload & payload,
                                                                   bool readVIDPIDAttributes)

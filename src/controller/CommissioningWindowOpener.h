@@ -26,10 +26,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <setup_payload/SetupPayload.h>
-
-/**
- * A helper class to open a commissioning window given some parameters.
- */
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -39,6 +36,9 @@ namespace Controller {
 typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
 typedef void (*OnOpenBasicCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status);
 
+/**
+ * A helper class to open a commissioning window given some parameters.
+ */
 class CommissioningWindowOpener
 {
 public:
@@ -67,7 +67,7 @@ public:
      * @param[in] callback The callback to call once the commissioning window is
      *                     open or if an error occurs.
      */
-    CHIP_ERROR OpenBasicCommissioningWindow(NodeId deviceId, uint16_t timeout,
+    CHIP_ERROR OpenBasicCommissioningWindow(NodeId deviceId, System::Clock::Seconds16 timeout,
                                             Callback::Callback<OnOpenBasicCommissioningWindow> * callback);
 
     /**
@@ -92,12 +92,11 @@ public:
      *                                 commissioning window.  If this argument is `true`, the API will read VID and
      *                                 PID from the device and include them in the setup payload passed to the
      *                                 callback.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                       Optional<uint32_t> setupPIN, Callback::Callback<OnOpenCommissioningWindow> * callback,
-                                       SetupPayload & payload, bool readVIDPIDAttributes = false);
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, System::Clock::Seconds16 timeout, uint32_t iteration,
+                                       uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                       Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
+                                       bool readVIDPIDAttributes = false);
 
 private:
     enum class Step : uint8_t
@@ -132,7 +131,7 @@ private:
     Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mNodeId                                       = kUndefinedNodeId;
-    uint16_t mCommissioningWindowTimeout                 = 0;
+    System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     uint32_t mCommissioningWindowIteration               = 0;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
     Spake2pVerifier mVerifier; // Used for non-basic commissioning.
@@ -151,12 +150,13 @@ class AutoCommissioningWindowOpener : private CommissioningWindowOpener
 public:
     // Takes the same arguments as CommissioningWindowOpener::OpenBasicCommissioningWindow except without the
     // callback.
-    static CHIP_ERROR OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId, uint16_t timeout);
+    static CHIP_ERROR OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
+                                                   System::Clock::Seconds16 timeout);
     // Takes the same arguments as CommissioningWindowOpener::OpenCommissioningWindow except without the
     // callback.
-    static CHIP_ERROR OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, uint16_t timeout, uint32_t iteration,
-                                              uint16_t discriminator, Optional<uint32_t> setupPIN, SetupPayload & payload,
-                                              bool readVIDPIDAttributes = false);
+    static CHIP_ERROR OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, System::Clock::Seconds16 timeout,
+                                              uint32_t iteration, uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                              SetupPayload & payload, bool readVIDPIDAttributes = false);
 
 private:
     AutoCommissioningWindowOpener(DeviceController * controller);

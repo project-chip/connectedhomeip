@@ -42,6 +42,7 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <system/SystemClock.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
@@ -481,7 +482,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 
     err = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
-        self.cppCommissioner, deviceID, static_cast<uint16_t>(duration));
+        self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -522,7 +523,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
     chip::SetupPayload setupPayload;
     err = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
-        static_cast<uint16_t>(duration), 1000, static_cast<uint16_t>(discriminator),
+        chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), 1000, static_cast<uint16_t>(discriminator),
         chip::MakeOptional(static_cast<uint32_t>(setupPIN)), setupPayload);
 
     if (err != CHIP_NO_ERROR) {
