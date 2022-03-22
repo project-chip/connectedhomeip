@@ -42,6 +42,8 @@ import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 public class MatterServant {
 
   private ChipAppServer chipAppServer;
+  private TvApp mTvApp;
+  private boolean mOnOff = true;
 
   private MatterServant() {}
 
@@ -59,7 +61,7 @@ public class MatterServant {
     // then chipPlatform to prepare platform
     // then TvApp.postInit to init app which needs platform
     // then start ChipAppServer
-    TvApp tvApp =
+    mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
               switch (clusterId) {
@@ -88,7 +90,7 @@ public class MatterServant {
                   app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
               }
             });
-    tvApp.setDACProvider(new DACProviderStub());
+    mTvApp.setDACProvider(new DACProviderStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
@@ -110,4 +112,10 @@ public class MatterServant {
     chipAppServer.stopApp();
     chipAppServer.startApp();
   }
+
+  public void toggleOnOff() {
+    mTvApp.SetOnOff(1,mOnOff);
+    mOnOff = !mOnOff;
+  }
+
 }
