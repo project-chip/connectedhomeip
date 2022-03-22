@@ -29,9 +29,9 @@
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
-#include <app/ObjectList.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/support/PersistedCounter.h>
@@ -340,8 +340,9 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ObjectList<EventPathParams> * apEventPathList, EventNumber & aEventMin,
-                                size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ObjectList<EventPathParams> * apEventPathList,
+                                EventNumber & aEventMin, size_t & aEventCount,
+                                const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**
      * @brief

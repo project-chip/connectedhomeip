@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -81,10 +81,10 @@ struct AttributePathParams
         return true;
     }
 
-    ClusterId mClusterId         = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId     = kInvalidAttributeId; // uint32
-    EndpointId mEndpointId       = kInvalidEndpointId;  // uint16
-    ListIndex mListIndex         = kInvalidListIndex;   // uint16
+    ClusterId mClusterId     = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
 } // namespace app
 } // namespace chip

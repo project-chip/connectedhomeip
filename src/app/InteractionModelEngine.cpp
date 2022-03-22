@@ -566,7 +566,7 @@ void InteractionModelEngine::ReleaseAttributePathList(ObjectList<AttributePathPa
 }
 
 CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
-                                                                    AttributePathParams & aAttributePath)
+                                                              AttributePathParams & aAttributePath)
 {
     CHIP_ERROR err = PushFront(aAttributePathList, aAttributePath, mAttributePathPool);
     if (err == CHIP_ERROR_NO_MEMORY)
@@ -644,7 +644,8 @@ bool InteractionModelEngine::IsOverlappedAttributePath(AttributePathParams & aAt
         {
             for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                if (object->mValue.IsAttributePathSupersetOf(aAttributePath) || aAttributePath.IsAttributePathSupersetOf(object->mValue))
+                if (object->mValue.IsAttributePathSupersetOf(aAttributePath) ||
+                    aAttributePath.IsAttributePathSupersetOf(object->mValue))
                 {
                     return Loop::Break;
                 }

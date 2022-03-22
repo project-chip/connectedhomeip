@@ -103,8 +103,8 @@ void AttributePathExpandIterator::PrepareClusterIndexRange(const AttributePathPa
     }
 }
 
-void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePathParams & aAttributePath,
-                                                             EndpointId aEndpointId, ClusterId aClusterId)
+void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId,
+                                                             ClusterId aClusterId)
 {
     if (aAttributePath.HasWildcardAttributeId())
     {

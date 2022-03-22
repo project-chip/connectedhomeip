@@ -18,9 +18,9 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
-#include <app/ObjectList.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
+#include <app/ObjectList.h>
 #include <app/util/mock/Constants.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>

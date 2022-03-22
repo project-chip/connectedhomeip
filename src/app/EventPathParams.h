@@ -53,10 +53,10 @@ struct EventPathParams
         return true;
     }
 
-    ClusterId mClusterId     = kInvalidClusterId;  // uint32
-    EventId mEventId         = kInvalidEventId;    // uint32
-    EndpointId mEndpointId   = kInvalidEndpointId; // uint16
-    bool mIsUrgentEvent      = false;              // uint8
+    ClusterId mClusterId   = kInvalidClusterId;  // uint32
+    EventId mEventId       = kInvalidEventId;    // uint32
+    EndpointId mEndpointId = kInvalidEndpointId; // uint16
+    bool mIsUrgentEvent    = false;              // uint8
 };
 } // namespace app
 } // namespace chip

@@ -46,9 +46,9 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/ObjectList.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
+#include <app/ObjectList.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
@@ -139,7 +139,7 @@ public:
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
     CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
-                                                AttributePathParams & aAttributePath);
+                                          AttributePathParams & aAttributePath);
 
     void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
 
@@ -147,7 +147,8 @@ public:
 
     void ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList);
 
-    CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList, DataVersionFilter & aDataVersionFilter);
+    CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+                                              DataVersionFilter & aDataVersionFilter);
 
     bool IsOverlappedAttributePath(AttributePathParams & aAttributePath);
 
@@ -348,13 +349,11 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
  *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
  * AttributeReportIB to the AttributeReportIBs::Builder.
- *  When the endpoint / cluster / attribute / event data specified by aAttributePathParams does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
- *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
- * into the TLVWriter. TLVWriter error will be returned if any error occurred during encoding
- * these values.
- *  This function is implemented by CHIP as a part of cluster data storage & management.
- * The apWriter and apDataExists can be nullptr.
+ *  When the endpoint / cluster / attribute / event data specified by aAttributePathParams does not exist, corresponding interaction
+ * model error code will be put into the writer, and CHIP_NO_ERROR will be returned. If the data exists on the server, the data
+ * (with tag kData) and the data version (with tag kDataVersion) will be put into the TLVWriter. TLVWriter error will be returned if
+ * any error occurred during encoding these values. This function is implemented by CHIP as a part of cluster data storage &
+ * management. The apWriter and apDataExists can be nullptr.
  *
  *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
  *  @param[in]    aPath                 The concrete path of the data being read.

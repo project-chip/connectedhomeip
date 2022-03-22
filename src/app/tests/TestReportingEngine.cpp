@@ -121,7 +121,7 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
-    clusterInfo->mAttributeId = 1;
+    clusterInfo->mAttributeId         = 1;
 
     {
         AttributePathParams testClusterInfo;

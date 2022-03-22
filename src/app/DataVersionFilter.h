@@ -35,9 +35,9 @@ struct DataVersionFilter
         return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion.HasValue());
     }
 
-    ClusterId mClusterId = kInvalidClusterId;        // uint32
-    Optional<DataVersion> mDataVersion;              // uint32
-    EndpointId mEndpointId     = kInvalidEndpointId; // uint16
+    ClusterId mClusterId = kInvalidClusterId;    // uint32
+    Optional<DataVersion> mDataVersion;          // uint32
+    EndpointId mEndpointId = kInvalidEndpointId; // uint16
 };
 } // namespace app
 } // namespace chip

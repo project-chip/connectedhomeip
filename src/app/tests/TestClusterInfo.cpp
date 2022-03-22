@@ -173,10 +173,8 @@ namespace {
 const nlTest sTests[] = {
     NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestPath::TestAttributePathIncludedSameFieldId),
     NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestPath::TestAttributePathIncludedDifferentFieldId),
-    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId",
-                chip::app::TestPath::TestAttributePathIncludedDifferentEndpointId),
-    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId",
-                chip::app::TestPath::TestAttributePathIncludedDifferentClusterId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId", chip::app::TestPath::TestAttributePathIncludedDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId", chip::app::TestPath::TestAttributePathIncludedDifferentClusterId),
     NL_TEST_DEF("TestEventPathSameEventId", chip::app::TestPath::TestEventPathSameEventId),
     NL_TEST_DEF("TestEventPathDifferentEventId", chip::app::TestPath::TestEventPathDifferentEventId),
     NL_TEST_DEF("TestEventPathDifferentClusterId", chip::app::TestPath::TestEventPathDifferentClusterId),

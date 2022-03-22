@@ -50,7 +50,8 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+bool Engine::IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList,
+                                       const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;
     bool existVersionMismatch = false;
@@ -266,11 +267,11 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
     TLV::TLVWriter backup;
-    bool eventClean                = true;
-    ObjectList<EventPathParams> * eventList  = apReadHandler->GetEventPathList();
-    EventNumber & eventMin         = apReadHandler->GetEventMin();
-    EventManagement & eventManager = EventManagement::GetInstance();
-    bool hasMoreChunks             = false;
+    bool eventClean                         = true;
+    ObjectList<EventPathParams> * eventList = apReadHandler->GetEventPathList();
+    EventNumber & eventMin                  = apReadHandler->GetEventMin();
+    EventManagement & eventManager          = EventManagement::GetInstance();
+    bool hasMoreChunks                      = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -610,7 +611,8 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
         {
             for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                if (aAttributePath.IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(aAttributePath))
+                if (aAttributePath.IsAttributePathSupersetOf(object->mValue) ||
+                    object->mValue.IsAttributePathSupersetOf(aAttributePath))
                 {
                     handler->SetDirty();
                     break;

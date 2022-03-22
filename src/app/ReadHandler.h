@@ -28,12 +28,12 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
-#include <app/ObjectList.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
+#include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -243,10 +243,10 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                             = HandlerState::Idle;
-    ObjectList<AttributePathParams> * mpAttributePathList = nullptr;
-    ObjectList<EventPathParams> * mpEventPathList         = nullptr;
-    ObjectList<DataVersionFilter> * mpDataVersionFilterList     = nullptr;
+    HandlerState mState                                     = HandlerState::Idle;
+    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
+    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
+    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

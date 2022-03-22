@@ -49,7 +49,7 @@ public:
 
 int TestInteractionModelEngine::GetAttributePathListLength(ObjectList<AttributePathParams> * apAttributePathParamsList)
 {
-    int length                   = 0;
+    int length                               = 0;
     ObjectList<AttributePathParams> * runner = apAttributePathParamsList;
     while (runner != nullptr)
     {
@@ -76,17 +76,20 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
 
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr && attributePathParams1.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+                   attributePathParamsList != nullptr &&
+                       attributePathParams1.mEndpointId == attributePathParamsList->mValue.mEndpointId);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
 
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr && attributePathParams2.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+                   attributePathParamsList != nullptr &&
+                       attributePathParams2.mEndpointId == attributePathParamsList->mValue.mEndpointId);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
 
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
     NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr && attributePathParams3.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+                   attributePathParamsList != nullptr &&
+                       attributePathParams3.mEndpointId == attributePathParamsList->mValue.mEndpointId);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
 
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
