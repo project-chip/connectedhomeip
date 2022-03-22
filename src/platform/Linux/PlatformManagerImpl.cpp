@@ -251,7 +251,7 @@ PlatformManagerImpl::_SetUserLabelList(
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
+PlatformManagerImpl::_AppendUserLabel(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
 {
     // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
     return CHIP_NO_ERROR;

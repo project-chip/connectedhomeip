@@ -197,7 +197,7 @@ public:
 
     CHIP_ERROR SetUserLabelList(EndpointId endpoint,
                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label);
+    CHIP_ERROR AppendUserLabel(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label);
     CHIP_ERROR
     GetUserLabelList(EndpointId endpoint,
                      std::function<CHIP_ERROR(
@@ -465,10 +465,10 @@ PlatformManager::SetUserLabelList(EndpointId endpoint,
     return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
-inline CHIP_ERROR PlatformManager::AppendUserLabelList(EndpointId endpoint,
-                                                       app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
+inline CHIP_ERROR PlatformManager::AppendUserLabel(EndpointId endpoint,
+                                                   app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
 {
-    return static_cast<ImplClass *>(this)->_AppendUserLabelList(endpoint, label);
+    return static_cast<ImplClass *>(this)->_AppendUserLabel(endpoint, label);
 }
 
 inline CHIP_ERROR PlatformManager::GetUserLabelList(

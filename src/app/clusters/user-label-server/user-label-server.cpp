@@ -106,7 +106,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         Structs::LabelStruct::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
 
-        return DeviceLayer::PlatformMgr().AppendUserLabelList(endpoint, entry);
+        return DeviceLayer::PlatformMgr().AppendUserLabel(endpoint, entry);
     }
     else
     {

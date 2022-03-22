@@ -144,7 +144,7 @@ PlatformManagerImpl::_SetUserLabelList(
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_AppendUserLabelList(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
+PlatformManagerImpl::_AppendUserLabel(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
 {
     return CHIP_NO_ERROR;
 }
