@@ -131,7 +131,7 @@ private:
     CHIP_ERROR PrepareNewReplyPacket();
 
     ServerBase * mServer;
-    QueryResponderPtrPool mResponders;
+    QueryResponderPtrPool mResponders = {};
 
     /// Current send state
     ResponseBuilder mResponseBuilder;          // packet being built
