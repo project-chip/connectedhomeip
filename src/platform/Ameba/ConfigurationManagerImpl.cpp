@@ -88,7 +88,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
 
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup to the pending Fail Safe Context with
+    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
     // which the fail-safe timer has been armed.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
