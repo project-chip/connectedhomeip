@@ -33,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
                 MatterServant.get().restart();
               }
             });
+    findViewById(R.id.OnOffBtn)
+        .setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                MatterServant.get().toggleOnOff();
+              }
+            });
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
