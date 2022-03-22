@@ -214,7 +214,7 @@ public:
 // The typical callback implementor is the engine, but that would proceed to return the object
 // back to the handler pool (which we obviously don't want in this case). This just no-ops those calls.
 //
-class NullReadHandlerCallback : public chip::app::ReadHandler::Callback
+class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback
 {
 public:
     void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}

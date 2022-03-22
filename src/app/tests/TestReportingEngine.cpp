@@ -66,7 +66,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-class DummyDelegate : public ReadHandler::Callback
+class DummyDelegate : public ReadHandler::ManagementCallback
 {
 public:
     void OnDone(ReadHandler & apHandler) override {}

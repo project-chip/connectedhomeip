@@ -65,7 +65,9 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate,
+                               public CommandHandler::Callback,
+                               public ReadHandler::ManagementCallback
 {
 public:
     /**
@@ -141,6 +143,15 @@ public:
     CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
+
+    /*
+     * Register an application callback to be notified of notable events when handling reads/subscribes.
+     */
+    void RegisterReadHandlerAppCallback(ReadHandler::ApplicationCallback * mpApplicationCallback)
+    {
+        mpReadHandlerApplicationCallback = mpApplicationCallback;
+    }
+    void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
     /**
      * Called when a timed interaction has failed (i.e. the exchange it was
@@ -303,6 +314,8 @@ private:
     ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
 
     ReadClient * mpActiveReadClientList = nullptr;
+
+    ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;

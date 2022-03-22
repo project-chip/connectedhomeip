@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
@@ -156,7 +157,7 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 
 namespace {
 
-class TestReadInteraction
+class TestReadInteraction : public app::ReadHandler::ApplicationCallback
 {
 public:
     TestReadInteraction() {}
@@ -169,6 +170,7 @@ public:
     static void TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_MultipleSubscriptionsAppRejection(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
@@ -177,13 +179,36 @@ public:
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
 
 private:
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
+    {
+        if (mEmitSubscriptionError)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions++; }
+
+    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions--; }
+
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
     static void MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount);
+
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
+
+private:
+    bool mEmitSubscriptionError     = false;
+    int32_t mNumActiveSubscriptions = 0;
 };
+
+TestReadInteraction gTestReadInteraction;
 
 void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext)
 {
@@ -411,6 +436,12 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls]() { numSubscriptionEstablishedCalls++; };
 
     //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    //
     // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
     // present in that define.
@@ -427,10 +458,77 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
+
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+}
+
+void TestReadInteraction::TestReadHandler_MultipleSubscriptionsAppRejection(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                       = ctx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls]() { numSubscriptionEstablishedCalls++; };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    //
+    // Test the application rejecting subscriptions.
+    //
+    gTestReadInteraction.mEmitSubscriptionError = true;
+
+    NL_TEST_ASSERT(apSuite,
+                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == 0);
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
+    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 0);
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    gTestReadInteraction.mEmitSubscriptionError = false;
 }
 
 void TestReadInteraction::TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext)
@@ -823,6 +921,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadFabricScopedWithoutFabricFilter", TestReadInteraction::TestReadFabricScopedWithoutFabricFilter),
     NL_TEST_DEF("TestReadFabricScopedWithFabricFilter", TestReadInteraction::TestReadFabricScopedWithFabricFilter),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptions", TestReadInteraction::TestReadHandler_MultipleSubscriptions),
+    NL_TEST_DEF("TestReadHandler_MultipleSubscriptionsAppRejection", TestReadInteraction::TestReadHandler_MultipleSubscriptionsAppRejection),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptionsWithDataVersionFilter", TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter),
     NL_TEST_DEF("TestReadHandler_MultipleReads", TestReadInteraction::TestReadHandler_MultipleReads),
     NL_TEST_DEF("TestReadHandler_OneSubscribeMultipleReads", TestReadInteraction::TestReadHandler_OneSubscribeMultipleReads),

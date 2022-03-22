@@ -331,6 +331,11 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
     if (handler)
     {
+        if (mpReadHandlerApplicationCallback)
+        {
+            handler->RegisterAppCallback(mpReadHandlerApplicationCallback);
+        }
+
         ReturnErrorOnFailure(handler->OnInitialRequest(std::move(aPayload)));
 
         aStatus = Protocols::InteractionModel::Status::Success;
