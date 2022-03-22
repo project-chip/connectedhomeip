@@ -47,7 +47,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipFactory);
@@ -87,29 +86,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
-
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
-    // which the fail-safe timer was armed.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        FabricIndex fabricIndex;
-        bool addNocCommandInvoked;
-        bool updateNocCommandInvoked;
-
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
-
-        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        SuccessOrExit(err);
-
-        ChipDeviceEvent event;
-        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-
-        err = PlatformMgr().PostEvent(&event);
-        SuccessOrExit(err);
-    }
 
     err = CHIP_NO_ERROR;
 

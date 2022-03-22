@@ -82,12 +82,14 @@ static void TestFailSafeContext_NocCommandInvoked(nlTestSuite * inSuite, void * 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
 
-    failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
+    err = failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.AddNocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex2);
 
-    failSafeContext.SetUpdateNocCommandInvoked(kTestAccessingFabricIndex1);
+    err = failSafeContext.SetUpdateNocCommandInvoked(kTestAccessingFabricIndex1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
@@ -106,10 +108,12 @@ static void TestFailSafeContext_CommitToStorage(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
 
-    failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex1);
+    err = failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.AddNocCommandHasBeenInvoked() == true);
 
-    failSafeContext.SetUpdateNocCommandInvoked(kTestAccessingFabricIndex1);
+    err = failSafeContext.SetUpdateNocCommandInvoked(kTestAccessingFabricIndex1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
 
     FabricIndex fabricIndex;

@@ -41,8 +41,8 @@ public:
      */
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
-    void SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
-    void SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
+    CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
+    CHIP_ERROR SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
@@ -68,6 +68,7 @@ public:
     }
 
     static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
+    static CHIP_ERROR DeleteFromStorage();
 
 private:
     // ===== Private members reserved for use by this class only.
@@ -85,10 +86,10 @@ private:
     }
 
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
+    static void HandleDisarmFailSafe(intptr_t arg);
 
     void FailSafeTimerExpired();
     CHIP_ERROR CommitToStorage();
-    CHIP_ERROR DeleteFromStorage();
 };
 
 } // namespace DeviceLayer

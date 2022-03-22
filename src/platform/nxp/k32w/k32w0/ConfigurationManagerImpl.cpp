@@ -50,7 +50,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
     uint32_t rebootCount = 0;
 
     if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
@@ -85,29 +84,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
-
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup to the pending Fail Safe Context with
-    // which the fail-safe timer has been armed.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        FabricIndex fabricIndex;
-        bool addNocCommandInvoked;
-        bool updateNocCommandInvoked;
-
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
-
-        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        SuccessOrExit(err);
-
-        ChipDeviceEvent event;
-        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-
-        err = PlatformMgr().PostEvent(&event);
-        SuccessOrExit(err);
-    }
 
     err = CHIP_NO_ERROR;
 

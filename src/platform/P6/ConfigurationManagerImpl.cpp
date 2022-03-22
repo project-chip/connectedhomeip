@@ -45,7 +45,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool failSafeArmed;
     uint32_t rebootCount;
 
     // Save out software version on first boot
@@ -79,29 +78,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<P6Config>::Init();
     VerifyOrReturnError(CHIP_NO_ERROR == err, err);
-
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup to the pending Fail Safe Context with
-    // which the fail-safe timer has been armed.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        FabricIndex fabricIndex;
-        bool addNocCommandInvoked;
-        bool updateNocCommandInvoked;
-
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
-
-        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        SuccessOrExit(err);
-
-        ChipDeviceEvent event;
-        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-
-        err = PlatformMgr().PostEvent(&event);
-        SuccessOrExit(err);
-    }
 
 exit:
     return err;

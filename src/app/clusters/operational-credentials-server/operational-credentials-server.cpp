@@ -648,12 +648,13 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // We might have a new operational identity, so we should start advertising it right away.
-    app::DnssdServer::Instance().AdvertiseOperational();
-
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
-    failSafeContext.SetAddNocCommandInvoked(fabricIndex);
+    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    // We might have a new operational identity, so we should start advertising it right away.
+    app::DnssdServer::Instance().AdvertiseOperational();
 
 exit:
 
@@ -713,14 +714,15 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     fabricIndex = fabric->GetFabricIndex();
 
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index associated with the UpdateNOC command being invoked.
+    err = failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.
     // So we need to StartServer() here.
     app::DnssdServer::Instance().StartServer();
-
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index associated with the UpdateNOC command being invoked.
-    failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
 
 exit:
 
