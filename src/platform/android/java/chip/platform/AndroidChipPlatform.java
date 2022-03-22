@@ -99,7 +99,8 @@ public final class AndroidChipPlatform {
    *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER. using null to generate it from passcode.
    * @param Spake2pSaltBase64 base64 encoded spake2p salt, ref
    *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT. using null to generate a random one.
-   * @param spake2pIterationCount Spake2p iteration count, or 0 to use CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+   * @param spake2pIterationCount Spake2p iteration count, or 0 to use
+   *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
    * @return true on success of false on failed
    */
   public native boolean updateCommissionableDataProviderData(
