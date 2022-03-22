@@ -166,4 +166,5 @@ else
             GBL_PATH="$TARGET_PATH".gbl
             ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 "$GBL_PATH" "$OTA_PATH"
         fi
+    fi
 fi
