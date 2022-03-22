@@ -20,8 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class CHIPSubscribeParams;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -91,6 +89,9 @@ extern NSString * const kCHIPNullValueType;
 extern NSString * const kCHIPStructureValueType;
 extern NSString * const kCHIPArrayValueType;
 
+@class CHIPReadParams;
+@class CHIPSubscribeParams;
+
 @interface CHIPDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -126,9 +127,10 @@ extern NSString * const kCHIPArrayValueType;
 /**
  * Read attribute in a designated attribute path
  */
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion;
 
@@ -137,11 +139,19 @@ extern NSString * const kCHIPArrayValueType;
  *
  * @param value       A data-value NSDictionary object as described in
  *                    CHIPDeviceResponseHandler.
+ *
+ * @param timeoutMs   timeout in milliseconds for timed write, or nil.
+ *
+ * @param completion  response handler will receive either values or error.
+ *
+ *                    Received values are an NSArray object with response-value element as described in
+ *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
  */
-- (void)writeAttributeWithEndpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(CHIPDeviceResponseHandler)completion;
 
@@ -152,22 +162,28 @@ extern NSString * const kCHIPArrayValueType;
  *                      as described in the CHIPDeviceResponseHandler.
  *                      The attribute must be a Structure, i.e.,
  *                      the NSDictionary kCHIPTypeKey key must have the value kCHIPStructureValueType.
+ *
+ * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
+ *
+ * @param completion  response handler will receive either values or error.
  */
-- (void)invokeCommandWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                       commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion;
 
 /**
  * Subscribe an attribute in a designated attribute path
  */
-- (void)subscribeAttributeWithEndpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(CHIPSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;

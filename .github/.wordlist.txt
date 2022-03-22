@@ -176,6 +176,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDEEDC
 CDVersionNumber
 ced
 cfg
@@ -342,6 +343,7 @@ detokenizer
 dev
 devcontainer
 devCtrl
+DevelopmentCerts
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -441,6 +443,8 @@ entrypoint
 enum
 Enums
 env
+epochKey
+epochStartTime
 eq
 errorValue
 esd
@@ -477,6 +481,7 @@ FC
 FDDE
 fddead
 fde
+fdx
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -545,6 +550,8 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupKeySecurityPolicy
+groupKeySetID
 groupsettings
 gtk
 GUA
@@ -650,6 +657,7 @@ kAdminister
 kBusy
 kCase
 Kconfig
+kDacPublicKey
 KeypadInput
 keyset
 kGroup
@@ -1252,7 +1260,7 @@ TXD
 txt
 uargument
 UART
-udc
+UDC
 udcport
 udhcpc
 UDP
@@ -1279,6 +1287,7 @@ ureverse
 URI
 urlrequest
 usbmodem
+usbserial
 USBtoUART
 uscif
 UserConsentNeeded
