@@ -25,6 +25,24 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS > 0
+
+#include <array>
+
+// Note: ptr storage is 2 + number of operational networks required, based on
+// the current implementation of Advertiser_ImplMinimalMdns.cpp:
+//    - 1 for commissionable advertising
+//    - 1 for commissioner responder
+//    - extra for every operational advertisement
+using QueryResponderPtrPool = std::array<mdns::Minimal::QueryResponderBase *, CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS + 2>;
+
+#else
+
+#include <list>
+using QueryResponderPtrPool = std::list<mdns::Minimal::QueryResponderBase *>;
+
+#endif
+
 namespace mdns {
 namespace Minimal {
 
@@ -88,8 +106,13 @@ private:
 class ResponseSender : public ResponderDelegate
 {
 public:
-    // TODO(cecille): Template this and set appropriately. Please see issue #8000.
+    // Generally this is 2 + number of operational networks required, based on
+    // the current implementation of Advertiser_ImplMinimalMdns.cpp:
+    //    - 1 for commissionable advertising
+    //    - 1 for commissioner responder
+    //    - extra for every operational advertisement
     static constexpr size_t kMaxQueryResponders = 7;
+
     ResponseSender(ServerBase * server) : mServer(server) {}
 
     CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
@@ -108,7 +131,7 @@ private:
     CHIP_ERROR PrepareNewReplyPacket();
 
     ServerBase * mServer;
-    QueryResponderBase * mResponder[kMaxQueryResponders] = {};
+    QueryResponderPtrPool mResponders;
 
     /// Current send state
     ResponseBuilder mResponseBuilder;          // packet being built

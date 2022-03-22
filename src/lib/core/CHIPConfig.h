@@ -1771,6 +1771,22 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
 
+/*
+ * @def CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
+ *
+ * @brief Maximum number of operational networks that the device may
+ *        advertise in parallel.
+ *
+ *        Value will be used for internal CHIP MDNS implementations but may
+ *        be ignored for platform implementations where the platform implements
+ *        its own memory management for DNSSD advertisement.
+ *
+ *        Set to 0 to mean "unlimited/use heap".
+ */
+#ifndef CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
+#define CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS 5
+#endif // CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
+
 /**
  * @}
  */

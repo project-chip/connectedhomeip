@@ -21,15 +21,6 @@
 
 #include <system/SystemClock.h>
 
-#define RETURN_IF_ERROR(err)                                                                                                       \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (err != CHIP_NO_ERROR)                                                                                                  \
-        {                                                                                                                          \
-            return;                                                                                                                \
-        }                                                                                                                          \
-    } while (false)
-
 namespace mdns {
 namespace Minimal {
 
@@ -61,24 +52,36 @@ bool ResponseSendingState::IncludeQuery() const
 
 CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder)
 {
-    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    // If already existing or we find a free slot, just use it
+    // Note that dynamic memory implementations are never expected to be nullptr
+    //
+    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
     {
-        if (mResponder[i] == nullptr || mResponder[i] == queryResponder)
+        if (*it == nullptr || *it == queryResponder)
         {
-            mResponder[i] = queryResponder;
+            *it = queryResponder;
             return CHIP_NO_ERROR;
         }
     }
+
+#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS > 0
     return CHIP_ERROR_NO_MEMORY;
+#else
+    mResponders.push_back(queryResponder);
+    return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryResponder)
 {
-    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
     {
-        if (mResponder[i] == queryResponder)
+        if (*it == queryResponder)
         {
-            mResponder[i] = nullptr;
+            *it = nullptr;
+#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS == 0
+            mResponders.erase(it);
+#endif
             return CHIP_NO_ERROR;
         }
     }
@@ -92,11 +95,13 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
-    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
     {
-        if (mResponder[i] != nullptr)
         {
-            mResponder[i]->ResetAdditionals();
+            if (*it != nullptr)
+            {
+                (*it)->ResetAdditionals();
+            }
         }
     }
 
@@ -117,18 +122,18 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             //       broadcasts on one interface to throttle broadcasts on another interface.
             responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNow - chip::System::Clock::Seconds32(1));
         }
-        for (size_t i = 0; i < kMaxQueryResponders; ++i)
+        for (auto responder = mResponders.begin(); responder != mResponders.end(); responder++)
         {
-            if (mResponder[i] == nullptr)
+            if (*responder == nullptr)
             {
                 continue;
             }
-            for (auto it = mResponder[i]->begin(&responseFilter); it != mResponder[i]->end(); it++)
+            for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
                 it->responder->AddAllResponses(querySource, this);
                 ReturnErrorOnFailure(mSendState.GetError());
 
-                mResponder[i]->MarkAdditionalRepliesFor(it);
+                (*responder)->MarkAdditionalRepliesFor(it);
 
                 if (!mSendState.SendUnicast())
                 {
@@ -150,13 +155,13 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         responseFilter
             .SetReplyFilter(&queryReplyFilter) //
             .SetIncludeAdditionalRepliesOnly(true);
-        for (size_t i = 0; i < kMaxQueryResponders; ++i)
+        for (auto responder = mResponders.begin(); responder != mResponders.end(); responder++)
         {
-            if (mResponder[i] == nullptr)
+            if (*responder == nullptr)
             {
                 continue;
             }
-            for (auto it = mResponder[i]->begin(&responseFilter); it != mResponder[i]->end(); it++)
+            for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
                 it->responder->AddAllResponses(querySource, this);
                 ReturnErrorOnFailure(mSendState.GetError());
@@ -212,12 +217,12 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
 
 void ResponseSender::AddResponse(const ResourceRecord & record)
 {
-    RETURN_IF_ERROR(mSendState.GetError());
+    ReturnOnFailure(mSendState.GetError());
 
     if (!mResponseBuilder.HasPacketBuffer())
     {
         mSendState.SetError(PrepareNewReplyPacket());
-        RETURN_IF_ERROR(mSendState.GetError());
+        ReturnOnFailure(mSendState.GetError());
     }
 
     if (!mResponseBuilder.Ok())
@@ -235,8 +240,8 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
     {
         mResponseBuilder.Header().SetFlags(mResponseBuilder.Header().GetFlags().SetTruncated(true));
 
-        RETURN_IF_ERROR(mSendState.SetError(FlushReply()));
-        RETURN_IF_ERROR(mSendState.SetError(PrepareNewReplyPacket()));
+        ReturnOnFailure(mSendState.SetError(FlushReply()));
+        ReturnOnFailure(mSendState.SetError(PrepareNewReplyPacket()));
 
         mResponseBuilder.AddRecord(mSendState.GetResourceType(), record);
         if (!mResponseBuilder.Ok())
