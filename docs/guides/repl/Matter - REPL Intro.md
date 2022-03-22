@@ -9,12 +9,13 @@ This goes over the basics of interacting with the REPL.
 
 ## Initialization
 
-Let's first begin by setting up by importing some key modules that are needed to make it easier for us to interact with the Matter stack.
+Let's first begin by setting up by importing some key modules that are needed to
+make it easier for us to interact with the Matter stack.
 
-`ChipReplStartup.py` is run within the global namespace. This results in all of its imports being made available here.
+`ChipReplStartup.py` is run within the global namespace. This results in all of
+its imports being made available here.
 
 > **NOTE**: _This is not needed if you launch the REPL from the command-line._
-
 
 ```python
 import chip.native
@@ -23,12 +24,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 %run {module.path}
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -43,56 +40,32 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
 
-
-
     2022-01-25 16:57:54 johnsj-macbookpro1.roam.corp.google.com root[27642] CRITICAL Loading configuration from /tmp/repl-storage.json...
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #000080; text-decoration-color: #000080">Fabric Admins have been loaded and are available at </span><span style="color: #800000; text-decoration-color: #800000">fabricAdmins</span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -100,12 +73,11 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
 ## Persistent Storage
 
-> NOTE: By default, the REPL points to `/tmp/repl-storage.json` for its persistent storage. To change that location, you can pass that in directly as follows:
-
+> NOTE: By default, the REPL points to `/tmp/repl-storage.json` for its
+> persistent storage. To change that location, you can pass that in directly as
+> follows:
 
 ```python
 import chip.native
@@ -114,12 +86,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 %run {module.path} --storagepath /tmp/repl.json
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -134,62 +102,35 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">2</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">2</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 2(2)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #000080; text-decoration-color: #000080">Fabric Admins have been loaded and are available at </span><span style="color: #800000; text-decoration-color: #800000">fabricAdmins</span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -197,17 +138,13 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
 ## Help
 
 To get help for the various classes and their respective methods, run:
 
-
 ```python
 matterhelp()
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────── </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'chip.ChipDeviceCtrl.ChipDeviceController'</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&gt;</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #008000; text-decoration-color: #008000">╭───────────────────────────────────────────────────────────────────────────────────────╮</span> <span style="color: #000080; text-decoration-color: #000080">│</span>
@@ -444,18 +381,12 @@ matterhelp()
 <span style="color: #000080; text-decoration-color: #000080">╰───────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭───────── </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">function</span><span style="color: #000000; text-decoration-color: #000000"> mattersetlog at </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0x7fed282cb700</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&gt;</span><span style="color: #000080; text-decoration-color: #000080"> ──────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #00ffff; text-decoration-color: #00ffff; font-style: italic">def </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">mattersetlog</span><span style="font-weight: bold">(</span>level<span style="font-weight: bold">)</span>:                                     <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span>                                                              <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">35</span><span style="font-style: italic"> attribute(s) not shown.</span> Run <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">inspect</span><span style="font-weight: bold">(</span>inspect<span style="font-weight: bold">)</span> for options. <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">╰──────────────────────────────────────────────────────────────╯</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────── </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">function</span><span style="color: #000000; text-decoration-color: #000000"> mattersetdebug at </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0x7fed282cb8b0</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&gt;</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #00ffff; text-decoration-color: #00ffff; font-style: italic">def </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">mattersetdebug</span><span style="font-weight: bold">(</span>enableDebugMode: bool = <span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">True</span><span style="font-weight: bold">)</span>:                           <span style="color: #000080; text-decoration-color: #000080">│</span>
@@ -468,15 +399,12 @@ matterhelp()
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 
-
-
-To get help on a specific method in that class, you can pass that in as an argument:
-
+To get help on a specific method in that class, you can pass that in as an
+argument:
 
 ```python
 matterhelp(devCtrl.SendCommand)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─ </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">bound</span><span style="color: #000000; text-decoration-color: #000000"> method ChipDeviceController.SendCommand of &lt;Controller for Fabric </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">000000000000000</span><span style="color: #000080; text-decoration-color: #000080">─╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #00ffff; text-decoration-color: #00ffff; font-style: italic">def </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">ChipDeviceController.SendCommand</span><span style="font-weight: bold">(</span>nodeid: int, endpoint: int, payload:                 <span style="color: #000080; text-decoration-color: #000080">│</span>
@@ -496,12 +424,10 @@ matterhelp(devCtrl.SendCommand)
 <span style="color: #000080; text-decoration-color: #000080">╰───────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 
-
-
 ## Log Levels
 
-By default on boot, the log level is set to `logging.ERROR`. If you would like to see more debug messages, you can set the logging level by doing so:
-
+By default on boot, the log level is set to `logging.ERROR`. If you would like
+to see more debug messages, you can set the logging level by doing so:
 
 ```python
 mattersetlog(logging.DEBUG)
@@ -509,22 +435,21 @@ mattersetlog(logging.DEBUG)
 
 To set it back:
 
-
 ```python
 mattersetlog(logging.WARNING)
 ```
 
 ## Pretty Printing
-The Matter REPL leverages the rich Python package heavily to do pretty printing of various data structures with appropriate colored formatting.
+
+The Matter REPL leverages the rich Python package heavily to do pretty printing
+of various data structures with appropriate colored formatting.
 
 This pretty printer is installed by default into the REPL environment:
-
 
 ```python
 a = {'value': [1, 2, 3, 4, [1, 2]]}
 a
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -541,17 +466,14 @@ a
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 # Check DocString for Clusters
 
-There are generated docstring for all clusters, you can check them by call `inspect()` on it, or `print(SomeCluster.__doc__)` directly.
-
+There are generated docstring for all clusters, you can check them by call
+`inspect()` on it, or `print(SomeCluster.__doc__)` directly.
 
 ```python
 print(Clusters.OnOff.__doc__)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Attributes:
         <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>: OnOff bool
@@ -580,15 +502,12 @@ Enums:
 
 </pre>
 
-
-
-You can check commands, attributes, events, enums or structs under some cluster separately.
-
+You can check commands, attributes, events, enums or structs under some cluster
+separately.
 
 ```python
 print(Clusters.AdministratorCommissioning.Commands.__doc__)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">        <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>: <span style="font-weight: bold">(</span>Require Timed Invoke<span style="font-weight: bold">)</span> <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">OpenCommissioningWindow</span><span style="font-weight: bold">(</span>commissioningTimeout: <span style="color: #008000; text-decoration-color: #008000">'uint'</span> = <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, 
 PAKEVerifier: <span style="color: #008000; text-decoration-color: #008000">'bytes'</span> = <span style="color: #008000; text-decoration-color: #008000">b''</span>, discriminator: <span style="color: #008000; text-decoration-color: #008000">'uint'</span> = <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, iterations: <span style="color: #008000; text-decoration-color: #008000">'uint'</span> = <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, salt: <span style="color: #008000; text-decoration-color: #008000">'bytes'</span>
@@ -598,13 +517,9 @@ PAKEVerifier: <span style="color: #008000; text-decoration-color: #008000">'byte
         <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>: <span style="font-weight: bold">(</span>Require Timed Invoke<span style="font-weight: bold">)</span> <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">RevokeCommissioning</span><span style="font-weight: bold">()</span>
 </pre>
 
-
-
-
 ```python
 print(Clusters.AccessControl.Attributes.__doc__)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">        <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>: Acl typing.List<span style="font-weight: bold">[</span>AccessControl.Structs.AccessControlEntry<span style="font-weight: bold">]</span>
         <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>: Extension typing.List<span style="font-weight: bold">[</span>AccessControl.Structs.ExtensionEntry<span style="font-weight: bold">]</span>
@@ -614,5 +529,3 @@ print(Clusters.AccessControl.Attributes.__doc__)
         <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">65532</span>: FeatureMap typing.Optional
         <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">65533</span>: ClusterRevision uint
 </pre>
-
-

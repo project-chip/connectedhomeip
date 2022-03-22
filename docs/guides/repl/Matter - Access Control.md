@@ -5,16 +5,21 @@
 </a>
 <br></br>
 
-This document explains how to use Access Control in Matter, and will be updated as development proceeds.
+This document explains how to use Access Control in Matter, and will be updated
+as development proceeds.
 
 ## What Does and Doesn’t Work Right Now?
 
-Briefly, you can read and write the entire ACL attribute in the all-clusters-app, but Access Control isn’t yet turned on, so it won’t affect interactions. There’s almost no error checking when writing the ACL attribute (e.g. ensuring subjects match auth mode, only your fabric can be written, etc.) so exercise caution for now.
+Briefly, you can read and write the entire ACL attribute in the
+all-clusters-app, but Access Control isn’t yet turned on, so it won’t affect
+interactions. There’s almost no error checking when writing the ACL attribute
+(e.g. ensuring subjects match auth mode, only your fabric can be written, etc.)
+so exercise caution for now.
 
 ## Clear Persisted Storage
 
-Let's clear out our persisted storage (if one exists) to start from a clean slate.
-
+Let's clear out our persisted storage (if one exists) to start from a clean
+slate.
 
 ```python
 import os, subprocess
@@ -26,18 +31,15 @@ if os.path.isfile('/tmp/repl-storage.json'):
 os.system('rm -rf /tmp/chip_*')
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>
 </pre>
 
-
-
 ## Initialization
 
-Let's first begin by setting up by importing some key modules that are needed to make it easier for us to interact with the Matter stack.
+Let's first begin by setting up by importing some key modules that are needed to
+make it easier for us to interact with the Matter stack.
 
 > **NOTE**: _This is not needed if you launch the REPL from the command-line._
-
 
 ```python
 import chip.native
@@ -46,12 +48,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 %run {module.path}
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -66,53 +64,30 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #000080; text-decoration-color: #000080">Fabric Admins have been loaded and are available at </span><span style="color: #800000; text-decoration-color: #800000">fabricAdmins</span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -120,14 +95,11 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
 ## Commission and Setup Server
 
 ### Launch Server
 
 Let's launch an instance of the `chip-all-clusters-app`.
-
 
 ```python
 import time, os
@@ -149,7 +121,6 @@ time.sleep(1)
 
 Commission the target with a NodeId of 1.
 
-
 ```python
 devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
 ```
@@ -160,22 +131,18 @@ devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
     Node address has been updated
     Commissioning complete
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">True</span>
 </pre>
 
-
-
 ## Bootstrap ACLs
 
-(For now) normally after commissioning there would be at least a single admin entry, but currently the ACL will be empty, so add that entry manually. This step will be removed later when it’s no longer necessary.
-
+(For now) normally after commissioning there would be at least a single admin
+entry, but currently the ACL will be empty, so add that entry manually. This
+step will be removed later when it’s no longer necessary.
 
 ```python
 await devCtrl.ReadAttribute(2, [ (0, Clusters.OperationalCredentials)], True)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -212,20 +179,16 @@ await devCtrl.ReadAttribute(2, [ (0, Clusters.OperationalCredentials)], True)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 acl = [ Clusters.AccessControl.Structs.AccessControlEntry(
     fabricIndex = 1,
     privilege = Clusters.AccessControl.Enums.Privilege.kAdminister,
     authMode = Clusters.AccessControl.Enums.AuthMode.kCase,
-    subjects = [ 1 ] ) 
+    subjects = [ 1 ] )
 ]
 
 acl
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -241,13 +204,9 @@ acl
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 await devCtrl.WriteAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl( acl ) ) ] )
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -262,14 +221,10 @@ await devCtrl.WriteAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl( acl
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 data = await devCtrl.ReadAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl) ] )
 data
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -291,14 +246,10 @@ data
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 acl = data[0][chip.clusters.Objects.AccessControl][chip.clusters.Objects.AccessControl.Attributes.Acl]
 acl
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -314,9 +265,6 @@ acl
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 acl.append(Clusters.AccessControl.Structs.AccessControlEntry(
     fabricIndex = 1,
@@ -327,7 +275,6 @@ acl.append(Clusters.AccessControl.Structs.AccessControlEntry(
     ) ] ) )
 acl
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -356,13 +303,9 @@ acl
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 await devCtrl.WriteAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl( acl ) ) ] )
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -377,13 +320,9 @@ await devCtrl.WriteAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl( acl
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 await devCtrl.ReadAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl ) ] )
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -417,5 +356,3 @@ await devCtrl.ReadAttribute(2, [ (0, Clusters.AccessControl.Attributes.Acl ) ] )
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="font-weight: bold">}</span>
 <span style="font-weight: bold">}</span>
 </pre>
-
-

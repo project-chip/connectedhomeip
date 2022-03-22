@@ -5,12 +5,13 @@
 </a>
 <br></br>
 
-This walks through the various interactions that can be initiated from the REPL towards a target using the Matter Interaction Model (IM) and Data Model (DM).
+This walks through the various interactions that can be initiated from the REPL
+towards a target using the Matter Interaction Model (IM) and Data Model (DM).
 
 ## Clear Persisted Storage
 
-Let's clear out our persisted storage (if one exists) to start from a clean slate.
-
+Let's clear out our persisted storage (if one exists) to start from a clean
+slate.
 
 ```python
 import os, subprocess
@@ -22,21 +23,17 @@ if os.path.isfile('/tmp/repl-storage.json'):
 os.system('rm -rf /tmp/chip_*')
 ```
 
-
-
-
     0
-
-
 
 ## Initialization
 
-Let's first begin by setting up by importing some key modules that are needed to make it easier for us to interact with the Matter stack.
+Let's first begin by setting up by importing some key modules that are needed to
+make it easier for us to interact with the Matter stack.
 
-`ChipReplStartup.py` is run within the global namespace. This results in all of its imports being made available here.
+`ChipReplStartup.py` is run within the global namespace. This results in all of
+its imports being made available here.
 
 > **NOTE**: _This is not needed if you launch the REPL from the command-line._
-
 
 ```python
 import chip.native
@@ -48,13 +45,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
     [0;34m[1643499271185] [10607:4156252] CHIP: [DL] _Init[0m
     [0;32m[1643499271185] [10607:4156669] CHIP: [DL] Platform main loop started.[0m
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -69,44 +61,26 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
 
-
-
     2022-01-29 15:34:31 johnsj-macbookpro1.roam.corp.google.com root[10607] ERROR [Errno 2] No such file or directory: '/tmp/repl-storage.json'
     2022-01-29 15:34:31 johnsj-macbookpro1.roam.corp.google.com root[10607] WARNING Could not load configuration from /tmp/repl-storage.json - resetting configuration...
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #af00ff; text-decoration-color: #af00ff">No previous fabric admins discovered in persistent storage - creating a new one...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -114,20 +88,25 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
 ## Cluster Elements
 
-The Interaction Model uses data model types that refer not just to the various base types defines in the spec, but types that correspond to structs/commands/events/attributes defined in each cluster specification. The cluster-specific types are referred to as 'cluster objects'. These are represented as Python dataclasses, with each field in the respective object equivalently named as a member within the dataclass.
+The Interaction Model uses data model types that refer not just to the various
+base types defines in the spec, but types that correspond to
+structs/commands/events/attributes defined in each cluster specification. The
+cluster-specific types are referred to as 'cluster objects'. These are
+represented as Python dataclasses, with each field in the respective object
+equivalently named as a member within the dataclass.
 
 ### Namespaces
 
-Objects in clusters are organized into namespaces. All clusters can be found under the `Clusters` namespace, with the appropriate cluster in upper camel case within that. (e.g `Clusters.TestCluster`).
+Objects in clusters are organized into namespaces. All clusters can be found
+under the `Clusters` namespace, with the appropriate cluster in upper camel case
+within that. (e.g `Clusters.TestCluster`).
 
-Within that, `Commands`, `Structs` and `Attributes` delimit the respective types in the cluster.
+Within that, `Commands`, `Structs` and `Attributes` delimit the respective types
+in the cluster.
 
 _Example Struct:_
-
 
 ```python
 v = Clusters.TestCluster.Structs.SimpleStruct()
@@ -140,7 +119,6 @@ v.g = 23.234
 
 v
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">SimpleStruct</span><span style="font-weight: bold">(</span>
@@ -155,15 +133,11 @@ v
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
 _Example Command:_
-
 
 ```python
 Clusters.TestCluster.Commands.TestAddArguments()
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">TestAddArguments</span><span style="font-weight: bold">(</span>
@@ -172,15 +146,11 @@ Clusters.TestCluster.Commands.TestAddArguments()
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
 To get more information about the fields in these objects and their types, run:
-
 
 ```python
 matterhelp(Clusters.TestCluster.Commands.TestAddArguments)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────── </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'chip.clusters.Objects.TestCluster.Commands.TestAddArguments'</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">&gt;</span><span style="color: #000080; text-decoration-color: #000080"> ─────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #00ffff; text-decoration-color: #00ffff; font-style: italic">def </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">TestCluster.Commands.TestAddArguments</span><span style="font-weight: bold">(</span>arg1: <span style="color: #008000; text-decoration-color: #008000">'uint'</span> = <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, arg2: <span style="color: #008000; text-decoration-color: #008000">'uint'</span> = <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span><span style="font-weight: bold">)</span> -&gt; <span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>: <span style="color: #000080; text-decoration-color: #000080">│</span>
@@ -213,21 +183,20 @@ matterhelp(Clusters.TestCluster.Commands.TestAddArguments)
 <span style="color: #000080; text-decoration-color: #000080">╰────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 
-
-
 ### Nullable Fields
 
-For fields that are nullable, they are represented as a `Typing.Union[Nullable, ...]`. This means that it can either be a `Nullable` type or the underlying type of the field.
+For fields that are nullable, they are represented as a
+`Typing.Union[Nullable, ...]`. This means that it can either be a `Nullable`
+type or the underlying type of the field.
 
-When nullable, a field can either take on the value of the native type, or a value of `NullValue`.
-
+When nullable, a field can either take on the value of the native type, or a
+value of `NullValue`.
 
 ```python
 a = Clusters.TestCluster.Structs.NullablesAndOptionalsStruct()
 a.nullableInt = Clusters.Types.NullValue
 a
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">NullablesAndOptionalsStruct</span><span style="font-weight: bold">(</span>
@@ -246,32 +215,28 @@ a
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
 ### Optional Fields
 
-If a field is optional, it is represented in the typing hints as a `Typing.Union[NoneType, ...]`. An optional field that isn't present has a value of `None`.
-
+If a field is optional, it is represented in the typing hints as a
+`Typing.Union[NoneType, ...]`. An optional field that isn't present has a value
+of `None`.
 
 ```python
 print(a.nullableOptionalInt)
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>
 </pre>
 
-
-
 ### Defaults
 
-Upon construction of a cluster object, the fields within that object are automatically initialized to type specific defaults as specified in the data model specification:
-
+Upon construction of a cluster object, the fields within that object are
+automatically initialized to type specific defaults as specified in the data
+model specification:
 
 ```python
 Clusters.TestCluster.Structs.SimpleStruct()
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">SimpleStruct</span><span style="font-weight: bold">(</span>
@@ -286,11 +251,10 @@ Clusters.TestCluster.Structs.SimpleStruct()
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
 ## IM Interactions
 
-This section will walk through the various types of IM Interactions that are possible in the REPL.
+This section will walk through the various types of IM Interactions that are
+possible in the REPL.
 
 ### Commission and Setup Server
 
@@ -300,12 +264,11 @@ Let's launch an instance of the `chip-all-clusters-app`.
 
 > NOTE: If you're interacting with real devices, this step can be skipped.
 
-
 ```python
 import time, os
 import subprocess
 
-# So that the all-clusters-app won't boot with stale prior state.    
+# So that the all-clusters-app won't boot with stale prior state.
 os.system('pkill -f chip-all-clusters-app')
 
 # The location of the all-clusters-app in the cloud playground is one level higher - adjust for this by testing for file presence.
@@ -313,7 +276,7 @@ if (os.path.isfile('../../../out/debug/chip-all-clusters-app')):
     appPath = '../../../out/debug/chip-all-clusters-app'
 else:
     appPath = '../../../../out/debug/chip-all-clusters-app'
-    
+
 process = subprocess.Popen(appPath, stdout=subprocess.DEVNULL)
 time.sleep(1)
 ```
@@ -321,7 +284,6 @@ time.sleep(1)
 #### Commission Target (Locally Launched App)
 
 Commission the target with a NodeId of 1.
-
 
 ```python
 devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
@@ -333,19 +295,17 @@ devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
     Node address has been updated
     Commissioning complete
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">True</span>
 </pre>
 
-
-
 #### Commission Target (BLE + Thread)
 
-To commission a Thread-based target over BLE, ensure your BLE stack is up on your host and available as `hci0` on Linux. You can confirm this by running `hciconfig -a`. You'll also need Thread credentials to join the Thread network.
+To commission a Thread-based target over BLE, ensure your BLE stack is up on
+your host and available as `hci0` on Linux. You can confirm this by running
+`hciconfig -a`. You'll also need Thread credentials to join the Thread network.
 
-> NOTE: MacOS Monterey is currently not supported due to issues with its BLE stack.
-
+> NOTE: MacOS Monterey is currently not supported due to issues with its BLE
+> stack.
 
 ```python
 devCtrl.CommissionThread(3840, 20202021, 2, b'\x01\x03\xff')
@@ -353,10 +313,12 @@ devCtrl.CommissionThread(3840, 20202021, 2, b'\x01\x03\xff')
 
 #### Commission Target (BLE + WiFi)
 
-To commission a Wifi-based target over BLE, ensure your BLE stack is up on your host and available as `hci0` on Linux. You can confirm this by running `hciconfig -a`. You'll also need Wifi credentials to join the Thread network.
+To commission a Wifi-based target over BLE, ensure your BLE stack is up on your
+host and available as `hci0` on Linux. You can confirm this by running
+`hciconfig -a`. You'll also need Wifi credentials to join the Thread network.
 
-> NOTE: MacOS Monterey is currently not supported due to issues with its BLE stack.
-
+> NOTE: MacOS Monterey is currently not supported due to issues with its BLE
+> stack.
 
 ```python
 devCtrl.CommissionWiFi(3840, 20202021, 2, 'MyWifiSsid', 'MyWifiPassword')
@@ -368,17 +330,18 @@ devCtrl.CommissionWiFi(3840, 20202021, 2, 'MyWifiSsid', 'MyWifiPassword')
 
 Let's send a basic command to turn on/off the light on Endpoint 1.
 
-
 ```python
 await devCtrl.SendCommand(2, 1, Clusters.OnOff.Commands.On())
 ```
 
-The receipt of a successful status response will result in the command just returning successfully. Otherwise, an exception will be thrown.
+The receipt of a successful status response will result in the command just
+returning successfully. Otherwise, an exception will be thrown.
 
 #### Basic Command (Failure Response)
 
-If we send the same command to an invalid endpoint, an exception is thrown. If an IM status code was received from the server, a `InteractionModelError` is thrown containing the IM status code:
-
+If we send the same command to an invalid endpoint, an exception is thrown. If
+an IM status code was received from the server, a `InteractionModelError` is
+thrown containing the IM status code:
 
 ```python
 try:
@@ -387,21 +350,17 @@ except Exception as e:
     pprint(e)
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800080; text-decoration-color: #800080; font-weight: bold">InteractionModelError</span><span style="font-weight: bold">(&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">Status.Failure:</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span><span style="font-weight: bold">&gt;)</span>
 </pre>
 
-
-
 #### Basic Command (Data Response)
 
-Here's an example of a command that sends back a data response, and how that is presented:
-
+Here's an example of a command that sends back a data response, and how that is
+presented:
 
 ```python
 await devCtrl.SendCommand(2, 1, Clusters.TestCluster.Commands.TestListInt8UReverseRequest([1, 3, 5, 7]))
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">TestListInt8UReverseResponse</span><span style="font-weight: bold">(</span>
@@ -414,22 +373,23 @@ await devCtrl.SendCommand(2, 1, Clusters.TestCluster.Commands.TestListInt8URever
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
 ### Read Interaction
 
-The `ReadAttribute` method on the `DeviceController` class can be used to read attributes from a target. The NodeId of the target is the first argument, followed by a list of paths that are expressed as cluster object namespaces to the respective slices of the data that is requested.
+The `ReadAttribute` method on the `DeviceController` class can be used to read
+attributes from a target. The NodeId of the target is the first argument,
+followed by a list of paths that are expressed as cluster object namespaces to
+the respective slices of the data that is requested.
 
-By default, the data is returned as a dictionary, with the top-level item representing the endpoint, then the cluster and the attribute. The latter two keys are expressed using cluster object namespaces.
+By default, the data is returned as a dictionary, with the top-level item
+representing the endpoint, then the cluster and the attribute. The latter two
+keys are expressed using cluster object namespaces.
 
 #### Read 1 attribute:
-
 
 ```python
 a = await devCtrl.ReadAttribute(2, [Clusters.TestCluster.Attributes.Int16u])
 a
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -441,13 +401,9 @@ a
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 a[1][Clusters.TestCluster]
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -455,26 +411,18 @@ a[1][Clusters.TestCluster]
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 a[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.Int16u]
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>
 </pre>
 
-
-
 #### Read 2 attributes:
-
 
 ```python
 await devCtrl.ReadAttribute(2, [Clusters.TestCluster.Attributes.Int16u, Clusters.TestCluster.Attributes.Boolean])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -487,17 +435,13 @@ await devCtrl.ReadAttribute(2, [Clusters.TestCluster.Attributes.Int16u, Clusters
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Read the entirety of a cluster on an endpoint:
 
 The path is represented as tuple of (endpoint, cluster)
 
-
 ```python
 await devCtrl.ReadAttribute(2, [(1, Clusters.OnOff)])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -515,15 +459,11 @@ await devCtrl.ReadAttribute(2, [(1, Clusters.OnOff)])
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Read the entirety of a cluster across all endpoints:
-
 
 ```python
 await devCtrl.ReadAttribute(2, [Clusters.OnOff])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -552,15 +492,11 @@ await devCtrl.ReadAttribute(2, [Clusters.OnOff])
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Read an endpoint:
-
 
 ```python
 await devCtrl.ReadAttribute(2, [2])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -605,10 +541,7 @@ await devCtrl.ReadAttribute(2, [2])
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Read the entire node:
-
 
 ```python
 await devCtrl.ReadAttribute(2, [('*')])
@@ -618,8 +551,6 @@ await devCtrl.ReadAttribute(2, [('*')])
     2022-01-25 16:58:32 johnsj-macbookpro1.roam.corp.google.com root[27801] ERROR For path: Endpoint = 1, Attribute = <class 'chip.clusters.Objects.NetworkCommissioning.Attributes.Networks'>, got IM Error: InteractionModelError: UnsupportedRead (0x8f)
     2022-01-25 16:58:32 johnsj-macbookpro1.roam.corp.google.com root[27801] ERROR For path: Endpoint = 1, Attribute = <class 'chip.clusters.Objects.TestCluster.Attributes.GeneralErrorBoolean'>, got IM Error: InteractionModelError: InvalidDataType (0x8d)
     2022-01-25 16:58:32 johnsj-macbookpro1.roam.corp.google.com root[27801] ERROR For path: Endpoint = 1, Attribute = <class 'chip.clusters.Objects.TestCluster.Attributes.ClusterErrorBoolean'>, got IM Error: InteractionModelError: Failure (0x1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -1636,17 +1567,16 @@ await devCtrl.ReadAttribute(2, [('*')])
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Alternative 'Cluster' View
 
-The above encapsulates each attribute as a 'cluster-object' key within the top-level cluster instance. Instead, an alternative view each attribute is represented as a field in the object can be retrieved by passing in `True` to the third argument:
-
+The above encapsulates each attribute as a 'cluster-object' key within the
+top-level cluster instance. Instead, an alternative view each attribute is
+represented as a field in the object can be retrieved by passing in `True` to
+the third argument:
 
 ```python
 await devCtrl.ReadAttribute(2, [2], True)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -1707,14 +1637,13 @@ await devCtrl.ReadAttribute(2, [2], True)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Read Events:
 
-A `ReadEvents` API exists that behaves similarly to the `ReadAttributes` API. It permits the same degrees of wildcard expression as its counterpart and follows the same format for expressing all wildcard permutations.
+A `ReadEvents` API exists that behaves similarly to the `ReadAttributes` API. It
+permits the same degrees of wildcard expression as its counterpart and follows
+the same format for expressing all wildcard permutations.
 
 #### Read all events:
-
 
 ```python
 # Force an event to get emitted.
@@ -1722,7 +1651,6 @@ await devCtrl.SendCommand(2, 1, Clusters.TestCluster.Commands.TestEmitTestEventR
 
 await devCtrl.ReadEvent(2, [('*')])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -1757,12 +1685,11 @@ await devCtrl.ReadEvent(2, [('*')])
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
 ### Subscription Interaction
 
-To subscribe to a Node, the same `ReadAttributes` API is used to trigger a subscription, with a valid `reportInterval` tuple passed in being used as a way to indicate the request to create a subscription.
-
+To subscribe to a Node, the same `ReadAttributes` API is used to trigger a
+subscription, with a valid `reportInterval` tuple passed in being used as a way
+to indicate the request to create a subscription.
 
 ```python
 reportingTimingParams = (0, 2) # MinInterval = 0s, MaxInterval = 2s
@@ -1770,17 +1697,12 @@ subscription = await devCtrl.ReadAttribute(2, [(2, Clusters.OnOff)], True, repor
 subscription
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">Subscription</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">Id</span><span style="color: #000000; text-decoration-color: #000000">=</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6469889299346410316</span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">)</span><span style="font-weight: bold">&gt;</span>
 </pre>
-
-
-
 
 ```python
 subscription.GetAttributes()
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -1799,14 +1721,14 @@ subscription.GetAttributes()
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 #### Trigger Report
 
-To trigger a report, let's alter the state of the on/off switch on EP1. That should trigger the generation of a set of attribute reports.
+To trigger a report, let's alter the state of the on/off switch on EP1. That
+should trigger the generation of a set of attribute reports.
 
-The `SubscriptionTransaction` object returned by `ReadAttribute` permits installing a callback that is invoked on any attribute report. A default callback is installed above that just dumps out the attribute data.
-
+The `SubscriptionTransaction` object returned by `ReadAttribute` permits
+installing a callback that is invoked on any attribute report. A default
+callback is installed above that just dumps out the attribute data.
 
 ```python
 await devCtrl.SendCommand(2, 2, Clusters.OnOff.Commands.On())
@@ -1815,8 +1737,6 @@ time.sleep(1)
 
     Attribute Changed:
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Endpoint'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Attribute'</span>: <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'chip.clusters.Objects.OnOff.Attributes.OnOff'</span><span style="font-weight: bold">&gt;</span>,
@@ -1824,11 +1744,7 @@ time.sleep(1)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
     Attribute Changed:
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Endpoint'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,
@@ -1837,11 +1753,7 @@ time.sleep(1)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
     Attribute Changed:
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Endpoint'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,
@@ -1850,17 +1762,12 @@ time.sleep(1)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 await devCtrl.SendCommand(2, 2, Clusters.OnOff.Commands.Off())
 time.sleep(1)
 ```
 
     Attribute Changed:
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Endpoint'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,
@@ -1869,11 +1776,7 @@ time.sleep(1)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
     Attribute Changed:
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #008000; text-decoration-color: #008000">'Endpoint'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,
@@ -1882,26 +1785,20 @@ time.sleep(1)
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 subscription.Shutdown()
 ```
 
 #### Subscribe to Events
 
-
 ```python
 reportingTimingParams = (0, 2) # MinInterval = 0s, MaxInterval = 2s
 subscription = await devCtrl.ReadEvent(2, [()], reportingTimingParams)
 ```
 
-
 ```python
 subscription.GetEvents()
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -1936,12 +1833,10 @@ subscription.GetEvents()
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
 ### Trigger Event
 
-Force an event to get emitted, which after a short while, should generate a report and trigger the print out of the received event:
-
+Force an event to get emitted, which after a short while, should generate a
+report and trigger the print out of the received event:
 
 ```python
 await devCtrl.SendCommand(2, 1, Clusters.TestCluster.Commands.TestEmitTestEventRequest())
@@ -1949,8 +1844,6 @@ time.sleep(3)
 ```
 
     Received Event:
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800080; text-decoration-color: #800080; font-weight: bold">EventReadResult</span><span style="font-weight: bold">(</span>
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="color: #808000; text-decoration-color: #808000">Header</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">EventHeader</span><span style="font-weight: bold">(</span>
@@ -1982,22 +1875,19 @@ time.sleep(3)
 <span style="font-weight: bold">)</span>
 </pre>
 
-
-
-
 ```python
 subscription.Shutdown()
 ```
 
 ### Write Interaction
 
-To write attribute data, the `WriteAttribute` API can be used. It requires a NodeId and a list of cluster object encapsulated data for the attribute being written.
-
+To write attribute data, the `WriteAttribute` API can be used. It requires a
+NodeId and a list of cluster object encapsulated data for the attribute being
+written.
 
 ```python
 await devCtrl.WriteAttribute(2, [ (1, Clusters.TestCluster.Attributes.Int16u(2)) ])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -2012,13 +1902,9 @@ await devCtrl.WriteAttribute(2, [ (1, Clusters.TestCluster.Attributes.Int16u(2))
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-
 ```python
 await devCtrl.ReadAttribute(2, [ (1, Clusters.TestCluster.Attributes.Int16u) ])
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -2029,5 +1915,3 @@ await devCtrl.ReadAttribute(2, [ (1, Clusters.TestCluster.Attributes.Int16u) ])
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="font-weight: bold">}</span>
 <span style="font-weight: bold">}</span>
 </pre>
-
-

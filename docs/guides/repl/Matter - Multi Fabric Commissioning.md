@@ -5,18 +5,26 @@
 </a>
 <br></br>
 
-This walks through creating multiple controllers on multiple fabrics, using those controllers to commission a target onto those fabrics and finally, interacting with them using the interaction model.
+This walks through creating multiple controllers on multiple fabrics, using
+those controllers to commission a target onto those fabrics and finally,
+interacting with them using the interaction model.
 
 ## FabricAdmins and Controllers
 
-The `FabricAdmin` class (present in the `chip.FabricAdmin` package) is responsible for adminstering a fabric. It houses the Fabric ID and Index, as well as an RCAC and ICAC that provides the certificate material grounding that fabric.
+The `FabricAdmin` class (present in the `chip.FabricAdmin` package) is
+responsible for adminstering a fabric. It houses the Fabric ID and Index, as
+well as an RCAC and ICAC that provides the certificate material grounding that
+fabric.
 
-The `FabricAdmin` can be used to vend `ChipDeviceController` objects that represent a controller instance with a specific identity grounded in the admin's fabric. This controller can then be used to commission and interact with devices.
+The `FabricAdmin` can be used to vend `ChipDeviceController` objects that
+represent a controller instance with a specific identity grounded in the admin's
+fabric. This controller can then be used to commission and interact with
+devices.
 
 ## Clear Persisted Storage
 
-Let's clear out our persisted storage (if one exists) to start from a clean slate.
-
+Let's clear out our persisted storage (if one exists) to start from a clean
+slate.
 
 ```python
 import os, subprocess
@@ -24,18 +32,19 @@ import os, subprocess
 if os.path.isfile('/tmp/repl-storage.json'):
     os.remove('/tmp/repl-storage.json')
 
-# So that the all-clusters-app won't boot with stale prior state.    
+# So that the all-clusters-app won't boot with stale prior state.
 os.system('rm -rf /tmp/chip_*')
 ```
 
 ## Initialization
 
-Let's first begin by setting up by importing some key modules that are needed to make it easier for us to interact with the Matter stack.
+Let's first begin by setting up by importing some key modules that are needed to
+make it easier for us to interact with the Matter stack.
 
-`ChipReplStartup.py` is run within the global namespace. This results in all of its imports being made available here.
+`ChipReplStartup.py` is run within the global namespace. This results in all of
+its imports being made available here.
 
 > **NOTE**: _This is not needed if you launch the REPL from the command-line._
-
 
 ```python
 import chip.native
@@ -44,12 +53,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 %run {module.path}
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -64,44 +69,26 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
 
-
-
     2022-01-25 16:58:57 johnsj-macbookpro1.roam.corp.google.com root[27921] ERROR [Errno 2] No such file or directory: '/tmp/repl-storage.json'
     2022-01-25 16:58:57 johnsj-macbookpro1.roam.corp.google.com root[27921] WARNING Could not load configuration from /tmp/repl-storage.json - resetting configuration...
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #af00ff; text-decoration-color: #af00ff">No previous fabric admins discovered in persistent storage - creating a new one...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -109,15 +96,14 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
-At startup, the REPL will attempt to find any previously configured fabrics stored in persisted storage. If it can't find any (as is the case here), it will construct a default `FabricAdmin` object on Fabric 1 (Index 1) as well as construct a device controller (`devCtrl`) on that fabric.
-
+At startup, the REPL will attempt to find any previously configured fabrics
+stored in persisted storage. If it can't find any (as is the case here), it will
+construct a default `FabricAdmin` object on Fabric 1 (Index 1) as well as
+construct a device controller (`devCtrl`) on that fabric.
 
 ```python
 fabricAdmins
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span>
@@ -125,27 +111,21 @@ fabricAdmins
 <span style="font-weight: bold">]</span>
 </pre>
 
-
-
-You can check the underlying fabric info by typing the name directly in the repl.
-
+You can check the underlying fabric info by typing the name directly in the
+repl.
 
 ```python
 devCtrl
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">Controller</span><span style="color: #000000; text-decoration-color: #000000"> for Fabric </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0000000000000001</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">(</span><span style="color: #000000; text-decoration-color: #000000">Compressed Fabric Id: b75777b5840b9309</span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">)</span><span style="font-weight: bold">&gt;</span>
 </pre>
-
-
 
 ### Commission onto Fabric 1
 
 #### Launch Server
 
 Let's launch an instance of the `chip-all-clusters-app`.
-
 
 ```python
 import time, os
@@ -165,8 +145,8 @@ time.sleep(1)
 
 #### Commission Target
 
-Commission the target onto Fabric 1 using the default device controller instance with a NodeId of 1.
-
+Commission the target onto Fabric 1 using the default device controller instance
+with a NodeId of 1.
 
 ```python
 devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
@@ -179,22 +159,16 @@ devCtrl.CommissionIP(b'127.0.0.1', 20202021, 2)
 
     Commissioning complete
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">True</span>
 </pre>
-
-
 
 ### Read OpCreds Cluster
 
 Read out the OpCreds cluster to confirm membership into Fabric 1.
 
-
 ```python
 await devCtrl.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fabrics)], fabricFiltered=False)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -216,12 +190,9 @@ await devCtrl.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fabr
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 ### Commission onto Fabric 2
 
 #### Create new FabricAdmin
-
 
 ```python
 import chip.FabricAdmin as FabricAdmin
@@ -230,14 +201,11 @@ fabric2 = FabricAdmin.FabricAdmin(fabricId = 2, fabricIndex = 2)
 
     New FabricAdmin: FabricId: 2(2)
 
-
 Here's a brief peek at the JSON data that is in the persisted storage file.
-
 
 ```python
 builtins.chipStack.GetStorageManager().jsonData
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -269,9 +237,6 @@ builtins.chipStack.GetStorageManager().jsonData
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-
 ```python
 devCtrl2 = fabric2.NewController()
 devCtrl2
@@ -282,20 +247,14 @@ devCtrl2
 
     Allocating new controller with FabricId: 2(2), NodeId: 2
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">Controller</span><span style="color: #000000; text-decoration-color: #000000"> for Fabric </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0000000000000002</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">(</span><span style="color: #000000; text-decoration-color: #000000">Compressed Fabric Id: b68c0efe11caa83c</span><span style="color: #000000; text-decoration-color: #000000; font-weight: bold">)</span><span style="font-weight: bold">&gt;</span>
 </pre>
 
-
-
 #### Open Commissioning Window
-
 
 ```python
 await devCtrl.SendCommand(2, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=1000)
 ```
-
 
 ```python
 devCtrl2.CommissionIP(b'127.0.0.1', 20202021, 2)
@@ -307,22 +266,16 @@ devCtrl2.CommissionIP(b'127.0.0.1', 20202021, 2)
 
     Commissioning complete
 
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">True</span>
 </pre>
-
-
 
 ### Read OpCreds Cluster
 
 Read out the OpCreds cluster to confirm membership into Fabric 2.
 
-
 ```python
 await devCtrl2.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fabrics)], fabricFiltered=False)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -352,12 +305,10 @@ await devCtrl2.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fab
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
 ## Relaunch REPL
 
-Let's simulate re-launching the REPL to show-case the capabilities of the persistence storage and its mechanics.
-
+Let's simulate re-launching the REPL to show-case the capabilities of the
+persistence storage and its mechanics.
 
 ```python
 import chip.native
@@ -366,12 +317,8 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 %run {module.path}
 ```
 
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">──────────────────────────────────────── </span>Matter REPL<span style="color: #00ff00; text-decoration-color: #00ff00"> ────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -386,62 +333,35 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">            </span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00; text-decoration-color: #00ff00">─────────────────────────────────────────────────────────────────────────────────────────────</span>
 </pre>
-
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 1(1)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Restoring FabricAdmin from storage to manage FabricId </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">2</span><span style="color: #af00ff; text-decoration-color: #af00ff">, FabricIndex </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">2</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     New FabricAdmin: FabricId: 2(2)
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="color: #000080; text-decoration-color: #000080">Fabric Admins have been loaded and are available at </span><span style="color: #800000; text-decoration-color: #800000">fabricAdmins</span>
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
 </pre>
 
-
-
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #af00ff; text-decoration-color: #af00ff">Creating default device controller on fabric </span><span style="color: #af00ff; text-decoration-color: #af00ff; font-weight: bold">1</span><span style="color: #af00ff; text-decoration-color: #af00ff">...</span>
 </pre>
 
-
-
     Allocating new controller with FabricId: 1(1), NodeId: 1
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 
@@ -449,22 +369,25 @@ module = pkgutil.get_loader('chip.ChipReplStartup')
 <span style="color: #000080; text-decoration-color: #000080; font-weight: bold">available as </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">devCtrl</span>
 </pre>
 
-
-
-The REPL has now loaded the two fabrics that were created in the previous session into the `fabricAdmins` variable. It has also created a default controller on the first fabric in that list (Fabric 1) as `devCtrl`.
+The REPL has now loaded the two fabrics that were created in the previous
+session into the `fabricAdmins` variable. It has also created a default
+controller on the first fabric in that list (Fabric 1) as `devCtrl`.
 
 ### Establish CASE and Read OpCreds
 
-To prove that we do indeed have two distinct fabrics and controllers on each fabric, let's go ahead and update the label of each fabric. To do so, you'd need to succcessfully establish a CASE session through a controller on the respective fabric, and call the 'UpdateLabel' command.
+To prove that we do indeed have two distinct fabrics and controllers on each
+fabric, let's go ahead and update the label of each fabric. To do so, you'd need
+to succcessfully establish a CASE session through a controller on the respective
+fabric, and call the 'UpdateLabel' command.
 
-Underneath the covers, each device controller will do operational discovery of the NodeId being read and establish a CASE session before issuing the IM interaction.
-
+Underneath the covers, each device controller will do operational discovery of
+the NodeId being read and establish a CASE session before issuing the IM
+interaction.
 
 ```python
 await devCtrl.SendCommand(2, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("Fabric1Label"))
 await devCtrl.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fabrics)], fabricFiltered=False)
 ```
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -494,10 +417,8 @@ await devCtrl.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fabr
 <span style="font-weight: bold">}</span>
 </pre>
 
-
-
-Instantiate a controller on fabric 2 and use it to read out the op creds from that fabric.
-
+Instantiate a controller on fabric 2 and use it to read out the op creds from
+that fabric.
 
 ```python
 devCtrl2 = fabricAdmins[1].NewController()
@@ -513,8 +434,6 @@ await devCtrl2.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fab
 
 
     2022-03-21 17:53:10 songguo.sha.corp.google.com chip.SC[2635279] ERROR The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.
-
-
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">{</span>
@@ -543,9 +462,6 @@ await devCtrl2.ReadAttribute(2, [(Clusters.OperationalCredentials.Attributes.Fab
 <span style="color: #7fbf7f; text-decoration-color: #7fbf7f">│   </span><span style="font-weight: bold">}</span>
 <span style="font-weight: bold">}</span>
 </pre>
-
-
-
 
 ```python
 devCtrl2.Shutdown()
