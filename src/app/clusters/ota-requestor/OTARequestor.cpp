@@ -104,8 +104,6 @@ OTARequestorInterface * GetRequestorInstance()
 
 void OTARequestor::InitState(intptr_t context)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::InitState");
-
     OTARequestor * requestorCore = reinterpret_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
@@ -116,8 +114,6 @@ void OTARequestor::InitState(intptr_t context)
     //   resetting the states appropriately, including the current update state.
     OtaRequestorServerSetUpdateState(requestorCore->mCurrentUpdateState);
     OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::InitState exit");
 }
 
 CHIP_ERROR OTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
@@ -142,8 +138,6 @@ CHIP_ERROR OTARequestor::Init(Server & server, OTARequestorStorage & storage, OT
 
 void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnQueryImageResponse");
-
     LogQueryImageResponse(response);
 
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
@@ -218,14 +212,10 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
         break;
     }
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnQueryImageResponse Exit");
 }
 
 void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnQueryImageFailure");
-    
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
@@ -240,14 +230,10 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
     }
 
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnQueryImageFailure Exit");
 }
 
 void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnApplyUpdateResponse");
-
     LogApplyUpdateResponse(response);
 
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
@@ -267,39 +253,26 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
         requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         break;
     }
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnApplyUpdateResponse Exit");
 }
 
 void OTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnApplyUpdateFailure");
-
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
     ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, error);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnApplyUpdateFailure Exit");
 }
 
-void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) 
-{
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnNotifyUpdateAppliedResponse - Does nothing");
-}
+void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
 
 void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnNotifyUpdateAppliedFailure");
-
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
     ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnNotifyUpdateAppliedFailure Exit");
 }
 
 void OTARequestor::Reset()
@@ -322,8 +295,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const AnnounceOtaProvider::DecodableType & commandData)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::HandleAnnounceOTAProvider");
-
     auto & announcementReason = commandData.announcementReason;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
@@ -350,15 +321,11 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::HandleAnnounceOTAProvider Exit");
-
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::ConnectToProvider");
-    
     if (mServer == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Server not set");
@@ -396,13 +363,10 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::ConnectToProvider Exit");
 }
 
 void OTARequestor::DisconnectFromProvider()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::DisconnectFromProvider");
-
     if (mServer == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Server not set");
@@ -426,23 +390,17 @@ void OTARequestor::DisconnectFromProvider()
     }
 
     mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::DisconnectFromProvider Exit");
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
 // cleared, UpdateState is reset to Idle
 void OTARequestor::CancelImageUpdate()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::CancelImageUpdate");
-
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
 
     mOtaRequestorDriver->UpdateCancelled();
 
     Reset();
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::CancelImageUpdate Exit");
 }
 
 CHIP_ERROR OTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -461,8 +419,6 @@ CHIP_ERROR OTARequestor::GetUpdateStateAttribute(EndpointId endpointId, OTAUpdat
 // Called whenever FindOrEstablishSession is successful
 void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnConnected");
-
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
     VerifyOrDie(deviceProxy != nullptr);
@@ -516,15 +472,11 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     default:
         break;
     }
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnConnected Exit");
 }
 
 // Called whenever FindOrEstablishSession fails
 void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnConnectionFailure");
-
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
@@ -545,29 +497,21 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     default:
         break;
     }
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnConnectionFailure Exit");
 }
 
 // Sends the QueryImage command to the Provider currently set in the OTARequestor
 void OTARequestor::TriggerImmediateQueryInternal()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::TriggerImmediateQueryInternal");
-
     // We are now connecting to a provider for the purpose of sending a QueryImage,
     // treat this as a move to the Querying state
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
     ConnectToProvider(kQueryImage);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::TriggerImmediateQueryInternal Exit");
 }
 
 // Sends the QueryImage command to the next available Provider
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::TriggerImmediateQuery");
-
     ProviderLocationType providerLocation;
     bool listExhausted = false;
     if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation, listExhausted) != true)
@@ -581,30 +525,22 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
     // Go through the driver as it has additional logic to execute
     mOtaRequestorDriver->SendQueryImage();
 
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::TriggerImmediateQuery Exit");
-
     return kTriggerSuccessful;
 }
 
 void OTARequestor::DownloadUpdate()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::DownloadUpdate");
-
     RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
     ConnectToProvider(kDownload);
 }
 
 void OTARequestor::DownloadUpdateDelayedOnUserConsent()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::DownloadUpdateDelayedOnUserConsent");
-
     RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnUserConsent, OTAChangeReasonEnum::kSuccess);
 }
 
 void OTARequestor::ApplyUpdate()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::ApplyUpdate");
-
     RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
 
     // If image is successfully applied, the device will reboot so persist all relevant data
@@ -615,8 +551,6 @@ void OTARequestor::ApplyUpdate()
 
 void OTARequestor::NotifyUpdateApplied()
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::NotifyUpdateApplied");
-
     // Log the VersionApplied event
     uint16_t productId;
     if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
@@ -633,8 +567,6 @@ void OTARequestor::NotifyUpdateApplied()
 
 CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::ClearDefaultOtaProviderList");
-
     CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
 
     // Ignore the error if no entry for the associated fabric index has been found.
@@ -646,8 +578,6 @@ CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 
 CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::AddDefaultOtaProvider");
-
     // Look for an entry with the same fabric index indicated
     auto iterator = mDefaultOtaProviderList.Begin();
     while (iterator.Next())
@@ -667,18 +597,14 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocationType & prov
 
 void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnDownloadStateChanged");
-
     VerifyOrDie(mOtaRequestorDriver != nullptr);
 
     switch (state)
     {
     case OTADownloader::State::kComplete:
-        ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnDownloadStateChanged - OTADownloader::State::kComplete");
         mOtaRequestorDriver->UpdateDownloaded();
         break;
     case OTADownloader::State::kIdle:
-        ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnDownloadStateChanged - OTADownloader::State::kIdle");
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             // TODO: Should we call some driver API to give it a chance to reschedule?

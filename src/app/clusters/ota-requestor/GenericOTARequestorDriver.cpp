@@ -409,7 +409,7 @@ void GenericOTARequestorDriver::StartPeriodicQueryTimer()
 
 void GenericOTARequestorDriver::StopPeriodicQueryTimer()
 {
-    ChipLogProgress(SoftwareUpdate, "Stopping the Default Provider timer");
+    ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
     CancelDelayedAction(
         [](System::Layer *, void * context) {
             (static_cast<GenericOTARequestorDriver *>(context))->PeriodicQueryTimerHandler(nullptr, context);
@@ -471,8 +471,6 @@ void GenericOTARequestorDriver::StopWatchdogTimer()
 
 void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
 {
-    ChipLogProgress(SoftwareUpdate, "//is: StartSelectedTimer");
-
     switch (timer)
     {
         case SelectedTimer::kPeriodicQueryTimer:
@@ -488,8 +486,6 @@ void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
 
 void GenericOTARequestorDriver::StopSelectedTimer(SelectedTimer timer)
 {
-    ChipLogProgress(SoftwareUpdate, "//is: StopSelectedTimer");
-
     switch (timer)
     {
         case SelectedTimer::kPeriodicQueryTimer:
