@@ -34,7 +34,7 @@ OnOffManager * gOnOffManagerTable[kOnffManagerTableSize] = { nullptr };
 
 }
 
-void emberAfOnOffClusterInitCallback(EndpointId endpoint) 
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App::OnOff::PostClusterInit");
     TvAppJNIMgr().PostClusterInit(chip::app::Clusters::OnOff::Id, endpoint);
@@ -53,7 +53,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);   
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gOnOffManagerTable[ep]);
 }
 

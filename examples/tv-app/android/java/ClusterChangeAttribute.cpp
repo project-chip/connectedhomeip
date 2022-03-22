@@ -33,7 +33,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         bool onoff = static_cast<bool>(*value);
 
         ChipLogProgress(Zcl, "Received on/off command endpoint %d value = %d", static_cast<int>(attributePath.mEndpointId), onoff);
-        
+
         OnOffManager().PostOnOffChanged(attributePath.mEndpointId, onoff);
     }
 }
