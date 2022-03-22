@@ -65,6 +65,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
     bool failSafeArmed;
 
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<CC13X2_26X2Config>::Init();
+    ReturnErrorOnFailure(err);
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
