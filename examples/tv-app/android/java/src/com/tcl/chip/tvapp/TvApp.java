@@ -54,6 +54,10 @@ public class TvApp {
 
   public native void setChannelManager(int endpoint, ChannelManager manager);
 
+  public native void setOnOffManager(int endpoint, OnOffManager manager);
+
+  public native boolean SetOnOff(int endpoint, boolean value);
+
   public native void setDACProvider(DACProvider provider);
 
   static {
