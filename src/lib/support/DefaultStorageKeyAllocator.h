@@ -43,7 +43,7 @@ public:
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // FailSafeContext
-    const char * FailSafeContextKey() { return Format("fsc"); }
+    const char * FailSafeContextKey() { return Format("g/fsc"); }
 
     // Access Control List
 
