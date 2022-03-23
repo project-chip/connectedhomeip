@@ -28,6 +28,8 @@
 #include <platform/CHIPDeviceEvent.h>
 
 #include <esp_event.h>
+#include <esp_netif_types.h>
+#include <esp_wifi_types.h>
 
 namespace chip {
 namespace DeviceLayer {
