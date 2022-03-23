@@ -276,11 +276,9 @@ class {{filename}}Suite: public TestCommand
         {{> maybeWait }}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
-        {{#if isGroupCommand}}
-        cluster.AssociateWithGroup({{>device}}, groupId);
-        {{else}}
+        {{#unless isGroupCommand}}
         cluster.Associate({{>device}}, endpoint);
-        {{/if}}
+        {{/unless}}
 
         {{#if (chip_tests_item_has_list)}} ListFreer listFreer;{{/if}}
         {{#chip_tests_item_parameters}}
@@ -289,11 +287,19 @@ class {{filename}}Suite: public TestCommand
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}
+        {{#if isGroupCommand}}
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(groupId, {{>device}}->GetSecureSession().Value()->GetFabricIndex(), {{>device}}->GetDeviceId(),{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
+            {{~> maybeTimedInteractionTimeout ~}}
+            {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
+            ));
+          {{> maybeWait }}
+        {{else}}
           ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
             {{~> maybeTimedInteractionTimeout ~}}
             {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
             ));
           {{> maybeWait }}
+        {{/if}}
         {{else if isReadEvent}}
           ReturnErrorOnFailure(cluster.ReadEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
         {{else if isSubscribeEvent}}

@@ -42,15 +42,6 @@ CHIP_ERROR ClusterBase::Associate(DeviceProxy * device, EndpointId endpoint)
     return err;
 }
 
-CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId)
-{
-    // TODO Update this function to work in all possible conditions Issue #11850
-    mDevice   = device;
-    mEndpoint = 0; // Set to 0 for now.
-    mGroupId.SetValue(groupId);
-    return CHIP_NO_ERROR;
-}
-
 void ClusterBase::Dissociate()
 {
     mDevice = nullptr;
