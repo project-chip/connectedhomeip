@@ -73,9 +73,9 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
-    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this));
     ReturnErrorOnFailure(CommitToStorage());
+    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
 
     return CHIP_NO_ERROR;
 }
