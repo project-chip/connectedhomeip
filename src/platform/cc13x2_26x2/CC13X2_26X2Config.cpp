@@ -231,7 +231,6 @@ CHIP_ERROR CC13X2_26X2Config::ReadKVS(const char * key, void * value, size_t val
         read_len = value_size;
     }
 
-
     VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, read_len, value) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
