@@ -436,6 +436,12 @@ private:
      */
     CHIP_ERROR StoreFabricIndexInfo() const;
 
+    /**
+     * Read our fabric index info from the given TLV reader and set up the
+     * fabric table accordingly.
+     */
+    CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
+
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
 

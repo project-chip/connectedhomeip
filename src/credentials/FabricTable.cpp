@@ -756,7 +756,10 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
 
     if (!mNextAvailableFabricIndex.HasValue())
     {
-        // We have one available now.
+        // We must have been in a situation where CHIP_CONFIG_MAX_FABRICS is 254
+        // and our fabric table was full, so there was no valid next index.  We
+        // have a single available index now, though; use it as
+        // mNextAvailableFabricIndex.
         mNextAvailableFabricIndex.SetValue(index);
     }
     // If StoreFabricIndexInfo fails here, that's probably OK.  When we try to
@@ -828,68 +831,7 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-        ReturnErrorOnFailure(reader.Next(kNextAvailableFabricIndexTag));
-        if (reader.GetType() == TLV::kTLVType_Null)
-        {
-            mNextAvailableFabricIndex.ClearValue();
-        }
-        else
-        {
-            ReturnErrorOnFailure(reader.Get(mNextAvailableFabricIndex.Emplace()));
-        }
-
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, kFabricIndicesTag));
-        TLV::TLVType arrayType;
-        ReturnErrorOnFailure(reader.EnterContainer(arrayType));
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            if (mFabricCount >= ArraySize(mStates))
-            {
-                // We have nowhere to deserialize this fabric info into.
-                return CHIP_ERROR_NO_MEMORY;
-            }
-
-            auto & fabric = mStates[mFabricCount];
-            ReturnErrorOnFailure(reader.Get(fabric.mFabricIndex));
-
-            err = LoadFromStorage(&fabric);
-            if (err == CHIP_NO_ERROR)
-            {
-                ++mFabricCount;
-            }
-            else
-            {
-                // This could happen if we failed to store our fabric index info
-                // after we deleted the fabric from storage.  Just ignore this
-                // fabric index and keep going.
-            }
-        }
-
-        if (err != CHIP_END_OF_TLV)
-        {
-            return err;
-        }
-
-        ReturnErrorOnFailure(reader.ExitContainer(arrayType));
-        ReturnErrorOnFailure(reader.ExitContainer(containerType));
-        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-        if (!mNextAvailableFabricIndex.HasValue() && mFabricCount < kMaxValidFabricIndex)
-        {
-            // We must have a fabric index available here. This situation could
-            // happen if we fail to store fabric index info when deleting a
-            // fabric.
-            mNextAvailableFabricIndex.SetValue(kMinValidFabricIndex);
-            if (FindFabricWithIndex(kMinValidFabricIndex))
-            {
-                UpdateNextAvailableFabricIndex();
-            }
-        }
+        ReturnErrorOnFailure(ReadFabricInfo(reader));
     }
 
     return CHIP_NO_ERROR;
@@ -976,6 +918,75 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
 
     DefaultStorageKeyAllocator keyAlloc;
     ReturnErrorOnFailure(mStorage->SyncSetKeyValue(keyAlloc.FabricIndexInfo(), buf, static_cast<uint16_t>(indexInfoLength)));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
+{
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(reader.Next(kNextAvailableFabricIndexTag));
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        mNextAvailableFabricIndex.ClearValue();
+    }
+    else
+    {
+        ReturnErrorOnFailure(reader.Get(mNextAvailableFabricIndex.Emplace()));
+    }
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, kFabricIndicesTag));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    CHIP_ERROR err;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (mFabricCount >= ArraySize(mStates))
+        {
+            // We have nowhere to deserialize this fabric info into.
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        auto & fabric = mStates[mFabricCount];
+        ReturnErrorOnFailure(reader.Get(fabric.mFabricIndex));
+
+        err = LoadFromStorage(&fabric);
+        if (err == CHIP_NO_ERROR)
+        {
+            ++mFabricCount;
+        }
+        else
+        {
+            // This could happen if we failed to store our fabric index info
+            // after we deleted the fabric from storage.  Just ignore this
+            // fabric index and keep going.
+        }
+    }
+
+    if (err != CHIP_END_OF_TLV)
+    {
+        return err;
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+
+    if (!mNextAvailableFabricIndex.HasValue() && mFabricCount < kMaxValidFabricIndex)
+    {
+        // We must have a fabric index available here. This situation could
+        // happen if we fail to store fabric index info when deleting a
+        // fabric.
+        mNextAvailableFabricIndex.SetValue(kMinValidFabricIndex);
+        if (FindFabricWithIndex(kMinValidFabricIndex))
+        {
+            UpdateNextAvailableFabricIndex();
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
