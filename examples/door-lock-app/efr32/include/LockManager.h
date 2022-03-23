@@ -42,7 +42,7 @@ public:
         kState_UnlockingInitiated,
         kState_UnlockingCompleted,
     } State;
-    
+
     LockManager() {}
 
     bool InitEndpoint(chip::EndpointId endpointId);

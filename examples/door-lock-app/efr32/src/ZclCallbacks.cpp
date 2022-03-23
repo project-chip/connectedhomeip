@@ -43,7 +43,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         emberAfDoorLockClusterPrintln("Door Lock attribute changed");
     }
-    
+
 }
 
 /** @brief OnOff Cluster Init
