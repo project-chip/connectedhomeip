@@ -656,7 +656,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     mOtaRequestorDriver->HandleStateTransition(mCurrentUpdateState, newState, reason, error);
 
     mCurrentUpdateState = newState;
-
+    
     ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordNewUpdateState Exit");
 }
 
