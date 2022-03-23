@@ -23,6 +23,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/ClusterEnums.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/GeneralFaults.h>
 
@@ -41,16 +42,7 @@ constexpr size_t kMaxIPv6AddrSize  = 16;
 constexpr size_t kMaxIPv4AddrCount = 4;
 constexpr size_t kMaxIPv6AddrCount = 8;
 
-enum BootReasonType : uint8_t
-{
-    Unspecified             = 0,
-    PowerOnReboot           = 1,
-    BrownOutReset           = 2,
-    SoftwareWatchdogReset   = 3,
-    HardwareWatchdogReset   = 4,
-    SoftwareUpdateCompleted = 5,
-    SoftwareReset           = 6,
-};
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
 
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
 {
@@ -168,7 +160,7 @@ public:
     virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
     virtual CHIP_ERROR GetUpTime(uint64_t & upTime);
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    virtual CHIP_ERROR GetBootReason(uint8_t & bootReason);
+    virtual CHIP_ERROR GetBootReason(BootReasonType & bootReason);
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
@@ -296,7 +288,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetTotalOperationalHours(uint32_t & to
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(uint8_t & bootReason)
+inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(BootReasonType & bootReason)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

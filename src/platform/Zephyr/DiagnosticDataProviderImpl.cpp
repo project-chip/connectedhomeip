@@ -40,14 +40,14 @@ namespace DeviceLayer {
 
 namespace {
 
-uint8_t DetermineBootReason()
+BootReasonType DetermineBootReason()
 {
 #ifdef CONFIG_HWINFO
     uint32_t reason;
 
     if (hwinfo_get_reset_cause(&reason) != 0)
     {
-        return BootReasonType::Unspecified;
+        return BootReasonType::kUnspecified;
     }
 
     // Bits returned by hwinfo_get_reset_cause() are accumulated between subsequent resets, so
@@ -58,17 +58,17 @@ uint8_t DetermineBootReason()
     // If no reset cause is provided, it indicates a power-on-reset.
     if (reason == 0 || reason & (RESET_POR | RESET_PIN))
     {
-        return BootReasonType::PowerOnReboot;
+        return BootReasonType::kPowerOnReboot;
     }
 
     if (reason & RESET_WATCHDOG)
     {
-        return BootReasonType::HardwareWatchdogReset;
+        return BootReasonType::kHardwareWatchdogReset;
     }
 
     if (reason & RESET_BROWNOUT)
     {
-        return BootReasonType::BrownOutReset;
+        return BootReasonType::kBrownOutReset;
     }
 
     if (reason & RESET_SOFTWARE)
@@ -76,14 +76,14 @@ uint8_t DetermineBootReason()
 #ifdef CONFIG_MCUBOOT_IMG_MANAGER
         if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
         {
-            return BootReasonType::SoftwareUpdateCompleted;
+            return BootReasonType::kSoftwareUpdateCompleted;
         }
 #endif
-        return BootReasonType::SoftwareReset;
+        return BootReasonType::kSoftwareReset;
     }
 #endif
 
-    return BootReasonType::Unspecified;
+    return BootReasonType::kUnspecified;
 }
 
 } // namespace
@@ -180,7 +180,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
 #if CONFIG_HWINFO
     bootReason = mBootReason;

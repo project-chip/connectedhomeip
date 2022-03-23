@@ -119,29 +119,28 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
-    uint8_t reason;
-    reason = POWER_GetResetCause();
+    bootReason     = to_underlying(BootReasonType::kUnspecified);
+    uint8_t reason = POWER_GetResetCause();
 
     if (reason == RESET_UNDEFINED)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        bootReason = to_underlying(BootReasonType::kUnspecified);
     }
     else if ((reason == RESET_POR) || (reason == RESET_EXT_PIN))
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        bootReason = to_underlying(BootReasonType::kPowerOnReboot);
     }
     else if (reason == RESET_BOR)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+        bootReason = to_underlying(BootReasonType::kBrownOutReset);
     }
     else if (reason == RESET_SW_REQ)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        bootReason = to_underlying(BootReasonType::kSoftwareReset);
     }
     else if (reason == RESET_WDT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        bootReason = to_underlying(BootReasonType::kSoftwareWatchdogReset);
         /* Reboot can be due to hardware or software watchdog */
     }
 

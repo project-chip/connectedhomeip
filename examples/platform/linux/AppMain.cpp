@@ -104,26 +104,26 @@ void OnSignalHandler(int signum)
     // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
     // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
     // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::Unspecified;
+    BootReasonType bootReason = BootReasonType::kUnspecified;
     switch (signum)
     {
     case SIGVTALRM:
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
         break;
     case SIGALRM:
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
         break;
     case SIGILL:
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         break;
     case SIGTRAP:
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
         break;
     case SIGIO:
-        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        bootReason = BootReasonType::kSoftwareUpdateCompleted;
         break;
     case SIGINT:
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
         break;
     default:
         IgnoreUnusedVariable(bootReason);

@@ -114,28 +114,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     cyhal_reset_reason_t reset_reason = cyhal_system_get_reset_reason();
     if (reset_reason == CYHAL_SYSTEM_RESET_NONE)
     {
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_WDT)
     {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_SOFT)
     {
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_HIB_WAKEUP)
     {
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
     }
     else
     {
-        bootReason = BootReasonType::Unspecified;
+        bootReason = BootReasonType::kUnspecified;
     }
     return CHIP_NO_ERROR;
 }
