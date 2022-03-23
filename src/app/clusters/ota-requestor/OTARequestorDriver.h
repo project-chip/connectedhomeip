@@ -69,11 +69,21 @@ enum class IdleStateReason
     kInvalidSession,
 };
 
+// The current selected OTA Requestor timer to be running
+enum class SelectedTimer
+{
+    kDefaultProviderTimer,
+    kWatchdogTimer,
+};
+
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
 {
 public:
+    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum; //is:
+    using OTAChangeReasonEnum = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum; //is:
+
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
     virtual ~OTARequestorDriver() = default;
@@ -86,6 +96,9 @@ public:
 
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
+
+    /// Called when OTA Requestor has a state transition for which the driver may need to take various actions
+    virtual void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR) = 0;
 
     // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
     virtual void HandleIdleState(IdleStateReason reason) = 0;

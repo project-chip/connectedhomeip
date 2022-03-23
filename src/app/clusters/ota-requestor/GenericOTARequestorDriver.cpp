@@ -118,17 +118,44 @@ bool GenericOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
 
 void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
+IdleStateReason GenericOTARequestorDriver::MapErrorToIdleStateReason(CHIP_ERROR error)
+{
+    if (error == CHIP_NO_ERROR)
+    {
+        return IdleStateReason::kIdle;
+    }
+    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
+    {
+        return IdleStateReason::kInvalidSession;
+    }
+
+    return IdleStateReason::kUnknown;
+}
+
+void GenericOTARequestorDriver::HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
+{
+    ChipLogDetail(SoftwareUpdate, "//is: GenericOTARequestorDriver::HandleStateTransition");
+
+    if ((newState == OTAUpdateStateEnum::kIdle) && (currentUpdateState != OTAUpdateStateEnum::kIdle))
+    {
+        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
+
+        // Inform the driver that the OTARequestor has entered the Idle state
+        HandleIdleState(idleStateReason); 
+    }
+}
+
 void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
 {
     switch (reason)
     {
     case IdleStateReason::kUnknown:
         ChipLogProgress(SoftwareUpdate, "Unknown idle state reason so set the periodic timer for a next attempt");
-        StartDefaultProviderTimer();
+        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
         break;
     case IdleStateReason::kIdle:
         // There is no current OTA update in progress so start the periodic query timer
-        StartDefaultProviderTimer();
+        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
         break;
     case IdleStateReason::kInvalidSession:
         // An invalid session is detected which may be temporary so try to query the same provider again
@@ -201,7 +228,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     else
     {
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
-        StartDefaultProviderTimer();
+        StartPeriodicQueryTimer();
     }
 }
 
@@ -240,7 +267,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     UpdateCancelled();
 
     // Restart the periodic default provider timer
-    StartDefaultProviderTimer();
+    StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
 }
 
 // Cancel all OTA update timers
@@ -337,14 +364,14 @@ void GenericOTARequestorDriver::SendQueryImage()
 
     // Default provider timer only runs when there is no ongoing query/update; must stop it now.
     // TriggerImmediateQueryInternal() will cause the state to change from kIdle
-    StopDefaultProviderTimer();
+    StopSelectedTimer(SelectedTimer::kDefaultProviderTimer);
 
     mProviderRetryCount++;
 
     DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
 }
 
-void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
+void GenericOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState)
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
@@ -353,7 +380,7 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
     bool listExhausted = false;
     if (GetNextProviderLocation(providerLocation, listExhausted) != true)
     {
-        StartDefaultProviderTimer();
+        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
         return;
     }
 
@@ -362,26 +389,102 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
     SendQueryImage();
 }
 
-void GenericOTARequestorDriver::StartDefaultProviderTimer()
+void GenericOTARequestorDriver::StartPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the Default Provider timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mPeriodicQueryTimeInterval),
         [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context);
+            (static_cast<GenericOTARequestorDriver *>(context))->PeriodicQueryTimerHandler(nullptr, context);
         },
         this);
 }
 
-void GenericOTARequestorDriver::StopDefaultProviderTimer()
+void GenericOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Default Provider timer");
     CancelDelayedAction(
         [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context);
+            (static_cast<GenericOTARequestorDriver *>(context))->PeriodicQueryTimerHandler(nullptr, context);
         },
         this);
+}
+
+void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    ChipLogProgress(SoftwareUpdate, "Default watchdog timer handler is invoked");
+
+    OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
+    
+    if((currentState == OTAUpdateStateEnum::kIdle) || (currentState == OTAUpdateStateEnum::kUnknown))
+    {
+        // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
+        StartWatchdogTimer();
+    }
+    else
+    {
+        // OTA Requestor has been in a non-idle state for too long.  Reset and start Provider timer for the next Query.
+        //is:
+        //mRequestor->Reset();
+        StartPeriodicQueryTimer();
+    }
+}
+
+void GenericOTARequestorDriver::StartWatchdogTimer()
+{
+    ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds",
+                    (unsigned int) mWatchdogTimeInterval);
+    ScheduleDelayedAction(
+        System::Clock::Seconds32(mWatchdogTimeInterval),
+        [](System::Layer *, void * context) {
+            (static_cast<GenericOTARequestorDriver *>(context))->WatchdogTimerHandler(nullptr, context);
+        },
+        this);
+}
+
+void GenericOTARequestorDriver::StopWatchdogTimer()
+{
+    ChipLogProgress(SoftwareUpdate, "Stopping the watchdog timer");
+    CancelDelayedAction(
+        [](System::Layer *, void * context) {
+            (static_cast<GenericOTARequestorDriver *>(context))->WatchdogTimerHandler(nullptr, context);
+        },
+        this);
+}
+
+void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
+{
+    ChipLogProgress(SoftwareUpdate, "//is: StartSelectedTimer");
+
+    switch (timer)
+    {
+        case SelectedTimer::kDefaultProviderTimer:
+            StopWatchdogTimer();
+            StartPeriodicQueryTimer();
+            break;
+        case SelectedTimer::kWatchdogTimer:
+            StopPeriodicQueryTimer();
+            StartWatchdogTimer();
+            break;
+    }
+}
+
+void GenericOTARequestorDriver::StopSelectedTimer(SelectedTimer timer)
+{
+    ChipLogProgress(SoftwareUpdate, "//is: StopSelectedTimer");
+
+    switch (timer)
+    {
+        case SelectedTimer::kDefaultProviderTimer:
+            StopPeriodicQueryTimer();
+            StartWatchdogTimer();
+            break;
+        case SelectedTimer::kWatchdogTimer:
+            StopWatchdogTimer();
+            StartPeriodicQueryTimer();
+            break;
+    }
 }
 
 /**
