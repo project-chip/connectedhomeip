@@ -155,32 +155,32 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     }
 
     // Set to global CommissionableDataProvider once success first time
-    if (!mIsInitialized)
+    if (!mFirstUpdated)
     {
         DeviceLayer::SetCommissionableDataProvider(this);
     }
-    mIsInitialized = true;
+    mFirstUpdated = true;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
     setupDiscriminator = mDiscriminator;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    VerifyOrReturnLogError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
     iterationCount = mPaseIterationCount;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(saltBuf.size() >= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), mPaseSalt.data(), mPaseSalt.size());
@@ -191,7 +191,7 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(chip::MutableByteSpan 
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
     // By now, serialized verifier from Init should be correct size
     VerifyOrReturnError(mSerializedPaseVerifier.size() == kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INTERNAL);
@@ -206,7 +206,7 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pVerifier(chip::MutableByteS
 
 CHIP_ERROR CommissionableDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
     // Pretend not implemented if we don't have a passcode value externally set
     if (!mSetupPasscode.HasValue())
