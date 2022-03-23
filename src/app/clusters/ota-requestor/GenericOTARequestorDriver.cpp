@@ -143,6 +143,12 @@ void GenericOTARequestorDriver::HandleStateTransition(OTAUpdateStateEnum current
         // Inform the driver that the OTARequestor has entered the Idle state
         HandleIdleState(idleStateReason); 
     }
+    else if(((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kUnknown)) &&
+            (newState != OTAUpdateStateEnum::kIdle))
+    {
+        // Start watchdog timer to monitor new Query Image session
+        StartSelectedTimer(SelectedTimer::kWatchdogTimer);
+    }
 }
 
 void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
@@ -151,11 +157,11 @@ void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
     {
     case IdleStateReason::kUnknown:
         ChipLogProgress(SoftwareUpdate, "Unknown idle state reason so set the periodic timer for a next attempt");
-        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
+        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kIdle:
         // There is no current OTA update in progress so start the periodic query timer
-        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
+        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
         // An invalid session is detected which may be temporary so try to query the same provider again
@@ -267,7 +273,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     UpdateCancelled();
 
     // Restart the periodic default provider timer
-    StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
+    StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
 }
 
 // Cancel all OTA update timers
@@ -364,7 +370,7 @@ void GenericOTARequestorDriver::SendQueryImage()
 
     // Default provider timer only runs when there is no ongoing query/update; must stop it now.
     // TriggerImmediateQueryInternal() will cause the state to change from kIdle
-    StopSelectedTimer(SelectedTimer::kDefaultProviderTimer);
+    StopSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
 
     mProviderRetryCount++;
 
@@ -380,7 +386,7 @@ void GenericOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
     bool listExhausted = false;
     if (GetNextProviderLocation(providerLocation, listExhausted) != true)
     {
-        StartSelectedTimer(SelectedTimer::kDefaultProviderTimer);
+        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         return;
     }
 
@@ -417,17 +423,27 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
 
     OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
     
-    if((currentState == OTAUpdateStateEnum::kIdle) || (currentState == OTAUpdateStateEnum::kUnknown))
+    switch(currentState)
     {
-        // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
-        StartWatchdogTimer();
-    }
-    else
-    {
-        // OTA Requestor has been in a non-idle state for too long.  Reset and start Provider timer for the next Query.
-        //is:
-        //mRequestor->Reset();
-        StartPeriodicQueryTimer();
+        case OTAUpdateStateEnum::kIdle:
+        case OTAUpdateStateEnum::kUnknown:
+            // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
+            StartWatchdogTimer();
+            break;
+        case OTAUpdateStateEnum::kQuerying:
+        case OTAUpdateStateEnum::kDelayedOnQuery:
+        case OTAUpdateStateEnum::kDownloading:
+        case OTAUpdateStateEnum::kApplying:
+        case OTAUpdateStateEnum::kDelayedOnApply:
+            UpdateCancelled();
+            mRequestor->Reset();
+            StartPeriodicQueryTimer();
+            break;
+        case OTAUpdateStateEnum::kRollingBack:
+        case OTAUpdateStateEnum::kDelayedOnUserConsent:
+            mRequestor->Reset();
+            StartPeriodicQueryTimer();
+            break;
     }
 }
 
@@ -459,7 +475,7 @@ void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
 
     switch (timer)
     {
-        case SelectedTimer::kDefaultProviderTimer:
+        case SelectedTimer::kPeriodicQueryTimer:
             StopWatchdogTimer();
             StartPeriodicQueryTimer();
             break;
@@ -476,7 +492,7 @@ void GenericOTARequestorDriver::StopSelectedTimer(SelectedTimer timer)
 
     switch (timer)
     {
-        case SelectedTimer::kDefaultProviderTimer:
+        case SelectedTimer::kPeriodicQueryTimer:
             StopPeriodicQueryTimer();
             StartWatchdogTimer();
             break;

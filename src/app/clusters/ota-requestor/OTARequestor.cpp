@@ -440,8 +440,7 @@ void OTARequestor::CancelImageUpdate()
 
     mOtaRequestorDriver->UpdateCancelled();
 
-    //is: replace with reset()
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+    Reset();
 
     ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::CancelImageUpdate Exit");
 }
