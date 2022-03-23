@@ -85,7 +85,17 @@ private:
         return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(bool));
     }
 
-    static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
+    /**
+     * @brief
+     *  The callback function to be called when "fail-safe timer" expires.
+     */
+    static void HandleArmFailSafeTimer(System::Layer * layer, void * aAppState);
+
+    /**
+     * @brief
+     *  The callback function to be called asynchronously when "fail-safe timer"
+     *  expires. We use this function to conduct a sequence of clean-up works.
+     */
     static void HandleDisarmFailSafe(intptr_t arg);
 
     void FailSafeTimerExpired();

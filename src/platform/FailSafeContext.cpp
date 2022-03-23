@@ -35,7 +35,7 @@ constexpr TLV::Tag kAddNocCommandTag    = TLV::ContextTag(1);
 constexpr TLV::Tag kUpdateNocCommandTag = TLV::ContextTag(2);
 } // anonymous namespace
 
-void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
+void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppState)
 {
     FailSafeContext * context = reinterpret_cast<FailSafeContext *>(aAppState);
     context->FailSafeTimerExpired();
@@ -43,8 +43,21 @@ void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 
 void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
-    ConfigurationMgr().SetFailSafeArmed(false);
-    DeleteFromStorage();
+    FailSafeContext * this_ = reinterpret_cast<FailSafeContext *>(arg);
+
+    this_->mFailSafeArmed                  = false;
+    this_->mAddNocCommandHasBeenInvoked    = false;
+    this_->mUpdateNocCommandHasBeenInvoked = false;
+
+    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to set FailSafeArmed config to false");
+    }
+
+    if (DeleteFromStorage() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
+    }
 }
 
 void FailSafeContext::FailSafeTimerExpired()
@@ -56,16 +69,12 @@ void FailSafeContext::FailSafeTimerExpired()
     event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
     CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
-    mFailSafeArmed                  = false;
-    mAddNocCommandHasBeenInvoked    = false;
-    mUpdateNocCommandHasBeenInvoked = false;
-
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
-    PlatformMgr().ScheduleWork(HandleDisarmFailSafe);
+    PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
@@ -73,7 +82,7 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
     ReturnErrorOnFailure(CommitToStorage());
     ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
 
@@ -86,7 +95,7 @@ CHIP_ERROR FailSafeContext::DisarmFailSafe()
     mAddNocCommandHasBeenInvoked    = false;
     mUpdateNocCommandHasBeenInvoked = false;
 
-    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
 
     ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(false));
     ReturnErrorOnFailure(DeleteFromStorage());

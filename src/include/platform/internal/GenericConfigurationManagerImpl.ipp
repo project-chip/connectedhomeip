@@ -907,7 +907,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::HandleFailSafeContextCleanup(
 
     if (FailSafeContext::DeleteFromStorage() != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from config");
+        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
     }
 }
 
