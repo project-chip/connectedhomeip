@@ -14925,6 +14925,12 @@ typedef NS_ENUM(uint8_t, CHIPOnOffEffectIdentifier) {
     CHIPOnOffEffectIdentifierDyingLight = 0x01,
 };
 
+typedef NS_ENUM(uint8_t, CHIPOnOffStartUpOnOff) {
+    CHIPOnOffStartUpOnOffOff = 0x00,
+    CHIPOnOffStartUpOnOffOn = 0x01,
+    CHIPOnOffStartUpOnOffTogglePreviousOnOff = 0x02,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPOnOffControl) {
     CHIPOnOffControlAcceptOnlyWhenOn = 0x1,
 };
