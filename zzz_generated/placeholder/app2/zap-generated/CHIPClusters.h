@@ -58,11 +58,39 @@ public:
     ~KeypadInputCluster() {}
 };
 
+class DLL_EXPORT ModeSelectCluster : public ClusterBase
+{
+public:
+    ModeSelectCluster() : ClusterBase(app::Clusters::ModeSelect::Id) {}
+    ~ModeSelectCluster() {}
+};
+
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
+};
+
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
+    ~RelativeHumidityMeasurementCluster() {}
+};
+
+class DLL_EXPORT SwitchCluster : public ClusterBase
+{
+public:
+    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
+    ~SwitchCluster() {}
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
@@ -77,6 +105,13 @@ class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 public:
     TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
+};
+
+class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+{
+public:
+    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
+    ~ThermostatUserInterfaceConfigurationCluster() {}
 };
 
 } // namespace Controller

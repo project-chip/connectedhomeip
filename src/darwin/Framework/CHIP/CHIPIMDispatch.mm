@@ -52,7 +52,8 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TODO: Maybe consider making this configurable?
+// TODO: Maybe consider making this configurable?  See also
+// CHIPControllerAccessControl.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
 
 } // anonymous namespace

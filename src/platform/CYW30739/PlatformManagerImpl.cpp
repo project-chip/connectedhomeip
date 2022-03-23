@@ -25,7 +25,7 @@
 
 #include <platform/CYW30739/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <hal/wiced_memory.h>
@@ -125,6 +125,11 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_LockChipStack(void)

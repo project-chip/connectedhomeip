@@ -5,7 +5,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 #include <platform/mbed/DiagnosticDataProviderImpl.h>
 #include <platform/mbed/SystemTimeSupport.h>
 #include <rtos/ThisThread.h>
