@@ -941,6 +941,12 @@ namespace BooleanState {
 } // namespace BooleanState
 
 namespace ModeSelect {
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+};
 } // namespace ModeSelect
 
 namespace ShadeConfiguration {

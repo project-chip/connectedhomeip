@@ -34568,11 +34568,12 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * CurrentMode                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * OnMode                                                            | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * Description                                                       | 0x0004 |
+| * Description                                                       | 0x0000 |
+| * StandardNamespace                                                 | 0x0001 |
+| * SupportedModes                                                    | 0x0002 |
+| * CurrentMode                                                       | 0x0003 |
+| * StartUpMode                                                       | 0x0004 |
+| * OnMode                                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -34617,340 +34618,6 @@ private:
 };
 
 /*
- * Attribute CurrentMode
- */
-class ReadModeSelectCurrentMode : public ModelCommand {
-public:
-    ReadModeSelectCurrentMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectCurrentMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "current-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute SupportedModes
- */
-class ReadModeSelectSupportedModes : public ModelCommand {
-public:
-    ReadModeSelectSupportedModes()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "supported-modes");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectSupportedModes()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "supported-modes");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                          params:params
-                                         subscriptionEstablished:NULL
-                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                   }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute OnMode
- */
-class ReadModeSelectOnMode : public ModelCommand {
-public:
-    ReadModeSelectOnMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "on-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.OnMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class WriteModeSelectOnMode : public ModelCommand {
-public:
-    WriteModeSelectOnMode()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-
-        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
-
-        [cluster writeAttributeOnModeWithValue:value
-                             completionHandler:^(NSError * _Nullable error) {
-                                 err = [CHIPError errorToCHIPErrorCode:error];
-                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-                                 SetCommandExitStatus(err);
-                             }];
-        return err;
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class SubscribeAttributeModeSelectOnMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectOnMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                  params:params
-                                 subscriptionEstablished:NULL
-                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute StartUpMode
- */
-class ReadModeSelectStartUpMode : public ModelCommand {
-public:
-    ReadModeSelectStartUpMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectStartUpMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute Description
  */
 class ReadModeSelectDescription : public ModelCommand {
@@ -34966,7 +34633,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
@@ -34998,7 +34665,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
@@ -35010,6 +34677,415 @@ public:
                                                     NSLog(@"ModeSelect.Description response %@", [value description]);
                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute StandardNamespace
+ */
+class ReadModeSelectStandardNamespace : public ModelCommand {
+public:
+    ReadModeSelectStandardNamespace()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "standard-namespace");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStandardNamespace() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect StandardNamespace Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectStandardNamespace : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectStandardNamespace()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "standard-namespace");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectStandardNamespace() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStandardNamespaceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:NULL
+                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                          NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportedModes
+ */
+class ReadModeSelectSupportedModes : public ModelCommand {
+public:
+    ReadModeSelectSupportedModes()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-modes");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectSupportedModes()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "supported-modes");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CurrentMode
+ */
+class ReadModeSelectCurrentMode : public ModelCommand {
+public:
+    ReadModeSelectCurrentMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectCurrentMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute StartUpMode
+ */
+class ReadModeSelectStartUpMode : public ModelCommand {
+public:
+    ReadModeSelectStartUpMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectStartUpMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute OnMode
+ */
+class ReadModeSelectOnMode : public ModelCommand {
+public:
+    ReadModeSelectOnMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "on-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.OnMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteModeSelectOnMode : public ModelCommand {
+public:
+    WriteModeSelectOnMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeOnModeWithValue:value
+                             completionHandler:^(NSError * _Nullable error) {
+                                 err = [CHIPError errorToCHIPErrorCode:error];
+                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+                                 SetCommandExitStatus(err);
+                             }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeModeSelectOnMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectOnMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                  params:params
+                                 subscriptionEstablished:NULL
+                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
+                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                           }];
 
         return CHIP_NO_ERROR;
     }
@@ -35237,6 +35313,81 @@ public:
                                                       NSLog(@"ModeSelect.AttributeList response %@", [value description]);
                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadModeSelectFeatureMap : public ModelCommand {
+public:
+    ReadModeSelectFeatureMap()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect FeatureMap Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectFeatureMap : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectFeatureMap()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                   NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }];
 
         return CHIP_NO_ERROR;
     }
@@ -73715,23 +73866,27 @@ void registerClusterModeSelect(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ModeSelectChangeToMode>(), //
-        make_unique<ReadModeSelectCurrentMode>(), //
-        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectDescription>(), //
+        make_unique<SubscribeAttributeModeSelectDescription>(), //
+        make_unique<ReadModeSelectStandardNamespace>(), //
+        make_unique<SubscribeAttributeModeSelectStandardNamespace>(), //
         make_unique<ReadModeSelectSupportedModes>(), //
         make_unique<SubscribeAttributeModeSelectSupportedModes>(), //
+        make_unique<ReadModeSelectCurrentMode>(), //
+        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectStartUpMode>(), //
+        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
         make_unique<ReadModeSelectOnMode>(), //
         make_unique<WriteModeSelectOnMode>(), //
         make_unique<SubscribeAttributeModeSelectOnMode>(), //
-        make_unique<ReadModeSelectStartUpMode>(), //
-        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
-        make_unique<ReadModeSelectDescription>(), //
-        make_unique<SubscribeAttributeModeSelectDescription>(), //
         make_unique<ReadModeSelectGeneratedCommandList>(), //
         make_unique<SubscribeAttributeModeSelectGeneratedCommandList>(), //
         make_unique<ReadModeSelectAcceptedCommandList>(), //
         make_unique<SubscribeAttributeModeSelectAcceptedCommandList>(), //
         make_unique<ReadModeSelectAttributeList>(), //
         make_unique<SubscribeAttributeModeSelectAttributeList>(), //
+        make_unique<ReadModeSelectFeatureMap>(), //
+        make_unique<SubscribeAttributeModeSelectFeatureMap>(), //
         make_unique<ReadModeSelectClusterRevision>(), //
         make_unique<SubscribeAttributeModeSelectClusterRevision>(), //
     };
