@@ -36,12 +36,6 @@ buildconfig_header("chip_buildconfig") {
   chip_config_short_error_str =
       chip_config_short_error_str || chip_target_style_embedded
 
-  if (chip_config_max_operational_networks == "unlimited") {
-    config_max_operational_networks = 0  # 0 means unlimited
-  } else {
-    config_max_operational_networks = chip_config_max_operational_networks
-  }
-
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
   defines = [
@@ -65,7 +59,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
     "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
-    "CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS=${config_max_operational_networks}",
+    "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
   ]
 }
 

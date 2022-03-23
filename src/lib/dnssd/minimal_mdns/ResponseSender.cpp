@@ -64,11 +64,11 @@ CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder
         }
     }
 
-#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS > 0
-    return CHIP_ERROR_NO_MEMORY;
-#else
+#if CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
     mResponders.push_back(queryResponder);
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NO_MEMORY;
 #endif
 }
 
@@ -79,7 +79,7 @@ CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryRespon
         if (*it == queryResponder)
         {
             *it = nullptr;
-#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS == 0
+#if CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
             mResponders.erase(it);
 #endif
             return CHIP_NO_ERROR;

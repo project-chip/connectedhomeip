@@ -1772,20 +1772,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
 
 /*
- * @def CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
+ * @def CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
  *
- * @brief Maximum number of operational networks that the device may
- *        advertise in parallel.
+ * @brief Enables usage of heap in the minmdns DNSSD implementation
+ *        for tracking active operational responder lists.
  *
- *        Value will be used for internal CHIP MDNS implementations but may
- *        be ignored for platform implementations where the platform implements
- *        its own memory management for DNSSD advertisement.
- *
- *        Set to 0 to mean "unlimited/use heap".
+ *        When this is not set, CHIP_CONFIG_MAX_FABRICS is used to determine
+ *        and statically allocate pointers needed to track active
+ *        operational responder lits.
  */
-#ifndef CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
-#define CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS 5
-#endif // CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS
+#ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+#define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
+#endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 
 /**
  * @}

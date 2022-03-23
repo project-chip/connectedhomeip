@@ -54,17 +54,13 @@ declare_args() {
   # When enabled traces messages using pw_trace.
   chip_enable_transport_trace = false
 
-  # Defines the maximum number of operational networks that the device can
-  # support advertising if using minmdns dnssd.
+  # Enables using dynamic memory for minmdns tracking of operational
+  # responders.
   #
-  # Use "unlimited" to specify no limit as a more readable alternative to 0
-  chip_config_max_operational_networks = 5
-
-  if (current_os == "linux" || current_os == "android" ||
-      current_os == "darwin") {
-    # large platforms do not need operational network limits by default
-    chip_config_max_operational_networks = "unlimited"
-  }
+  # When not set, CHIP_CONFIG_MAX_FABRICS is used for static allocation
+  # of tracking information for operational advertisement.
+  chip_config_minmdns_dynamic_operational_responder_list =
+      current_os == "linux" || current_os == "android" || current_os == "darwin"
 }
 
 if (chip_target_style == "") {

@@ -25,7 +25,11 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS > 0
+#if CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
+#include <list>
+using QueryResponderPtrPool = std::list<mdns::Minimal::QueryResponderBase *>;
+#else
 
 #include <array>
 
@@ -34,12 +38,7 @@
 //    - 1 for commissionable advertising
 //    - 1 for commissioner responder
 //    - extra for every operational advertisement
-using QueryResponderPtrPool = std::array<mdns::Minimal::QueryResponderBase *, CHIP_CONFIG_MAX_OPERATIONAL_NETWORKS + 2>;
-
-#else
-
-#include <list>
-using QueryResponderPtrPool = std::list<mdns::Minimal::QueryResponderBase *>;
+using QueryResponderPtrPool = std::array<mdns::Minimal::QueryResponderBase *, CHIP_CONFIG_MAX_FABRICS + 2>;
 
 #endif
 
