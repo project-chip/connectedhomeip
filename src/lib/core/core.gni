@@ -55,7 +55,7 @@ declare_args() {
   chip_enable_transport_trace = false
 
   # Defines the maximum number of operational networks that the device can
-  # support advertising if using internam dnssd implementations.
+  # support advertising if using minmdns dnssd.
   #
   # Use "unlimited" to specify no limit as a more readable alternative to 0
   chip_config_max_operational_networks = 5
