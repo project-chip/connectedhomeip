@@ -27,6 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
@@ -75,7 +76,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
