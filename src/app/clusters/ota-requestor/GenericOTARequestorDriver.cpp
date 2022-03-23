@@ -85,7 +85,7 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     else
     {
         // Start the first periodic query timer
-        StartDefaultProviderTimer();
+        StartPeriodicQueryTimer();
     }
 }
 
@@ -118,35 +118,10 @@ bool GenericOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
 
 void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
-IdleStateReason GenericOTARequestorDriver::MapErrorToIdleStateReason(CHIP_ERROR error)
+void GenericOTARequestorDriver::HandleIdleStateExit()
 {
-    if (error == CHIP_NO_ERROR)
-    {
-        return IdleStateReason::kIdle;
-    }
-    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
-    {
-        return IdleStateReason::kInvalidSession;
-    }
-
-    return IdleStateReason::kUnknown;
-}
-
-void GenericOTARequestorDriver::HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
-{
-    if ((newState == OTAUpdateStateEnum::kIdle) && (currentUpdateState != OTAUpdateStateEnum::kIdle))
-    {
-        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
-
-        // Inform the driver that the OTARequestor has entered the Idle state
-        HandleIdleState(idleStateReason); 
-    }
-    else if(((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kUnknown)) &&
-            (newState != OTAUpdateStateEnum::kIdle))
-    {
-        // Start watchdog timer to monitor new Query Image session
-        StartSelectedTimer(SelectedTimer::kWatchdogTimer);
-    }
+    // Start watchdog timer to monitor new Query Image session
+    StartSelectedTimer(SelectedTimer::kWatchdogTimer);
 }
 
 void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)

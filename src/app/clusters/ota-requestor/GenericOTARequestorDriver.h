@@ -56,7 +56,7 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
-    void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR) override;
+    void HandleIdleStateExit() override;
     void HandleIdleState(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
@@ -83,8 +83,6 @@ protected:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
-    // Map a CHIP_ERROR to an IdleStateReason enum type
-    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;

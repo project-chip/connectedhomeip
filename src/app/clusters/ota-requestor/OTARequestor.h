@@ -187,6 +187,11 @@ private:
      * Callback to initialize states and server attributes in the CHIP context
      */
     static void InitState(intptr_t context);
+    
+    /**
+     * Map a CHIP_ERROR to an IdleStateReason enum type
+     */
+    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
 
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event

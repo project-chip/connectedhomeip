@@ -622,6 +622,20 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
     OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
+IdleStateReason OTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
+{
+    if (error == CHIP_NO_ERROR)
+    {
+        return IdleStateReason::kIdle;
+    }
+    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
+    {
+        return IdleStateReason::kInvalidSession;
+    }
+
+    return IdleStateReason::kUnknown;
+}
+
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
     // Set server UpdateState attribute
@@ -644,14 +658,18 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    //if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
-    //{
-    //    IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
+    if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
+    {
+        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
-        //mOtaRequestorDriver->HandleIdleState(idleStateReason); 
-    //} 
-    mOtaRequestorDriver->HandleStateTransition(mCurrentUpdateState, newState, reason, error);
+        mOtaRequestorDriver->HandleIdleState(idleStateReason); 
+    }
+    else if(((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) || (mCurrentUpdateState == OTAUpdateStateEnum::kUnknown)) &&
+            (newState != OTAUpdateStateEnum::kIdle))
+    {
+        mOtaRequestorDriver->HandleIdleStateExit(); 
+    }
 
     mCurrentUpdateState = newState;
 }
