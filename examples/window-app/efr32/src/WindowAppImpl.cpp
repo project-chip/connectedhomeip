@@ -26,7 +26,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#if QR_CODE_ENABLED
+#ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
 #endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
