@@ -30,15 +30,6 @@ using chip::EventId;
 
 namespace {
 
-static_assert(GENERATED_ACCESS_PRIVILEGE__VIEW == kMatterAccessPrivilegeView,
-              "Generated privilege value must match privilege value in code");
-static_assert(GENERATED_ACCESS_PRIVILEGE__OPERATE == kMatterAccessPrivilegeOperate,
-              "Generated privilege value must match privilege value in code");
-static_assert(GENERATED_ACCESS_PRIVILEGE__MANAGE == kMatterAccessPrivilegeManage,
-              "Generated privilege value must match privilege value in code");
-static_assert(GENERATED_ACCESS_PRIVILEGE__ADMINISTER == kMatterAccessPrivilegeAdminister,
-              "Generated privilege value must match privilege value in code");
-
 #ifdef GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER
 namespace GeneratedAccessReadAttribute {
 constexpr ClusterId kCluster[]     = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
@@ -93,7 +84,7 @@ int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attr
         }
     }
 #endif
-    return GENERATED_ACCESS_PRIVILEGE__VIEW;
+    return kMatterAccessPrivilegeView;
 }
 
 int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
@@ -108,7 +99,7 @@ int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId att
         }
     }
 #endif
-    return GENERATED_ACCESS_PRIVILEGE__OPERATE;
+    return kMatterAccessPrivilegeOperate;
 }
 
 int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
@@ -123,7 +114,7 @@ int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId comman
         }
     }
 #endif
-    return GENERATED_ACCESS_PRIVILEGE__OPERATE;
+    return kMatterAccessPrivilegeOperate;
 }
 
 int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
@@ -138,5 +129,5 @@ int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
         }
     }
 #endif
-    return GENERATED_ACCESS_PRIVILEGE__VIEW;
+    return kMatterAccessPrivilegeView;
 }

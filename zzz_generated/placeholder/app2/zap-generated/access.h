@@ -20,13 +20,10 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/util/privilege-storage.h>
+
 // Prevent changing generated format
 // clang-format off
-
-#define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
-#define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
-#define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
-#define GENERATED_ACCESS_PRIVILEGE__ADMINISTER (3)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +56,7 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

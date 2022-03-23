@@ -20,13 +20,10 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/util/privilege-storage.h>
+
 // Prevent changing generated format
 // clang-format off
-
-#define GENERATED_ACCESS_PRIVILEGE__VIEW (0)
-#define GENERATED_ACCESS_PRIVILEGE__OPERATE (1)
-#define GENERATED_ACCESS_PRIVILEGE__MANAGE (2)
-#define GENERATED_ACCESS_PRIVILEGE__ADMINISTER (3)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +59,8 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Door Lock, Attribute: Language, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: view */ \
@@ -109,17 +106,17 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: Language, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__MANAGE, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: Language, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,18 +155,18 @@
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,8 +185,8 @@
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
-    GENERATED_ACCESS_PRIVILEGE__ADMINISTER, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
