@@ -72,7 +72,7 @@ enum class IdleStateReason
 // The current selected OTA Requestor timer to be running
 enum class SelectedTimer
 {
-    kDefaultProviderTimer,
+    kPeriodicQueryTimer,
     kWatchdogTimer,
 };
 
