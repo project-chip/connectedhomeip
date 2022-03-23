@@ -433,7 +433,7 @@ void WindowAppImpl::UpdateLCD()
             LcdPainter::Paint(type, static_cast<uint8_t>(lift.Value()), static_cast<uint8_t>(tilt.Value()), mIcon);
         }
     }
-#if !defined(QR_CODE_ENABLED) || QR_CODE_ENABLED
+#ifdef QR_CODE_ENABLED
     else
     {
         if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
@@ -441,7 +441,7 @@ void WindowAppImpl::UpdateLCD()
             LCDWriteQRCode((uint8_t *) mQRCode.c_str());
         }
     }
-#endif // !defined(QR_CODE_ENABLED) || QR_CODE_ENABLED
+#endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 }
 
