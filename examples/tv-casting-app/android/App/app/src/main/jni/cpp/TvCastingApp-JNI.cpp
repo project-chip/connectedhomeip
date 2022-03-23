@@ -84,6 +84,3 @@ JNI_METHOD(void, doSomethingInCpp)(JNIEnv *, jobject, jint endpoint)
 {
     ChipLogProgress(AppServer, "JNI_METHOD doSomethingInCpp called with endpoint %d", endpoint);
 }
-
-// extra init calls in app server, the function will be called right before running Matter main loop.
-void ApplicationInit() {}

@@ -51,7 +51,10 @@ CHIP_ERROR ChipAndroidAppInit(void)
     err = chip::Server::GetInstance().Init(nullptr, CHIP_PORT, CHIP_UDC_PORT);
     SuccessOrExit(err);
 
-    ApplicationInit();
+    if (!IsDeviceAttestationCredentialsProviderSet())
+    {
+        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
