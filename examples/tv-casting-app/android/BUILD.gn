@@ -75,6 +75,7 @@ group("default") {
     ":java",
     ":jni",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java",
     "${chip_root}/src/platform/android:java",
   ]
 }
