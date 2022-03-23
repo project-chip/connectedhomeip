@@ -26,14 +26,14 @@
 #include "MediaPlaybackManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
+#include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
-#include <app/server/Dnssd.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 using namespace chip;
 using namespace chip::app;
