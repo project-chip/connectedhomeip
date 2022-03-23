@@ -624,8 +624,6 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordNewUpdateState");
-
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
 
@@ -656,15 +654,10 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     mOtaRequestorDriver->HandleStateTransition(mCurrentUpdateState, newState, reason, error);
 
     mCurrentUpdateState = newState;
-    
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordNewUpdateState Exit");
 }
 
 void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState failureState %d reason %d", 
-            to_underlying(failureState), to_underlying(reason));
-
     // Inform driver of the error
     mOtaRequestorDriver->HandleError(failureState, error);
 
@@ -677,8 +670,6 @@ void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_
 
     // Whenever an error occurs, always reset to Idle state
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);
-
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState Exit");
 }
 
 CHIP_ERROR OTARequestor::GenerateUpdateToken()
@@ -701,8 +692,6 @@ CHIP_ERROR OTARequestor::GenerateUpdateToken()
 
 CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & deviceProxy)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::SendQueryImageRequest");
-
     VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
@@ -740,8 +729,6 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::SendQueryImageRequest Exit");
-
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);
 }
 
@@ -773,8 +760,6 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
 
 CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::StartDownload");
-
     VerifyOrReturnError(mBdxDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: allow caller to provide their own OTADownloader instance and set BDX parameters
@@ -804,8 +789,6 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
 
 CHIP_ERROR OTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::SendApplyUpdateRequest");
-
     VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(GenerateUpdateToken());
 
@@ -821,8 +804,6 @@ CHIP_ERROR OTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceP
 
 CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::SendNotifyUpdateAppliedRequest");
-
     VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(GenerateUpdateToken());
 
@@ -918,8 +899,6 @@ void OTARequestor::LoadCurrentUpdateInfo()
 // Invoked when the device becomes commissioned
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::OnCommissioningCompleteRequestor");
-
     VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
 
     ChipLogProgress(SoftwareUpdate, "Device commissioned, schedule a default provider query");
