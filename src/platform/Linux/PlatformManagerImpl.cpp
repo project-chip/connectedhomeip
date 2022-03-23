@@ -243,55 +243,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_AppendUserLabel(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
-{
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetUserLabelList(
-    EndpointId endpoint,
-    std::function<CHIP_ERROR(const AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)>
-        fp)
-{
-    DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
-
-    // In Linux simulation, return following hardcoded labelList on all endpoints.
-    UserLabel::Structs::LabelStruct::Type room;
-    UserLabel::Structs::LabelStruct::Type orientation;
-    UserLabel::Structs::LabelStruct::Type floor;
-    UserLabel::Structs::LabelStruct::Type direction;
-
-    room.label = CharSpan::fromCharString("room");
-    room.value = CharSpan::fromCharString("bedroom 2");
-
-    orientation.label = CharSpan::fromCharString("orientation");
-    orientation.value = CharSpan::fromCharString("North");
-
-    floor.label = CharSpan::fromCharString("floor");
-    floor.value = CharSpan::fromCharString("2");
-
-    direction.label = CharSpan::fromCharString("direction");
-    direction.value = CharSpan::fromCharString("up");
-
-    labelList.add(room);
-    labelList.add(orientation);
-    labelList.add(floor);
-    labelList.add(direction);
-
-    return fp(labelList);
-}
-
-CHIP_ERROR
 PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.

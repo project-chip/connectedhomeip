@@ -35,6 +35,31 @@ DeviceInfoProvider * gDeviceInfoProvider = nullptr;
 
 } // namespace
 
+CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
+                                                const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList)
+{
+    size_t index = 0;
+
+    ReturnErrorOnFailure(SetUserLabelCount(endpoint, labelList.size()));
+
+    for (const UserLabelType & label : labelList)
+    {
+        ReturnErrorOnFailure(SetUserLabelAt(endpoint, index++, label));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLabelType & label)
+{
+    size_t index;
+
+    ReturnErrorOnFailure(GetUserLabelCount(endpoint, index));
+    ReturnErrorOnFailure(SetUserLabelAt(endpoint, index + 1, label));
+
+    return CHIP_NO_ERROR;
+}
+
 /**
  * Instance getter for the global DeviceInfoProvider.
  *

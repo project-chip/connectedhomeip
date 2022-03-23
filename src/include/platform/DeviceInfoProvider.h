@@ -28,8 +28,9 @@
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr size_t kMaxLabelNameLength  = 16;
-static constexpr size_t kMaxLabelValueLength = 16;
+static constexpr size_t kMaxUserLabelListLength = 10;
+static constexpr size_t kMaxLabelNameLength     = 16;
+static constexpr size_t kMaxLabelValueLength    = 16;
 
 class DeviceInfoProvider
 {
@@ -63,8 +64,10 @@ public:
     };
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
+    using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
 
     using FixedLabelIterator = Iterator<FixedLabelType>;
+    using UserLabelIterator  = Iterator<UserLabelType>;
 
     DeviceInfoProvider() = default;
 
@@ -73,6 +76,9 @@ public:
     // Not copyable
     DeviceInfoProvider(const DeviceInfoProvider &) = delete;
     DeviceInfoProvider & operator=(const DeviceInfoProvider &) = delete;
+
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
+    CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
     // Iterators
     /**
@@ -83,6 +89,12 @@ public:
      *  @retval nullptr if no iterator instances are available.
      */
     virtual FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) = 0;
+    virtual UserLabelIterator * IterateUserLabel(EndpointId endpoint)   = 0;
+
+protected:
+    virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
+    virtual CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val)                                 = 0;
+    virtual CHIP_ERROR GetUserLabelCount(EndpointId endpoint, size_t & val)                               = 0;
 };
 
 /**

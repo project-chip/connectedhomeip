@@ -59,21 +59,24 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    auto labelListEncoder = [&aEncoder](const DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type,
-                                                                         DeviceLayer::kMaxUserLabels> & labelList) -> CHIP_ERROR {
-        CHIP_ERROR error = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
-            for (auto label : labelList)
+    DeviceLayer::DeviceInfoProvider::UserLabelIterator * it = DeviceLayer::GetDeviceInfoProvider()->IterateUserLabel(endpoint);
+
+    if (it)
+    {
+        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+            UserLabel::Structs::LabelStruct::Type userlabel;
+
+            while (it->Next(userlabel))
             {
-                ReturnErrorOnFailure(encoder.Encode(label));
+                ReturnErrorOnFailure(encoder.Encode(userlabel));
             }
 
             return CHIP_NO_ERROR;
         });
 
-        return error;
-    };
-
-    if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelListEncoder) != CHIP_NO_ERROR)
+        it->Release();
+    }
+    else
     {
         err = aEncoder.EncodeEmptyList();
     }
@@ -86,7 +89,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
     EndpointId endpoint = aPath.mEndpointId;
     if (!aPath.IsListItemOperation())
     {
-        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabelListLength> labelList;
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
@@ -99,14 +102,13 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
-        return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
+        return DeviceLayer::GetDeviceInfoProvider()->SetUserLabelList(endpoint, labelList);
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
-
-        return DeviceLayer::PlatformMgr().AppendUserLabel(endpoint, entry);
+        return DeviceLayer::GetDeviceInfoProvider()->AppendUserLabel(endpoint, entry);
     }
     else
     {

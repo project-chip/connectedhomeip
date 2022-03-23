@@ -137,19 +137,6 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_AppendUserLabel(EndpointId endpoint, app::Clusters::UserLabel::Structs::LabelStruct::Type & label)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
