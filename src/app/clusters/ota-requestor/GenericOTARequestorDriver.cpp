@@ -139,7 +139,7 @@ void GenericOTARequestorDriver::HandleStateTransition(OTAUpdateStateEnum current
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
-        HandleIdleState(idleStateReason); 
+        HandleIdleState(idleStateReason);
     }
     else if(((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kUnknown)) &&
             (newState != OTAUpdateStateEnum::kIdle))
@@ -420,7 +420,7 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     ChipLogProgress(SoftwareUpdate, "Watchdog timer handler is invoked");
 
     OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
-    
+
     switch(currentState)
     {
         case OTAUpdateStateEnum::kIdle:

@@ -649,8 +649,8 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     //    IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
-        //mOtaRequestorDriver->HandleIdleState(idleStateReason); 
-    //} 
+        //mOtaRequestorDriver->HandleIdleState(idleStateReason);
+    //}
     mOtaRequestorDriver->HandleStateTransition(mCurrentUpdateState, newState, reason, error);
 
     mCurrentUpdateState = newState;
