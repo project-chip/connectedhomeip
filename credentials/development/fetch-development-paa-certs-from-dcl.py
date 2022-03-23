@@ -35,6 +35,7 @@ import re
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
 
+
 def parse_paa_root_certs(cmdpipe, paa_list):
     """
     example output of a query to all x509 root certs in DCL:
