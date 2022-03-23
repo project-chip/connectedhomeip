@@ -235,39 +235,39 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          ./chip-tool basic read AcceptedCommandList 1 0
+          ./chip-tool basic read client-generated-command-list 1 0
 
-        [1646261193889] [5094:213098] CHIP: [EM] Found matching exchange: 59233i, Delegate: 0x7ffe83c2c6c0
-        [1646261193889] [5094:213098] CHIP: [EM] Rxd Ack; Removing MessageCounter:16023881 from Retrans Table on exchange 59233i
-        [1646261193889] [5094:213098] CHIP: [EM] Removed CHIP MessageCounter:16023881 from RetransTable on exchange 59233i
-        [1646261193889] [5094:213098] CHIP: [DMG] ReportDataMessage =
-        [1646261193889] [5094:213098] CHIP: [DMG] {
-        [1646261193889] [5094:213098] CHIP: [DMG]         AttributeReportIBs =
-        [1646261193889] [5094:213098] CHIP: [DMG]         [
-        [1646261193889] [5094:213098] CHIP: [DMG]                 AttributeReportIB =
-        [1646261193889] [5094:213098] CHIP: [DMG]                 {
-        [1646261193889] [5094:213098] CHIP: [DMG]                         AttributeDataIB =
-        [1646261193889] [5094:213098] CHIP: [DMG]                         {
-        [1646261193889] [5094:213098] CHIP: [DMG]                                 DataVersion = 0x2d467ce6,
-        [1646261193889] [5094:213098] CHIP: [DMG]                                 AttributePathIB =
-        [1646261193889] [5094:213098] CHIP: [DMG]                                 {
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         Endpoint = 0x0,
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         Cluster = 0x28,
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         Attribute = 0x0000_FFF9,
-        [1646261193889] [5094:213098] CHIP: [DMG]                                 }
-        [1646261193889] [5094:213098] CHIP: [DMG]
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         Data = [
-        [1646261193889] [5094:213098] CHIP: [DMG]
-        [1646261193889] [5094:213098] CHIP: [DMG]                                         ],
-        [1646261193889] [5094:213098] CHIP: [DMG]                         },
-        [1646261193889] [5094:213098] CHIP: [DMG]
-        [1646261193889] [5094:213098] CHIP: [DMG]                 },
-        [1646261193889] [5094:213098] CHIP: [DMG]
-        [1646261193889] [5094:213098] CHIP: [DMG]         ],
-        [1646261193889] [5094:213098] CHIP: [DMG]
-        [1646261193889] [5094:213098] CHIP: [DMG]         SuppressResponse = true,
-        [1646261193889] [5094:213098] CHIP: [DMG]         InteractionModelRevision = 1
-        [1646261193889] [5094:213098] CHIP: [DMG] }
-        [1646261193889] [5094:213098] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9DataVersion: 759594214
-        [1646261193889] [5094:213098] CHIP: [TOO]   AcceptedCommandList: 0 entries
-    disabled: true
+          [1646261193889] [5094:213098] CHIP: [EM] Found matching exchange: 59233i, Delegate: 0x7ffe83c2c6c0
+          [1646261193889] [5094:213098] CHIP: [EM] Rxd Ack; Removing MessageCounter:16023881 from Retrans Table on exchange 59233i
+          [1646261193889] [5094:213098] CHIP: [EM] Removed CHIP MessageCounter:16023881 from RetransTable on exchange 59233i
+          [1646261193889] [5094:213098] CHIP: [DMG] ReportDataMessage =
+          [1646261193889] [5094:213098] CHIP: [DMG] {
+          [1646261193889] [5094:213098] CHIP: [DMG]         AttributeReportIBs =
+          [1646261193889] [5094:213098] CHIP: [DMG]         [
+          [1646261193889] [5094:213098] CHIP: [DMG]                 AttributeReportIB =
+          [1646261193889] [5094:213098] CHIP: [DMG]                 {
+          [1646261193889] [5094:213098] CHIP: [DMG]                         AttributeDataIB =
+          [1646261193889] [5094:213098] CHIP: [DMG]                         {
+          [1646261193889] [5094:213098] CHIP: [DMG]                                 DataVersion = 0x2d467ce6,
+          [1646261193889] [5094:213098] CHIP: [DMG]                                 AttributePathIB =
+          [1646261193889] [5094:213098] CHIP: [DMG]                                 {
+          [1646261193889] [5094:213098] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1646261193889] [5094:213098] CHIP: [DMG]                                         Cluster = 0x28,
+          [1646261193889] [5094:213098] CHIP: [DMG]                                         Attribute = 0x0000_FFF9,
+          [1646261193889] [5094:213098] CHIP: [DMG]                                 }
+          [1646261193889] [5094:213098] CHIP: [DMG]
+          [1646261193889] [5094:213098] CHIP: [DMG]                                         Data = [
+          [1646261193889] [5094:213098] CHIP: [DMG]
+          [1646261193889] [5094:213098] CHIP: [DMG]                                         ],
+          [1646261193889] [5094:213098] CHIP: [DMG]                         },
+          [1646261193889] [5094:213098] CHIP: [DMG]
+          [1646261193889] [5094:213098] CHIP: [DMG]                 },
+          [1646261193889] [5094:213098] CHIP: [DMG]
+          [1646261193889] [5094:213098] CHIP: [DMG]         ],
+          [1646261193889] [5094:213098] CHIP: [DMG]
+          [1646261193889] [5094:213098] CHIP: [DMG]         SuppressResponse = true,
+          [1646261193889] [5094:213098] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646261193889] [5094:213098] CHIP: [DMG] }
+          [1646261193889] [5094:213098] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9DataVersion: 759594214
+          [1646261193889] [5094:213098] CHIP: [TOO]   ClientGeneratedCommandList: 0 entries
+      disabled: true
