@@ -215,8 +215,8 @@ CHIP_ERROR AppTask::Init()
     }
 
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    //err = LockMgr().InitEndpoint();
-    //if (err != CHIP_NO_ERROR)
+    // err = LockMgr().InitEndpoint();
+    // if (err != CHIP_NO_ERROR)
     //{
     //    EFR32_LOG("LockMgr().Init() failed");
     //    appError(err);
@@ -344,8 +344,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    //bool initiated = false;
-    //CHIP_ERROR err = CHIP_NO_ERROR;
+    // bool initiated = false;
+    // CHIP_ERROR err = CHIP_NO_ERROR;
 
     /*if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -559,10 +559,10 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
 void AppTask::ActionRequest(int32_t aActor, LockManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Lock;
+    event.Type             = AppEvent::kEventType_Lock;
     event.LockEvent.Actor  = aActor;
     event.LockEvent.Action = aAction;
-    event.Handler           = LockActionEventHandler;
+    event.Handler          = LockActionEventHandler;
     PostEvent(&event);
 }
 
@@ -614,7 +614,8 @@ void AppTask::UpdateClusterState(intptr_t context)
 {
 
     // write the new on/off value
-    bool status = DoorLockServer::Instance().SetLockState(1, LockMgr().isLocked(1) ? DlLockState::kUnlocked : DlLockState::kLocked, DlOperationSource::kUnspecified);
+    bool status = DoorLockServer::Instance().SetLockState(1, LockMgr().isLocked(1) ? DlLockState::kUnlocked : DlLockState::kLocked,
+                                                          DlOperationSource::kUnspecified);
 
     if (status != true)
     {

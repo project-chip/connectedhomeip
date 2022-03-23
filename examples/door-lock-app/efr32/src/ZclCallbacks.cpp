@@ -20,9 +20,9 @@
  *   This file implements the handler for data model messages.
  */
 
-#include "AppConfig.h"
 #include "../include/LockEndpoint.h"
 #include "../include/LockManager.h"
+#include "AppConfig.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -43,7 +43,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         emberAfDoorLockClusterPrintln("Door Lock attribute changed");
     }
-
 }
 
 /** @brief OnOff Cluster Init
@@ -66,5 +65,4 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
     DoorLockServer::Instance().InitServer(endpoint);
     LockManager::Instance().InitEndpoint(endpoint);
-
 }
