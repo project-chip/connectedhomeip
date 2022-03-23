@@ -34,7 +34,7 @@ namespace Test {
 CHIP_ERROR AppContext::Init()
 {
     ReturnErrorOnFailure(Super::Init());
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable()));
 
     Access::SetAccessControl(gPermissiveAccessControl);
     ReturnErrorOnFailure(Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate()));

@@ -183,6 +183,8 @@ public:
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
+    // Returns the number of interested paths, including wildcard and corcrete paths.
+    size_t GetPathCount() const { return mPathCount; };
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:
@@ -332,6 +334,8 @@ private:
      */
 
     uint32_t mLastWrittenEventsBytes = 0;
+    // The number of interested paths, including wildcard and corcrete paths.
+    size_t mPathCount = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;

@@ -79,6 +79,15 @@ public:
      */
     static InteractionModelEngine * GetInstance(void);
 
+    /**
+     * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
+     * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
+     */
+    static constexpr size_t kMinSupportedSubscriptionPerFabric = 3;
+    static constexpr size_t kMinSupportedPathPerSubscription   = 3;
+    static constexpr size_t kReservedPathInfoForReadRequests   = 9;
+    static constexpr size_t kReservedPathInfoForDirtyPaths     = 3;
+
     InteractionModelEngine(void);
 
     /**
@@ -91,7 +100,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable);
 
     void Shutdown();
 
@@ -205,6 +214,11 @@ public:
      */
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
+    /**
+     * Checks if we have enough remaining available slots in the cluster info pool.
+     */
+    bool CheckResourceQuotaForCurrentFabric(const ReadHandler * apReadHandler);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -317,17 +331,29 @@ private:
 
     ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
-    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
+                          (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric +
+                           kReservedPathInfoForReadRequests),
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+
     ObjectPool<ObjectList<AttributePathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mAttributePathPool;
     ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
+
+    static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= CHIP_CONFIG_MAX_FABRICS * (kMinSupportedSubscriptionPerFabric + 1),
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
+
     ReadClient * mpActiveReadClientList = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
 #endif
+
+    FabricTable * mpFabricTable;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.

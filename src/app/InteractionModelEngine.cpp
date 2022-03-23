@@ -37,11 +37,13 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
     return &sInteractionModelEngine;
 }
 
-CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable)
 {
     mpExchangeMgr = apExchangeMgr;
+    mpFabricTable = apFabricTable;
 
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
+    VerifyOrReturnError(mpFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mReportingEngine.Init();
     mMagic++;
@@ -332,7 +334,12 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
     if (handler)
     {
-        ReturnErrorOnFailure(handler->OnInitialRequest(std::move(aPayload)));
+        CHIP_ERROR err = handler->OnInitialRequest(std::move(aPayload));
+        if (err == CHIP_ERROR_NO_MEMORY)
+        {
+            aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+        }
+        ReturnErrorOnFailure(err);
 
         aStatus = Protocols::InteractionModel::Status::Success;
         return CHIP_NO_ERROR;
@@ -483,6 +490,52 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
     apReadClient->SetNextClient(mpActiveReadClientList);
     mpActiveReadClientList = apReadClient;
+}
+
+bool InteractionModelEngine::CheckResourceQuotaForCurrentFabric(const ReadHandler * apReadHandler)
+{
+    FabricIndex currentFabricIndex                 = apReadHandler->GetAccessingFabricIndex();
+    size_t pathsSubscribedByCurrentFabric          = 0;
+    size_t pathsUsedByCurrentFabric                = 0;
+    size_t subscriptionsEstablishedByCurrentFabric = 0;
+    size_t activeReadHandlersByCurrentFabric       = 0;
+    mReadHandlers.ForEachActiveObject([currentFabricIndex, &pathsSubscribedByCurrentFabric, &pathsUsedByCurrentFabric,
+                                       &subscriptionsEstablishedByCurrentFabric,
+                                       &activeReadHandlersByCurrentFabric](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == currentFabricIndex)
+        {
+            if (handler->IsType(ReadHandler::InteractionType::Subscribe))
+            {
+                pathsSubscribedByCurrentFabric += handler->GetPathCount();
+                subscriptionsEstablishedByCurrentFabric++;
+            }
+            pathsUsedByCurrentFabric += handler->GetPathCount();
+            activeReadHandlersByCurrentFabric++;
+        }
+        return Loop::Continue;
+    });
+
+    // Ensure the total number of subscriptions and ongoing read requests don't exceed the limit per fabric.
+    VerifyOrReturnError(
+        (subscriptionsEstablishedByCurrentFabric + 1) * mpFabricTable->FabricCount() <= CHIP_IM_MAX_NUM_READ_HANDLER, false);
+    VerifyOrReturnError(activeReadHandlersByCurrentFabric * mpFabricTable->FabricCount() <= CHIP_IM_MAX_NUM_READ_HANDLER, false);
+
+    // For all transactions, ensure we won't use up the quota of paths assigned to current fabric.
+    VerifyOrReturnError(pathsUsedByCurrentFabric * mpFabricTable->FabricCount() <= CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS, false);
+
+    if (apReadHandler->IsType(ReadHandler::InteractionType::Read))
+    {
+        return true;
+    }
+
+    if (mpFabricTable->FabricCount() == 0)
+    {
+        return false;
+    }
+
+    // Similar to the check above, but always ensure we can process a read request with 9 paths.
+    return (pathsSubscribedByCurrentFabric + kReservedPathInfoForReadRequests) * mpFabricTable->FabricCount() <=
+        mClusterInfoPool.Capacity();
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)

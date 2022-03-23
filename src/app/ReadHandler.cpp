@@ -28,6 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -317,6 +318,9 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
+
+    mPathCount = 0;
+
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -358,6 +362,8 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
+    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CheckResourceQuotaForCurrentFabric(this), CHIP_ERROR_NO_MEMORY);
+
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
@@ -377,6 +383,10 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
+
+    size_t attributePathCount = 0;
+    TLV::Utilities::Count(reader, attributePathCount, false);
+    mPathCount += attributePathCount;
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
@@ -481,6 +491,10 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aEventPathsParser.GetReader(&reader);
+
+    size_t eventPathCount = 0;
+    TLV::Utilities::Count(reader, eventPathCount, false);
+    mPathCount += eventPathCount;
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
