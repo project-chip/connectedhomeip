@@ -266,6 +266,13 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CommissionableDataProviderMgrImpl().Update(env, spake2pVerifierBase64, Spake2pSaltBase64,
                                                                 spake2pIterationCount, setupPasscode, discriminator);
+    
+    
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %s", ErrorStr(err));
+        return false;
+    }
 
-    return err == CHIP_NO_ERROR;
+    return true;
 }
