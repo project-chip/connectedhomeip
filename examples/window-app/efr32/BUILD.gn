@@ -218,9 +218,7 @@ efr32_executable("window_app") {
 
     if (show_qr_code) {
       deps += [ "${chip_root}/examples/common/QRCode" ]
-      defines += [ "QR_CODE_ENABLED=1" ]
-    } else {
-      defines += [ "QR_CODE_ENABLED=0" ]
+      defines += [ "QR_CODE_ENABLED" ]
     }
   }
 
