@@ -45,6 +45,7 @@
 #include <lib/support/BitFlags.h>
 
 #include "esp_event.h"
+#include "esp_netif_types.h"
 
 namespace chip {
 
