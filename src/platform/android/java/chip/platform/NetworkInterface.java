@@ -33,5 +33,7 @@ public class NetworkInterface {
   @Nullable public Boolean offPremiseServicesReachableIPv4;
   @Nullable public Boolean offPremiseServicesReachableIPv6;
   public byte[] hardwareAddress;
+  public byte[] ipv4Address;
+  public byte[] ipv6Address;
   public int type;
 }
