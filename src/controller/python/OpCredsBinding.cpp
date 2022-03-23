@@ -37,6 +37,7 @@
 
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 
 using namespace chip;
 
@@ -47,6 +48,15 @@ using Py_GenerateNOCChainFunc         = void (*)(void * pyContext, const char * 
                                          Controller::OnNOCChainGeneration onNocChainGenerationFunc);
 using Py_SetNodeIdForNextNOCRequest   = void (*)(void * pyContext, NodeId nodeId);
 using Py_SetFabricIdForNextNOCRequest = void (*)(void * pyContext, FabricId fabricId);
+
+namespace {
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    return &attestationTrustStore;
+}
+} // namespace
 
 namespace chip {
 namespace Controller {
@@ -129,7 +139,8 @@ void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCreden
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId, bool useTestCommissioner)
+                                                         FabricId fabricId, chip::NodeId nodeId, const char * paaTrustStorePath,
+                                                         bool useTestCommissioner)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -139,8 +150,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(
+        paaTrustStorePath == nullptr ? "./credentials/development/paa-root-certs" : paaTrustStorePath);
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Crypto::P256Keypair ephemeralKey;

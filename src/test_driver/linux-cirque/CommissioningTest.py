@@ -39,6 +39,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
+MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 DEVICE_CONFIG = {
     'device0': {
@@ -92,10 +93,11 @@ class TestCommissioner(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {}".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
-            ethernet_ip)
+            ethernet_ip,
+            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
