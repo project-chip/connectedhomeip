@@ -19,8 +19,6 @@ killall -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
 rm -f "$FIRMWARE_OTA" "$FIRMWARE_BIN" "$OTA_DOWNLOAD_PATH"
 
 scripts/examples/gn_build_example.sh examples/chip-tool "$CHIP_TOOL_FOLDER"
-scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux "$OTA_REQUESTOR_FOLDER" chip_config_network_layer_ble=false
-scripts/examples/gn_build_example.sh examples/ota-provider-app/linux "$OTA_PROVIDER_FOLDER" chip_config_network_layer_ble=false
 
 echo "Test" >"$FIRMWARE_BIN"
 
