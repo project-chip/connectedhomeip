@@ -139,7 +139,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(CharSpan::fromCharString(gOtaDownloadPath));
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
@@ -213,5 +213,21 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
     ChipLinuxAppMainLoop();
+
+    // If the event loop had been stopped due to an update being applied, boot into the new image
+    if (gRequestorCore.GetCurrentUpdateState() == OTARequestor::OTAUpdateStateEnum::kApplying)
+    {
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
+        {
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+            return -1;
+        }
+
+        argv[0] = kImageExecPath;
+        execv(argv[0], argv);
+
+        // If successfully executing the new iamge, execv should not return
+        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+    }
     return 0;
 }

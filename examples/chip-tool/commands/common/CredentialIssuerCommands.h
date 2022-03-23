@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,6 +63,7 @@ public:
      *
      * @param[in] nodeId   The desired NodeId for the generated NOC Chain - May be optional/unused in some implementations.
      * @param[in] fabricId The desired FabricId for the generated NOC Chain - May be optional/unused in some implementations.
+     * @param[in] cats     The desired CATs for the generated NOC Chain - May be optional/unused in some implementations.
      * @param[in] keypair  The desired Keypair for the generated NOC Chain - May be optional/unused in some implementations.
      * @param[in,out] rcac  Buffer to hold the Root Certificate of the generated NOC Chain.
      * @param[in,out] icac  Buffer to hold the Intermediate Certificate of the generated NOC Chain.
@@ -70,7 +71,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, chip::Crypto::P256Keypair & keypair,
-                                                  chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-                                                  chip::MutableByteSpan & noc) = 0;
+    virtual CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+                                                  chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                                  chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) = 0;
 };

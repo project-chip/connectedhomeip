@@ -147,10 +147,49 @@ void TestUpdateToken(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR != otaStorage.LoadUpdateToken(readUpdateToken));
 }
 
+void TestCurrentUpdateState(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    DefaultOTARequestorStorage otaStorage;
+    otaStorage.Init(persistentStorage);
+
+    OTARequestorStorage::OTAUpdateStateEnum updateState = OTARequestorStorage::OTAUpdateStateEnum::kApplying;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.StoreCurrentUpdateState(updateState));
+
+    updateState = OTARequestorStorage::OTAUpdateStateEnum::kUnknown;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.LoadCurrentUpdateState(updateState));
+    NL_TEST_ASSERT(inSuite, updateState == OTARequestorStorage::OTAUpdateStateEnum::kApplying);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.ClearCurrentUpdateState());
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR != otaStorage.LoadCurrentUpdateState(updateState));
+}
+
+void TestTargetVersion(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    DefaultOTARequestorStorage otaStorage;
+    otaStorage.Init(persistentStorage);
+
+    uint32_t targetVersion = 2;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.StoreTargetVersion(targetVersion));
+
+    targetVersion = 0;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.LoadTargetVersion(targetVersion));
+    NL_TEST_ASSERT(inSuite, targetVersion == 2);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == otaStorage.ClearTargetVersion());
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR != otaStorage.LoadTargetVersion(targetVersion));
+}
+
 const nlTest sTests[] = { NL_TEST_DEF("Test default providers", TestDefaultProviders),
                           NL_TEST_DEF("Test default providers (empty list)", TestDefaultProvidersEmpty),
                           NL_TEST_DEF("Test current provider location", TestCurrentProviderLocation),
-                          NL_TEST_DEF("Test update token", TestUpdateToken), NL_TEST_SENTINEL() };
+                          NL_TEST_DEF("Test update token", TestUpdateToken),
+                          NL_TEST_DEF("Test current update state", TestCurrentUpdateState),
+                          NL_TEST_DEF("Test target version", TestTargetVersion),
+                          NL_TEST_SENTINEL() };
 
 int TestSetup(void * inContext)
 {

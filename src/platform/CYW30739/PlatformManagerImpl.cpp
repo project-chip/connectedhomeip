@@ -127,6 +127,11 @@ exit:
     return err;
 }
 
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::_LockChipStack(void)
 {
     const wiced_result_t result = wiced_rtos_lock_mutex(mMutex);

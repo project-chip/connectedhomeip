@@ -576,8 +576,8 @@ class BaseTestHelper:
             "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 0,
-            "SoftwareVersionString": "prerelease",
+            "SoftwareVersion": 1,
+            "SoftwareVersionString": "1.0",
         }
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():

@@ -27,6 +27,9 @@
 
 namespace chip {
 
+// Full file path to where the new image will be executed from post-download
+static char kImageExecPath[] = "/tmp/ota.update";
+
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
@@ -36,11 +39,11 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
+    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -66,8 +69,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    uint32_t mSoftwareVersion;
-    CharSpan mImageFile;
+    const char * mImageFile = nullptr;
 };
 
 } // namespace chip
