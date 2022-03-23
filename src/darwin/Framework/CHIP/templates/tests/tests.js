@@ -169,10 +169,6 @@ function getTests()
     'Test_TC_MOD_1_1',
   ];
 
-  const MultipleFabrics = [
-    'Test_TC_MF_1_4',
-  ];
-
   const OnOff = [
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
@@ -299,7 +295,6 @@ function getTests()
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
-    MultipleFabrics, //
     ModeSelect, //
     OccupancySensing, //
     OnOff, //
