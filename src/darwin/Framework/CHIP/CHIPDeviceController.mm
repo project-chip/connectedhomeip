@@ -17,6 +17,7 @@
 #import "CHIPDeviceController.h"
 
 #import "CHIPCommissioningParameters.h"
+#import "CHIPControllerAccessControl.h"
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
@@ -157,6 +158,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             commissionerInitialized = YES;
             return;
         }
+
+        [CHIPControllerAccessControl init];
 
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 

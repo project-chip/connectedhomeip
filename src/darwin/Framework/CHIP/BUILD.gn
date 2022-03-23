@@ -30,6 +30,8 @@ static_library("framework") {
   sources = [
     "CHIP.h",
     "CHIPCluster.mm",
+    "CHIPControllerAccessControl.h",
+    "CHIPControllerAccessControl.mm",
     "CHIPDevice.h",
     "CHIPDevice.mm",
     "CHIPDeviceConnectionBridge.mm",
@@ -42,6 +44,7 @@ static_library("framework") {
     "CHIPError.h",
     "CHIPError.mm",
     "CHIPError_Internal.h",
+    "CHIPIMDispatch.mm",
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
