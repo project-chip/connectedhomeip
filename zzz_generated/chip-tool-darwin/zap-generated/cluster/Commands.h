@@ -159,8 +159,8 @@
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -325,18 +325,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadAccessControlServerGeneratedCommandList : public ModelCommand {
+class ReadAccessControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadAccessControlServerGeneratedCommandList()
+    ReadAccessControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccessControlServerGeneratedCommandList() {}
+    ~ReadAccessControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -345,31 +345,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccessControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccessControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccessControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAccessControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAccessControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAccessControlServerGeneratedCommandList()
+    SubscribeAttributeAccessControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAccessControlServerGeneratedCommandList() {}
+    ~SubscribeAttributeAccessControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -377,16 +376,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccessControl.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AccessControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -403,18 +401,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadAccessControlClientGeneratedCommandList : public ModelCommand {
+class ReadAccessControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadAccessControlClientGeneratedCommandList()
+    ReadAccessControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccessControlClientGeneratedCommandList() {}
+    ~ReadAccessControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -423,31 +421,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccessControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccessControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccessControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAccessControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAccessControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAccessControlClientGeneratedCommandList()
+    SubscribeAttributeAccessControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAccessControlClientGeneratedCommandList() {}
+    ~SubscribeAttributeAccessControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -456,15 +453,14 @@ public:
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccessControl.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -639,8 +635,8 @@ private:
 | * Logout                                                            |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -755,18 +751,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadAccountLoginServerGeneratedCommandList : public ModelCommand {
+class ReadAccountLoginGeneratedCommandList : public ModelCommand {
 public:
-    ReadAccountLoginServerGeneratedCommandList()
+    ReadAccountLoginGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccountLoginServerGeneratedCommandList() {}
+    ~ReadAccountLoginGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -775,31 +771,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccountLogin.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccountLogin.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccountLogin ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccountLogin GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAccountLoginServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAccountLoginGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAccountLoginServerGeneratedCommandList()
+    SubscribeAttributeAccountLoginGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAccountLoginServerGeneratedCommandList() {}
+    ~SubscribeAttributeAccountLoginGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -807,16 +802,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccountLogin.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AccountLogin.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -833,18 +827,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadAccountLoginClientGeneratedCommandList : public ModelCommand {
+class ReadAccountLoginAcceptedCommandList : public ModelCommand {
 public:
-    ReadAccountLoginClientGeneratedCommandList()
+    ReadAccountLoginAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccountLoginClientGeneratedCommandList() {}
+    ~ReadAccountLoginAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -853,31 +847,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AccountLogin.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AccountLogin ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AccountLogin AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAccountLoginClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAccountLoginAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAccountLoginClientGeneratedCommandList()
+    SubscribeAttributeAccountLoginAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAccountLoginClientGeneratedCommandList() {}
+    ~SubscribeAttributeAccountLoginAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -886,15 +879,14 @@ public:
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AccountLogin.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -1072,8 +1064,8 @@ private:
 | * WindowStatus                                                      | 0x0000 |
 | * AdminFabricIndex                                                  | 0x0001 |
 | * AdminVendorId                                                     | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -1437,18 +1429,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadAdministratorCommissioningServerGeneratedCommandList : public ModelCommand {
+class ReadAdministratorCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    ReadAdministratorCommissioningServerGeneratedCommandList()
+    ReadAdministratorCommissioningGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAdministratorCommissioningServerGeneratedCommandList() {}
+    ~ReadAdministratorCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -1459,31 +1451,30 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AdministratorCommissioning.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AdministratorCommissioning ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AdministratorCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAdministratorCommissioningServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAdministratorCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAdministratorCommissioningServerGeneratedCommandList()
+    SubscribeAttributeAdministratorCommissioningGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAdministratorCommissioningServerGeneratedCommandList() {}
+    ~SubscribeAttributeAdministratorCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -1493,17 +1484,15 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AdministratorCommissioning.ServerGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -1520,18 +1509,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadAdministratorCommissioningClientGeneratedCommandList : public ModelCommand {
+class ReadAdministratorCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    ReadAdministratorCommissioningClientGeneratedCommandList()
+    ReadAdministratorCommissioningAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAdministratorCommissioningClientGeneratedCommandList() {}
+    ~ReadAdministratorCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -1542,31 +1531,30 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AdministratorCommissioning.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AdministratorCommissioning ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AdministratorCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAdministratorCommissioningClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAdministratorCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAdministratorCommissioningClientGeneratedCommandList()
+    SubscribeAttributeAdministratorCommissioningAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAdministratorCommissioningClientGeneratedCommandList() {}
+    ~SubscribeAttributeAdministratorCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -1576,17 +1564,15 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AdministratorCommissioning.ClientGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -1776,8 +1762,8 @@ private:
 | * Status                                                            | 0x0005 |
 | * ApplicationVersion                                                | 0x0006 |
 | * AllowedVendorList                                                 | 0x0007 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -2376,18 +2362,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadApplicationBasicServerGeneratedCommandList : public ModelCommand {
+class ReadApplicationBasicGeneratedCommandList : public ModelCommand {
 public:
-    ReadApplicationBasicServerGeneratedCommandList()
+    ReadApplicationBasicGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicServerGeneratedCommandList() {}
+    ~ReadApplicationBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -2398,31 +2384,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationBasic.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationBasic ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeApplicationBasicServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeApplicationBasicGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeApplicationBasicServerGeneratedCommandList()
+    SubscribeAttributeApplicationBasicGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeApplicationBasicServerGeneratedCommandList() {}
+    ~SubscribeAttributeApplicationBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -2432,16 +2417,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationBasic.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ApplicationBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -2458,18 +2442,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadApplicationBasicClientGeneratedCommandList : public ModelCommand {
+class ReadApplicationBasicAcceptedCommandList : public ModelCommand {
 public:
-    ReadApplicationBasicClientGeneratedCommandList()
+    ReadApplicationBasicAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicClientGeneratedCommandList() {}
+    ~ReadApplicationBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -2480,31 +2464,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationBasic.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationBasic ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeApplicationBasicClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeApplicationBasicAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeApplicationBasicClientGeneratedCommandList()
+    SubscribeAttributeApplicationBasicAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeApplicationBasicClientGeneratedCommandList() {}
+    ~SubscribeAttributeApplicationBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -2514,16 +2497,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationBasic.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ApplicationBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -2708,8 +2690,8 @@ private:
 | Attributes:                                                         |        |
 | * CatalogList                                                       | 0x0000 |
 | * CurrentApp                                                        | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -2977,18 +2959,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadApplicationLauncherServerGeneratedCommandList : public ModelCommand {
+class ReadApplicationLauncherGeneratedCommandList : public ModelCommand {
 public:
-    ReadApplicationLauncherServerGeneratedCommandList()
+    ReadApplicationLauncherGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherServerGeneratedCommandList() {}
+    ~ReadApplicationLauncherGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -2999,31 +2981,30 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationLauncher.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationLauncher.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationLauncher ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeApplicationLauncherServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeApplicationLauncherGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeApplicationLauncherServerGeneratedCommandList()
+    SubscribeAttributeApplicationLauncherGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeApplicationLauncherServerGeneratedCommandList() {}
+    ~SubscribeAttributeApplicationLauncherGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3033,16 +3014,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationLauncher.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ApplicationLauncher.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -3059,18 +3039,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadApplicationLauncherClientGeneratedCommandList : public ModelCommand {
+class ReadApplicationLauncherAcceptedCommandList : public ModelCommand {
 public:
-    ReadApplicationLauncherClientGeneratedCommandList()
+    ReadApplicationLauncherAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherClientGeneratedCommandList() {}
+    ~ReadApplicationLauncherAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3081,31 +3061,30 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ApplicationLauncher.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ApplicationLauncher.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ApplicationLauncher ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ApplicationLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeApplicationLauncherClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeApplicationLauncherAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeApplicationLauncherClientGeneratedCommandList()
+    SubscribeAttributeApplicationLauncherAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeApplicationLauncherClientGeneratedCommandList() {}
+    ~SubscribeAttributeApplicationLauncherAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3115,16 +3094,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ApplicationLauncher.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ApplicationLauncher.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -3309,8 +3287,8 @@ private:
 | Attributes:                                                         |        |
 | * OutputList                                                        | 0x0000 |
 | * CurrentOutput                                                     | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -3540,18 +3518,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadAudioOutputServerGeneratedCommandList : public ModelCommand {
+class ReadAudioOutputGeneratedCommandList : public ModelCommand {
 public:
-    ReadAudioOutputServerGeneratedCommandList()
+    ReadAudioOutputGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAudioOutputServerGeneratedCommandList() {}
+    ~ReadAudioOutputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3560,31 +3538,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AudioOutput.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AudioOutput ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AudioOutput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAudioOutputServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAudioOutputGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAudioOutputServerGeneratedCommandList()
+    SubscribeAttributeAudioOutputGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAudioOutputServerGeneratedCommandList() {}
+    ~SubscribeAttributeAudioOutputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3593,15 +3570,14 @@ public:
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AudioOutput.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -3618,18 +3594,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadAudioOutputClientGeneratedCommandList : public ModelCommand {
+class ReadAudioOutputAcceptedCommandList : public ModelCommand {
 public:
-    ReadAudioOutputClientGeneratedCommandList()
+    ReadAudioOutputAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadAudioOutputClientGeneratedCommandList() {}
+    ~ReadAudioOutputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3638,31 +3614,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"AudioOutput.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "AudioOutput ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "AudioOutput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeAudioOutputClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeAudioOutputAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeAudioOutputClientGeneratedCommandList()
+    SubscribeAttributeAudioOutputAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeAudioOutputClientGeneratedCommandList() {}
+    ~SubscribeAttributeAudioOutputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -3671,15 +3646,14 @@ public:
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"AudioOutput.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -3863,8 +3837,8 @@ private:
 | * BarrierOpenPeriod                                                 | 0x0008 |
 | * BarrierClosePeriod                                                | 0x0009 |
 | * BarrierPosition                                                   | 0x000A |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -4239,18 +4213,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBarrierControlServerGeneratedCommandList : public ModelCommand {
+class ReadBarrierControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadBarrierControlServerGeneratedCommandList()
+    ReadBarrierControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlServerGeneratedCommandList() {}
+    ~ReadBarrierControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -4259,31 +4233,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BarrierControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BarrierControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BarrierControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BarrierControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBarrierControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBarrierControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBarrierControlServerGeneratedCommandList()
+    SubscribeAttributeBarrierControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBarrierControlServerGeneratedCommandList() {}
+    ~SubscribeAttributeBarrierControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -4291,16 +4264,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BarrierControl.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BarrierControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -4317,18 +4289,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBarrierControlClientGeneratedCommandList : public ModelCommand {
+class ReadBarrierControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadBarrierControlClientGeneratedCommandList()
+    ReadBarrierControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlClientGeneratedCommandList() {}
+    ~ReadBarrierControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -4337,31 +4309,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BarrierControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BarrierControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BarrierControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BarrierControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBarrierControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBarrierControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBarrierControlClientGeneratedCommandList()
+    SubscribeAttributeBarrierControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBarrierControlClientGeneratedCommandList() {}
+    ~SubscribeAttributeBarrierControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -4369,16 +4340,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BarrierControl.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BarrierControl.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -4570,8 +4540,8 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -6117,18 +6087,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBasicServerGeneratedCommandList : public ModelCommand {
+class ReadBasicGeneratedCommandList : public ModelCommand {
 public:
-    ReadBasicServerGeneratedCommandList()
+    ReadBasicGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicServerGeneratedCommandList() {}
+    ~ReadBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6137,31 +6107,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Basic.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Basic ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Basic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBasicServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBasicGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBasicServerGeneratedCommandList()
+    SubscribeAttributeBasicGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBasicServerGeneratedCommandList() {}
+    ~SubscribeAttributeBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6169,16 +6138,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Basic.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -6195,18 +6162,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBasicClientGeneratedCommandList : public ModelCommand {
+class ReadBasicAcceptedCommandList : public ModelCommand {
 public:
-    ReadBasicClientGeneratedCommandList()
+    ReadBasicAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicClientGeneratedCommandList() {}
+    ~ReadBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6215,31 +6182,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Basic.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Basic ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Basic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBasicClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBasicAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBasicClientGeneratedCommandList()
+    SubscribeAttributeBasicAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBasicClientGeneratedCommandList() {}
+    ~SubscribeAttributeBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6247,16 +6213,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Basic.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -6437,8 +6401,8 @@ private:
 | * Reliability                                                       | 0x0067 |
 | * StatusFlags                                                       | 0x006F |
 | * ApplicationType                                                   | 0x0100 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -6756,18 +6720,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBinaryInputBasicServerGeneratedCommandList : public ModelCommand {
+class ReadBinaryInputBasicGeneratedCommandList : public ModelCommand {
 public:
-    ReadBinaryInputBasicServerGeneratedCommandList()
+    ReadBinaryInputBasicGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicServerGeneratedCommandList() {}
+    ~ReadBinaryInputBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6778,31 +6742,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BinaryInputBasic.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BinaryInputBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BinaryInputBasic ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BinaryInputBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBinaryInputBasicServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBinaryInputBasicGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBinaryInputBasicServerGeneratedCommandList()
+    SubscribeAttributeBinaryInputBasicGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBinaryInputBasicServerGeneratedCommandList() {}
+    ~SubscribeAttributeBinaryInputBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6812,16 +6775,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BinaryInputBasic.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BinaryInputBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -6838,18 +6800,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBinaryInputBasicClientGeneratedCommandList : public ModelCommand {
+class ReadBinaryInputBasicAcceptedCommandList : public ModelCommand {
 public:
-    ReadBinaryInputBasicClientGeneratedCommandList()
+    ReadBinaryInputBasicAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicClientGeneratedCommandList() {}
+    ~ReadBinaryInputBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6860,31 +6822,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BinaryInputBasic.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BinaryInputBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BinaryInputBasic ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BinaryInputBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBinaryInputBasicClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBinaryInputBasicAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBinaryInputBasicClientGeneratedCommandList()
+    SubscribeAttributeBinaryInputBasicAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBinaryInputBasicClientGeneratedCommandList() {}
+    ~SubscribeAttributeBinaryInputBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -6894,16 +6855,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BinaryInputBasic.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BinaryInputBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -7084,8 +7044,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Binding                                                           | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -7171,18 +7131,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBindingServerGeneratedCommandList : public ModelCommand {
+class ReadBindingGeneratedCommandList : public ModelCommand {
 public:
-    ReadBindingServerGeneratedCommandList()
+    ReadBindingGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBindingServerGeneratedCommandList() {}
+    ~ReadBindingGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7191,31 +7151,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Binding.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Binding ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Binding GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBindingServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBindingGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBindingServerGeneratedCommandList()
+    SubscribeAttributeBindingGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBindingServerGeneratedCommandList() {}
+    ~SubscribeAttributeBindingGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7224,15 +7183,14 @@ public:
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Binding.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -7249,18 +7207,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBindingClientGeneratedCommandList : public ModelCommand {
+class ReadBindingAcceptedCommandList : public ModelCommand {
 public:
-    ReadBindingClientGeneratedCommandList()
+    ReadBindingAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBindingClientGeneratedCommandList() {}
+    ~ReadBindingAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7269,31 +7227,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Binding.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Binding ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Binding AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBindingClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBindingAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBindingClientGeneratedCommandList()
+    SubscribeAttributeBindingAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBindingClientGeneratedCommandList() {}
+    ~SubscribeAttributeBindingAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7301,16 +7258,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Binding.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -7483,8 +7438,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * StateValue                                                        | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -7569,18 +7524,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBooleanStateServerGeneratedCommandList : public ModelCommand {
+class ReadBooleanStateGeneratedCommandList : public ModelCommand {
 public:
-    ReadBooleanStateServerGeneratedCommandList()
+    ReadBooleanStateGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBooleanStateServerGeneratedCommandList() {}
+    ~ReadBooleanStateGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7589,31 +7544,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BooleanState.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BooleanState.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BooleanState ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BooleanState GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBooleanStateServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBooleanStateGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBooleanStateServerGeneratedCommandList()
+    SubscribeAttributeBooleanStateGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBooleanStateServerGeneratedCommandList() {}
+    ~SubscribeAttributeBooleanStateGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7621,16 +7575,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BooleanState.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BooleanState.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -7647,18 +7600,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBooleanStateClientGeneratedCommandList : public ModelCommand {
+class ReadBooleanStateAcceptedCommandList : public ModelCommand {
 public:
-    ReadBooleanStateClientGeneratedCommandList()
+    ReadBooleanStateAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBooleanStateClientGeneratedCommandList() {}
+    ~ReadBooleanStateAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7667,31 +7620,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BooleanState.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BooleanState ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BooleanState AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBooleanStateClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBooleanStateAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBooleanStateClientGeneratedCommandList()
+    SubscribeAttributeBooleanStateAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBooleanStateClientGeneratedCommandList() {}
+    ~SubscribeAttributeBooleanStateAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -7700,15 +7652,14 @@ public:
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BooleanState.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -7895,8 +7846,8 @@ private:
 | * ActionList                                                        | 0x0000 |
 | * EndpointList                                                      | 0x0001 |
 | * SetupUrl                                                          | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -8591,18 +8542,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBridgedActionsServerGeneratedCommandList : public ModelCommand {
+class ReadBridgedActionsGeneratedCommandList : public ModelCommand {
 public:
-    ReadBridgedActionsServerGeneratedCommandList()
+    ReadBridgedActionsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsServerGeneratedCommandList() {}
+    ~ReadBridgedActionsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -8611,31 +8562,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedActions.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedActions.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedActions ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedActions GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBridgedActionsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBridgedActionsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBridgedActionsServerGeneratedCommandList()
+    SubscribeAttributeBridgedActionsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBridgedActionsServerGeneratedCommandList() {}
+    ~SubscribeAttributeBridgedActionsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -8643,16 +8593,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedActions.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BridgedActions.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -8669,18 +8618,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBridgedActionsClientGeneratedCommandList : public ModelCommand {
+class ReadBridgedActionsAcceptedCommandList : public ModelCommand {
 public:
-    ReadBridgedActionsClientGeneratedCommandList()
+    ReadBridgedActionsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsClientGeneratedCommandList() {}
+    ~ReadBridgedActionsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -8689,31 +8638,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedActions.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedActions.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedActions ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedActions AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBridgedActionsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBridgedActionsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBridgedActionsClientGeneratedCommandList()
+    SubscribeAttributeBridgedActionsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBridgedActionsClientGeneratedCommandList() {}
+    ~SubscribeAttributeBridgedActionsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -8721,16 +8669,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedActions.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BridgedActions.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -8917,8 +8864,8 @@ private:
 | * SerialNumber                                                      | 0x000F |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -10159,18 +10106,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadBridgedDeviceBasicServerGeneratedCommandList : public ModelCommand {
+class ReadBridgedDeviceBasicGeneratedCommandList : public ModelCommand {
 public:
-    ReadBridgedDeviceBasicServerGeneratedCommandList()
+    ReadBridgedDeviceBasicGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedDeviceBasicServerGeneratedCommandList() {}
+    ~ReadBridgedDeviceBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10181,31 +10128,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedDeviceBasic.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedDeviceBasic ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedDeviceBasic GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBridgedDeviceBasicServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBridgedDeviceBasicGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBridgedDeviceBasicServerGeneratedCommandList()
+    SubscribeAttributeBridgedDeviceBasicGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBridgedDeviceBasicServerGeneratedCommandList() {}
+    ~SubscribeAttributeBridgedDeviceBasicGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10215,16 +10161,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedDeviceBasic.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -10241,18 +10186,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadBridgedDeviceBasicClientGeneratedCommandList : public ModelCommand {
+class ReadBridgedDeviceBasicAcceptedCommandList : public ModelCommand {
 public:
-    ReadBridgedDeviceBasicClientGeneratedCommandList()
+    ReadBridgedDeviceBasicAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedDeviceBasicClientGeneratedCommandList() {}
+    ~ReadBridgedDeviceBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10263,31 +10208,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"BridgedDeviceBasic.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "BridgedDeviceBasic ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "BridgedDeviceBasic AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeBridgedDeviceBasicClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeBridgedDeviceBasicAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeBridgedDeviceBasicClientGeneratedCommandList()
+    SubscribeAttributeBridgedDeviceBasicAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBridgedDeviceBasicClientGeneratedCommandList() {}
+    ~SubscribeAttributeBridgedDeviceBasicAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10297,16 +10241,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"BridgedDeviceBasic.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -10493,8 +10436,8 @@ private:
 | * ChannelList                                                       | 0x0000 |
 | * Lineup                                                            | 0x0001 |
 | * CurrentChannel                                                    | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -10751,18 +10694,18 @@ public:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadChannelServerGeneratedCommandList : public ModelCommand {
+class ReadChannelGeneratedCommandList : public ModelCommand {
 public:
-    ReadChannelServerGeneratedCommandList()
+    ReadChannelGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadChannelServerGeneratedCommandList() {}
+    ~ReadChannelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10771,31 +10714,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Channel.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Channel ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Channel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeChannelServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeChannelGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeChannelServerGeneratedCommandList()
+    SubscribeAttributeChannelGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeChannelServerGeneratedCommandList() {}
+    ~SubscribeAttributeChannelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10804,15 +10746,14 @@ public:
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Channel.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -10829,18 +10770,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadChannelClientGeneratedCommandList : public ModelCommand {
+class ReadChannelAcceptedCommandList : public ModelCommand {
 public:
-    ReadChannelClientGeneratedCommandList()
+    ReadChannelAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadChannelClientGeneratedCommandList() {}
+    ~ReadChannelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10849,31 +10790,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Channel.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Channel ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Channel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeChannelClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeChannelAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeChannelClientGeneratedCommandList()
+    SubscribeAttributeChannelAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeChannelClientGeneratedCommandList() {}
+    ~SubscribeAttributeChannelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -10881,16 +10821,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Channel.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -11133,8 +11071,8 @@ private:
 | * ColorTempPhysicalMax                                              | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -16376,18 +16314,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadColorControlServerGeneratedCommandList : public ModelCommand {
+class ReadColorControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadColorControlServerGeneratedCommandList()
+    ReadColorControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlServerGeneratedCommandList() {}
+    ~ReadColorControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -16396,31 +16334,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ColorControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ColorControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ColorControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ColorControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeColorControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeColorControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeColorControlServerGeneratedCommandList()
+    SubscribeAttributeColorControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeColorControlServerGeneratedCommandList() {}
+    ~SubscribeAttributeColorControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -16428,16 +16365,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ColorControl.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ColorControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -16454,18 +16390,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadColorControlClientGeneratedCommandList : public ModelCommand {
+class ReadColorControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadColorControlClientGeneratedCommandList()
+    ReadColorControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlClientGeneratedCommandList() {}
+    ~ReadColorControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -16474,31 +16410,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ColorControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ColorControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ColorControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeColorControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeColorControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeColorControlClientGeneratedCommandList()
+    SubscribeAttributeColorControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeColorControlClientGeneratedCommandList() {}
+    ~SubscribeAttributeColorControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -16507,15 +16442,14 @@ public:
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ColorControl.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -16691,8 +16625,8 @@ private:
 | Attributes:                                                         |        |
 | * AcceptHeader                                                      | 0x0000 |
 | * SupportedStreamingProtocols                                       | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -16974,18 +16908,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadContentLauncherServerGeneratedCommandList : public ModelCommand {
+class ReadContentLauncherGeneratedCommandList : public ModelCommand {
 public:
-    ReadContentLauncherServerGeneratedCommandList()
+    ReadContentLauncherGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherServerGeneratedCommandList() {}
+    ~ReadContentLauncherGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -16994,31 +16928,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ContentLauncher.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ContentLauncher.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ContentLauncher ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ContentLauncher GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeContentLauncherServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeContentLauncherGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeContentLauncherServerGeneratedCommandList()
+    SubscribeAttributeContentLauncherGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeContentLauncherServerGeneratedCommandList() {}
+    ~SubscribeAttributeContentLauncherGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17026,16 +16959,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ContentLauncher.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ContentLauncher.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -17052,18 +16984,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadContentLauncherClientGeneratedCommandList : public ModelCommand {
+class ReadContentLauncherAcceptedCommandList : public ModelCommand {
 public:
-    ReadContentLauncherClientGeneratedCommandList()
+    ReadContentLauncherAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherClientGeneratedCommandList() {}
+    ~ReadContentLauncherAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17072,31 +17004,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ContentLauncher.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ContentLauncher.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ContentLauncher ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ContentLauncher AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeContentLauncherClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeContentLauncherAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeContentLauncherClientGeneratedCommandList()
+    SubscribeAttributeContentLauncherAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeContentLauncherClientGeneratedCommandList() {}
+    ~SubscribeAttributeContentLauncherAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17104,16 +17035,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ContentLauncher.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ContentLauncher.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -17289,8 +17219,8 @@ private:
 | * ServerList                                                        | 0x0001 |
 | * ClientList                                                        | 0x0002 |
 | * PartsList                                                         | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -17599,18 +17529,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadDescriptorServerGeneratedCommandList : public ModelCommand {
+class ReadDescriptorGeneratedCommandList : public ModelCommand {
 public:
-    ReadDescriptorServerGeneratedCommandList()
+    ReadDescriptorGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorServerGeneratedCommandList() {}
+    ~ReadDescriptorGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17619,31 +17549,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Descriptor.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Descriptor ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Descriptor GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDescriptorServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDescriptorGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDescriptorServerGeneratedCommandList()
+    SubscribeAttributeDescriptorGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDescriptorServerGeneratedCommandList() {}
+    ~SubscribeAttributeDescriptorGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17652,15 +17581,14 @@ public:
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Descriptor.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -17677,18 +17605,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadDescriptorClientGeneratedCommandList : public ModelCommand {
+class ReadDescriptorAcceptedCommandList : public ModelCommand {
 public:
-    ReadDescriptorClientGeneratedCommandList()
+    ReadDescriptorAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorClientGeneratedCommandList() {}
+    ~ReadDescriptorAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17697,31 +17625,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Descriptor.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Descriptor ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Descriptor AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDescriptorClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDescriptorAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDescriptorClientGeneratedCommandList()
+    SubscribeAttributeDescriptorAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDescriptorClientGeneratedCommandList() {}
+    ~SubscribeAttributeDescriptorAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17730,15 +17657,14 @@ public:
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Descriptor.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -17911,8 +17837,8 @@ private:
 | * RetrieveLogsRequest                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -17964,18 +17890,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadDiagnosticLogsServerGeneratedCommandList : public ModelCommand {
+class ReadDiagnosticLogsGeneratedCommandList : public ModelCommand {
 public:
-    ReadDiagnosticLogsServerGeneratedCommandList()
+    ReadDiagnosticLogsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDiagnosticLogsServerGeneratedCommandList() {}
+    ~ReadDiagnosticLogsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -17984,31 +17910,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DiagnosticLogs.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DiagnosticLogs.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DiagnosticLogs ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DiagnosticLogs GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDiagnosticLogsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDiagnosticLogsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDiagnosticLogsServerGeneratedCommandList()
+    SubscribeAttributeDiagnosticLogsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDiagnosticLogsServerGeneratedCommandList() {}
+    ~SubscribeAttributeDiagnosticLogsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -18016,16 +17941,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DiagnosticLogs.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"DiagnosticLogs.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -18042,18 +17966,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadDiagnosticLogsClientGeneratedCommandList : public ModelCommand {
+class ReadDiagnosticLogsAcceptedCommandList : public ModelCommand {
 public:
-    ReadDiagnosticLogsClientGeneratedCommandList()
+    ReadDiagnosticLogsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDiagnosticLogsClientGeneratedCommandList() {}
+    ~ReadDiagnosticLogsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -18062,31 +17986,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DiagnosticLogs.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DiagnosticLogs.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DiagnosticLogs ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DiagnosticLogs AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDiagnosticLogsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDiagnosticLogsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDiagnosticLogsClientGeneratedCommandList()
+    SubscribeAttributeDiagnosticLogsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDiagnosticLogsClientGeneratedCommandList() {}
+    ~SubscribeAttributeDiagnosticLogsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -18094,16 +18017,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DiagnosticLogs.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"DiagnosticLogs.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -18276,8 +18198,8 @@ private:
 | * KeypadProgrammingEventMask                                        | 0x0045 |
 | * RemoteProgrammingEventMask                                        | 0x0046 |
 | * RFIDProgrammingEventMask                                          | 0x0047 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -20724,18 +20646,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadDoorLockServerGeneratedCommandList : public ModelCommand {
+class ReadDoorLockGeneratedCommandList : public ModelCommand {
 public:
-    ReadDoorLockServerGeneratedCommandList()
+    ReadDoorLockGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDoorLockServerGeneratedCommandList() {}
+    ~ReadDoorLockGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -20744,31 +20666,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DoorLock.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DoorLock ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DoorLock GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDoorLockServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDoorLockGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDoorLockServerGeneratedCommandList()
+    SubscribeAttributeDoorLockGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDoorLockServerGeneratedCommandList() {}
+    ~SubscribeAttributeDoorLockGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -20777,15 +20698,14 @@ public:
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DoorLock.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -20802,18 +20722,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadDoorLockClientGeneratedCommandList : public ModelCommand {
+class ReadDoorLockAcceptedCommandList : public ModelCommand {
 public:
-    ReadDoorLockClientGeneratedCommandList()
+    ReadDoorLockAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadDoorLockClientGeneratedCommandList() {}
+    ~ReadDoorLockAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -20822,31 +20742,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"DoorLock.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "DoorLock ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "DoorLock AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeDoorLockClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeDoorLockAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeDoorLockClientGeneratedCommandList()
+    SubscribeAttributeDoorLockAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeDoorLockClientGeneratedCommandList() {}
+    ~SubscribeAttributeDoorLockAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -20854,16 +20773,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"DoorLock.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -21165,8 +21082,8 @@ private:
 | * RmsExtremeUnderVoltagePeriodPhaseC                                | 0x0A15 |
 | * RmsVoltageSagPeriodPhaseC                                         | 0x0A16 |
 | * RmsVoltageSwellPeriodPhaseC                                       | 0x0A17 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -22052,18 +21969,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadElectricalMeasurementServerGeneratedCommandList : public ModelCommand {
+class ReadElectricalMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    ReadElectricalMeasurementServerGeneratedCommandList()
+    ReadElectricalMeasurementGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementServerGeneratedCommandList() {}
+    ~ReadElectricalMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -22074,31 +21991,30 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ElectricalMeasurement.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ElectricalMeasurement ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ElectricalMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeElectricalMeasurementServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeElectricalMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeElectricalMeasurementServerGeneratedCommandList()
+    SubscribeAttributeElectricalMeasurementGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeElectricalMeasurementServerGeneratedCommandList() {}
+    ~SubscribeAttributeElectricalMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -22108,16 +22024,15 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ElectricalMeasurement.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -22134,18 +22049,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadElectricalMeasurementClientGeneratedCommandList : public ModelCommand {
+class ReadElectricalMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    ReadElectricalMeasurementClientGeneratedCommandList()
+    ReadElectricalMeasurementAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementClientGeneratedCommandList() {}
+    ~ReadElectricalMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -22156,31 +22071,30 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ElectricalMeasurement.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ElectricalMeasurement ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ElectricalMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeElectricalMeasurementClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeElectricalMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeElectricalMeasurementClientGeneratedCommandList()
+    SubscribeAttributeElectricalMeasurementAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeElectricalMeasurementClientGeneratedCommandList() {}
+    ~SubscribeAttributeElectricalMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -22190,16 +22104,15 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ElectricalMeasurement.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -22391,8 +22304,8 @@ private:
 | * OverrunCount                                                      | 0x0006 |
 | * CarrierDetect                                                     | 0x0007 |
 | * TimeSinceReset                                                    | 0x0008 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -23149,18 +23062,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadEthernetNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class ReadEthernetNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    ReadEthernetNetworkDiagnosticsServerGeneratedCommandList()
+    ReadEthernetNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~ReadEthernetNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23171,31 +23084,30 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"EthernetNetworkDiagnostics.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "EthernetNetworkDiagnostics ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "EthernetNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeEthernetNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeEthernetNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeEthernetNetworkDiagnosticsServerGeneratedCommandList()
+    SubscribeAttributeEthernetNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeEthernetNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~SubscribeAttributeEthernetNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23205,17 +23117,15 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"EthernetNetworkDiagnostics.ServerGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -23232,18 +23142,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadEthernetNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class ReadEthernetNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    ReadEthernetNetworkDiagnosticsClientGeneratedCommandList()
+    ReadEthernetNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~ReadEthernetNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23254,31 +23164,30 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"EthernetNetworkDiagnostics.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "EthernetNetworkDiagnostics ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "EthernetNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeEthernetNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeEthernetNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeEthernetNetworkDiagnosticsClientGeneratedCommandList()
+    SubscribeAttributeEthernetNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeEthernetNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~SubscribeAttributeEthernetNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23288,17 +23197,15 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"EthernetNetworkDiagnostics.ClientGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -23561,8 +23468,8 @@ private:
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
 | * FanModeSequence                                                   | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -23789,18 +23696,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadFanControlServerGeneratedCommandList : public ModelCommand {
+class ReadFanControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadFanControlServerGeneratedCommandList()
+    ReadFanControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFanControlServerGeneratedCommandList() {}
+    ~ReadFanControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23809,31 +23716,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FanControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FanControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FanControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFanControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFanControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFanControlServerGeneratedCommandList()
+    SubscribeAttributeFanControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFanControlServerGeneratedCommandList() {}
+    ~SubscribeAttributeFanControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23842,15 +23748,14 @@ public:
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FanControl.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -23867,18 +23772,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadFanControlClientGeneratedCommandList : public ModelCommand {
+class ReadFanControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadFanControlClientGeneratedCommandList()
+    ReadFanControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFanControlClientGeneratedCommandList() {}
+    ~ReadFanControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23887,31 +23792,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FanControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FanControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FanControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFanControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFanControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFanControlClientGeneratedCommandList()
+    SubscribeAttributeFanControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFanControlClientGeneratedCommandList() {}
+    ~SubscribeAttributeFanControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -23920,15 +23824,14 @@ public:
         CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FanControl.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -24176,8 +24079,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LabelList                                                         | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -24261,18 +24164,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadFixedLabelServerGeneratedCommandList : public ModelCommand {
+class ReadFixedLabelGeneratedCommandList : public ModelCommand {
 public:
-    ReadFixedLabelServerGeneratedCommandList()
+    ReadFixedLabelGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFixedLabelServerGeneratedCommandList() {}
+    ~ReadFixedLabelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24281,31 +24184,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FixedLabel.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FixedLabel ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FixedLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFixedLabelServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFixedLabelGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFixedLabelServerGeneratedCommandList()
+    SubscribeAttributeFixedLabelGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFixedLabelServerGeneratedCommandList() {}
+    ~SubscribeAttributeFixedLabelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24314,15 +24216,14 @@ public:
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FixedLabel.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -24339,18 +24240,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadFixedLabelClientGeneratedCommandList : public ModelCommand {
+class ReadFixedLabelAcceptedCommandList : public ModelCommand {
 public:
-    ReadFixedLabelClientGeneratedCommandList()
+    ReadFixedLabelAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFixedLabelClientGeneratedCommandList() {}
+    ~ReadFixedLabelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24359,31 +24260,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FixedLabel.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FixedLabel ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FixedLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFixedLabelClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFixedLabelAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFixedLabelClientGeneratedCommandList()
+    SubscribeAttributeFixedLabelAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFixedLabelClientGeneratedCommandList() {}
+    ~SubscribeAttributeFixedLabelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24392,15 +24292,14 @@ public:
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FixedLabel.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -24576,8 +24475,8 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -24888,18 +24787,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadFlowMeasurementServerGeneratedCommandList : public ModelCommand {
+class ReadFlowMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    ReadFlowMeasurementServerGeneratedCommandList()
+    ReadFlowMeasurementGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementServerGeneratedCommandList() {}
+    ~ReadFlowMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24908,31 +24807,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FlowMeasurement.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FlowMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FlowMeasurement ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FlowMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFlowMeasurementServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFlowMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFlowMeasurementServerGeneratedCommandList()
+    SubscribeAttributeFlowMeasurementGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFlowMeasurementServerGeneratedCommandList() {}
+    ~SubscribeAttributeFlowMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24940,16 +24838,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FlowMeasurement.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"FlowMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -24966,18 +24863,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadFlowMeasurementClientGeneratedCommandList : public ModelCommand {
+class ReadFlowMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    ReadFlowMeasurementClientGeneratedCommandList()
+    ReadFlowMeasurementAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementClientGeneratedCommandList() {}
+    ~ReadFlowMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -24986,31 +24883,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"FlowMeasurement.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FlowMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "FlowMeasurement ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "FlowMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeFlowMeasurementClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeFlowMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeFlowMeasurementClientGeneratedCommandList()
+    SubscribeAttributeFlowMeasurementAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeFlowMeasurementClientGeneratedCommandList() {}
+    ~SubscribeAttributeFlowMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -25018,16 +24914,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"FlowMeasurement.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"FlowMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -25206,8 +25101,8 @@ private:
 | * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -25653,18 +25548,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadGeneralCommissioningServerGeneratedCommandList : public ModelCommand {
+class ReadGeneralCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    ReadGeneralCommissioningServerGeneratedCommandList()
+    ReadGeneralCommissioningGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningServerGeneratedCommandList() {}
+    ~ReadGeneralCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -25675,31 +25570,30 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralCommissioning.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralCommissioning ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGeneralCommissioningServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGeneralCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGeneralCommissioningServerGeneratedCommandList()
+    SubscribeAttributeGeneralCommissioningGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGeneralCommissioningServerGeneratedCommandList() {}
+    ~SubscribeAttributeGeneralCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -25709,16 +25603,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralCommissioning.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GeneralCommissioning.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -25735,18 +25628,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadGeneralCommissioningClientGeneratedCommandList : public ModelCommand {
+class ReadGeneralCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    ReadGeneralCommissioningClientGeneratedCommandList()
+    ReadGeneralCommissioningAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningClientGeneratedCommandList() {}
+    ~ReadGeneralCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -25757,31 +25650,30 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralCommissioning.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralCommissioning ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGeneralCommissioningClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGeneralCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGeneralCommissioningClientGeneratedCommandList()
+    SubscribeAttributeGeneralCommissioningAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGeneralCommissioningClientGeneratedCommandList() {}
+    ~SubscribeAttributeGeneralCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -25791,16 +25683,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralCommissioning.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GeneralCommissioning.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -25989,8 +25880,8 @@ private:
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -26640,18 +26531,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadGeneralDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class ReadGeneralDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    ReadGeneralDiagnosticsServerGeneratedCommandList()
+    ReadGeneralDiagnosticsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsServerGeneratedCommandList() {}
+    ~ReadGeneralDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -26662,31 +26553,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralDiagnostics.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralDiagnostics ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGeneralDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGeneralDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGeneralDiagnosticsServerGeneratedCommandList()
+    SubscribeAttributeGeneralDiagnosticsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGeneralDiagnosticsServerGeneratedCommandList() {}
+    ~SubscribeAttributeGeneralDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -26696,16 +26586,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralDiagnostics.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -26722,18 +26611,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadGeneralDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class ReadGeneralDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    ReadGeneralDiagnosticsClientGeneratedCommandList()
+    ReadGeneralDiagnosticsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsClientGeneratedCommandList() {}
+    ~ReadGeneralDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -26744,31 +26633,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GeneralDiagnostics.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GeneralDiagnostics ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GeneralDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGeneralDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGeneralDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGeneralDiagnosticsClientGeneratedCommandList()
+    SubscribeAttributeGeneralDiagnosticsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGeneralDiagnosticsClientGeneratedCommandList() {}
+    ~SubscribeAttributeGeneralDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -26778,16 +26666,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GeneralDiagnostics.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -26976,8 +26863,8 @@ private:
 | * GroupTable                                                        | 0x0001 |
 | * MaxGroupsPerFabric                                                | 0x0002 |
 | * MaxGroupKeysPerFabric                                             | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -27453,18 +27340,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadGroupKeyManagementServerGeneratedCommandList : public ModelCommand {
+class ReadGroupKeyManagementGeneratedCommandList : public ModelCommand {
 public:
-    ReadGroupKeyManagementServerGeneratedCommandList()
+    ReadGroupKeyManagementGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupKeyManagementServerGeneratedCommandList() {}
+    ~ReadGroupKeyManagementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -27475,31 +27362,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GroupKeyManagement.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GroupKeyManagement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GroupKeyManagement ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GroupKeyManagement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGroupKeyManagementServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGroupKeyManagementGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGroupKeyManagementServerGeneratedCommandList()
+    SubscribeAttributeGroupKeyManagementGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGroupKeyManagementServerGeneratedCommandList() {}
+    ~SubscribeAttributeGroupKeyManagementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -27509,16 +27395,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GroupKeyManagement.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"GroupKeyManagement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -27535,18 +27420,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadGroupKeyManagementClientGeneratedCommandList : public ModelCommand {
+class ReadGroupKeyManagementAcceptedCommandList : public ModelCommand {
 public:
-    ReadGroupKeyManagementClientGeneratedCommandList()
+    ReadGroupKeyManagementAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupKeyManagementClientGeneratedCommandList() {}
+    ~ReadGroupKeyManagementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -27557,31 +27442,30 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GroupKeyManagement.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GroupKeyManagement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "GroupKeyManagement ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "GroupKeyManagement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGroupKeyManagementClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGroupKeyManagementAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGroupKeyManagementClientGeneratedCommandList()
+    SubscribeAttributeGroupKeyManagementAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGroupKeyManagementClientGeneratedCommandList() {}
+    ~SubscribeAttributeGroupKeyManagementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -27591,16 +27475,15 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"GroupKeyManagement.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"GroupKeyManagement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -27788,8 +27671,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -28085,18 +27968,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadGroupsServerGeneratedCommandList : public ModelCommand {
+class ReadGroupsGeneratedCommandList : public ModelCommand {
 public:
-    ReadGroupsServerGeneratedCommandList()
+    ReadGroupsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupsServerGeneratedCommandList() {}
+    ~ReadGroupsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28105,31 +27988,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Groups.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Groups ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Groups GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGroupsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGroupsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGroupsServerGeneratedCommandList()
+    SubscribeAttributeGroupsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGroupsServerGeneratedCommandList() {}
+    ~SubscribeAttributeGroupsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28137,16 +28019,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Groups.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -28163,18 +28043,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadGroupsClientGeneratedCommandList : public ModelCommand {
+class ReadGroupsAcceptedCommandList : public ModelCommand {
 public:
-    ReadGroupsClientGeneratedCommandList()
+    ReadGroupsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupsClientGeneratedCommandList() {}
+    ~ReadGroupsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28183,31 +28063,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Groups.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Groups ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Groups AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeGroupsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeGroupsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeGroupsClientGeneratedCommandList()
+    SubscribeAttributeGroupsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeGroupsClientGeneratedCommandList() {}
+    ~SubscribeAttributeGroupsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28215,16 +28094,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Groups.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -28401,8 +28278,8 @@ private:
 | Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
 | * IdentifyType                                                      | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -28697,18 +28574,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadIdentifyServerGeneratedCommandList : public ModelCommand {
+class ReadIdentifyGeneratedCommandList : public ModelCommand {
 public:
-    ReadIdentifyServerGeneratedCommandList()
+    ReadIdentifyGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadIdentifyServerGeneratedCommandList() {}
+    ~ReadIdentifyGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28717,31 +28594,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Identify.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Identify ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Identify GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeIdentifyServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeIdentifyGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeIdentifyServerGeneratedCommandList()
+    SubscribeAttributeIdentifyGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeIdentifyServerGeneratedCommandList() {}
+    ~SubscribeAttributeIdentifyGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28750,15 +28626,14 @@ public:
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Identify.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -28775,18 +28650,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadIdentifyClientGeneratedCommandList : public ModelCommand {
+class ReadIdentifyAcceptedCommandList : public ModelCommand {
 public:
-    ReadIdentifyClientGeneratedCommandList()
+    ReadIdentifyAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadIdentifyClientGeneratedCommandList() {}
+    ~ReadIdentifyAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28795,31 +28670,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Identify.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Identify ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Identify AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeIdentifyClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeIdentifyAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeIdentifyClientGeneratedCommandList()
+    SubscribeAttributeIdentifyAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeIdentifyClientGeneratedCommandList() {}
+    ~SubscribeAttributeIdentifyAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -28827,16 +28701,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Identify.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -29013,8 +28885,8 @@ private:
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
 | * LightSensorType                                                   | 0x0004 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -29422,18 +29294,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadIlluminanceMeasurementServerGeneratedCommandList : public ModelCommand {
+class ReadIlluminanceMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    ReadIlluminanceMeasurementServerGeneratedCommandList()
+    ReadIlluminanceMeasurementGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementServerGeneratedCommandList() {}
+    ~ReadIlluminanceMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29444,31 +29316,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"IlluminanceMeasurement.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "IlluminanceMeasurement ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "IlluminanceMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeIlluminanceMeasurementServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeIlluminanceMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeIlluminanceMeasurementServerGeneratedCommandList()
+    SubscribeAttributeIlluminanceMeasurementGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeIlluminanceMeasurementServerGeneratedCommandList() {}
+    ~SubscribeAttributeIlluminanceMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29478,17 +29349,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"IlluminanceMeasurement.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -29505,18 +29374,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadIlluminanceMeasurementClientGeneratedCommandList : public ModelCommand {
+class ReadIlluminanceMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    ReadIlluminanceMeasurementClientGeneratedCommandList()
+    ReadIlluminanceMeasurementAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementClientGeneratedCommandList() {}
+    ~ReadIlluminanceMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29527,31 +29396,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"IlluminanceMeasurement.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "IlluminanceMeasurement ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "IlluminanceMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeIlluminanceMeasurementClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeIlluminanceMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeIlluminanceMeasurementClientGeneratedCommandList()
+    SubscribeAttributeIlluminanceMeasurementAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeIlluminanceMeasurementClientGeneratedCommandList() {}
+    ~SubscribeAttributeIlluminanceMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29561,17 +29429,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"IlluminanceMeasurement.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -29754,8 +29620,8 @@ private:
 | * SendKey                                                           |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -29799,18 +29665,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadKeypadInputServerGeneratedCommandList : public ModelCommand {
+class ReadKeypadInputGeneratedCommandList : public ModelCommand {
 public:
-    ReadKeypadInputServerGeneratedCommandList()
+    ReadKeypadInputGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadKeypadInputServerGeneratedCommandList() {}
+    ~ReadKeypadInputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29819,31 +29685,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"KeypadInput.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "KeypadInput ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "KeypadInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeKeypadInputServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeKeypadInputGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeKeypadInputServerGeneratedCommandList()
+    SubscribeAttributeKeypadInputGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeKeypadInputServerGeneratedCommandList() {}
+    ~SubscribeAttributeKeypadInputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29852,15 +29717,14 @@ public:
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"KeypadInput.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -29877,18 +29741,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadKeypadInputClientGeneratedCommandList : public ModelCommand {
+class ReadKeypadInputAcceptedCommandList : public ModelCommand {
 public:
-    ReadKeypadInputClientGeneratedCommandList()
+    ReadKeypadInputAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadKeypadInputClientGeneratedCommandList() {}
+    ~ReadKeypadInputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29897,31 +29761,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"KeypadInput.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "KeypadInput ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "KeypadInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeKeypadInputClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeKeypadInputAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeKeypadInputClientGeneratedCommandList()
+    SubscribeAttributeKeypadInputAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeKeypadInputClientGeneratedCommandList() {}
+    ~SubscribeAttributeKeypadInputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -29930,15 +29793,14 @@ public:
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"KeypadInput.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -30132,8 +29994,8 @@ private:
 | * OffTransitionTime                                                 | 0x0013 |
 | * DefaultMoveRate                                                   | 0x0014 |
 | * StartUpCurrentLevel                                               | 0x4000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -31746,18 +31608,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadLevelControlServerGeneratedCommandList : public ModelCommand {
+class ReadLevelControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadLevelControlServerGeneratedCommandList()
+    ReadLevelControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlServerGeneratedCommandList() {}
+    ~ReadLevelControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -31766,31 +31628,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LevelControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LevelControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LevelControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LevelControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLevelControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLevelControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLevelControlServerGeneratedCommandList()
+    SubscribeAttributeLevelControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLevelControlServerGeneratedCommandList() {}
+    ~SubscribeAttributeLevelControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -31798,16 +31659,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LevelControl.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"LevelControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -31824,18 +31684,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadLevelControlClientGeneratedCommandList : public ModelCommand {
+class ReadLevelControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadLevelControlClientGeneratedCommandList()
+    ReadLevelControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlClientGeneratedCommandList() {}
+    ~ReadLevelControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -31844,31 +31704,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LevelControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LevelControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LevelControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLevelControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLevelControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLevelControlClientGeneratedCommandList()
+    SubscribeAttributeLevelControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLevelControlClientGeneratedCommandList() {}
+    ~SubscribeAttributeLevelControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -31877,15 +31736,14 @@ public:
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LevelControl.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -32134,8 +31992,8 @@ private:
 | Attributes:                                                         |        |
 | * ActiveLocale                                                      | 0x0001 |
 | * SupportedLocales                                                  | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -32343,18 +32201,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadLocalizationConfigurationServerGeneratedCommandList : public ModelCommand {
+class ReadLocalizationConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    ReadLocalizationConfigurationServerGeneratedCommandList()
+    ReadLocalizationConfigurationGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLocalizationConfigurationServerGeneratedCommandList() {}
+    ~ReadLocalizationConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32365,31 +32223,30 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LocalizationConfiguration.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LocalizationConfiguration ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LocalizationConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLocalizationConfigurationServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLocalizationConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLocalizationConfigurationServerGeneratedCommandList()
+    SubscribeAttributeLocalizationConfigurationGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLocalizationConfigurationServerGeneratedCommandList() {}
+    ~SubscribeAttributeLocalizationConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32399,17 +32256,15 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LocalizationConfiguration.ServerGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -32426,18 +32281,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadLocalizationConfigurationClientGeneratedCommandList : public ModelCommand {
+class ReadLocalizationConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    ReadLocalizationConfigurationClientGeneratedCommandList()
+    ReadLocalizationConfigurationAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLocalizationConfigurationClientGeneratedCommandList() {}
+    ~ReadLocalizationConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32448,31 +32303,30 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LocalizationConfiguration.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LocalizationConfiguration ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LocalizationConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLocalizationConfigurationClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLocalizationConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLocalizationConfigurationClientGeneratedCommandList()
+    SubscribeAttributeLocalizationConfigurationAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLocalizationConfigurationClientGeneratedCommandList() {}
+    ~SubscribeAttributeLocalizationConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32482,17 +32336,15 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LocalizationConfiguration.ClientGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -32595,8 +32447,8 @@ private:
 | * Sleep                                                             |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -32634,18 +32486,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadLowPowerServerGeneratedCommandList : public ModelCommand {
+class ReadLowPowerGeneratedCommandList : public ModelCommand {
 public:
-    ReadLowPowerServerGeneratedCommandList()
+    ReadLowPowerGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLowPowerServerGeneratedCommandList() {}
+    ~ReadLowPowerGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32654,31 +32506,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LowPower.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LowPower ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LowPower GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLowPowerServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLowPowerGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLowPowerServerGeneratedCommandList()
+    SubscribeAttributeLowPowerGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLowPowerServerGeneratedCommandList() {}
+    ~SubscribeAttributeLowPowerGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32687,15 +32538,14 @@ public:
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LowPower.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -32712,18 +32562,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadLowPowerClientGeneratedCommandList : public ModelCommand {
+class ReadLowPowerAcceptedCommandList : public ModelCommand {
 public:
-    ReadLowPowerClientGeneratedCommandList()
+    ReadLowPowerAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadLowPowerClientGeneratedCommandList() {}
+    ~ReadLowPowerAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32732,31 +32582,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"LowPower.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "LowPower ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "LowPower AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeLowPowerClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeLowPowerAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeLowPowerClientGeneratedCommandList()
+    SubscribeAttributeLowPowerAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeLowPowerClientGeneratedCommandList() {}
+    ~SubscribeAttributeLowPowerAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -32764,16 +32613,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"LowPower.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -32951,8 +32798,8 @@ private:
 | Attributes:                                                         |        |
 | * InputList                                                         | 0x0000 |
 | * CurrentInput                                                      | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -33240,18 +33087,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadMediaInputServerGeneratedCommandList : public ModelCommand {
+class ReadMediaInputGeneratedCommandList : public ModelCommand {
 public:
-    ReadMediaInputServerGeneratedCommandList()
+    ReadMediaInputGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaInputServerGeneratedCommandList() {}
+    ~ReadMediaInputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -33260,31 +33107,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaInput.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaInput ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaInput GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeMediaInputServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeMediaInputGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeMediaInputServerGeneratedCommandList()
+    SubscribeAttributeMediaInputGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeMediaInputServerGeneratedCommandList() {}
+    ~SubscribeAttributeMediaInputGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -33293,15 +33139,14 @@ public:
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaInput.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -33318,18 +33163,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadMediaInputClientGeneratedCommandList : public ModelCommand {
+class ReadMediaInputAcceptedCommandList : public ModelCommand {
 public:
-    ReadMediaInputClientGeneratedCommandList()
+    ReadMediaInputAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaInputClientGeneratedCommandList() {}
+    ~ReadMediaInputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -33338,31 +33183,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaInput.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaInput ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaInput AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeMediaInputClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeMediaInputAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeMediaInputClientGeneratedCommandList()
+    SubscribeAttributeMediaInputAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeMediaInputClientGeneratedCommandList() {}
+    ~SubscribeAttributeMediaInputAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -33371,15 +33215,14 @@ public:
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaInput.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -33569,8 +33412,8 @@ private:
 | * PlaybackSpeed                                                     | 0x0004 |
 | * SeekRangeEnd                                                      | 0x0005 |
 | * SeekRangeStart                                                    | 0x0006 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -34417,18 +34260,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadMediaPlaybackServerGeneratedCommandList : public ModelCommand {
+class ReadMediaPlaybackGeneratedCommandList : public ModelCommand {
 public:
-    ReadMediaPlaybackServerGeneratedCommandList()
+    ReadMediaPlaybackGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackServerGeneratedCommandList() {}
+    ~ReadMediaPlaybackGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -34437,31 +34280,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaPlayback.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaPlayback.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaPlayback ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaPlayback GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeMediaPlaybackServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeMediaPlaybackGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeMediaPlaybackServerGeneratedCommandList()
+    SubscribeAttributeMediaPlaybackGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeMediaPlaybackServerGeneratedCommandList() {}
+    ~SubscribeAttributeMediaPlaybackGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -34469,16 +34311,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaPlayback.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"MediaPlayback.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -34495,18 +34336,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadMediaPlaybackClientGeneratedCommandList : public ModelCommand {
+class ReadMediaPlaybackAcceptedCommandList : public ModelCommand {
 public:
-    ReadMediaPlaybackClientGeneratedCommandList()
+    ReadMediaPlaybackAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackClientGeneratedCommandList() {}
+    ~ReadMediaPlaybackAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -34515,31 +34356,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"MediaPlayback.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "MediaPlayback ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "MediaPlayback AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeMediaPlaybackClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeMediaPlaybackAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeMediaPlaybackClientGeneratedCommandList()
+    SubscribeAttributeMediaPlaybackAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeMediaPlaybackClientGeneratedCommandList() {}
+    ~SubscribeAttributeMediaPlaybackAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -34548,15 +34388,14 @@ public:
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"MediaPlayback.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -34729,13 +34568,14 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * CurrentMode                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * OnMode                                                            | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * Description                                                       | 0x0004 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * Description                                                       | 0x0000 |
+| * StandardNamespace                                                 | 0x0001 |
+| * SupportedModes                                                    | 0x0002 |
+| * CurrentMode                                                       | 0x0003 |
+| * StartUpMode                                                       | 0x0004 |
+| * OnMode                                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -34778,340 +34618,6 @@ private:
 };
 
 /*
- * Attribute CurrentMode
- */
-class ReadModeSelectCurrentMode : public ModelCommand {
-public:
-    ReadModeSelectCurrentMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectCurrentMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "current-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute SupportedModes
- */
-class ReadModeSelectSupportedModes : public ModelCommand {
-public:
-    ReadModeSelectSupportedModes()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "supported-modes");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectSupportedModes()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "supported-modes");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                          params:params
-                                         subscriptionEstablished:NULL
-                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                   }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute OnMode
- */
-class ReadModeSelectOnMode : public ModelCommand {
-public:
-    ReadModeSelectOnMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "on-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.OnMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class WriteModeSelectOnMode : public ModelCommand {
-public:
-    WriteModeSelectOnMode()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-
-        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
-
-        [cluster writeAttributeOnModeWithValue:value
-                             completionHandler:^(NSError * _Nullable error) {
-                                 err = [CHIPError errorToCHIPErrorCode:error];
-                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-                                 SetCommandExitStatus(err);
-                             }];
-        return err;
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class SubscribeAttributeModeSelectOnMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectOnMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                  params:params
-                                 subscriptionEstablished:NULL
-                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute StartUpMode
- */
-class ReadModeSelectStartUpMode : public ModelCommand {
-public:
-    ReadModeSelectStartUpMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectStartUpMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute Description
  */
 class ReadModeSelectDescription : public ModelCommand {
@@ -35127,7 +34633,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
@@ -35159,7 +34665,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
@@ -35187,68 +34693,65 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute StandardNamespace
  */
-class ReadModeSelectServerGeneratedCommandList : public ModelCommand {
+class ReadModeSelectStandardNamespace : public ModelCommand {
 public:
-    ReadModeSelectServerGeneratedCommandList()
+    ReadModeSelectStandardNamespace()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "standard-namespace");
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectServerGeneratedCommandList() {}
+    ~ReadModeSelectStandardNamespace() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ModeSelect.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ModeSelect ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ModeSelect StandardNamespace Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeModeSelectServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeModeSelectStandardNamespace : public ModelCommand {
 public:
-    SubscribeAttributeModeSelectServerGeneratedCommandList()
+    SubscribeAttributeModeSelectStandardNamespace()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "standard-namespace");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeModeSelectServerGeneratedCommandList() {}
+    ~SubscribeAttributeModeSelectStandardNamespace() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ModeSelect.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeStandardNamespaceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:NULL
+                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                          NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }];
 
         return CHIP_NO_ERROR;
     }
@@ -35265,18 +34768,428 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute SupportedModes
  */
-class ReadModeSelectClientGeneratedCommandList : public ModelCommand {
+class ReadModeSelectSupportedModes : public ModelCommand {
 public:
-    ReadModeSelectClientGeneratedCommandList()
+    ReadModeSelectSupportedModes()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "supported-modes");
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectClientGeneratedCommandList() {}
+    ~ReadModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectSupportedModes()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "supported-modes");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CurrentMode
+ */
+class ReadModeSelectCurrentMode : public ModelCommand {
+public:
+    ReadModeSelectCurrentMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectCurrentMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute StartUpMode
+ */
+class ReadModeSelectStartUpMode : public ModelCommand {
+public:
+    ReadModeSelectStartUpMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectStartUpMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute OnMode
+ */
+class ReadModeSelectOnMode : public ModelCommand {
+public:
+    ReadModeSelectOnMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "on-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.OnMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteModeSelectOnMode : public ModelCommand {
+public:
+    WriteModeSelectOnMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeOnModeWithValue:value
+                             completionHandler:^(NSError * _Nullable error) {
+                                 err = [CHIPError errorToCHIPErrorCode:error];
+                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+                                 SetCommandExitStatus(err);
+                             }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeModeSelectOnMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectOnMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                  params:params
+                                 subscriptionEstablished:NULL
+                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
+                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute GeneratedCommandList
+ */
+class ReadModeSelectGeneratedCommandList : public ModelCommand {
+public:
+    ReadModeSelectGeneratedCommandList()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectGeneratedCommandList : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectGeneratedCommandList()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AcceptedCommandList
+ */
+class ReadModeSelectAcceptedCommandList : public ModelCommand {
+public:
+    ReadModeSelectAcceptedCommandList()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "accepted-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -35285,31 +35198,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ModeSelect.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ModeSelect ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ModeSelect AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeModeSelectClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeModeSelectAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeModeSelectClientGeneratedCommandList()
+    SubscribeAttributeModeSelectAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeModeSelectClientGeneratedCommandList() {}
+    ~SubscribeAttributeModeSelectAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -35318,15 +35230,14 @@ public:
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ModeSelect.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -35402,6 +35313,81 @@ public:
                                                       NSLog(@"ModeSelect.AttributeList response %@", [value description]);
                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadModeSelectFeatureMap : public ModelCommand {
+public:
+    ReadModeSelectFeatureMap()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect FeatureMap Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectFeatureMap : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectFeatureMap()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                   NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }];
 
         return CHIP_NO_ERROR;
     }
@@ -35512,8 +35498,8 @@ private:
 | * LastNetworkingStatus                                              | 0x0005 |
 | * LastNetworkID                                                     | 0x0006 |
 | * LastConnectErrorValue                                             | 0x0007 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -36448,18 +36434,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadNetworkCommissioningServerGeneratedCommandList : public ModelCommand {
+class ReadNetworkCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    ReadNetworkCommissioningServerGeneratedCommandList()
+    ReadNetworkCommissioningGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadNetworkCommissioningServerGeneratedCommandList() {}
+    ~ReadNetworkCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -36470,31 +36456,30 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"NetworkCommissioning.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"NetworkCommissioning.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "NetworkCommissioning ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "NetworkCommissioning GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeNetworkCommissioningServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeNetworkCommissioningGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeNetworkCommissioningServerGeneratedCommandList()
+    SubscribeAttributeNetworkCommissioningGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeNetworkCommissioningServerGeneratedCommandList() {}
+    ~SubscribeAttributeNetworkCommissioningGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -36504,16 +36489,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"NetworkCommissioning.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"NetworkCommissioning.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -36530,18 +36514,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadNetworkCommissioningClientGeneratedCommandList : public ModelCommand {
+class ReadNetworkCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    ReadNetworkCommissioningClientGeneratedCommandList()
+    ReadNetworkCommissioningAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadNetworkCommissioningClientGeneratedCommandList() {}
+    ~ReadNetworkCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -36552,31 +36536,30 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"NetworkCommissioning.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"NetworkCommissioning.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "NetworkCommissioning ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "NetworkCommissioning AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeNetworkCommissioningClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeNetworkCommissioningAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeNetworkCommissioningClientGeneratedCommandList()
+    SubscribeAttributeNetworkCommissioningAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeNetworkCommissioningClientGeneratedCommandList() {}
+    ~SubscribeAttributeNetworkCommissioningAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -36586,16 +36569,15 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"NetworkCommissioning.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"NetworkCommissioning.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -36779,8 +36761,8 @@ private:
 | * NotifyUpdateApplied                                               |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -37096,8 +37078,8 @@ private:
 | * UpdatePossible                                                    | 0x0001 |
 | * UpdateState                                                       | 0x0002 |
 | * UpdateStateProgress                                               | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -37658,8 +37640,8 @@ private:
 | * PhysicalContactOccupiedToUnoccupiedDelay                          | 0x0030 |
 | * PhysicalContactUnoccupiedToOccupiedDelay                          | 0x0031 |
 | * PhysicalContactUnoccupiedToOccupiedThreshold                      | 0x0032 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -37909,18 +37891,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadOccupancySensingServerGeneratedCommandList : public ModelCommand {
+class ReadOccupancySensingGeneratedCommandList : public ModelCommand {
 public:
-    ReadOccupancySensingServerGeneratedCommandList()
+    ReadOccupancySensingGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingServerGeneratedCommandList() {}
+    ~ReadOccupancySensingGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -37931,31 +37913,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OccupancySensing.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OccupancySensing.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OccupancySensing ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OccupancySensing GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOccupancySensingServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOccupancySensingGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOccupancySensingServerGeneratedCommandList()
+    SubscribeAttributeOccupancySensingGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOccupancySensingServerGeneratedCommandList() {}
+    ~SubscribeAttributeOccupancySensingGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -37965,16 +37946,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OccupancySensing.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OccupancySensing.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -37991,18 +37971,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadOccupancySensingClientGeneratedCommandList : public ModelCommand {
+class ReadOccupancySensingAcceptedCommandList : public ModelCommand {
 public:
-    ReadOccupancySensingClientGeneratedCommandList()
+    ReadOccupancySensingAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingClientGeneratedCommandList() {}
+    ~ReadOccupancySensingAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -38013,31 +37993,30 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OccupancySensing.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OccupancySensing.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OccupancySensing ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OccupancySensing AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOccupancySensingClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOccupancySensingAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOccupancySensingClientGeneratedCommandList()
+    SubscribeAttributeOccupancySensingAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOccupancySensingClientGeneratedCommandList() {}
+    ~SubscribeAttributeOccupancySensingAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -38047,16 +38026,15 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OccupancySensing.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OccupancySensing.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -38247,8 +38225,8 @@ private:
 | * OnTime                                                            | 0x4001 |
 | * OffWaitTime                                                       | 0x4002 |
 | * StartUpOnOff                                                      | 0x4003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -38868,7 +38846,7 @@ public:
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
 
-        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
 
         [cluster writeAttributeStartUpOnOffWithValue:value
                                    completionHandler:^(NSError * _Nullable error) {
@@ -38927,18 +38905,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadOnOffServerGeneratedCommandList : public ModelCommand {
+class ReadOnOffGeneratedCommandList : public ModelCommand {
 public:
-    ReadOnOffServerGeneratedCommandList()
+    ReadOnOffGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffServerGeneratedCommandList() {}
+    ~ReadOnOffGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -38947,31 +38925,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOff.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOff ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOff GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOnOffServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOnOffGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOnOffServerGeneratedCommandList()
+    SubscribeAttributeOnOffGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOnOffServerGeneratedCommandList() {}
+    ~SubscribeAttributeOnOffGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -38979,16 +38956,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOff.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -39005,18 +38980,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadOnOffClientGeneratedCommandList : public ModelCommand {
+class ReadOnOffAcceptedCommandList : public ModelCommand {
 public:
-    ReadOnOffClientGeneratedCommandList()
+    ReadOnOffAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffClientGeneratedCommandList() {}
+    ~ReadOnOffAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39025,31 +39000,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOff.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOff ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOff AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOnOffClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOnOffAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOnOffClientGeneratedCommandList()
+    SubscribeAttributeOnOffAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOnOffClientGeneratedCommandList() {}
+    ~SubscribeAttributeOnOffAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39057,16 +39031,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOff.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -39315,8 +39287,8 @@ private:
 | Attributes:                                                         |        |
 | * SwitchType                                                        | 0x0000 |
 | * SwitchActions                                                     | 0x0010 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -39521,18 +39493,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadOnOffSwitchConfigurationServerGeneratedCommandList : public ModelCommand {
+class ReadOnOffSwitchConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    ReadOnOffSwitchConfigurationServerGeneratedCommandList()
+    ReadOnOffSwitchConfigurationGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffSwitchConfigurationServerGeneratedCommandList() {}
+    ~ReadOnOffSwitchConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39543,31 +39515,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOffSwitchConfiguration.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOffSwitchConfiguration ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOffSwitchConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOnOffSwitchConfigurationServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOnOffSwitchConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOnOffSwitchConfigurationServerGeneratedCommandList()
+    SubscribeAttributeOnOffSwitchConfigurationGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOnOffSwitchConfigurationServerGeneratedCommandList() {}
+    ~SubscribeAttributeOnOffSwitchConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39577,17 +39548,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOffSwitchConfiguration.ServerGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -39604,18 +39573,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadOnOffSwitchConfigurationClientGeneratedCommandList : public ModelCommand {
+class ReadOnOffSwitchConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    ReadOnOffSwitchConfigurationClientGeneratedCommandList()
+    ReadOnOffSwitchConfigurationAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffSwitchConfigurationClientGeneratedCommandList() {}
+    ~ReadOnOffSwitchConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39626,31 +39595,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OnOffSwitchConfiguration.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OnOffSwitchConfiguration ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OnOffSwitchConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOnOffSwitchConfigurationClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOnOffSwitchConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOnOffSwitchConfigurationClientGeneratedCommandList()
+    SubscribeAttributeOnOffSwitchConfigurationAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOnOffSwitchConfigurationClientGeneratedCommandList() {}
+    ~SubscribeAttributeOnOffSwitchConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -39660,17 +39628,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"OnOffSwitchConfiguration.ClientGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -39867,8 +39833,8 @@ private:
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
 | * CurrentFabricIndex                                                | 0x0005 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -40714,18 +40680,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadOperationalCredentialsServerGeneratedCommandList : public ModelCommand {
+class ReadOperationalCredentialsGeneratedCommandList : public ModelCommand {
 public:
-    ReadOperationalCredentialsServerGeneratedCommandList()
+    ReadOperationalCredentialsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsServerGeneratedCommandList() {}
+    ~ReadOperationalCredentialsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -40736,31 +40702,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OperationalCredentials.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OperationalCredentials ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OperationalCredentials GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOperationalCredentialsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOperationalCredentialsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOperationalCredentialsServerGeneratedCommandList()
+    SubscribeAttributeOperationalCredentialsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOperationalCredentialsServerGeneratedCommandList() {}
+    ~SubscribeAttributeOperationalCredentialsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -40770,17 +40735,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"OperationalCredentials.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"OperationalCredentials.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -40797,18 +40760,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadOperationalCredentialsClientGeneratedCommandList : public ModelCommand {
+class ReadOperationalCredentialsAcceptedCommandList : public ModelCommand {
 public:
-    ReadOperationalCredentialsClientGeneratedCommandList()
+    ReadOperationalCredentialsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsClientGeneratedCommandList() {}
+    ~ReadOperationalCredentialsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -40819,31 +40782,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"OperationalCredentials.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "OperationalCredentials ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "OperationalCredentials AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeOperationalCredentialsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeOperationalCredentialsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeOperationalCredentialsClientGeneratedCommandList()
+    SubscribeAttributeOperationalCredentialsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeOperationalCredentialsClientGeneratedCommandList() {}
+    ~SubscribeAttributeOperationalCredentialsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -40853,17 +40815,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"OperationalCredentials.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"OperationalCredentials.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -41076,8 +41036,8 @@ private:
 | * BatteryFunctionalWhileCharging                                    | 0x001C |
 | * BatteryChargingCurrent                                            | 0x001D |
 | * ActiveBatteryChargeFaults                                         | 0x001E |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -41767,18 +41727,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadPowerSourceServerGeneratedCommandList : public ModelCommand {
+class ReadPowerSourceGeneratedCommandList : public ModelCommand {
 public:
-    ReadPowerSourceServerGeneratedCommandList()
+    ReadPowerSourceGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceServerGeneratedCommandList() {}
+    ~ReadPowerSourceGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -41787,31 +41747,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSource.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSource ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSource GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePowerSourceServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePowerSourceGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePowerSourceServerGeneratedCommandList()
+    SubscribeAttributePowerSourceGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePowerSourceServerGeneratedCommandList() {}
+    ~SubscribeAttributePowerSourceGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -41820,15 +41779,14 @@ public:
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSource.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -41845,18 +41803,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadPowerSourceClientGeneratedCommandList : public ModelCommand {
+class ReadPowerSourceAcceptedCommandList : public ModelCommand {
 public:
-    ReadPowerSourceClientGeneratedCommandList()
+    ReadPowerSourceAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceClientGeneratedCommandList() {}
+    ~ReadPowerSourceAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -41865,31 +41823,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSource.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSource ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSource AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePowerSourceClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePowerSourceAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePowerSourceClientGeneratedCommandList()
+    SubscribeAttributePowerSourceAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePowerSourceClientGeneratedCommandList() {}
+    ~SubscribeAttributePowerSourceAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -41898,15 +41855,14 @@ public:
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSource.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -42154,8 +42110,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Sources                                                           | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -42243,18 +42199,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadPowerSourceConfigurationServerGeneratedCommandList : public ModelCommand {
+class ReadPowerSourceConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    ReadPowerSourceConfigurationServerGeneratedCommandList()
+    ReadPowerSourceConfigurationGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceConfigurationServerGeneratedCommandList() {}
+    ~ReadPowerSourceConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -42265,31 +42221,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSourceConfiguration.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSourceConfiguration ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSourceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePowerSourceConfigurationServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePowerSourceConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePowerSourceConfigurationServerGeneratedCommandList()
+    SubscribeAttributePowerSourceConfigurationGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePowerSourceConfigurationServerGeneratedCommandList() {}
+    ~SubscribeAttributePowerSourceConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -42299,17 +42254,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSourceConfiguration.ServerGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -42326,18 +42279,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadPowerSourceConfigurationClientGeneratedCommandList : public ModelCommand {
+class ReadPowerSourceConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    ReadPowerSourceConfigurationClientGeneratedCommandList()
+    ReadPowerSourceConfigurationAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceConfigurationClientGeneratedCommandList() {}
+    ~ReadPowerSourceConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -42348,31 +42301,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PowerSourceConfiguration.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PowerSourceConfiguration ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PowerSourceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePowerSourceConfigurationClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePowerSourceConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePowerSourceConfigurationClientGeneratedCommandList()
+    SubscribeAttributePowerSourceConfigurationAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePowerSourceConfigurationClientGeneratedCommandList() {}
+    ~SubscribeAttributePowerSourceConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -42382,17 +42334,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PowerSourceConfiguration.ClientGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -42583,8 +42533,8 @@ private:
 | * MaxScaledValue                                                    | 0x0012 |
 | * ScaledTolerance                                                   | 0x0013 |
 | * Scale                                                             | 0x0014 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -43020,8 +42970,8 @@ private:
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
 | * AlarmMask                                                         | 0x0022 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -45112,18 +45062,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadPumpConfigurationAndControlServerGeneratedCommandList : public ModelCommand {
+class ReadPumpConfigurationAndControlGeneratedCommandList : public ModelCommand {
 public:
-    ReadPumpConfigurationAndControlServerGeneratedCommandList()
+    ReadPumpConfigurationAndControlGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlServerGeneratedCommandList() {}
+    ~ReadPumpConfigurationAndControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45134,31 +45084,30 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PumpConfigurationAndControl.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PumpConfigurationAndControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PumpConfigurationAndControl GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePumpConfigurationAndControlServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePumpConfigurationAndControlGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePumpConfigurationAndControlServerGeneratedCommandList()
+    SubscribeAttributePumpConfigurationAndControlGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePumpConfigurationAndControlServerGeneratedCommandList() {}
+    ~SubscribeAttributePumpConfigurationAndControlGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45168,17 +45117,15 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PumpConfigurationAndControl.ServerGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -45195,18 +45142,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadPumpConfigurationAndControlClientGeneratedCommandList : public ModelCommand {
+class ReadPumpConfigurationAndControlAcceptedCommandList : public ModelCommand {
 public:
-    ReadPumpConfigurationAndControlClientGeneratedCommandList()
+    ReadPumpConfigurationAndControlAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlClientGeneratedCommandList() {}
+    ~ReadPumpConfigurationAndControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45217,31 +45164,30 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"PumpConfigurationAndControl.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "PumpConfigurationAndControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "PumpConfigurationAndControl AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributePumpConfigurationAndControlClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributePumpConfigurationAndControlAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributePumpConfigurationAndControlClientGeneratedCommandList()
+    SubscribeAttributePumpConfigurationAndControlAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributePumpConfigurationAndControlClientGeneratedCommandList() {}
+    ~SubscribeAttributePumpConfigurationAndControlAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45251,17 +45197,15 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"PumpConfigurationAndControl.ClientGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -45527,8 +45471,8 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -45856,18 +45800,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadRelativeHumidityMeasurementServerGeneratedCommandList : public ModelCommand {
+class ReadRelativeHumidityMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    ReadRelativeHumidityMeasurementServerGeneratedCommandList()
+    ReadRelativeHumidityMeasurementGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementServerGeneratedCommandList() {}
+    ~ReadRelativeHumidityMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45878,31 +45822,30 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"RelativeHumidityMeasurement.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "RelativeHumidityMeasurement ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "RelativeHumidityMeasurement GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeRelativeHumidityMeasurementServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeRelativeHumidityMeasurementGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeRelativeHumidityMeasurementServerGeneratedCommandList()
+    SubscribeAttributeRelativeHumidityMeasurementGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeRelativeHumidityMeasurementServerGeneratedCommandList() {}
+    ~SubscribeAttributeRelativeHumidityMeasurementGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45912,17 +45855,15 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"RelativeHumidityMeasurement.ServerGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -45939,18 +45880,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadRelativeHumidityMeasurementClientGeneratedCommandList : public ModelCommand {
+class ReadRelativeHumidityMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    ReadRelativeHumidityMeasurementClientGeneratedCommandList()
+    ReadRelativeHumidityMeasurementAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementClientGeneratedCommandList() {}
+    ~ReadRelativeHumidityMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45961,31 +45902,30 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"RelativeHumidityMeasurement.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "RelativeHumidityMeasurement ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "RelativeHumidityMeasurement AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeRelativeHumidityMeasurementClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeRelativeHumidityMeasurementAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeRelativeHumidityMeasurementClientGeneratedCommandList()
+    SubscribeAttributeRelativeHumidityMeasurementAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeRelativeHumidityMeasurementClientGeneratedCommandList() {}
+    ~SubscribeAttributeRelativeHumidityMeasurementAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -45995,17 +45935,15 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"RelativeHumidityMeasurement.ClientGeneratedCommandList "
-                                                                    @"response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -46203,8 +46141,8 @@ private:
 | * SceneValid                                                        | 0x0003 |
 | * NameSupport                                                       | 0x0004 |
 | * LastConfiguredBy                                                  | 0x0005 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -46861,18 +46799,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadScenesServerGeneratedCommandList : public ModelCommand {
+class ReadScenesGeneratedCommandList : public ModelCommand {
 public:
-    ReadScenesServerGeneratedCommandList()
+    ReadScenesGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesServerGeneratedCommandList() {}
+    ~ReadScenesGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -46881,31 +46819,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Scenes.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Scenes ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Scenes GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeScenesServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeScenesGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeScenesServerGeneratedCommandList()
+    SubscribeAttributeScenesGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeScenesServerGeneratedCommandList() {}
+    ~SubscribeAttributeScenesGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -46913,16 +46850,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Scenes.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -46939,18 +46874,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadScenesClientGeneratedCommandList : public ModelCommand {
+class ReadScenesAcceptedCommandList : public ModelCommand {
 public:
-    ReadScenesClientGeneratedCommandList()
+    ReadScenesAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesClientGeneratedCommandList() {}
+    ~ReadScenesAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -46959,31 +46894,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Scenes.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Scenes ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Scenes AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeScenesClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeScenesAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeScenesClientGeneratedCommandList()
+    SubscribeAttributeScenesAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeScenesClientGeneratedCommandList() {}
+    ~SubscribeAttributeScenesAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -46991,16 +46925,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Scenes.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -47177,8 +47109,8 @@ private:
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -47540,18 +47472,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadSoftwareDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class ReadSoftwareDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    ReadSoftwareDiagnosticsServerGeneratedCommandList()
+    ReadSoftwareDiagnosticsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsServerGeneratedCommandList() {}
+    ~ReadSoftwareDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -47562,31 +47494,30 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"SoftwareDiagnostics.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "SoftwareDiagnostics ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "SoftwareDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeSoftwareDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeSoftwareDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeSoftwareDiagnosticsServerGeneratedCommandList()
+    SubscribeAttributeSoftwareDiagnosticsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeSoftwareDiagnosticsServerGeneratedCommandList() {}
+    ~SubscribeAttributeSoftwareDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -47596,16 +47527,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"SoftwareDiagnostics.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -47622,18 +47552,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadSoftwareDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class ReadSoftwareDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    ReadSoftwareDiagnosticsClientGeneratedCommandList()
+    ReadSoftwareDiagnosticsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsClientGeneratedCommandList() {}
+    ~ReadSoftwareDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -47644,31 +47574,30 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"SoftwareDiagnostics.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "SoftwareDiagnostics ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "SoftwareDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeSoftwareDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeSoftwareDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeSoftwareDiagnosticsClientGeneratedCommandList()
+    SubscribeAttributeSoftwareDiagnosticsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeSoftwareDiagnosticsClientGeneratedCommandList() {}
+    ~SubscribeAttributeSoftwareDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -47678,16 +47607,15 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"SoftwareDiagnostics.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -47950,8 +47878,8 @@ private:
 | * NumberOfPositions                                                 | 0x0000 |
 | * CurrentPosition                                                   | 0x0001 |
 | * MultiPressMax                                                     | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -48192,18 +48120,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadSwitchServerGeneratedCommandList : public ModelCommand {
+class ReadSwitchGeneratedCommandList : public ModelCommand {
 public:
-    ReadSwitchServerGeneratedCommandList()
+    ReadSwitchGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchServerGeneratedCommandList() {}
+    ~ReadSwitchGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48212,31 +48140,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Switch.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Switch ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Switch GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeSwitchServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeSwitchGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeSwitchServerGeneratedCommandList()
+    SubscribeAttributeSwitchGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeSwitchServerGeneratedCommandList() {}
+    ~SubscribeAttributeSwitchGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48244,16 +48171,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Switch.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -48270,18 +48195,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadSwitchClientGeneratedCommandList : public ModelCommand {
+class ReadSwitchAcceptedCommandList : public ModelCommand {
 public:
-    ReadSwitchClientGeneratedCommandList()
+    ReadSwitchAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchClientGeneratedCommandList() {}
+    ~ReadSwitchAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48290,31 +48215,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Switch.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "Switch ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "Switch AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeSwitchClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeSwitchAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeSwitchClientGeneratedCommandList()
+    SubscribeAttributeSwitchAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeSwitchClientGeneratedCommandList() {}
+    ~SubscribeAttributeSwitchAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48322,16 +48246,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"Switch.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -48581,8 +48503,8 @@ private:
 | Attributes:                                                         |        |
 | * TargetList                                                        | 0x0000 |
 | * CurrentTarget                                                     | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -48780,18 +48702,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadTargetNavigatorServerGeneratedCommandList : public ModelCommand {
+class ReadTargetNavigatorGeneratedCommandList : public ModelCommand {
 public:
-    ReadTargetNavigatorServerGeneratedCommandList()
+    ReadTargetNavigatorGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTargetNavigatorServerGeneratedCommandList() {}
+    ~ReadTargetNavigatorGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48800,31 +48722,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TargetNavigator.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TargetNavigator.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TargetNavigator ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TargetNavigator GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTargetNavigatorServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTargetNavigatorGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTargetNavigatorServerGeneratedCommandList()
+    SubscribeAttributeTargetNavigatorGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTargetNavigatorServerGeneratedCommandList() {}
+    ~SubscribeAttributeTargetNavigatorGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48832,16 +48753,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TargetNavigator.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"TargetNavigator.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -48858,18 +48778,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadTargetNavigatorClientGeneratedCommandList : public ModelCommand {
+class ReadTargetNavigatorAcceptedCommandList : public ModelCommand {
 public:
-    ReadTargetNavigatorClientGeneratedCommandList()
+    ReadTargetNavigatorAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTargetNavigatorClientGeneratedCommandList() {}
+    ~ReadTargetNavigatorAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48878,31 +48798,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TargetNavigator.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TargetNavigator.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TargetNavigator ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TargetNavigator AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTargetNavigatorClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTargetNavigatorAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTargetNavigatorClientGeneratedCommandList()
+    SubscribeAttributeTargetNavigatorAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTargetNavigatorClientGeneratedCommandList() {}
+    ~SubscribeAttributeTargetNavigatorAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -48910,16 +48829,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TargetNavigator.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"TargetNavigator.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -49095,8 +49013,8 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -49692,8 +49610,8 @@ private:
 | * NullableRangeRestrictedInt8s                                      | 0x8027 |
 | * NullableRangeRestrictedInt16u                                     | 0x8028 |
 | * NullableRangeRestrictedInt16s                                     | 0x8029 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -58906,18 +58824,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadTestClusterServerGeneratedCommandList : public ModelCommand {
+class ReadTestClusterGeneratedCommandList : public ModelCommand {
 public:
-    ReadTestClusterServerGeneratedCommandList()
+    ReadTestClusterGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterServerGeneratedCommandList() {}
+    ~ReadTestClusterGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -58926,31 +58844,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TestCluster.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TestCluster ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TestCluster GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTestClusterServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTestClusterGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTestClusterServerGeneratedCommandList()
+    SubscribeAttributeTestClusterGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTestClusterServerGeneratedCommandList() {}
+    ~SubscribeAttributeTestClusterGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -58959,15 +58876,14 @@ public:
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TestCluster.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -58984,18 +58900,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadTestClusterClientGeneratedCommandList : public ModelCommand {
+class ReadTestClusterAcceptedCommandList : public ModelCommand {
 public:
-    ReadTestClusterClientGeneratedCommandList()
+    ReadTestClusterAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterClientGeneratedCommandList() {}
+    ~ReadTestClusterAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -59004,31 +58920,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TestCluster.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TestCluster ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TestCluster AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTestClusterClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTestClusterAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTestClusterClientGeneratedCommandList()
+    SubscribeAttributeTestClusterAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTestClusterClientGeneratedCommandList() {}
+    ~SubscribeAttributeTestClusterAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -59037,15 +58952,14 @@ public:
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"TestCluster.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -59265,8 +59179,8 @@ private:
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
 | * AcCapacityFormat                                                  | 0x0047 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -61300,8 +61214,8 @@ private:
 | * TemperatureDisplayMode                                            | 0x0000 |
 | * KeypadLockout                                                     | 0x0001 |
 | * ScheduleProgrammingVisibility                                     | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -61660,18 +61574,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadThermostatUserInterfaceConfigurationServerGeneratedCommandList : public ModelCommand {
+class ReadThermostatUserInterfaceConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    ReadThermostatUserInterfaceConfigurationServerGeneratedCommandList()
+    ReadThermostatUserInterfaceConfigurationGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationServerGeneratedCommandList() {}
+    ~ReadThermostatUserInterfaceConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -61681,32 +61595,30 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThermostatUserInterfaceConfiguration.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(
-                    chipTool, "ThermostatUserInterfaceConfiguration ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThermostatUserInterfaceConfiguration GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeThermostatUserInterfaceConfigurationServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeThermostatUserInterfaceConfigurationGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeThermostatUserInterfaceConfigurationServerGeneratedCommandList()
+    SubscribeAttributeThermostatUserInterfaceConfigurationGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeThermostatUserInterfaceConfigurationServerGeneratedCommandList() {}
+    ~SubscribeAttributeThermostatUserInterfaceConfigurationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -61715,17 +61627,16 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThermostatUserInterfaceConfiguration."
-                                                                    @"ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList "
+                                                                   @"response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -61742,18 +61653,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadThermostatUserInterfaceConfigurationClientGeneratedCommandList : public ModelCommand {
+class ReadThermostatUserInterfaceConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    ReadThermostatUserInterfaceConfigurationClientGeneratedCommandList()
+    ReadThermostatUserInterfaceConfigurationAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationClientGeneratedCommandList() {}
+    ~ReadThermostatUserInterfaceConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -61763,32 +61674,30 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThermostatUserInterfaceConfiguration.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(
-                    chipTool, "ThermostatUserInterfaceConfiguration ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThermostatUserInterfaceConfiguration AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeThermostatUserInterfaceConfigurationClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeThermostatUserInterfaceConfigurationAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeThermostatUserInterfaceConfigurationClientGeneratedCommandList()
+    SubscribeAttributeThermostatUserInterfaceConfigurationAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeThermostatUserInterfaceConfigurationClientGeneratedCommandList() {}
+    ~SubscribeAttributeThermostatUserInterfaceConfigurationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -61798,16 +61707,16 @@ public:
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThermostatUserInterfaceConfiguration."
-                                                                    @"ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(
+                                                           @"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@",
+                                                           [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -62049,8 +61958,8 @@ private:
 | * ChannelMask                                                       | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -67141,18 +67050,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadThreadNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class ReadThreadNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    ReadThreadNetworkDiagnosticsServerGeneratedCommandList()
+    ReadThreadNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~ReadThreadNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67163,31 +67072,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThreadNetworkDiagnostics.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ThreadNetworkDiagnostics ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThreadNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeThreadNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeThreadNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeThreadNetworkDiagnosticsServerGeneratedCommandList()
+    SubscribeAttributeThreadNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeThreadNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~SubscribeAttributeThreadNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67197,17 +67105,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThreadNetworkDiagnostics.ServerGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -67224,18 +67130,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadThreadNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class ReadThreadNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    ReadThreadNetworkDiagnosticsClientGeneratedCommandList()
+    ReadThreadNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~ReadThreadNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67246,31 +67152,30 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"ThreadNetworkDiagnostics.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "ThreadNetworkDiagnostics ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "ThreadNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeThreadNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeThreadNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeThreadNetworkDiagnosticsClientGeneratedCommandList()
+    SubscribeAttributeThreadNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeThreadNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~SubscribeAttributeThreadNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67280,17 +67185,15 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"ThreadNetworkDiagnostics.ClientGeneratedCommandList response "
-                                                                    @"%@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -67554,8 +67457,8 @@ private:
 | * HourFormat                                                        | 0x0000 |
 | * ActiveCalendarType                                                | 0x0001 |
 | * SupportedCalendarTypes                                            | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -67876,18 +67779,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadTimeFormatLocalizationServerGeneratedCommandList : public ModelCommand {
+class ReadTimeFormatLocalizationGeneratedCommandList : public ModelCommand {
 public:
-    ReadTimeFormatLocalizationServerGeneratedCommandList()
+    ReadTimeFormatLocalizationGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTimeFormatLocalizationServerGeneratedCommandList() {}
+    ~ReadTimeFormatLocalizationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67898,31 +67801,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TimeFormatLocalization.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TimeFormatLocalization ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TimeFormatLocalization GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTimeFormatLocalizationServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTimeFormatLocalizationGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTimeFormatLocalizationServerGeneratedCommandList()
+    SubscribeAttributeTimeFormatLocalizationGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTimeFormatLocalizationServerGeneratedCommandList() {}
+    ~SubscribeAttributeTimeFormatLocalizationGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67932,17 +67834,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"TimeFormatLocalization.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -67959,18 +67859,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadTimeFormatLocalizationClientGeneratedCommandList : public ModelCommand {
+class ReadTimeFormatLocalizationAcceptedCommandList : public ModelCommand {
 public:
-    ReadTimeFormatLocalizationClientGeneratedCommandList()
+    ReadTimeFormatLocalizationAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTimeFormatLocalizationClientGeneratedCommandList() {}
+    ~ReadTimeFormatLocalizationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -67981,31 +67881,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"TimeFormatLocalization.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "TimeFormatLocalization ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "TimeFormatLocalization AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeTimeFormatLocalizationClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeTimeFormatLocalizationAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeTimeFormatLocalizationClientGeneratedCommandList()
+    SubscribeAttributeTimeFormatLocalizationAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeTimeFormatLocalizationClientGeneratedCommandList() {}
+    ~SubscribeAttributeTimeFormatLocalizationAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68015,17 +67914,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"TimeFormatLocalization.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -68128,8 +68025,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TemperatureUnit                                                   | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -68496,8 +68393,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LabelList                                                         | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -68581,18 +68478,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadUserLabelServerGeneratedCommandList : public ModelCommand {
+class ReadUserLabelGeneratedCommandList : public ModelCommand {
 public:
-    ReadUserLabelServerGeneratedCommandList()
+    ReadUserLabelGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadUserLabelServerGeneratedCommandList() {}
+    ~ReadUserLabelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68601,31 +68498,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"UserLabel.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "UserLabel ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "UserLabel GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeUserLabelServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeUserLabelGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeUserLabelServerGeneratedCommandList()
+    SubscribeAttributeUserLabelGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeUserLabelServerGeneratedCommandList() {}
+    ~SubscribeAttributeUserLabelGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68634,15 +68530,14 @@ public:
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"UserLabel.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -68659,18 +68554,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadUserLabelClientGeneratedCommandList : public ModelCommand {
+class ReadUserLabelAcceptedCommandList : public ModelCommand {
 public:
-    ReadUserLabelClientGeneratedCommandList()
+    ReadUserLabelAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadUserLabelClientGeneratedCommandList() {}
+    ~ReadUserLabelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68679,31 +68574,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"UserLabel.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "UserLabel ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "UserLabel AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeUserLabelClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeUserLabelAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeUserLabelClientGeneratedCommandList()
+    SubscribeAttributeUserLabelAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeUserLabelClientGeneratedCommandList() {}
+    ~SubscribeAttributeUserLabelAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68712,15 +68606,14 @@ public:
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"UserLabel.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -68818,8 +68711,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MACAddress                                                        | 0x0000 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -68903,18 +68796,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadWakeOnLanServerGeneratedCommandList : public ModelCommand {
+class ReadWakeOnLanGeneratedCommandList : public ModelCommand {
 public:
-    ReadWakeOnLanServerGeneratedCommandList()
+    ReadWakeOnLanGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWakeOnLanServerGeneratedCommandList() {}
+    ~ReadWakeOnLanGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68923,31 +68816,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WakeOnLan.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WakeOnLan ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WakeOnLan GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWakeOnLanServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWakeOnLanGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWakeOnLanServerGeneratedCommandList()
+    SubscribeAttributeWakeOnLanGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWakeOnLanServerGeneratedCommandList() {}
+    ~SubscribeAttributeWakeOnLanGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -68956,15 +68848,14 @@ public:
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WakeOnLan.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
 
         return CHIP_NO_ERROR;
     }
@@ -68981,18 +68872,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadWakeOnLanClientGeneratedCommandList : public ModelCommand {
+class ReadWakeOnLanAcceptedCommandList : public ModelCommand {
 public:
-    ReadWakeOnLanClientGeneratedCommandList()
+    ReadWakeOnLanAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWakeOnLanClientGeneratedCommandList() {}
+    ~ReadWakeOnLanAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -69001,31 +68892,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WakeOnLan.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WakeOnLan ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WakeOnLan AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWakeOnLanClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWakeOnLanAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWakeOnLanClientGeneratedCommandList()
+    SubscribeAttributeWakeOnLanAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWakeOnLanClientGeneratedCommandList() {}
+    ~SubscribeAttributeWakeOnLanAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -69034,15 +68924,14 @@ public:
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WakeOnLan.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+            subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
 
         return CHIP_NO_ERROR;
     }
@@ -69228,8 +69117,8 @@ private:
 | * PacketUnicastTxCount                                              | 0x000A |
 | * CurrentMaxRate                                                    | 0x000B |
 | * OverrunCount                                                      | 0x000C |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -70307,18 +70196,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadWiFiNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class ReadWiFiNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    ReadWiFiNetworkDiagnosticsServerGeneratedCommandList()
+    ReadWiFiNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~ReadWiFiNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -70329,31 +70218,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WiFiNetworkDiagnostics.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WiFiNetworkDiagnostics ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WiFiNetworkDiagnostics GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWiFiNetworkDiagnosticsServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWiFiNetworkDiagnosticsGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWiFiNetworkDiagnosticsServerGeneratedCommandList()
+    SubscribeAttributeWiFiNetworkDiagnosticsGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWiFiNetworkDiagnosticsServerGeneratedCommandList() {}
+    ~SubscribeAttributeWiFiNetworkDiagnosticsGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -70363,17 +70251,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"WiFiNetworkDiagnostics.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -70390,18 +70276,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadWiFiNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class ReadWiFiNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    ReadWiFiNetworkDiagnosticsClientGeneratedCommandList()
+    ReadWiFiNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~ReadWiFiNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -70412,31 +70298,30 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WiFiNetworkDiagnostics.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WiFiNetworkDiagnostics ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WiFiNetworkDiagnostics AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWiFiNetworkDiagnosticsClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWiFiNetworkDiagnosticsAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWiFiNetworkDiagnosticsClientGeneratedCommandList()
+    SubscribeAttributeWiFiNetworkDiagnosticsAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWiFiNetworkDiagnosticsClientGeneratedCommandList() {}
+    ~SubscribeAttributeWiFiNetworkDiagnosticsAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -70446,17 +70331,15 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(
-                                                                  @"WiFiNetworkDiagnostics.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -70746,8 +70629,8 @@ private:
 | * InstalledClosedLimitTilt                                          | 0x0013 |
 | * Mode                                                              | 0x0017 |
 | * SafetyStatus                                                      | 0x001A |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -72408,18 +72291,18 @@ private:
 };
 
 /*
- * Attribute ServerGeneratedCommandList
+ * Attribute GeneratedCommandList
  */
-class ReadWindowCoveringServerGeneratedCommandList : public ModelCommand {
+class ReadWindowCoveringGeneratedCommandList : public ModelCommand {
 public:
-    ReadWindowCoveringServerGeneratedCommandList()
+    ReadWindowCoveringGeneratedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringServerGeneratedCommandList() {}
+    ~ReadWindowCoveringGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -72428,31 +72311,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WindowCovering.ServerGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WindowCovering.GeneratedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WindowCovering ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WindowCovering GeneratedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWindowCoveringServerGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWindowCoveringGeneratedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWindowCoveringServerGeneratedCommandList()
+    SubscribeAttributeWindowCoveringGeneratedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("attr-name", "generated-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWindowCoveringServerGeneratedCommandList() {}
+    ~SubscribeAttributeWindowCoveringGeneratedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -72460,16 +72342,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WindowCovering.ServerGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:NULL
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"WindowCovering.GeneratedCommandList response %@",
+                                                                 [value description]);
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -72486,18 +72367,18 @@ private:
 };
 
 /*
- * Attribute ClientGeneratedCommandList
+ * Attribute AcceptedCommandList
  */
-class ReadWindowCoveringClientGeneratedCommandList : public ModelCommand {
+class ReadWindowCoveringAcceptedCommandList : public ModelCommand {
 public:
-    ReadWindowCoveringClientGeneratedCommandList()
+    ReadWindowCoveringAcceptedCommandList()
         : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringClientGeneratedCommandList() {}
+    ~ReadWindowCoveringAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -72506,31 +72387,30 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"WindowCovering.ClientGeneratedCommandList response %@", [value description]);
-                err = [CHIPError errorToCHIPErrorCode:error];
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WindowCovering.AcceptedCommandList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
 
-                ChipLogError(chipTool, "WindowCovering ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
-                SetCommandExitStatus(err);
-            }];
+            ChipLogError(chipTool, "WindowCovering AcceptedCommandList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
         return err;
     }
 };
 
-class SubscribeAttributeWindowCoveringClientGeneratedCommandList : public ModelCommand {
+class SubscribeAttributeWindowCoveringAcceptedCommandList : public ModelCommand {
 public:
-    SubscribeAttributeWindowCoveringClientGeneratedCommandList()
+    SubscribeAttributeWindowCoveringAcceptedCommandList()
         : ModelCommand("subscribe")
     {
-        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("attr-name", "accepted-command-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeWindowCoveringClientGeneratedCommandList() {}
+    ~SubscribeAttributeWindowCoveringAcceptedCommandList() {}
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
@@ -72538,16 +72418,15 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                 params:params
-                                                subscriptionEstablished:NULL
-                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                              NSLog(@"WindowCovering.ClientGeneratedCommandList response %@",
-                                                                  [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                          }];
+        [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:NULL
+                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"WindowCovering.AcceptedCommandList response %@",
+                                                                [value description]);
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }];
 
         return CHIP_NO_ERROR;
     }
@@ -72800,10 +72679,10 @@ void registerClusterAccessControl(Commands & commands)
         make_unique<SubscribeAttributeAccessControlAcl>(), //
         make_unique<ReadAccessControlExtension>(), //
         make_unique<SubscribeAttributeAccessControlExtension>(), //
-        make_unique<ReadAccessControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAccessControlServerGeneratedCommandList>(), //
-        make_unique<ReadAccessControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAccessControlClientGeneratedCommandList>(), //
+        make_unique<ReadAccessControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeAccessControlGeneratedCommandList>(), //
+        make_unique<ReadAccessControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeAccessControlAcceptedCommandList>(), //
         make_unique<ReadAccessControlAttributeList>(), //
         make_unique<SubscribeAttributeAccessControlAttributeList>(), //
         make_unique<ReadAccessControlClusterRevision>(), //
@@ -72820,10 +72699,10 @@ void registerClusterAccountLogin(Commands & commands)
         make_unique<AccountLoginGetSetupPIN>(), //
         make_unique<AccountLoginLogin>(), //
         make_unique<AccountLoginLogout>(), //
-        make_unique<ReadAccountLoginServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAccountLoginServerGeneratedCommandList>(), //
-        make_unique<ReadAccountLoginClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAccountLoginClientGeneratedCommandList>(), //
+        make_unique<ReadAccountLoginGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeAccountLoginGeneratedCommandList>(), //
+        make_unique<ReadAccountLoginAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeAccountLoginAcceptedCommandList>(), //
         make_unique<ReadAccountLoginAttributeList>(), //
         make_unique<SubscribeAttributeAccountLoginAttributeList>(), //
         make_unique<ReadAccountLoginClusterRevision>(), //
@@ -72846,10 +72725,10 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<SubscribeAttributeAdministratorCommissioningAdminFabricIndex>(), //
         make_unique<ReadAdministratorCommissioningAdminVendorId>(), //
         make_unique<SubscribeAttributeAdministratorCommissioningAdminVendorId>(), //
-        make_unique<ReadAdministratorCommissioningServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAdministratorCommissioningServerGeneratedCommandList>(), //
-        make_unique<ReadAdministratorCommissioningClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAdministratorCommissioningClientGeneratedCommandList>(), //
+        make_unique<ReadAdministratorCommissioningGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeAdministratorCommissioningGeneratedCommandList>(), //
+        make_unique<ReadAdministratorCommissioningAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeAdministratorCommissioningAcceptedCommandList>(), //
         make_unique<ReadAdministratorCommissioningAttributeList>(), //
         make_unique<SubscribeAttributeAdministratorCommissioningAttributeList>(), //
         make_unique<ReadAdministratorCommissioningClusterRevision>(), //
@@ -72877,10 +72756,10 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<SubscribeAttributeApplicationBasicApplicationVersion>(), //
         make_unique<ReadApplicationBasicAllowedVendorList>(), //
         make_unique<SubscribeAttributeApplicationBasicAllowedVendorList>(), //
-        make_unique<ReadApplicationBasicServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeApplicationBasicServerGeneratedCommandList>(), //
-        make_unique<ReadApplicationBasicClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeApplicationBasicClientGeneratedCommandList>(), //
+        make_unique<ReadApplicationBasicGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeApplicationBasicGeneratedCommandList>(), //
+        make_unique<ReadApplicationBasicAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeApplicationBasicAcceptedCommandList>(), //
         make_unique<ReadApplicationBasicAttributeList>(), //
         make_unique<SubscribeAttributeApplicationBasicAttributeList>(), //
         make_unique<ReadApplicationBasicClusterRevision>(), //
@@ -72899,10 +72778,10 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ApplicationLauncherStopApp>(), //
         make_unique<ReadApplicationLauncherCatalogList>(), //
         make_unique<SubscribeAttributeApplicationLauncherCatalogList>(), //
-        make_unique<ReadApplicationLauncherServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeApplicationLauncherServerGeneratedCommandList>(), //
-        make_unique<ReadApplicationLauncherClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeApplicationLauncherClientGeneratedCommandList>(), //
+        make_unique<ReadApplicationLauncherGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeApplicationLauncherGeneratedCommandList>(), //
+        make_unique<ReadApplicationLauncherAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeApplicationLauncherAcceptedCommandList>(), //
         make_unique<ReadApplicationLauncherAttributeList>(), //
         make_unique<SubscribeAttributeApplicationLauncherAttributeList>(), //
         make_unique<ReadApplicationLauncherClusterRevision>(), //
@@ -72922,10 +72801,10 @@ void registerClusterAudioOutput(Commands & commands)
         make_unique<SubscribeAttributeAudioOutputOutputList>(), //
         make_unique<ReadAudioOutputCurrentOutput>(), //
         make_unique<SubscribeAttributeAudioOutputCurrentOutput>(), //
-        make_unique<ReadAudioOutputServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAudioOutputServerGeneratedCommandList>(), //
-        make_unique<ReadAudioOutputClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeAudioOutputClientGeneratedCommandList>(), //
+        make_unique<ReadAudioOutputGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeAudioOutputGeneratedCommandList>(), //
+        make_unique<ReadAudioOutputAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeAudioOutputAcceptedCommandList>(), //
         make_unique<ReadAudioOutputAttributeList>(), //
         make_unique<SubscribeAttributeAudioOutputAttributeList>(), //
         make_unique<ReadAudioOutputClusterRevision>(), //
@@ -72949,10 +72828,10 @@ void registerClusterBarrierControl(Commands & commands)
         make_unique<SubscribeAttributeBarrierControlBarrierCapabilities>(), //
         make_unique<ReadBarrierControlBarrierPosition>(), //
         make_unique<SubscribeAttributeBarrierControlBarrierPosition>(), //
-        make_unique<ReadBarrierControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBarrierControlServerGeneratedCommandList>(), //
-        make_unique<ReadBarrierControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBarrierControlClientGeneratedCommandList>(), //
+        make_unique<ReadBarrierControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBarrierControlGeneratedCommandList>(), //
+        make_unique<ReadBarrierControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBarrierControlAcceptedCommandList>(), //
         make_unique<ReadBarrierControlAttributeList>(), //
         make_unique<SubscribeAttributeBarrierControlAttributeList>(), //
         make_unique<ReadBarrierControlClusterRevision>(), //
@@ -73007,10 +72886,10 @@ void registerClusterBasic(Commands & commands)
         make_unique<SubscribeAttributeBasicReachable>(), //
         make_unique<ReadBasicUniqueID>(), //
         make_unique<SubscribeAttributeBasicUniqueID>(), //
-        make_unique<ReadBasicServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBasicServerGeneratedCommandList>(), //
-        make_unique<ReadBasicClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBasicClientGeneratedCommandList>(), //
+        make_unique<ReadBasicGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBasicGeneratedCommandList>(), //
+        make_unique<ReadBasicAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBasicAcceptedCommandList>(), //
         make_unique<ReadBasicAttributeList>(), //
         make_unique<SubscribeAttributeBasicAttributeList>(), //
         make_unique<ReadBasicClusterRevision>(), //
@@ -73032,10 +72911,10 @@ void registerClusterBinaryInputBasic(Commands & commands)
         make_unique<SubscribeAttributeBinaryInputBasicPresentValue>(), //
         make_unique<ReadBinaryInputBasicStatusFlags>(), //
         make_unique<SubscribeAttributeBinaryInputBasicStatusFlags>(), //
-        make_unique<ReadBinaryInputBasicServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBinaryInputBasicServerGeneratedCommandList>(), //
-        make_unique<ReadBinaryInputBasicClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBinaryInputBasicClientGeneratedCommandList>(), //
+        make_unique<ReadBinaryInputBasicGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBinaryInputBasicGeneratedCommandList>(), //
+        make_unique<ReadBinaryInputBasicAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBinaryInputBasicAcceptedCommandList>(), //
         make_unique<ReadBinaryInputBasicAttributeList>(), //
         make_unique<SubscribeAttributeBinaryInputBasicAttributeList>(), //
         make_unique<ReadBinaryInputBasicClusterRevision>(), //
@@ -73051,10 +72930,10 @@ void registerClusterBinding(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadBindingBinding>(), //
         make_unique<SubscribeAttributeBindingBinding>(), //
-        make_unique<ReadBindingServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBindingServerGeneratedCommandList>(), //
-        make_unique<ReadBindingClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBindingClientGeneratedCommandList>(), //
+        make_unique<ReadBindingGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBindingGeneratedCommandList>(), //
+        make_unique<ReadBindingAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBindingAcceptedCommandList>(), //
         make_unique<ReadBindingAttributeList>(), //
         make_unique<SubscribeAttributeBindingAttributeList>(), //
         make_unique<ReadBindingClusterRevision>(), //
@@ -73070,10 +72949,10 @@ void registerClusterBooleanState(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadBooleanStateStateValue>(), //
         make_unique<SubscribeAttributeBooleanStateStateValue>(), //
-        make_unique<ReadBooleanStateServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBooleanStateServerGeneratedCommandList>(), //
-        make_unique<ReadBooleanStateClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBooleanStateClientGeneratedCommandList>(), //
+        make_unique<ReadBooleanStateGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBooleanStateGeneratedCommandList>(), //
+        make_unique<ReadBooleanStateAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBooleanStateAcceptedCommandList>(), //
         make_unique<ReadBooleanStateAttributeList>(), //
         make_unique<SubscribeAttributeBooleanStateAttributeList>(), //
         make_unique<ReadBooleanStateClusterRevision>(), //
@@ -73105,10 +72984,10 @@ void registerClusterBridgedActions(Commands & commands)
         make_unique<SubscribeAttributeBridgedActionsEndpointList>(), //
         make_unique<ReadBridgedActionsSetupUrl>(), //
         make_unique<SubscribeAttributeBridgedActionsSetupUrl>(), //
-        make_unique<ReadBridgedActionsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBridgedActionsServerGeneratedCommandList>(), //
-        make_unique<ReadBridgedActionsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBridgedActionsClientGeneratedCommandList>(), //
+        make_unique<ReadBridgedActionsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBridgedActionsGeneratedCommandList>(), //
+        make_unique<ReadBridgedActionsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBridgedActionsAcceptedCommandList>(), //
         make_unique<ReadBridgedActionsAttributeList>(), //
         make_unique<SubscribeAttributeBridgedActionsAttributeList>(), //
         make_unique<ReadBridgedActionsClusterRevision>(), //
@@ -73153,10 +73032,10 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
         make_unique<SubscribeAttributeBridgedDeviceBasicReachable>(), //
         make_unique<ReadBridgedDeviceBasicUniqueID>(), //
         make_unique<SubscribeAttributeBridgedDeviceBasicUniqueID>(), //
-        make_unique<ReadBridgedDeviceBasicServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBridgedDeviceBasicServerGeneratedCommandList>(), //
-        make_unique<ReadBridgedDeviceBasicClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeBridgedDeviceBasicClientGeneratedCommandList>(), //
+        make_unique<ReadBridgedDeviceBasicGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeBridgedDeviceBasicGeneratedCommandList>(), //
+        make_unique<ReadBridgedDeviceBasicAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeBridgedDeviceBasicAcceptedCommandList>(), //
         make_unique<ReadBridgedDeviceBasicAttributeList>(), //
         make_unique<SubscribeAttributeBridgedDeviceBasicAttributeList>(), //
         make_unique<ReadBridgedDeviceBasicClusterRevision>(), //
@@ -73175,10 +73054,10 @@ void registerClusterChannel(Commands & commands)
         make_unique<ChannelSkipChannel>(), //
         make_unique<ReadChannelChannelList>(), //
         make_unique<SubscribeAttributeChannelChannelList>(), //
-        make_unique<ReadChannelServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeChannelServerGeneratedCommandList>(), //
-        make_unique<ReadChannelClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeChannelClientGeneratedCommandList>(), //
+        make_unique<ReadChannelGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeChannelGeneratedCommandList>(), //
+        make_unique<ReadChannelAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeChannelAcceptedCommandList>(), //
         make_unique<ReadChannelAttributeList>(), //
         make_unique<SubscribeAttributeChannelAttributeList>(), //
         make_unique<ReadChannelClusterRevision>(), //
@@ -73328,10 +73207,10 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlStartUpColorTemperatureMireds>(), //
         make_unique<WriteColorControlStartUpColorTemperatureMireds>(), //
         make_unique<SubscribeAttributeColorControlStartUpColorTemperatureMireds>(), //
-        make_unique<ReadColorControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeColorControlServerGeneratedCommandList>(), //
-        make_unique<ReadColorControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeColorControlClientGeneratedCommandList>(), //
+        make_unique<ReadColorControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeColorControlGeneratedCommandList>(), //
+        make_unique<ReadColorControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeColorControlAcceptedCommandList>(), //
         make_unique<ReadColorControlAttributeList>(), //
         make_unique<SubscribeAttributeColorControlAttributeList>(), //
         make_unique<ReadColorControlClusterRevision>(), //
@@ -73352,10 +73231,10 @@ void registerClusterContentLauncher(Commands & commands)
         make_unique<ReadContentLauncherSupportedStreamingProtocols>(), //
         make_unique<WriteContentLauncherSupportedStreamingProtocols>(), //
         make_unique<SubscribeAttributeContentLauncherSupportedStreamingProtocols>(), //
-        make_unique<ReadContentLauncherServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeContentLauncherServerGeneratedCommandList>(), //
-        make_unique<ReadContentLauncherClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeContentLauncherClientGeneratedCommandList>(), //
+        make_unique<ReadContentLauncherGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeContentLauncherGeneratedCommandList>(), //
+        make_unique<ReadContentLauncherAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeContentLauncherAcceptedCommandList>(), //
         make_unique<ReadContentLauncherAttributeList>(), //
         make_unique<SubscribeAttributeContentLauncherAttributeList>(), //
         make_unique<ReadContentLauncherClusterRevision>(), //
@@ -73377,10 +73256,10 @@ void registerClusterDescriptor(Commands & commands)
         make_unique<SubscribeAttributeDescriptorClientList>(), //
         make_unique<ReadDescriptorPartsList>(), //
         make_unique<SubscribeAttributeDescriptorPartsList>(), //
-        make_unique<ReadDescriptorServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDescriptorServerGeneratedCommandList>(), //
-        make_unique<ReadDescriptorClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDescriptorClientGeneratedCommandList>(), //
+        make_unique<ReadDescriptorGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeDescriptorGeneratedCommandList>(), //
+        make_unique<ReadDescriptorAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeDescriptorAcceptedCommandList>(), //
         make_unique<ReadDescriptorAttributeList>(), //
         make_unique<SubscribeAttributeDescriptorAttributeList>(), //
         make_unique<ReadDescriptorClusterRevision>(), //
@@ -73395,10 +73274,10 @@ void registerClusterDiagnosticLogs(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<DiagnosticLogsRetrieveLogsRequest>(), //
-        make_unique<ReadDiagnosticLogsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDiagnosticLogsServerGeneratedCommandList>(), //
-        make_unique<ReadDiagnosticLogsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDiagnosticLogsClientGeneratedCommandList>(), //
+        make_unique<ReadDiagnosticLogsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeDiagnosticLogsGeneratedCommandList>(), //
+        make_unique<ReadDiagnosticLogsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeDiagnosticLogsAcceptedCommandList>(), //
         make_unique<ReadDiagnosticLogsAttributeList>(), //
         make_unique<SubscribeAttributeDiagnosticLogsAttributeList>(), //
     };
@@ -73474,10 +73353,10 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReadDoorLockWrongCodeEntryLimit>(), //
         make_unique<WriteDoorLockWrongCodeEntryLimit>(), //
         make_unique<SubscribeAttributeDoorLockWrongCodeEntryLimit>(), //
-        make_unique<ReadDoorLockServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDoorLockServerGeneratedCommandList>(), //
-        make_unique<ReadDoorLockClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeDoorLockClientGeneratedCommandList>(), //
+        make_unique<ReadDoorLockGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeDoorLockGeneratedCommandList>(), //
+        make_unique<ReadDoorLockAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeDoorLockAcceptedCommandList>(), //
         make_unique<ReadDoorLockAttributeList>(), //
         make_unique<SubscribeAttributeDoorLockAttributeList>(), //
         make_unique<ReadDoorLockClusterRevision>(), //
@@ -73513,10 +73392,10 @@ void registerClusterElectricalMeasurement(Commands & commands)
         make_unique<SubscribeAttributeElectricalMeasurementActivePowerMin>(), //
         make_unique<ReadElectricalMeasurementActivePowerMax>(), //
         make_unique<SubscribeAttributeElectricalMeasurementActivePowerMax>(), //
-        make_unique<ReadElectricalMeasurementServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeElectricalMeasurementServerGeneratedCommandList>(), //
-        make_unique<ReadElectricalMeasurementClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeElectricalMeasurementClientGeneratedCommandList>(), //
+        make_unique<ReadElectricalMeasurementGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeElectricalMeasurementGeneratedCommandList>(), //
+        make_unique<ReadElectricalMeasurementAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeElectricalMeasurementAcceptedCommandList>(), //
         make_unique<ReadElectricalMeasurementAttributeList>(), //
         make_unique<SubscribeAttributeElectricalMeasurementAttributeList>(), //
         make_unique<ReadElectricalMeasurementClusterRevision>(), //
@@ -73549,10 +73428,10 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<SubscribeAttributeEthernetNetworkDiagnosticsCarrierDetect>(), //
         make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(), //
         make_unique<SubscribeAttributeEthernetNetworkDiagnosticsTimeSinceReset>(), //
-        make_unique<ReadEthernetNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeEthernetNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<ReadEthernetNetworkDiagnosticsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeEthernetNetworkDiagnosticsClientGeneratedCommandList>(), //
+        make_unique<ReadEthernetNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeEthernetNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<ReadEthernetNetworkDiagnosticsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeEthernetNetworkDiagnosticsAcceptedCommandList>(), //
         make_unique<ReadEthernetNetworkDiagnosticsAttributeList>(), //
         make_unique<SubscribeAttributeEthernetNetworkDiagnosticsAttributeList>(), //
         make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(), //
@@ -73574,10 +73453,10 @@ void registerClusterFanControl(Commands & commands)
         make_unique<ReadFanControlFanModeSequence>(), //
         make_unique<WriteFanControlFanModeSequence>(), //
         make_unique<SubscribeAttributeFanControlFanModeSequence>(), //
-        make_unique<ReadFanControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFanControlServerGeneratedCommandList>(), //
-        make_unique<ReadFanControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFanControlClientGeneratedCommandList>(), //
+        make_unique<ReadFanControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeFanControlGeneratedCommandList>(), //
+        make_unique<ReadFanControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeFanControlAcceptedCommandList>(), //
         make_unique<ReadFanControlAttributeList>(), //
         make_unique<SubscribeAttributeFanControlAttributeList>(), //
         make_unique<ReadFanControlFeatureMap>(), //
@@ -73595,10 +73474,10 @@ void registerClusterFixedLabel(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadFixedLabelLabelList>(), //
         make_unique<SubscribeAttributeFixedLabelLabelList>(), //
-        make_unique<ReadFixedLabelServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFixedLabelServerGeneratedCommandList>(), //
-        make_unique<ReadFixedLabelClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFixedLabelClientGeneratedCommandList>(), //
+        make_unique<ReadFixedLabelGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeFixedLabelGeneratedCommandList>(), //
+        make_unique<ReadFixedLabelAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeFixedLabelAcceptedCommandList>(), //
         make_unique<ReadFixedLabelAttributeList>(), //
         make_unique<SubscribeAttributeFixedLabelAttributeList>(), //
         make_unique<ReadFixedLabelClusterRevision>(), //
@@ -73620,10 +73499,10 @@ void registerClusterFlowMeasurement(Commands & commands)
         make_unique<SubscribeAttributeFlowMeasurementMaxMeasuredValue>(), //
         make_unique<ReadFlowMeasurementTolerance>(), //
         make_unique<SubscribeAttributeFlowMeasurementTolerance>(), //
-        make_unique<ReadFlowMeasurementServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFlowMeasurementServerGeneratedCommandList>(), //
-        make_unique<ReadFlowMeasurementClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeFlowMeasurementClientGeneratedCommandList>(), //
+        make_unique<ReadFlowMeasurementGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeFlowMeasurementGeneratedCommandList>(), //
+        make_unique<ReadFlowMeasurementAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeFlowMeasurementAcceptedCommandList>(), //
         make_unique<ReadFlowMeasurementAttributeList>(), //
         make_unique<SubscribeAttributeFlowMeasurementAttributeList>(), //
         make_unique<ReadFlowMeasurementClusterRevision>(), //
@@ -73647,10 +73526,10 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<SubscribeAttributeGeneralCommissioningRegulatoryConfig>(), //
         make_unique<ReadGeneralCommissioningLocationCapability>(), //
         make_unique<SubscribeAttributeGeneralCommissioningLocationCapability>(), //
-        make_unique<ReadGeneralCommissioningServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGeneralCommissioningServerGeneratedCommandList>(), //
-        make_unique<ReadGeneralCommissioningClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGeneralCommissioningClientGeneratedCommandList>(), //
+        make_unique<ReadGeneralCommissioningGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeGeneralCommissioningGeneratedCommandList>(), //
+        make_unique<ReadGeneralCommissioningAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeGeneralCommissioningAcceptedCommandList>(), //
         make_unique<ReadGeneralCommissioningAttributeList>(), //
         make_unique<SubscribeAttributeGeneralCommissioningAttributeList>(), //
         make_unique<ReadGeneralCommissioningClusterRevision>(), //
@@ -73680,10 +73559,10 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         make_unique<SubscribeAttributeGeneralDiagnosticsActiveRadioFaults>(), //
         make_unique<ReadGeneralDiagnosticsActiveNetworkFaults>(), //
         make_unique<SubscribeAttributeGeneralDiagnosticsActiveNetworkFaults>(), //
-        make_unique<ReadGeneralDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGeneralDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<ReadGeneralDiagnosticsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGeneralDiagnosticsClientGeneratedCommandList>(), //
+        make_unique<ReadGeneralDiagnosticsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeGeneralDiagnosticsGeneratedCommandList>(), //
+        make_unique<ReadGeneralDiagnosticsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeGeneralDiagnosticsAcceptedCommandList>(), //
         make_unique<ReadGeneralDiagnosticsAttributeList>(), //
         make_unique<SubscribeAttributeGeneralDiagnosticsAttributeList>(), //
         make_unique<ReadGeneralDiagnosticsClusterRevision>(), //
@@ -73709,10 +73588,10 @@ void registerClusterGroupKeyManagement(Commands & commands)
         make_unique<SubscribeAttributeGroupKeyManagementMaxGroupsPerFabric>(), //
         make_unique<ReadGroupKeyManagementMaxGroupKeysPerFabric>(), //
         make_unique<SubscribeAttributeGroupKeyManagementMaxGroupKeysPerFabric>(), //
-        make_unique<ReadGroupKeyManagementServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGroupKeyManagementServerGeneratedCommandList>(), //
-        make_unique<ReadGroupKeyManagementClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGroupKeyManagementClientGeneratedCommandList>(), //
+        make_unique<ReadGroupKeyManagementGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeGroupKeyManagementGeneratedCommandList>(), //
+        make_unique<ReadGroupKeyManagementAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeGroupKeyManagementAcceptedCommandList>(), //
         make_unique<ReadGroupKeyManagementAttributeList>(), //
         make_unique<SubscribeAttributeGroupKeyManagementAttributeList>(), //
         make_unique<ReadGroupKeyManagementClusterRevision>(), //
@@ -73734,10 +73613,10 @@ void registerClusterGroups(Commands & commands)
         make_unique<GroupsViewGroup>(), //
         make_unique<ReadGroupsNameSupport>(), //
         make_unique<SubscribeAttributeGroupsNameSupport>(), //
-        make_unique<ReadGroupsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGroupsServerGeneratedCommandList>(), //
-        make_unique<ReadGroupsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeGroupsClientGeneratedCommandList>(), //
+        make_unique<ReadGroupsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeGroupsGeneratedCommandList>(), //
+        make_unique<ReadGroupsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeGroupsAcceptedCommandList>(), //
         make_unique<ReadGroupsAttributeList>(), //
         make_unique<SubscribeAttributeGroupsAttributeList>(), //
         make_unique<ReadGroupsClusterRevision>(), //
@@ -73759,10 +73638,10 @@ void registerClusterIdentify(Commands & commands)
         make_unique<SubscribeAttributeIdentifyIdentifyTime>(), //
         make_unique<ReadIdentifyIdentifyType>(), //
         make_unique<SubscribeAttributeIdentifyIdentifyType>(), //
-        make_unique<ReadIdentifyServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeIdentifyServerGeneratedCommandList>(), //
-        make_unique<ReadIdentifyClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeIdentifyClientGeneratedCommandList>(), //
+        make_unique<ReadIdentifyGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeIdentifyGeneratedCommandList>(), //
+        make_unique<ReadIdentifyAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeIdentifyAcceptedCommandList>(), //
         make_unique<ReadIdentifyAttributeList>(), //
         make_unique<SubscribeAttributeIdentifyAttributeList>(), //
         make_unique<ReadIdentifyClusterRevision>(), //
@@ -73786,10 +73665,10 @@ void registerClusterIlluminanceMeasurement(Commands & commands)
         make_unique<SubscribeAttributeIlluminanceMeasurementTolerance>(), //
         make_unique<ReadIlluminanceMeasurementLightSensorType>(), //
         make_unique<SubscribeAttributeIlluminanceMeasurementLightSensorType>(), //
-        make_unique<ReadIlluminanceMeasurementServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeIlluminanceMeasurementServerGeneratedCommandList>(), //
-        make_unique<ReadIlluminanceMeasurementClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeIlluminanceMeasurementClientGeneratedCommandList>(), //
+        make_unique<ReadIlluminanceMeasurementGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeIlluminanceMeasurementGeneratedCommandList>(), //
+        make_unique<ReadIlluminanceMeasurementAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeIlluminanceMeasurementAcceptedCommandList>(), //
         make_unique<ReadIlluminanceMeasurementAttributeList>(), //
         make_unique<SubscribeAttributeIlluminanceMeasurementAttributeList>(), //
         make_unique<ReadIlluminanceMeasurementClusterRevision>(), //
@@ -73804,10 +73683,10 @@ void registerClusterKeypadInput(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<KeypadInputSendKey>(), //
-        make_unique<ReadKeypadInputServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeKeypadInputServerGeneratedCommandList>(), //
-        make_unique<ReadKeypadInputClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeKeypadInputClientGeneratedCommandList>(), //
+        make_unique<ReadKeypadInputGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeKeypadInputGeneratedCommandList>(), //
+        make_unique<ReadKeypadInputAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeKeypadInputAcceptedCommandList>(), //
         make_unique<ReadKeypadInputAttributeList>(), //
         make_unique<SubscribeAttributeKeypadInputAttributeList>(), //
         make_unique<ReadKeypadInputClusterRevision>(), //
@@ -73864,10 +73743,10 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<ReadLevelControlStartUpCurrentLevel>(), //
         make_unique<WriteLevelControlStartUpCurrentLevel>(), //
         make_unique<SubscribeAttributeLevelControlStartUpCurrentLevel>(), //
-        make_unique<ReadLevelControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLevelControlServerGeneratedCommandList>(), //
-        make_unique<ReadLevelControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLevelControlClientGeneratedCommandList>(), //
+        make_unique<ReadLevelControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeLevelControlGeneratedCommandList>(), //
+        make_unique<ReadLevelControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeLevelControlAcceptedCommandList>(), //
         make_unique<ReadLevelControlAttributeList>(), //
         make_unique<SubscribeAttributeLevelControlAttributeList>(), //
         make_unique<ReadLevelControlFeatureMap>(), //
@@ -73888,10 +73767,10 @@ void registerClusterLocalizationConfiguration(Commands & commands)
         make_unique<SubscribeAttributeLocalizationConfigurationActiveLocale>(), //
         make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
         make_unique<SubscribeAttributeLocalizationConfigurationSupportedLocales>(), //
-        make_unique<ReadLocalizationConfigurationServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLocalizationConfigurationServerGeneratedCommandList>(), //
-        make_unique<ReadLocalizationConfigurationClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLocalizationConfigurationClientGeneratedCommandList>(), //
+        make_unique<ReadLocalizationConfigurationGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeLocalizationConfigurationGeneratedCommandList>(), //
+        make_unique<ReadLocalizationConfigurationAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeLocalizationConfigurationAcceptedCommandList>(), //
         make_unique<ReadLocalizationConfigurationClusterRevision>(), //
         make_unique<SubscribeAttributeLocalizationConfigurationClusterRevision>(), //
     };
@@ -73904,10 +73783,10 @@ void registerClusterLowPower(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<LowPowerSleep>(), //
-        make_unique<ReadLowPowerServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLowPowerServerGeneratedCommandList>(), //
-        make_unique<ReadLowPowerClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeLowPowerClientGeneratedCommandList>(), //
+        make_unique<ReadLowPowerGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeLowPowerGeneratedCommandList>(), //
+        make_unique<ReadLowPowerAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeLowPowerAcceptedCommandList>(), //
         make_unique<ReadLowPowerAttributeList>(), //
         make_unique<SubscribeAttributeLowPowerAttributeList>(), //
         make_unique<ReadLowPowerClusterRevision>(), //
@@ -73929,10 +73808,10 @@ void registerClusterMediaInput(Commands & commands)
         make_unique<SubscribeAttributeMediaInputInputList>(), //
         make_unique<ReadMediaInputCurrentInput>(), //
         make_unique<SubscribeAttributeMediaInputCurrentInput>(), //
-        make_unique<ReadMediaInputServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeMediaInputServerGeneratedCommandList>(), //
-        make_unique<ReadMediaInputClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeMediaInputClientGeneratedCommandList>(), //
+        make_unique<ReadMediaInputGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeMediaInputGeneratedCommandList>(), //
+        make_unique<ReadMediaInputAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeMediaInputAcceptedCommandList>(), //
         make_unique<ReadMediaInputAttributeList>(), //
         make_unique<SubscribeAttributeMediaInputAttributeList>(), //
         make_unique<ReadMediaInputClusterRevision>(), //
@@ -73969,10 +73848,10 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<SubscribeAttributeMediaPlaybackSeekRangeEnd>(), //
         make_unique<ReadMediaPlaybackSeekRangeStart>(), //
         make_unique<SubscribeAttributeMediaPlaybackSeekRangeStart>(), //
-        make_unique<ReadMediaPlaybackServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeMediaPlaybackServerGeneratedCommandList>(), //
-        make_unique<ReadMediaPlaybackClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeMediaPlaybackClientGeneratedCommandList>(), //
+        make_unique<ReadMediaPlaybackGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeMediaPlaybackGeneratedCommandList>(), //
+        make_unique<ReadMediaPlaybackAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeMediaPlaybackAcceptedCommandList>(), //
         make_unique<ReadMediaPlaybackAttributeList>(), //
         make_unique<SubscribeAttributeMediaPlaybackAttributeList>(), //
         make_unique<ReadMediaPlaybackClusterRevision>(), //
@@ -73987,23 +73866,27 @@ void registerClusterModeSelect(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ModeSelectChangeToMode>(), //
-        make_unique<ReadModeSelectCurrentMode>(), //
-        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectDescription>(), //
+        make_unique<SubscribeAttributeModeSelectDescription>(), //
+        make_unique<ReadModeSelectStandardNamespace>(), //
+        make_unique<SubscribeAttributeModeSelectStandardNamespace>(), //
         make_unique<ReadModeSelectSupportedModes>(), //
         make_unique<SubscribeAttributeModeSelectSupportedModes>(), //
+        make_unique<ReadModeSelectCurrentMode>(), //
+        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectStartUpMode>(), //
+        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
         make_unique<ReadModeSelectOnMode>(), //
         make_unique<WriteModeSelectOnMode>(), //
         make_unique<SubscribeAttributeModeSelectOnMode>(), //
-        make_unique<ReadModeSelectStartUpMode>(), //
-        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
-        make_unique<ReadModeSelectDescription>(), //
-        make_unique<SubscribeAttributeModeSelectDescription>(), //
-        make_unique<ReadModeSelectServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeModeSelectServerGeneratedCommandList>(), //
-        make_unique<ReadModeSelectClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeModeSelectClientGeneratedCommandList>(), //
+        make_unique<ReadModeSelectGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeModeSelectGeneratedCommandList>(), //
+        make_unique<ReadModeSelectAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeModeSelectAcceptedCommandList>(), //
         make_unique<ReadModeSelectAttributeList>(), //
         make_unique<SubscribeAttributeModeSelectAttributeList>(), //
+        make_unique<ReadModeSelectFeatureMap>(), //
+        make_unique<SubscribeAttributeModeSelectFeatureMap>(), //
         make_unique<ReadModeSelectClusterRevision>(), //
         make_unique<SubscribeAttributeModeSelectClusterRevision>(), //
     };
@@ -74038,10 +73921,10 @@ void registerClusterNetworkCommissioning(Commands & commands)
         make_unique<SubscribeAttributeNetworkCommissioningLastNetworkID>(), //
         make_unique<ReadNetworkCommissioningLastConnectErrorValue>(), //
         make_unique<SubscribeAttributeNetworkCommissioningLastConnectErrorValue>(), //
-        make_unique<ReadNetworkCommissioningServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeNetworkCommissioningServerGeneratedCommandList>(), //
-        make_unique<ReadNetworkCommissioningClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeNetworkCommissioningClientGeneratedCommandList>(), //
+        make_unique<ReadNetworkCommissioningGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeNetworkCommissioningGeneratedCommandList>(), //
+        make_unique<ReadNetworkCommissioningAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeNetworkCommissioningAcceptedCommandList>(), //
         make_unique<ReadNetworkCommissioningFeatureMap>(), //
         make_unique<SubscribeAttributeNetworkCommissioningFeatureMap>(), //
         make_unique<ReadNetworkCommissioningClusterRevision>(), //
@@ -74099,10 +73982,10 @@ void registerClusterOccupancySensing(Commands & commands)
         make_unique<SubscribeAttributeOccupancySensingOccupancySensorType>(), //
         make_unique<ReadOccupancySensingOccupancySensorTypeBitmap>(), //
         make_unique<SubscribeAttributeOccupancySensingOccupancySensorTypeBitmap>(), //
-        make_unique<ReadOccupancySensingServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOccupancySensingServerGeneratedCommandList>(), //
-        make_unique<ReadOccupancySensingClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOccupancySensingClientGeneratedCommandList>(), //
+        make_unique<ReadOccupancySensingGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeOccupancySensingGeneratedCommandList>(), //
+        make_unique<ReadOccupancySensingAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeOccupancySensingAcceptedCommandList>(), //
         make_unique<ReadOccupancySensingAttributeList>(), //
         make_unique<SubscribeAttributeOccupancySensingAttributeList>(), //
         make_unique<ReadOccupancySensingClusterRevision>(), //
@@ -74135,10 +74018,10 @@ void registerClusterOnOff(Commands & commands)
         make_unique<ReadOnOffStartUpOnOff>(), //
         make_unique<WriteOnOffStartUpOnOff>(), //
         make_unique<SubscribeAttributeOnOffStartUpOnOff>(), //
-        make_unique<ReadOnOffServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOnOffServerGeneratedCommandList>(), //
-        make_unique<ReadOnOffClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOnOffClientGeneratedCommandList>(), //
+        make_unique<ReadOnOffGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeOnOffGeneratedCommandList>(), //
+        make_unique<ReadOnOffAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeOnOffAcceptedCommandList>(), //
         make_unique<ReadOnOffAttributeList>(), //
         make_unique<SubscribeAttributeOnOffAttributeList>(), //
         make_unique<ReadOnOffFeatureMap>(), //
@@ -74159,10 +74042,10 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands)
         make_unique<ReadOnOffSwitchConfigurationSwitchActions>(), //
         make_unique<WriteOnOffSwitchConfigurationSwitchActions>(), //
         make_unique<SubscribeAttributeOnOffSwitchConfigurationSwitchActions>(), //
-        make_unique<ReadOnOffSwitchConfigurationServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOnOffSwitchConfigurationServerGeneratedCommandList>(), //
-        make_unique<ReadOnOffSwitchConfigurationClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOnOffSwitchConfigurationClientGeneratedCommandList>(), //
+        make_unique<ReadOnOffSwitchConfigurationGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeOnOffSwitchConfigurationGeneratedCommandList>(), //
+        make_unique<ReadOnOffSwitchConfigurationAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeOnOffSwitchConfigurationAcceptedCommandList>(), //
         make_unique<ReadOnOffSwitchConfigurationAttributeList>(), //
         make_unique<SubscribeAttributeOnOffSwitchConfigurationAttributeList>(), //
         make_unique<ReadOnOffSwitchConfigurationClusterRevision>(), //
@@ -74197,10 +74080,10 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<SubscribeAttributeOperationalCredentialsTrustedRootCertificates>(), //
         make_unique<ReadOperationalCredentialsCurrentFabricIndex>(), //
         make_unique<SubscribeAttributeOperationalCredentialsCurrentFabricIndex>(), //
-        make_unique<ReadOperationalCredentialsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOperationalCredentialsServerGeneratedCommandList>(), //
-        make_unique<ReadOperationalCredentialsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeOperationalCredentialsClientGeneratedCommandList>(), //
+        make_unique<ReadOperationalCredentialsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeOperationalCredentialsGeneratedCommandList>(), //
+        make_unique<ReadOperationalCredentialsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeOperationalCredentialsAcceptedCommandList>(), //
         make_unique<ReadOperationalCredentialsAttributeList>(), //
         make_unique<SubscribeAttributeOperationalCredentialsAttributeList>(), //
         make_unique<ReadOperationalCredentialsClusterRevision>(), //
@@ -74232,10 +74115,10 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<SubscribeAttributePowerSourceActiveBatteryFaults>(), //
         make_unique<ReadPowerSourceBatteryChargeState>(), //
         make_unique<SubscribeAttributePowerSourceBatteryChargeState>(), //
-        make_unique<ReadPowerSourceServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePowerSourceServerGeneratedCommandList>(), //
-        make_unique<ReadPowerSourceClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePowerSourceClientGeneratedCommandList>(), //
+        make_unique<ReadPowerSourceGeneratedCommandList>(), //
+        make_unique<SubscribeAttributePowerSourceGeneratedCommandList>(), //
+        make_unique<ReadPowerSourceAcceptedCommandList>(), //
+        make_unique<SubscribeAttributePowerSourceAcceptedCommandList>(), //
         make_unique<ReadPowerSourceAttributeList>(), //
         make_unique<SubscribeAttributePowerSourceAttributeList>(), //
         make_unique<ReadPowerSourceFeatureMap>(), //
@@ -74253,10 +74136,10 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadPowerSourceConfigurationSources>(), //
         make_unique<SubscribeAttributePowerSourceConfigurationSources>(), //
-        make_unique<ReadPowerSourceConfigurationServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePowerSourceConfigurationServerGeneratedCommandList>(), //
-        make_unique<ReadPowerSourceConfigurationClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePowerSourceConfigurationClientGeneratedCommandList>(), //
+        make_unique<ReadPowerSourceConfigurationGeneratedCommandList>(), //
+        make_unique<SubscribeAttributePowerSourceConfigurationGeneratedCommandList>(), //
+        make_unique<ReadPowerSourceConfigurationAcceptedCommandList>(), //
+        make_unique<SubscribeAttributePowerSourceConfigurationAcceptedCommandList>(), //
         make_unique<ReadPowerSourceConfigurationAttributeList>(), //
         make_unique<SubscribeAttributePowerSourceConfigurationAttributeList>(), //
         make_unique<ReadPowerSourceConfigurationClusterRevision>(), //
@@ -74341,10 +74224,10 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<SubscribeAttributePumpConfigurationAndControlControlMode>(), //
         make_unique<ReadPumpConfigurationAndControlAlarmMask>(), //
         make_unique<SubscribeAttributePumpConfigurationAndControlAlarmMask>(), //
-        make_unique<ReadPumpConfigurationAndControlServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePumpConfigurationAndControlServerGeneratedCommandList>(), //
-        make_unique<ReadPumpConfigurationAndControlClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributePumpConfigurationAndControlClientGeneratedCommandList>(), //
+        make_unique<ReadPumpConfigurationAndControlGeneratedCommandList>(), //
+        make_unique<SubscribeAttributePumpConfigurationAndControlGeneratedCommandList>(), //
+        make_unique<ReadPumpConfigurationAndControlAcceptedCommandList>(), //
+        make_unique<SubscribeAttributePumpConfigurationAndControlAcceptedCommandList>(), //
         make_unique<ReadPumpConfigurationAndControlAttributeList>(), //
         make_unique<SubscribeAttributePumpConfigurationAndControlAttributeList>(), //
         make_unique<ReadPumpConfigurationAndControlFeatureMap>(), //
@@ -74368,10 +74251,10 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
         make_unique<SubscribeAttributeRelativeHumidityMeasurementMaxMeasuredValue>(), //
         make_unique<ReadRelativeHumidityMeasurementTolerance>(), //
         make_unique<SubscribeAttributeRelativeHumidityMeasurementTolerance>(), //
-        make_unique<ReadRelativeHumidityMeasurementServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeRelativeHumidityMeasurementServerGeneratedCommandList>(), //
-        make_unique<ReadRelativeHumidityMeasurementClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeRelativeHumidityMeasurementClientGeneratedCommandList>(), //
+        make_unique<ReadRelativeHumidityMeasurementGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeRelativeHumidityMeasurementGeneratedCommandList>(), //
+        make_unique<ReadRelativeHumidityMeasurementAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeRelativeHumidityMeasurementAcceptedCommandList>(), //
         make_unique<ReadRelativeHumidityMeasurementAttributeList>(), //
         make_unique<SubscribeAttributeRelativeHumidityMeasurementAttributeList>(), //
         make_unique<ReadRelativeHumidityMeasurementClusterRevision>(), //
@@ -74402,10 +74285,10 @@ void registerClusterScenes(Commands & commands)
         make_unique<SubscribeAttributeScenesSceneValid>(), //
         make_unique<ReadScenesNameSupport>(), //
         make_unique<SubscribeAttributeScenesNameSupport>(), //
-        make_unique<ReadScenesServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeScenesServerGeneratedCommandList>(), //
-        make_unique<ReadScenesClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeScenesClientGeneratedCommandList>(), //
+        make_unique<ReadScenesGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeScenesGeneratedCommandList>(), //
+        make_unique<ReadScenesAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeScenesAcceptedCommandList>(), //
         make_unique<ReadScenesAttributeList>(), //
         make_unique<SubscribeAttributeScenesAttributeList>(), //
         make_unique<ReadScenesClusterRevision>(), //
@@ -74428,10 +74311,10 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<SubscribeAttributeSoftwareDiagnosticsCurrentHeapUsed>(), //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
         make_unique<SubscribeAttributeSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
-        make_unique<ReadSoftwareDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeSoftwareDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<ReadSoftwareDiagnosticsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeSoftwareDiagnosticsClientGeneratedCommandList>(), //
+        make_unique<ReadSoftwareDiagnosticsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeSoftwareDiagnosticsGeneratedCommandList>(), //
+        make_unique<ReadSoftwareDiagnosticsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeSoftwareDiagnosticsAcceptedCommandList>(), //
         make_unique<ReadSoftwareDiagnosticsAttributeList>(), //
         make_unique<SubscribeAttributeSoftwareDiagnosticsAttributeList>(), //
         make_unique<ReadSoftwareDiagnosticsFeatureMap>(), //
@@ -74453,10 +74336,10 @@ void registerClusterSwitch(Commands & commands)
         make_unique<SubscribeAttributeSwitchCurrentPosition>(), //
         make_unique<ReadSwitchMultiPressMax>(), //
         make_unique<SubscribeAttributeSwitchMultiPressMax>(), //
-        make_unique<ReadSwitchServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeSwitchServerGeneratedCommandList>(), //
-        make_unique<ReadSwitchClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeSwitchClientGeneratedCommandList>(), //
+        make_unique<ReadSwitchGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeSwitchGeneratedCommandList>(), //
+        make_unique<ReadSwitchAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeSwitchAcceptedCommandList>(), //
         make_unique<ReadSwitchAttributeList>(), //
         make_unique<SubscribeAttributeSwitchAttributeList>(), //
         make_unique<ReadSwitchFeatureMap>(), //
@@ -74477,10 +74360,10 @@ void registerClusterTargetNavigator(Commands & commands)
         make_unique<SubscribeAttributeTargetNavigatorTargetList>(), //
         make_unique<ReadTargetNavigatorCurrentTarget>(), //
         make_unique<SubscribeAttributeTargetNavigatorCurrentTarget>(), //
-        make_unique<ReadTargetNavigatorServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTargetNavigatorServerGeneratedCommandList>(), //
-        make_unique<ReadTargetNavigatorClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTargetNavigatorClientGeneratedCommandList>(), //
+        make_unique<ReadTargetNavigatorGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeTargetNavigatorGeneratedCommandList>(), //
+        make_unique<ReadTargetNavigatorAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeTargetNavigatorAcceptedCommandList>(), //
         make_unique<ReadTargetNavigatorAttributeList>(), //
         make_unique<SubscribeAttributeTargetNavigatorAttributeList>(), //
         make_unique<ReadTargetNavigatorClusterRevision>(), //
@@ -74764,10 +74647,10 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableRangeRestrictedInt16s>(), //
         make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(), //
         make_unique<SubscribeAttributeTestClusterNullableRangeRestrictedInt16s>(), //
-        make_unique<ReadTestClusterServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTestClusterServerGeneratedCommandList>(), //
-        make_unique<ReadTestClusterClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTestClusterClientGeneratedCommandList>(), //
+        make_unique<ReadTestClusterGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeTestClusterGeneratedCommandList>(), //
+        make_unique<ReadTestClusterAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeTestClusterAcceptedCommandList>(), //
         make_unique<ReadTestClusterAttributeList>(), //
         make_unique<SubscribeAttributeTestClusterAttributeList>(), //
         make_unique<ReadTestClusterClusterRevision>(), //
@@ -74853,10 +74736,10 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
         make_unique<ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
         make_unique<WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
         make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
-        make_unique<ReadThermostatUserInterfaceConfigurationServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationServerGeneratedCommandList>(), //
-        make_unique<ReadThermostatUserInterfaceConfigurationClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationClientGeneratedCommandList>(), //
+        make_unique<ReadThermostatUserInterfaceConfigurationGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationGeneratedCommandList>(), //
+        make_unique<ReadThermostatUserInterfaceConfigurationAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationAcceptedCommandList>(), //
         make_unique<ReadThermostatUserInterfaceConfigurationAttributeList>(), //
         make_unique<SubscribeAttributeThermostatUserInterfaceConfigurationAttributeList>(), //
         make_unique<ReadThermostatUserInterfaceConfigurationClusterRevision>(), //
@@ -74997,10 +74880,10 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<SubscribeAttributeThreadNetworkDiagnosticsOperationalDatasetComponents>(), //
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(), //
         make_unique<SubscribeAttributeThreadNetworkDiagnosticsActiveNetworkFaultsList>(), //
-        make_unique<ReadThreadNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeThreadNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<ReadThreadNetworkDiagnosticsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeThreadNetworkDiagnosticsClientGeneratedCommandList>(), //
+        make_unique<ReadThreadNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeThreadNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<ReadThreadNetworkDiagnosticsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeThreadNetworkDiagnosticsAcceptedCommandList>(), //
         make_unique<ReadThreadNetworkDiagnosticsAttributeList>(), //
         make_unique<SubscribeAttributeThreadNetworkDiagnosticsAttributeList>(), //
         make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(), //
@@ -75024,10 +74907,10 @@ void registerClusterTimeFormatLocalization(Commands & commands)
         make_unique<SubscribeAttributeTimeFormatLocalizationActiveCalendarType>(), //
         make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(), //
         make_unique<SubscribeAttributeTimeFormatLocalizationSupportedCalendarTypes>(), //
-        make_unique<ReadTimeFormatLocalizationServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTimeFormatLocalizationServerGeneratedCommandList>(), //
-        make_unique<ReadTimeFormatLocalizationClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeTimeFormatLocalizationClientGeneratedCommandList>(), //
+        make_unique<ReadTimeFormatLocalizationGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeTimeFormatLocalizationGeneratedCommandList>(), //
+        make_unique<ReadTimeFormatLocalizationAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeTimeFormatLocalizationAcceptedCommandList>(), //
         make_unique<ReadTimeFormatLocalizationClusterRevision>(), //
         make_unique<SubscribeAttributeTimeFormatLocalizationClusterRevision>(), //
     };
@@ -75059,10 +74942,10 @@ void registerClusterUserLabel(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadUserLabelLabelList>(), //
         make_unique<SubscribeAttributeUserLabelLabelList>(), //
-        make_unique<ReadUserLabelServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeUserLabelServerGeneratedCommandList>(), //
-        make_unique<ReadUserLabelClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeUserLabelClientGeneratedCommandList>(), //
+        make_unique<ReadUserLabelGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeUserLabelGeneratedCommandList>(), //
+        make_unique<ReadUserLabelAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeUserLabelAcceptedCommandList>(), //
         make_unique<ReadUserLabelClusterRevision>(), //
         make_unique<SubscribeAttributeUserLabelClusterRevision>(), //
     };
@@ -75076,10 +74959,10 @@ void registerClusterWakeOnLan(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadWakeOnLanMACAddress>(), //
         make_unique<SubscribeAttributeWakeOnLanMACAddress>(), //
-        make_unique<ReadWakeOnLanServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWakeOnLanServerGeneratedCommandList>(), //
-        make_unique<ReadWakeOnLanClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWakeOnLanClientGeneratedCommandList>(), //
+        make_unique<ReadWakeOnLanGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeWakeOnLanGeneratedCommandList>(), //
+        make_unique<ReadWakeOnLanAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeWakeOnLanAcceptedCommandList>(), //
         make_unique<ReadWakeOnLanAttributeList>(), //
         make_unique<SubscribeAttributeWakeOnLanAttributeList>(), //
         make_unique<ReadWakeOnLanClusterRevision>(), //
@@ -75120,10 +75003,10 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<SubscribeAttributeWiFiNetworkDiagnosticsCurrentMaxRate>(), //
         make_unique<ReadWiFiNetworkDiagnosticsOverrunCount>(), //
         make_unique<SubscribeAttributeWiFiNetworkDiagnosticsOverrunCount>(), //
-        make_unique<ReadWiFiNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWiFiNetworkDiagnosticsServerGeneratedCommandList>(), //
-        make_unique<ReadWiFiNetworkDiagnosticsClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWiFiNetworkDiagnosticsClientGeneratedCommandList>(), //
+        make_unique<ReadWiFiNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeWiFiNetworkDiagnosticsGeneratedCommandList>(), //
+        make_unique<ReadWiFiNetworkDiagnosticsAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeWiFiNetworkDiagnosticsAcceptedCommandList>(), //
         make_unique<ReadWiFiNetworkDiagnosticsAttributeList>(), //
         make_unique<SubscribeAttributeWiFiNetworkDiagnosticsAttributeList>(), //
         make_unique<ReadWiFiNetworkDiagnosticsFeatureMap>(), //
@@ -75183,10 +75066,10 @@ void registerClusterWindowCovering(Commands & commands)
         make_unique<SubscribeAttributeWindowCoveringMode>(), //
         make_unique<ReadWindowCoveringSafetyStatus>(), //
         make_unique<SubscribeAttributeWindowCoveringSafetyStatus>(), //
-        make_unique<ReadWindowCoveringServerGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWindowCoveringServerGeneratedCommandList>(), //
-        make_unique<ReadWindowCoveringClientGeneratedCommandList>(), //
-        make_unique<SubscribeAttributeWindowCoveringClientGeneratedCommandList>(), //
+        make_unique<ReadWindowCoveringGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeWindowCoveringGeneratedCommandList>(), //
+        make_unique<ReadWindowCoveringAcceptedCommandList>(), //
+        make_unique<SubscribeAttributeWindowCoveringAcceptedCommandList>(), //
         make_unique<ReadWindowCoveringAttributeList>(), //
         make_unique<SubscribeAttributeWindowCoveringAttributeList>(), //
         make_unique<ReadWindowCoveringFeatureMap>(), //

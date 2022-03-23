@@ -728,8 +728,8 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     GetMinEventLogPosition(minEventLogPosition);
     if (aBytesWritten - minEventLogPosition > CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD)
     {
-        ChipLogProgress(DataManagement, "<RE> Buffer overfilled CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD %d, schedule engine run",
-                        CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD);
+        ChipLogDetail(DataManagement, "<RE> Buffer overfilled CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD %d, schedule engine run",
+                      CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD);
         return ScheduleRun();
     }
     return CHIP_NO_ERROR;
@@ -763,10 +763,9 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
         ChipLogDetail(DataManagement, "urgent event schedule run");
         return ScheduleRun();
     }
-    else
-    {
-        return ScheduleBufferPressureEventDelivery(aBytesWritten);
-    }
+
+    return ScheduleBufferPressureEventDelivery(aBytesWritten);
+
     return CHIP_NO_ERROR;
 }
 

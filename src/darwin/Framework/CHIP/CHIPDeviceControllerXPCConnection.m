@@ -148,23 +148,41 @@
                                     completion:(void (^)(void))completion
 {
     dispatch_async(_workQueue, ^{
-        NSMutableDictionary * controllerDictionary = self.reportRegistry[controller];
-        if (!controllerDictionary) {
+        __auto_type clearRegistry = ^{
+            NSMutableDictionary * controllerDictionary = self.reportRegistry[controller];
+            if (!controllerDictionary) {
+                completion();
+                return;
+            }
+            NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+            NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+            if (!nodeArray) {
+                completion();
+                return;
+            }
+            [controllerDictionary removeObjectForKey:nodeIdKey];
+            if ([controllerDictionary count] == 0) {
+                // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
+                self.proxyRetainerForReports = nil;
+            }
             completion();
-            return;
-        }
-        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
-        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
-        if (!nodeArray) {
-            completion();
-            return;
-        }
-        [controllerDictionary removeObjectForKey:nodeIdKey];
-        if ([controllerDictionary count] == 0) {
-            // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
-            self.proxyRetainerForReports = nil;
-        }
-        completion();
+        };
+        [self
+            getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, CHIPDeviceControllerXPCProxyHandle * _Nullable handle) {
+                if (handle) {
+                    CHIP_LOG_DEBUG("CHIP XPC connection requests to stop reports");
+                    [handle.proxy stopReportsWithController:controller
+                                                     nodeId:nodeId
+                                                 completion:^{
+                                                     __auto_type handleRetainer = handle;
+                                                     (void) handleRetainer;
+                                                     clearRegistry();
+                                                 }];
+                } else {
+                    CHIP_LOG_ERROR("CHIP XPC connection failed to stop reporting");
+                    clearRegistry();
+                }
+            }];
     });
 }
 

@@ -71,7 +71,7 @@ public:
     {
         SetFabricIndex(fabric);
     }
-    ~SecureSession() { NotifySessionReleased(); }
+    ~SecureSession() override { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;

@@ -343,7 +343,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
 
-bool ThreadStackManagerImpl::_IsThreadAttached()
+bool ThreadStackManagerImpl::_IsThreadAttached() const
 {
     return mAttached;
 }
@@ -426,7 +426,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
         std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
@@ -446,15 +446,13 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         }
         return type;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
     }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
-        return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-    }
+
+    ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
+    return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)

@@ -50,11 +50,11 @@ public:
 
         Iterator operator++();
 
-        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+        bool operator==(const Iterator & rhs) const { return mIndex == rhs.mIndex; }
 
-        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+        bool operator!=(const Iterator & rhs) const { return mIndex != rhs.mIndex; }
 
-        uint8_t GetIndex() { return mIndex; }
+        uint8_t GetIndex() const { return mIndex; }
 
     private:
         BindingTable * mTable;
@@ -71,7 +71,7 @@ public:
 
     // Returns the number of active entries in the binding table.
     // *NOTE* The function does not return the capacity of the binding table.
-    uint8_t Size() { return mSize; }
+    uint8_t Size() const { return mSize; }
 
     Iterator begin();
 

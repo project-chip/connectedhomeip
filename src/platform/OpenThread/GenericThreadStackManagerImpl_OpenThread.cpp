@@ -1889,7 +1889,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
     switch (aError)
     {
     case OT_ERROR_NONE: {
-        ChipLogProgress(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+        ChipLogDetail(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
 
         if (aHostInfo)
         {

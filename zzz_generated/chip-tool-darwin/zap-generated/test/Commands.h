@@ -326,7 +326,6 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
@@ -349,9 +348,9 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -381,9 +380,9 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
             {
@@ -413,6 +412,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -446,8 +446,6 @@ private:
                          {
                              id actualValue = value;
                              VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(3)));
-                             VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                              VerifyOrReturn(CheckValue(
@@ -516,7 +514,7 @@ private:
                                          .targets[2])
                                      .deviceType));
                              VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege, 1));
                              VerifyOrReturn(CheckValue(
@@ -596,7 +594,7 @@ private:
                                          .targets[2])
                                      .deviceType));
                              VerifyOrReturn(CheckValue(
-                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex, 1));
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
                              VerifyOrReturn(CheckValue(
                                  "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).privilege, 3));
                              VerifyOrReturn(CheckValue(
@@ -675,6 +673,8 @@ private:
                                  ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                          .targets[2])
                                      .deviceType));
+                             VerifyOrReturn(CheckValue(
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex, 1));
                          }
 
                          NextTest();
@@ -693,14 +693,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -711,6 +710,7 @@ private:
                 NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -743,8 +743,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(2)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -754,7 +752,7 @@ private:
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
                                   VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege, 1));
                                   VerifyOrReturn(CheckValue(
@@ -763,6 +761,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -781,18 +781,18 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:3];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -824,8 +824,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -834,6 +832,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -852,18 +852,18 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -895,8 +895,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -905,6 +903,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -923,14 +923,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -939,6 +938,7 @@ private:
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
             }
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -970,8 +970,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -980,6 +978,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -998,14 +998,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -1018,6 +1017,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1049,8 +1049,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1059,6 +1057,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1077,14 +1077,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             {
@@ -1112,6 +1111,7 @@ private:
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
             }
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1143,8 +1143,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1153,6 +1151,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1171,14 +1171,13 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -1286,6 +1285,7 @@ private:
 
                 ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
             }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1317,8 +1317,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1327,6 +1325,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -1345,11 +1345,11 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             aclArgument = temp_0;
         }
@@ -1382,8 +1382,6 @@ private:
                               {
                                   id actualValue = value;
                                   VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(1)));
-                                  VerifyOrReturn(CheckValue("FabricIndex",
-                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                                   VerifyOrReturn(CheckValue(
                                       "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
                                   VerifyOrReturn(CheckValue(
@@ -1392,6 +1390,8 @@ private:
                                       "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
                                   VerifyOrReturn(CheckValueNull(
                                       "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                                  VerifyOrReturn(CheckValue("FabricIndex",
+                                      ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
                               }
 
                               NextTest();
@@ -38733,12 +38733,12 @@ public:
             err = TestReadAttributeThatReturnsClusterSpecificStatusOnRead_477();
             break;
         case 478:
-            ChipLogProgress(chipTool, " ***** Test Step 478 : read ClientGeneratedCommandList attribute\n");
-            err = TestReadClientGeneratedCommandListAttribute_478();
+            ChipLogProgress(chipTool, " ***** Test Step 478 : read AcceptedCommandList attribute\n");
+            err = TestReadAcceptedCommandListAttribute_478();
             break;
         case 479:
-            ChipLogProgress(chipTool, " ***** Test Step 479 : read ServerGeneratedCommandList attribute\n");
-            err = TestReadServerGeneratedCommandListAttribute_479();
+            ChipLogProgress(chipTool, " ***** Test Step 479 : read GeneratedCommandList attribute\n");
+            err = TestReadGeneratedCommandListAttribute_479();
             break;
         case 480:
             ChipLogProgress(chipTool, " ***** Test Step 480 : Write struct-typed attribute\n");
@@ -41047,7 +41047,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         id octetStringArgument;
-        octetStringArgument = [[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9];
+        octetStringArgument = [[NSData alloc] initWithBytes:"Tes\000ti\000ng" length:9];
         [cluster writeAttributeOctetStringWithValue:octetStringArgument
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute OCTET_STRING with embedded null Error: %@", err);
@@ -41074,7 +41074,7 @@ private:
             {
                 id actualValue = value;
                 VerifyOrReturn(
-                    CheckValueAsString("octet_string", actualValue, [[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9]));
+                    CheckValueAsString("octet_string", actualValue, [[NSData alloc] initWithBytes:"Tes\000ti\000ng" length:9]));
             }
 
             NextTest();
@@ -41090,7 +41090,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         id octetStringArgument;
-        octetStringArgument = [[NSData alloc] initWithBytes:"\x0d\x0a\xff\x22\xa0" length:5];
+        octetStringArgument = [[NSData alloc] initWithBytes:"\015\012\377\042\240" length:5];
         [cluster writeAttributeOctetStringWithValue:octetStringArgument
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute OCTET_STRING with weird chars Error: %@", err);
@@ -41117,7 +41117,7 @@ private:
             {
                 id actualValue = value;
                 VerifyOrReturn(CheckValueAsString(
-                    "octet_string", actualValue, [[NSData alloc] initWithBytes:"\x0d\x0a\xff\x22\xa0" length:5]));
+                    "octet_string", actualValue, [[NSData alloc] initWithBytes:"\015\012\377\042\240" length:5]));
             }
 
             NextTest();
@@ -49832,74 +49832,72 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadClientGeneratedCommandListAttribute_478()
+    CHIP_ERROR TestReadAcceptedCommandListAttribute_478()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ClientGeneratedCommandList attribute Error: %@", err);
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read AcceptedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("ClientGeneratedCommandList", [actualValue count], static_cast<uint32_t>(18)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
-                    VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
-                    VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
-                    VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
-                    VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
-                    VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
-                    VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
-                    VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
-                    VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
-                    VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(18)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
+                VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
+                VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
+                VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
+                VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
+                VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
+                VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
+                VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
+                VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
+                VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadServerGeneratedCommandListAttribute_479()
+    CHIP_ERROR TestReadGeneratedCommandListAttribute_479()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ServerGeneratedCommandList attribute Error: %@", err);
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read GeneratedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("ServerGeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -54924,15 +54922,15 @@ private:
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
             [NSNumber numberWithUnsignedChar:0];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
-            [[NSData alloc] initWithBytes:"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf" length:16];
+            [[NSData alloc] initWithBytes:"\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
             [NSNumber numberWithUnsignedLongLong:1110000ULL];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
-            [[NSData alloc] initWithBytes:"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" length:16];
+            [[NSData alloc] initWithBytes:"\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
             [NSNumber numberWithUnsignedLongLong:1110001ULL];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
-            [[NSData alloc] initWithBytes:"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" length:16];
+            [[NSData alloc] initWithBytes:"\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
             [NSNumber numberWithUnsignedLongLong:1110002ULL];
 
@@ -54963,15 +54961,15 @@ private:
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
             [NSNumber numberWithUnsignedChar:1];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
-            [[NSData alloc] initWithBytes:"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" length:16];
+            [[NSData alloc] initWithBytes:"\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
             [NSNumber numberWithUnsignedLongLong:2110000ULL];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
-            [[NSData alloc] initWithBytes:"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef" length:16];
+            [[NSData alloc] initWithBytes:"\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
             [NSNumber numberWithUnsignedLongLong:2110001ULL];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
-            [[NSData alloc] initWithBytes:"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" length:16];
+            [[NSData alloc] initWithBytes:"\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377" length:16];
         ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
             [NSNumber numberWithUnsignedLongLong:2110002ULL];
 
@@ -55049,14 +55047,14 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
             temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
             groupKeyMapArgument = temp_0;
         }
@@ -55092,18 +55090,18 @@ private:
                                  {
                                      id actualValue = value;
                                      VerifyOrReturn(CheckValue("GroupKeyMap", [actualValue count], static_cast<uint32_t>(2)));
-                                     VerifyOrReturn(CheckValue("FabricIndex",
-                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex, 1));
                                      VerifyOrReturn(CheckValue("GroupId",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId, 257U));
                                      VerifyOrReturn(CheckValue("GroupKeySetID",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID, 417U));
                                      VerifyOrReturn(CheckValue("FabricIndex",
-                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex, 1));
+                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex, 1));
                                      VerifyOrReturn(CheckValue("GroupId",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId, 258U));
                                      VerifyOrReturn(CheckValue("GroupKeySetID",
                                          ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID, 418U));
+                                     VerifyOrReturn(CheckValue("FabricIndex",
+                                         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex, 1));
                                  }
 
                                  NextTest();
@@ -55131,20 +55129,20 @@ private:
                                      {
                                          id actualValue = value;
                                          VerifyOrReturn(CheckValue("GroupTable", [actualValue count], static_cast<uint32_t>(2)));
-                                         VerifyOrReturn(CheckValue("FabricIndex",
-                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex, 1));
                                          VerifyOrReturn(CheckValue("GroupId",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId, 257U));
                                          VerifyOrReturn(CheckValueAsString("GroupName",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName,
                                              @"Group #1"));
                                          VerifyOrReturn(CheckValue("FabricIndex",
-                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex, 1));
+                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex, 1));
                                          VerifyOrReturn(CheckValue("GroupId",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId, 258U));
                                          VerifyOrReturn(CheckValueAsString("GroupName",
                                              ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName,
                                              @"Group #2"));
+                                         VerifyOrReturn(CheckValue("FabricIndex",
+                                             ((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex, 1));
                                      }
 
                                      NextTest();
@@ -55710,11 +55708,11 @@ private:
                                   {
                                       id actualValue = value;
                                       VerifyOrReturn(CheckValue("Fabrics", [actualValue count], static_cast<uint32_t>(1)));
+                                      VerifyOrReturn(CheckValueAsString("Label",
+                                          ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @""));
                                       VerifyOrReturn(CheckValue("FabricIndex",
                                           ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                           ourFabricIndex));
-                                      VerifyOrReturn(CheckValueAsString("Label",
-                                          ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @""));
                                   }
 
                                   NextTest();
@@ -55776,11 +55774,11 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Fabrics", [actualValue count], static_cast<uint32_t>(1)));
+                                 VerifyOrReturn(CheckValueAsString("Label",
+                                     ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @"Batcave"));
                                  VerifyOrReturn(CheckValue("FabricIndex",
                                      ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                      ourFabricIndex));
-                                 VerifyOrReturn(CheckValueAsString("Label",
-                                     ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label, @"Batcave"));
                              }
 
                              NextTest();
@@ -55831,36 +55829,72 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read CurrentMode\n");
-            err = TestReadCurrentMode_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read Description\n");
+            err = TestReadDescription_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read OnMode\n");
-            err = TestReadOnMode_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read StandardNamespace\n");
+            err = TestReadStandardNamespace_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read StartUpMode\n");
-            err = TestReadStartUpMode_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read SupportedModes\n");
+            err = TestReadSupportedModes_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read Description\n");
-            err = TestReadDescription_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read CurrentMode\n");
+            err = TestReadCurrentMode_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read SupportedModes\n");
-            err = TestReadSupportedModes_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read StartUpMode\n");
+            err = TestReadStartUpMode_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Change to Supported Mode\n");
-            err = TestChangeToSupportedMode_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read OnMode\n");
+            err = TestReadOnMode_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify Current Mode Change\n");
-            err = TestVerifyCurrentModeChange_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Change to Supported Mode\n");
+            err = TestChangeToSupportedMode_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Change to Unsupported Mode\n");
-            err = TestChangeToUnsupportedMode_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Verify Current Mode Change\n");
+            err = TestVerifyCurrentModeChange_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Change to Unsupported Mode\n");
+            err = TestChangeToUnsupportedMode_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Toggle OnOff\n");
+            err = TestToggleOnOff_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Toggle OnOff\n");
+            err = TestToggleOnOff_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Verify Current Mode does not change when OnMode is null\n");
+            err = TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Change OnMode\n");
+            err = TestChangeOnMode_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Verify OnMode\n");
+            err = TestVerifyOnMode_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Toggle OnOff\n");
+            err = TestToggleOnOff_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Toggle OnOff\n");
+            err = TestToggleOnOff_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Verify Current Mode Changes if OnMode is not null\n");
+            err = TestVerifyCurrentModeChangesIfOnModeIsNotNull_17();
             break;
         }
 
@@ -55877,7 +55911,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -55890,73 +55924,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadCurrentMode_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read CurrentMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadOnMode_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read OnMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("OnMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadStartUpMode_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read StartUpMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadDescription_4()
+    CHIP_ERROR TestReadDescription_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -55978,7 +55946,30 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadSupportedModes_5()
+    CHIP_ERROR TestReadStandardNamespace_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read StandardNamespace Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StandardNamespace", actualValue));
+                VerifyOrReturn(CheckValue("StandardNamespace", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadSupportedModes_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56015,7 +56006,74 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestChangeToSupportedMode_6()
+    CHIP_ERROR TestReadCurrentMode_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read CurrentMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadStartUpMode_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read StartUpMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StartUpMode", actualValue));
+                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadOnMode_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read OnMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNull("OnMode", actualValue));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeToSupportedMode_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56034,8 +56092,9 @@ private:
 
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull currentModeBeforeToggle;
 
-    CHIP_ERROR TestVerifyCurrentModeChange_7()
+    CHIP_ERROR TestVerifyCurrentModeChange_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56050,6 +56109,9 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("CurrentMode", actualValue, 4));
             }
+            {
+                currentModeBeforeToggle = value;
+            }
 
             NextTest();
         }];
@@ -56057,7 +56119,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestChangeToUnsupportedMode_8()
+    CHIP_ERROR TestChangeToUnsupportedMode_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56072,6 +56134,165 @@ private:
                           VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
                           NextTest();
                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify Current Mode does not change when OnMode is null Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, currentModeBeforeToggle));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeOnMode_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id onModeArgument;
+        onModeArgument = [NSNumber numberWithUnsignedChar:7];
+        [cluster writeAttributeOnModeWithValue:onModeArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Change OnMode Error: %@", err);
+
+                                 VerifyOrReturn(CheckValue("status", err, 0));
+
+                                 NextTest();
+                             }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nullable OnModeValue;
+
+    CHIP_ERROR TestVerifyOnMode_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify OnMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("OnMode", actualValue));
+                VerifyOrReturn(CheckValue("OnMode", actualValue, 7));
+            }
+            {
+                OnModeValue = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyCurrentModeChangesIfOnModeIsNotNull_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify Current Mode Changes if OnMode is not null Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, OnModeValue));
+            }
+
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -56238,11 +56459,11 @@ private:
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).group = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56267,19 +56488,19 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).group = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
             ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+            ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             temp_0[2] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[2]).node = [NSNumber numberWithUnsignedLongLong:2ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[2]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56313,21 +56534,21 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(3)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Group", ((CHIPBindingClusterTargetStruct *) actualValue[0]).group, 1U));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[1]).node, 1ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint, 1U));
                                  VerifyOrReturn(
                                      CheckValue("Cluster", ((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster, 6UL));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[2]).node, 2ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
                              }
 
                              NextTest();
@@ -56346,9 +56567,9 @@ private:
         {
             NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
             temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
             ((CHIPBindingClusterTargetStruct *) temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
             bindingArgument = temp_0;
         }
@@ -56382,11 +56603,11 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(1)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[0]).node, 3ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[0]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                              }
 
                              NextTest();
@@ -56413,21 +56634,21 @@ private:
                              {
                                  id actualValue = value;
                                  VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(3)));
-                                 VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Group", ((CHIPBindingClusterTargetStruct *) actualValue[0]).group, 1U));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[1]).node, 1ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint, 1U));
                                  VerifyOrReturn(
                                      CheckValue("Cluster", ((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster, 6UL));
                                  VerifyOrReturn(
-                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
                                  VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[2]).node, 2ULL));
                                  VerifyOrReturn(
                                      CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
                              }
 
                              NextTest();

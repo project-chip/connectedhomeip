@@ -30,21 +30,21 @@ namespace DeviceLayer {
 void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 {
     FailSafeContext * context = reinterpret_cast<FailSafeContext *>(aAppState);
-    context->CommissioningFailedTimerComplete();
+    context->FailSafeTimerExpired();
 }
 
-void FailSafeContext::CommissioningFailedTimerComplete()
+void FailSafeContext::FailSafeTimerExpired()
 {
-    // TODO: If the fail-safe timer expires before the CommissioningComplete command is
-    // successfully invoked, conduct clean-up steps.
-
     ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.Status = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
+    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
+    event.FailSafeTimerExpired.PeerFabricIndex                = mFabricIndex;
+    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
+    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
+    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
-    mFailSafeArmed            = false;
-    mNocCommandHasBeenInvoked = false;
+    mFailSafeArmed                  = false;
+    mAddNocCommandHasBeenInvoked    = false;
+    mUpdateNocCommandHasBeenInvoked = false;
 
     if (status != CHIP_NO_ERROR)
     {
@@ -62,8 +62,9 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
 CHIP_ERROR FailSafeContext::DisarmFailSafe()
 {
-    mFailSafeArmed            = false;
-    mNocCommandHasBeenInvoked = false;
+    mFailSafeArmed                  = false;
+    mAddNocCommandHasBeenInvoked    = false;
+    mUpdateNocCommandHasBeenInvoked = false;
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }

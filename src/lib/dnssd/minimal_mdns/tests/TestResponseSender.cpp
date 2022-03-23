@@ -271,6 +271,16 @@ void AddManyQueryResponders(nlTestSuite * inSuite, void * inContext)
 
     // Last one should return a no memory error (no space)
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_ERROR_NO_MEMORY);
+
+    // can make space
+    NL_TEST_ASSERT(inSuite, responseSender.RemoveQueryResponder(&q3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_NO_ERROR);
+
+    // adding back does not fail
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_NO_ERROR);
+
+    // still full and cannot add more
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q3) == CHIP_ERROR_NO_MEMORY);
 }
 
 void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inContext)

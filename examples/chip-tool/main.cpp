@@ -20,6 +20,7 @@
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
 #include "commands/discover/Commands.h"
+#include "commands/group/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
 
@@ -37,6 +38,7 @@ int main(int argc, char * argv[])
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerCommandsTests(commands, &credIssuerCommands);
+    registerCommandsGroup(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
 
     return commands.Run(argc, argv);

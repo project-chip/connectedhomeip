@@ -76,7 +76,7 @@ public:
     CASESession(CASESession &&)      = default;
     CASESession(const CASESession &) = default;
 
-    virtual ~CASESession();
+    ~CASESession() override;
 
     /**
      * @brief
@@ -142,7 +142,7 @@ public:
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
     /**
      * @brief Serialize the CASESession to the given cachableSession data structure for secure pairing

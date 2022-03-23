@@ -37,11 +37,13 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
 CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
+
     ChipDeviceEvent event;
+
     event.Type                                  = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.PeerNodeId      = peerNodeId;
     event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
-    event.CommissioningComplete.Status          = CHIP_NO_ERROR;
+
     return PlatformMgr().PostEvent(&event);
 }
 
@@ -64,9 +66,7 @@ exit:
         ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %s", ErrorStr(err));
     }
 
-    // TODO(cecille): This command fails on ESP32, but it's blocking IP cluster-based commissioning so for now just return a success
-    // status.
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)

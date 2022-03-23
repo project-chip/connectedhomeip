@@ -22,6 +22,8 @@ from chip.clusters.Types import NullValue
 import chip.interaction_model
 import asyncio
 
+import base
+
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
 
@@ -48,6 +50,7 @@ WIFI_NETWORK_FEATURE_MAP = 1
 THREAD_NETWORK_FEATURE_MAP = 2
 
 
+@base.test_set
 class NetworkCommissioningTests:
     def __init__(self, devCtrl, nodeid):
         self._devCtrl = devCtrl
@@ -279,26 +282,34 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"Unexpected result: network is not marked as connected")
 
+    @base.test_case
+    async def Test(self):
+        clusters = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
+        if Clusters.NetworkCommissioning.id not in clusters[0][Clusters.Descriptor].serverList:
+            logger.info(
+                f"Network commissioning cluster {endpoint} is not enabled on this device.")
+            return
+        endpoints = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)], returnClusterObject=True)
+        logger.info(endpoints)
+        for endpoint, obj in endpoints.items():
+            clus = obj[Clusters.NetworkCommissioning]
+            if clus.featureMap == WIFI_NETWORK_FEATURE_MAP:
+                logger.info(
+                    f"Endpoint {endpoint} is configured as WiFi network, run WiFi commissioning test.")
+                await self.test_negative(endpoint)
+                await self.test_wifi(endpoint)
+            elif clus.featureMap == THREAD_NETWORK_FEATURE_MAP:
+                logger.info(
+                    f"Endpoint {endpoint} is configured as Thread network, run Thread commissioning test.")
+                await self.test_negative(endpoint)
+                await self.test_thread(endpoint)
+            else:
+                logger.info(
+                    f"Skip endpoint {endpoint} with featureMap {clus.featureMap}")
+
     async def run(self):
         try:
-            endpoints = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)], returnClusterObject=True)
-            logger.info(endpoints)
-            for endpoint, obj in endpoints.items():
-                clus = obj[Clusters.NetworkCommissioning]
-                if clus.featureMap == WIFI_NETWORK_FEATURE_MAP:
-                    logger.info(
-                        f"Endpoint {endpoint} is configured as WiFi network, run WiFi commissioning test.")
-                    await self.test_negative(endpoint)
-                    await self.test_wifi(endpoint)
-                elif clus.featureMap == THREAD_NETWORK_FEATURE_MAP:
-                    logger.info(
-                        f"Endpoint {endpoint} is configured as Thread network, run Thread commissioning test.")
-                    await self.test_negative(endpoint)
-                    await self.test_thread(endpoint)
-                else:
-                    logger.info(
-                        f"Skip endpoint {endpoint} with featureMap {clus.featureMap}")
+            await self.Test()
+            return True
         except Exception as ex:
-            logger.exception(ex)
             return False
-        return True

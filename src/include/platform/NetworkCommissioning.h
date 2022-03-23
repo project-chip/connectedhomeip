@@ -272,7 +272,7 @@ public:
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;
 
-    virtual ~WiFiDriver() = default;
+    ~WiFiDriver() override = default;
 };
 
 class ThreadDriver : public Internal::WirelessDriver
@@ -302,7 +302,7 @@ public:
      */
     virtual void ScanNetworks(ScanCallback * callback) = 0;
 
-    virtual ~ThreadDriver() = default;
+    ~ThreadDriver() override = default;
 };
 
 class EthernetDriver : public Internal::BaseDriver
