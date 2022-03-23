@@ -53,6 +53,11 @@ public class MatterServant {
   }
 
   public void init(@NonNull Context context) {
+    // The order is important, must
+    // first new TvApp to load dynamic library
+    // then chipPlatform to prepare platform
+    // then TvApp.postInit to init app which needs platform
+    // then start ChipAppServer
     TvApp tvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
@@ -91,6 +96,8 @@ public class MatterServant {
             new NsdManagerServiceResolver(applicationContext),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
+
+    tvApp.postInit();
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();

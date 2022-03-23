@@ -27,6 +27,3 @@ void ChipAndroidAppShutdown(void);
 jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved);
 
 void AndroidAppServerJNI_OnUnload(JavaVM * jvm, void * reserved);
-
-// For extra init calls, the function will be called right before running Matter main loop.
-void ApplicationInit();
