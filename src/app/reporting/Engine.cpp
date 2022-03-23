@@ -308,7 +308,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
         {
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
-            // However, we may have encoded some attributes befoure, we don't skip it in that case.
+            // However, we may have encoded some attributes before, we don't skip it in that case.
             if (eventCount == 0)
             {
                 if (!aBufferIsUsed)
