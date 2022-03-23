@@ -37,15 +37,24 @@
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterModeSelectPluginClientInitCallback();                                                                                    \
+    MatterModeSelectPluginServerInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginClientInitCallback();                                                                        \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPumpConfigurationAndControlPluginServerInitCallback();                                                                   \
+    MatterRelativeHumidityMeasurementPluginClientInitCallback();                                                                   \
+    MatterRelativeHumidityMeasurementPluginServerInitCallback();                                                                   \
     MatterScenesPluginServerInitCallback();                                                                                        \
+    MatterSwitchPluginClientInitCallback();                                                                                        \
+    MatterSwitchPluginServerInitCallback();                                                                                        \
     MatterTargetNavigatorPluginClientInitCallback();                                                                               \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterThermostatPluginServerInitCallback();                                                                                    \
+    MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
+    MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();                                                          \
     MatterWindowCoveringPluginServerInitCallback();

@@ -341,7 +341,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *
  *  @code
  *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INVALID_STATE);
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INCORRECT_STATE);
  *  @endcode
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.

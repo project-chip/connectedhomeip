@@ -2656,25 +2656,29 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ModeSelect {
 namespace Attributes {
 
-namespace CurrentMode {
+namespace Description {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace CurrentMode
+} // namespace Description
+
+namespace StandardNamespace {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace StandardNamespace
 
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedModes
 
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace OnMode
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace StartUpMode
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace Description
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OnMode
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

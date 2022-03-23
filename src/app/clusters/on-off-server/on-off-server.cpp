@@ -41,6 +41,7 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -166,6 +167,21 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
 #endif
+#ifdef EMBER_AF_PLUGIN_MODE_SELECT
+        // If OnMode is not a null value, then change the current mode to it.
+        ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+        status = ModeSelect::Attributes::OnMode::Get(endpoint, onMode);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfOnOffClusterPrintln("ERR: reading onMode %x", status);
+            return status;
+        }
+        if (!onMode.IsNull())
+        {
+            emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+            status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+        }
+#endif
     }
     else // Set Off
     {
@@ -260,7 +276,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
                         break;
                     }
                 }
-                status = Attributes::OnOff::Set(endpoint, updatedOnOff);
+                status = setOnOffValue(endpoint, updatedOnOff, false);
             }
         }
     }

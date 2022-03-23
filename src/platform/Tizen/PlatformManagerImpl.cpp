@@ -27,7 +27,7 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/Tizen/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 namespace chip {
 namespace DeviceLayer {

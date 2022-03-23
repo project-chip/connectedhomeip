@@ -23,6 +23,7 @@ following command line options are available for the OTA Requestor application.
 | -c/--requestorCanConsent                              | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                                                                         |
 | -f/--otaDownloadPath <file path>                      | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.                                                                                                                                                               |
 | -u/--userConsentState <granted \| denied \| deferred> | The user consent state for the first QueryImage command. For all subsequent commands, the value of granted will be used. <li> granted: Authorize OTA requestor to download an OTA image <li> denied: Forbid OTA requestor to download an OTA image <li> deferred: Defer obtaining user consent |
+| -a/--autoApplyImage                                   | If supplied, apply the image immediately after download. Otherwise, the OTA update is complete after image download.                                                                                                                                                                           |
 
 ## Software Image Header
 

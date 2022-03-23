@@ -553,8 +553,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
     Close(CHIP_ERROR_TIMEOUT);
 }
 
@@ -888,7 +888,7 @@ bool ReadClient::ResubscribeIfNeeded()
     uint32_t intervalMsec  = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
-        ChipLogProgress(DataManagement, "mResubscribePolicy is null");
+        ChipLogDetail(DataManagement, "mResubscribePolicy is null");
         return false;
     }
     mReadPrepareParams.mResubscribePolicy(mNumRetries, intervalMsec, shouldResubscribe);
@@ -901,7 +901,7 @@ bool ReadClient::ResubscribeIfNeeded()
         System::Clock::Milliseconds32(intervalMsec), OnResubscribeTimerCallback, this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
