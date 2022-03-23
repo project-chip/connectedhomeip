@@ -35,6 +35,7 @@ public:
     const char * KeyName() { return mKeyName; }
 
     // Fabric Table
+    const char * FabricIndexInfo() { return Format("g/fidx"); }
     const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
     const char * FabricICAC(FabricIndex fabric) { return Format("f/%x/i", fabric); }
     const char * FabricRCAC(FabricIndex fabric) { return Format("f/%x/r", fabric); }
