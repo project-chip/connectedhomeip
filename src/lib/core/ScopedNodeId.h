@@ -21,7 +21,8 @@
 
 namespace chip {
 
-/// The ScopedNodeId provides an identifier for an operational node on the network that is only valid for use within the current Matter stack instance. It is not to be exchanged or directly used remotely over the network.
+/// The ScopedNodeId provides an identifier for an operational node on the network that is only valid for use within the current
+/// Matter stack instance. It is not to be exchanged or directly used remotely over the network.
 class ScopedNodeId
 {
 public:

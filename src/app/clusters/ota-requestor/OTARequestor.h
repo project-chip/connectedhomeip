@@ -130,7 +130,6 @@ public:
             mUpdateToken = updateToken;
         }
 
-
         // Schedule the initializations that needs to be performed in the CHIP context
         DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
 
