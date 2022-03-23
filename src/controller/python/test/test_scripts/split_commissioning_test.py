@@ -74,13 +74,24 @@ def main():
         type='str',
         help="Address of the second device",
     )
+    optParser.add_option(
+        "-p",
+        "--paa-trust-store-path",
+        action="store",
+        dest="paaTrustStorePath",
+        default='',
+        type='str',
+        help="Path that contains valid and trusted PAA Root Certificates.",
+        metavar="<paa-trust-store-path>"
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=False)
+    test = BaseTestHelper(
+        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")

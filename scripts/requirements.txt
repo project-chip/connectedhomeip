@@ -51,3 +51,5 @@ click
 # scripts/idl
 lark
 stringcase
+
+cryptography

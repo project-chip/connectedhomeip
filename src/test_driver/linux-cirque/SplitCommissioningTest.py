@@ -38,6 +38,7 @@ CIRQUE_URL = "http://localhost:5000"
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
+MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 DEVICE_CONFIG = {
     'device0': {
@@ -100,10 +101,10 @@ class TestSplitCommissioning(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --address1 {} --address2 {}".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --address1 {} --address2 {} --paa-trust-store-path {}".format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/split_commissioning_test.py"),
-            ethernet_ips[0], ethernet_ips[1])
+            ethernet_ips[0], ethernet_ips[1], os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
