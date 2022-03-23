@@ -73,7 +73,11 @@ class ClangTidyEntry:
 
         command = json_entry["command"]
 
-        if command.startswith("clang++ ") or command.startswith("clang "):
+        compiler = os.path.basename(command.split(' ')[0])
+
+        # Allow gcc/g++ invocations to also be tidied - arguments should be
+        # compatible and on darwin, gcc/g++ is actually a symlink to clang
+        if compiler in ['clang++', 'clang', 'gcc', 'g++']:
             self.valid = True
             self.clang_arguments = shlex.split(command[command.find(" "):])
         else:
