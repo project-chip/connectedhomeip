@@ -12310,6 +12310,14 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface StartUpOnOffAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -12388,7 +12396,7 @@ public class ChipClusters {
       subscribeOffWaitTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpOnOffAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpOnOffAttribute(StartUpOnOffAttributeCallback callback) {
       readStartUpOnOffAttribute(chipClusterPtr, callback);
     }
 
@@ -12402,7 +12410,7 @@ public class ChipClusters {
     }
 
     public void subscribeStartUpOnOffAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpOnOffAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpOnOffAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -12486,7 +12494,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpOnOffAttributeCallback callback);
 
     private native void writeStartUpOnOffAttribute(
         long chipClusterPtr,
@@ -12495,7 +12503,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        StartUpOnOffAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

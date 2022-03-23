@@ -58,33 +58,53 @@
             /* 32 - TotalOperationalHours, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Window Covering (server), big-endian */                                                       \
+            /* Endpoint: 0, Cluster: Switch (server), big-endian */                                                                \
                                                                                                                                    \
             /* 36 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Mode Select (server), big-endian */                                                           \
+                                                                                                                                   \
+            /* 40 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Window Covering (server), big-endian */                                                       \
+                                                                                                                                   \
+            /* 44 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x17,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Pump Configuration and Control (server), big-endian */                                        \
                                                                                                                                    \
-            /* 40 - LifetimeRunningHours, */                                                                                       \
+            /* 48 - LifetimeRunningHours, */                                                                                       \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 43 - Power, */                                                                                                      \
+            /* 51 - Power, */                                                                                                      \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 46 - LifetimeEnergyConsumed, */                                                                                     \
+            /* 54 - LifetimeEnergyConsumed, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 50 - FeatureMap, */                                                                                                 \
+            /* 58 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thermostat (server), big-endian */                                                            \
                                                                                                                                    \
-            /* 54 - FeatureMap, */                                                                                                 \
+            /* 62 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x0B,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (server), big-endian */                               \
+                                                                                                                                   \
+            /* 66 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Relative Humidity Measurement (server), big-endian */                                         \
+                                                                                                                                   \
+            /* 70 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 58 - SupportedStreamingProtocols, */                                                                                \
+            /* 74 - SupportedStreamingProtocols, */                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -121,39 +141,59 @@
             /* 32 - TotalOperationalHours, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Window Covering (server), little-endian */                                                    \
+            /* Endpoint: 0, Cluster: Switch (server), little-endian */                                                             \
                                                                                                                                    \
             /* 36 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Mode Select (server), little-endian */                                                        \
+                                                                                                                                   \
+            /* 40 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Window Covering (server), little-endian */                                                    \
+                                                                                                                                   \
+            /* 44 - FeatureMap, */                                                                                                 \
             0x17, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Pump Configuration and Control (server), little-endian */                                     \
                                                                                                                                    \
-            /* 40 - LifetimeRunningHours, */                                                                                       \
+            /* 48 - LifetimeRunningHours, */                                                                                       \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 43 - Power, */                                                                                                      \
+            /* 51 - Power, */                                                                                                      \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 46 - LifetimeEnergyConsumed, */                                                                                     \
+            /* 54 - LifetimeEnergyConsumed, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 50 - FeatureMap, */                                                                                                 \
+            /* 58 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thermostat (server), little-endian */                                                         \
                                                                                                                                    \
-            /* 54 - FeatureMap, */                                                                                                 \
+            /* 62 - FeatureMap, */                                                                                                 \
             0x0B, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (server), little-endian */                            \
+                                                                                                                                   \
+            /* 66 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Relative Humidity Measurement (server), little-endian */                                      \
+                                                                                                                                   \
+            /* 70 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 58 - SupportedStreamingProtocols, */                                                                                \
+            /* 74 - SupportedStreamingProtocols, */                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (14)
+#define GENERATED_DEFAULTS_COUNT (18)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -174,7 +214,7 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 12
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 15
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
@@ -194,6 +234,11 @@
             { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },         /* control sequence of operation */                        \
             { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x7 },         /* system mode */                                          \
                                                                                                                                    \
+            /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (server) */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* temperature display mode */                                     \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x5 }, /* keypad lockout */                                               \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* schedule programming visibility */                              \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Identify (server) */                                                                          \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE }, /* identify time */                                               \
                                                                                                                                    \
@@ -205,7 +250,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 188
+#define GENERATED_ATTRIBUTE_COUNT 210
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -214,9 +259,10 @@
             { 0x00004000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) }, /* GlobalSceneControl */                            \
             { 0x00004001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* OnTime */            \
             { 0x00004002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* OffWaitTime */       \
-            { 0x00004003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0xFF) },    /* StartUpOnOff */      \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(0) },                          /* FeatureMap */        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                                 /* ClusterRevision */   \
+            { 0x00004003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
+              ZAP_SIMPLE_DEFAULT(0xFF) },                                         /* StartUpOnOff */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* FeatureMap */                                 \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
@@ -302,6 +348,13 @@
               ZAP_EMPTY_DEFAULT() },                                            /* ActiveNetworkFaults */                          \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
+            /* Endpoint: 0, Cluster: Switch (server) */                                                                            \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(2) },          /* number of positions */                       \
+            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },            /* current position */                          \
+            { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(2) },          /* multi press max */                           \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(36) }, /* FeatureMap */                                \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
+                                                                                                                                   \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* Fabrics */           \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* SupportedFabrics */  \
@@ -311,6 +364,15 @@
             { 0x00000005, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                           \
               ZAP_EMPTY_DEFAULT() },                                       /* CurrentFabricIndex */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Mode Select (server) */                                                                       \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* CurrentMode */       \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SupportedModes */    \
+            { 0x00000002, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(255) },     /* OnMode */            \
+            { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* StartUpMode */       \
+            { 0x00000004, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },                             /* Description */       \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(40) },                         /* FeatureMap */        \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Window Covering (server) */                                                                   \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Type */                                            \
@@ -345,7 +407,7 @@
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                           \
               ZAP_MIN_MAX_DEFAULTS_INDEX(0) },                                     /* Mode */                                      \
             { 0x0000001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* SafetyStatus */                              \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(36) }, /* FeatureMap */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(44) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Pump Configuration and Control (server) */                                                    \
@@ -368,16 +430,16 @@
             { 0x00000013, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Capacity */                                          \
             { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Speed */                                             \
             { 0x00000015, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(40) },                                     /* LifetimeRunningHours */                        \
-            { 0x00000016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(43) }, /* Power */                                       \
+              ZAP_LONG_DEFAULTS_INDEX(48) },                                     /* LifetimeRunningHours */                        \
+            { 0x00000016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(51) }, /* Power */                                       \
             { 0x00000017, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(46) }, /* LifetimeEnergyConsumed */                                                          \
+              ZAP_LONG_DEFAULTS_INDEX(54) }, /* LifetimeEnergyConsumed */                                                          \
             { 0x00000020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(1) }, /* OperationMode */                                                                 \
             { 0x00000021, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(2) },                                     /* ControlMode */                               \
             { 0x00000022, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },         /* AlarmMask */                                 \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(50) }, /* FeatureMap */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(58) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thermostat (server) */                                                                        \
@@ -406,14 +468,31 @@
             { 0x00000020, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },          /* start of week */                             \
             { 0x00000021, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(7) },          /* number of weekly transitions */              \
             { 0x00000022, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(4) },          /* number of daily transitions */               \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(54) }, /* FeatureMap */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(62) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },         /* ClusterRevision */                           \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (server) */                                           \
+            { 0x00000000, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(10) }, /* temperature display mode */                                                     \
+            { 0x00000001, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(11) }, /* keypad lockout */                                                               \
+            { 0x00000002, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(12) },                                    /* schedule programming visibility */           \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(66) }, /* FeatureMap */                                \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Temperature Measurement (server) */                                                           \
             { 0x00000000, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0x8000) }, /* MeasuredValue */     \
             { 0x00000001, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0x8000) }, /* MinMeasuredValue */  \
             { 0x00000002, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0x8000) }, /* MaxMeasuredValue */  \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                                 /* ClusterRevision */   \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Relative Humidity Measurement (server) */                                                     \
+            { 0x00000000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* measured value */                            \
+            { 0x00000001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) },    /* min measured value */                        \
+            { 0x00000002, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) },    /* max measured value */                        \
+            { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* tolerance */                                 \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(70) }, /* FeatureMap */                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Target Navigator (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* TargetList */        \
@@ -426,7 +505,7 @@
             /* Endpoint: 0, Cluster: Content Launcher (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AcceptHeader */      \
             { 0x00000001, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(58) },                               /* SupportedStreamingProtocols */                       \
+              ZAP_LONG_DEFAULTS_INDEX(74) },                               /* SupportedStreamingProtocols */                       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Application Basic (server) */                                                                 \
@@ -442,7 +521,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Identify (server) */                                                                          \
             { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                         \
-              ZAP_MIN_MAX_DEFAULTS_INDEX(10) },                             /* identify time */                                    \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(13) },                             /* identify time */                                    \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x0) }, /* identify type */                                    \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },  /* ClusterRevision */                                  \
                                                                                                                                    \
@@ -515,7 +594,7 @@
               ZAP_SIMPLE_DEFAULT(0x00) },                                /* color control options */                               \
             { 0x0000400D, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* couple color temp to level min-mireds */               \
             { 0x00004010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                         \
-              ZAP_MIN_MAX_DEFAULTS_INDEX(11) },                            /* start up color temperature mireds */                 \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(14) },                            /* start up color temperature mireds */                 \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                   \
     }
 
@@ -541,6 +620,9 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayThermostatServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfThermostatClusterServerInitCallback,                                                \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayThermostatUserInterfaceConfigurationServer[] = {                              \
+        (EmberAfGenericClusterFunction) MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback,        \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
@@ -611,6 +693,10 @@
   0x00000003 /* CertificateChainResponse */, \
   0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 0, Cluster: Mode Select (server) */\
+  /*   client_generated */ \
+  0x00000000 /* ChangeToMode */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 0, Cluster: Window Covering (server) */\
   /*   client_generated */ \
@@ -719,7 +805,7 @@
 // clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 31
+#define GENERATED_CLUSTER_COUNT 39
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -812,9 +898,31 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
+      /* Endpoint: 0, Cluster: Switch (client) */ \
+      .clusterId = 0x0000003B,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(57), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Switch (server) */ \
+      .clusterId = 0x0000003B,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(57), \
+      .attributeCount = 5, \
+      .clusterSize = 9, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
       /* Endpoint: 0, Cluster: Operational Credentials (client) */ \
       .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(57), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(62), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -825,7 +933,7 @@
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
       .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(57), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(62), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -834,20 +942,42 @@
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 35 ) ,\
     },\
   { \
+      /* Endpoint: 0, Cluster: Mode Select (client) */ \
+      .clusterId = 0x00000050,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(68), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Mode Select (server) */ \
+      .clusterId = 0x00000050,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(68), \
+      .attributeCount = 7, \
+      .clusterSize = 42, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 40 ) ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
       /* Endpoint: 0, Cluster: Window Covering (server) */ \
       .clusterId = 0x00000102,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(63), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(75), \
       .attributeCount = 20, \
       .clusterSize = 35, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 40 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 42 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Pump Configuration and Control (server) */ \
       .clusterId = 0x00000200,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(83), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(95), \
       .attributeCount = 26, \
       .clusterSize = 54, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
@@ -858,18 +988,40 @@
   { \
       /* Endpoint: 0, Cluster: Thermostat (server) */ \
       .clusterId = 0x00000201,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(109), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(121), \
       .attributeCount = 18, \
       .clusterSize = 32, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayThermostatServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 50 ) ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (client) */ \
+      .clusterId = 0x00000204,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(139), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Thermostat User Interface Configuration (server) */ \
+      .clusterId = 0x00000204,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(139), \
+      .attributeCount = 5, \
+      .clusterSize = 9, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayThermostatUserInterfaceConfigurationServer, \
+      .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Temperature Measurement (client) */ \
       .clusterId = 0x00000402,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(127), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(144), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -880,7 +1032,7 @@
   { \
       /* Endpoint: 0, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(127), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(144), \
       .attributeCount = 4, \
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -889,9 +1041,31 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
+      /* Endpoint: 0, Cluster: Relative Humidity Measurement (client) */ \
+      .clusterId = 0x00000405,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(148), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Relative Humidity Measurement (server) */ \
+      .clusterId = 0x00000405,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(148), \
+      .attributeCount = 5, \
+      .clusterSize = 12, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
       /* Endpoint: 0, Cluster: Target Navigator (client) */ \
       .clusterId = 0x00000505,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(131), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(153), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -902,18 +1076,18 @@
   { \
       /* Endpoint: 0, Cluster: Target Navigator (server) */ \
       .clusterId = 0x00000505,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(131), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(153), \
       .attributeCount = 3, \
       .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Keypad Input (client) */ \
       .clusterId = 0x00000509,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(134), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(156), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -924,18 +1098,18 @@
   { \
       /* Endpoint: 0, Cluster: Keypad Input (server) */ \
       .clusterId = 0x00000509,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(134), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(156), \
       .attributeCount = 1, \
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 58 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 58 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Content Launcher (client) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(135), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(157), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -946,18 +1120,18 @@
   { \
       /* Endpoint: 0, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(135), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(157), \
       .attributeCount = 3, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 62 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 65 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Application Basic (client) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(138), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(160), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -968,7 +1142,7 @@
   { \
       /* Endpoint: 0, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(138), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(160), \
       .attributeCount = 9, \
       .clusterSize = 106, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -979,40 +1153,40 @@
   { \
       /* Endpoint: 1, Cluster: Identify (server) */ \
       .clusterId = 0x00000003,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(147), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(169), \
       .attributeCount = 3, \
       .clusterSize = 5, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 65 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 68 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 67 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
       .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(150), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(172), \
       .attributeCount = 2, \
       .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 77 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 72 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 79 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Scenes (server) */ \
       .clusterId = 0x00000005,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(152), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(174), \
       .attributeCount = 6, \
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayScenesServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 82 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 90 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 84 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (client) */ \
       .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(158), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(180), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -1023,29 +1197,29 @@
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(158), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(180), \
       .attributeCount = 2, \
       .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 97 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 99 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Level Control (server) */ \
       .clusterId = 0x00000008,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(160), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(182), \
       .attributeCount = 2, \
       .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 101 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 103 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Basic (server) */ \
       .clusterId = 0x00000028,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(162), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(184), \
       .attributeCount = 20, \
       .clusterSize = 39, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
@@ -1056,12 +1230,12 @@
   { \
       /* Endpoint: 1, Cluster: Color Control (server) */ \
       .clusterId = 0x00000300,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(182), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(204), \
       .attributeCount = 6, \
       .clusterSize = 11, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayColorControlServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 110 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 112 ) ,\
       .generatedCommandList = nullptr ,\
     },\
 }
@@ -1070,12 +1244,12 @@
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 22
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 26
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 23, 383 }, { ZAP_CLUSTER_INDEX(23), 8, 72 },                                                       \
+        { ZAP_CLUSTER_INDEX(0), 31, 455 }, { ZAP_CLUSTER_INDEX(31), 8, 72 },                                                       \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1087,7 +1261,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (78)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (455)
+#define ATTRIBUTE_MAX_SIZE (527)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

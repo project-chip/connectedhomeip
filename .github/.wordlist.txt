@@ -95,6 +95,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
@@ -1113,6 +1114,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink

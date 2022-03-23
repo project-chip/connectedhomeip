@@ -7976,7 +7976,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartUpOnOffWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.

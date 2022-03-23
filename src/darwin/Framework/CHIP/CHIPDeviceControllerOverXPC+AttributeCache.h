@@ -21,14 +21,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CHIPSubscribeParams;
+
 @interface CHIPDeviceControllerOverXPC (AttributeCache)
 
-- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId completion:(void (^)(NSError * _Nullable error))completion;
+- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId
+                                   params:(CHIPSubscribeParams * _Nullable)params
+                               completion:(void (^)(NSError * _Nullable error))completion;
 
 - (void)readAttributeCacheWithNodeId:(uint64_t)nodeId
-                          endpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+                          endpointId:(NSNumber * _Nullable)endpointId
+                           clusterId:(NSNumber * _Nullable)clusterId
+                         attributeId:(NSNumber * _Nullable)attributeId
                           completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 @end

@@ -38695,7 +38695,7 @@ public:
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIP_ERROR __block err = CHIP_NO_ERROR;
 
-        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
 
         [cluster writeAttributeStartUpOnOffWithValue:value
                                    completionHandler:^(NSError * _Nullable error) {

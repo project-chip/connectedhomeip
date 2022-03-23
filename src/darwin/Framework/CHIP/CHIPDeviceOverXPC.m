@@ -17,6 +17,7 @@
 
 #import "CHIPDeviceOverXPC.h"
 
+#import "CHIPCluster.h"
 #import "CHIPDeviceController+XPC.h"
 #import "CHIPDeviceControllerXPCConnection.h"
 #import "CHIPError.h"
@@ -57,9 +58,10 @@ NS_ASSUME_NONNULL_BEGIN
     });
 }
 
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
@@ -72,6 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                endpointId:endpointId
                                                 clusterId:clusterId
                                               attributeId:attributeId
+                                                   params:[CHIPDeviceController encodeXPCReadParams:params]
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
                                                    dispatch_async(clientQueue, ^{
                                                        CHIP_LOG_DEBUG("Attribute read");
@@ -91,10 +94,11 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)writeAttributeWithEndpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(CHIPDeviceResponseHandler)completion
 {
@@ -108,6 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  clusterId:clusterId
                                                attributeId:attributeId
                                                      value:value
+                                         timedWriteTimeout:timeoutMs
                                                 completion:^(id _Nullable values, NSError * _Nullable error) {
                                                     dispatch_async(clientQueue, ^{
                                                         CHIP_LOG_DEBUG("Attribute written");
@@ -127,10 +132,11 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)invokeCommandWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                       commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
@@ -144,6 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                 clusterId:clusterId
                                                 commandId:commandId
                                                    fields:commandFields
+                                       timedInvokeTimeout:timeoutMs
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
                                                    dispatch_async(clientQueue, ^{
                                                        CHIP_LOG_DEBUG("Command invoked");
@@ -163,11 +170,12 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(CHIPSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
@@ -197,12 +205,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                     [NSMutableArray arrayWithCapacity:[decodedValues count]];
                                                 for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
                                                     CHIPAttributePath * attributePath = decodedValue[kCHIPAttributePathKey];
-                                                    if (([attributePath.endpoint unsignedIntegerValue] == endpointId
-                                                            || endpointId == 0xffff)
-                                                        && ([attributePath.cluster unsignedIntegerValue] == clusterId
-                                                            || clusterId == 0xffffffff)
-                                                        && ([attributePath.attribute unsignedIntegerValue] == attributeId
-                                                            || attributeId == 0xffffffff)) {
+                                                    if ((endpointId == nil || [attributePath.endpoint isEqualToNumber:endpointId])
+                                                        && (clusterId == nil || [attributePath.cluster isEqualToNumber:clusterId])
+                                                        && (attributeId == nil ||
+                                                            [attributePath.attribute isEqualToNumber:attributeId])) {
                                                         [filteredValues addObject:decodedValue];
                                                     }
                                                 }
@@ -220,6 +226,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                attributeId:attributeId
                                                minInterval:minInterval
                                                maxInterval:maxInterval
+                                                    params:[CHIPDeviceController encodeXPCSubscribeParams:params]
                                         establishedHandler:^{
                                             dispatch_async(clientQueue, ^{
                                                 CHIP_LOG_DEBUG("Subscription established");

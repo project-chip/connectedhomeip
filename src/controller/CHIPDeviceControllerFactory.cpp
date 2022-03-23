@@ -55,8 +55,11 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
+    // Save our initialization state that we can't recover later from a
+    // created-but-shut-down system state.
     mListenPort               = params.listenPort;
     mFabricIndependentStorage = params.fabricIndependentStorage;
+    mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -74,9 +77,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
+        params.listenPort               = mListenPort;
+        params.fabricIndependentStorage = mFabricIndependentStorage;
+        params.enableServerInteractions = mEnableServerInteractions;
     }
-
-    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -128,12 +132,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,

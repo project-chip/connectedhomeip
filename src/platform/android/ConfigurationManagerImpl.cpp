@@ -35,7 +35,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/android/AndroidConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 namespace chip {
 namespace DeviceLayer {
