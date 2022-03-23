@@ -134,8 +134,6 @@ IdleStateReason GenericOTARequestorDriver::MapErrorToIdleStateReason(CHIP_ERROR 
 
 void GenericOTARequestorDriver::HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: GenericOTARequestorDriver::HandleStateTransition");
-
     if ((newState == OTAUpdateStateEnum::kIdle) && (currentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
@@ -397,7 +395,7 @@ void GenericOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
 
 void GenericOTARequestorDriver::StartPeriodicQueryTimer()
 {
-    ChipLogProgress(SoftwareUpdate, "Starting the Default Provider timer, timeout: %u seconds",
+    ChipLogProgress(SoftwareUpdate, "Starting the periodic query timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mPeriodicQueryTimeInterval),
@@ -419,7 +417,7 @@ void GenericOTARequestorDriver::StopPeriodicQueryTimer()
 
 void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    ChipLogProgress(SoftwareUpdate, "Default watchdog timer handler is invoked");
+    ChipLogProgress(SoftwareUpdate, "Watchdog timer handler is invoked");
 
     OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
     
@@ -435,7 +433,8 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
         case OTAUpdateStateEnum::kDownloading:
         case OTAUpdateStateEnum::kApplying:
         case OTAUpdateStateEnum::kDelayedOnApply:
-            UpdateCancelled();
+            UpdateDiscontinued();
+            mRequestor->CancelImageUpdate();
             mRequestor->Reset();
             StartPeriodicQueryTimer();
             break;
