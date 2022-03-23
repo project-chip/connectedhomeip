@@ -395,36 +395,35 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     ChipLogProgress(SoftwareUpdate, "Watchdog timer handler is invoked");
 
     OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
-    
-    switch(currentState)
+
+    switch (currentState)
     {
-        case OTAUpdateStateEnum::kIdle:
-        case OTAUpdateStateEnum::kUnknown:
-            // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
-            StartWatchdogTimer();
-            break;
-        case OTAUpdateStateEnum::kQuerying:
-        case OTAUpdateStateEnum::kDelayedOnQuery:
-        case OTAUpdateStateEnum::kDownloading:
-        case OTAUpdateStateEnum::kApplying:
-        case OTAUpdateStateEnum::kDelayedOnApply:
-            UpdateDiscontinued();
-            mRequestor->CancelImageUpdate();
-            mRequestor->Reset();
-            StartPeriodicQueryTimer();
-            break;
-        case OTAUpdateStateEnum::kRollingBack:
-        case OTAUpdateStateEnum::kDelayedOnUserConsent:
-            mRequestor->Reset();
-            StartPeriodicQueryTimer();
-            break;
+    case OTAUpdateStateEnum::kIdle:
+    case OTAUpdateStateEnum::kUnknown:
+        // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
+        StartWatchdogTimer();
+        break;
+    case OTAUpdateStateEnum::kQuerying:
+    case OTAUpdateStateEnum::kDelayedOnQuery:
+    case OTAUpdateStateEnum::kDownloading:
+    case OTAUpdateStateEnum::kApplying:
+    case OTAUpdateStateEnum::kDelayedOnApply:
+        UpdateDiscontinued();
+        mRequestor->CancelImageUpdate();
+        mRequestor->Reset();
+        StartPeriodicQueryTimer();
+        break;
+    case OTAUpdateStateEnum::kRollingBack:
+    case OTAUpdateStateEnum::kDelayedOnUserConsent:
+        mRequestor->Reset();
+        StartPeriodicQueryTimer();
+        break;
     }
 }
 
 void GenericOTARequestorDriver::StartWatchdogTimer()
 {
-    ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds",
-                    (unsigned int) mWatchdogTimeInterval);
+    ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mWatchdogTimeInterval),
         [](System::Layer *, void * context) {
@@ -447,14 +446,14 @@ void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
 {
     switch (timer)
     {
-        case SelectedTimer::kPeriodicQueryTimer:
-            StopWatchdogTimer();
-            StartPeriodicQueryTimer();
-            break;
-        case SelectedTimer::kWatchdogTimer:
-            StopPeriodicQueryTimer();
-            StartWatchdogTimer();
-            break;
+    case SelectedTimer::kPeriodicQueryTimer:
+        StopWatchdogTimer();
+        StartPeriodicQueryTimer();
+        break;
+    case SelectedTimer::kWatchdogTimer:
+        StopPeriodicQueryTimer();
+        StartWatchdogTimer();
+        break;
     }
 }
 
@@ -462,14 +461,14 @@ void GenericOTARequestorDriver::StopSelectedTimer(SelectedTimer timer)
 {
     switch (timer)
     {
-        case SelectedTimer::kPeriodicQueryTimer:
-            StopPeriodicQueryTimer();
-            StartWatchdogTimer();
-            break;
-        case SelectedTimer::kWatchdogTimer:
-            StopWatchdogTimer();
-            StartPeriodicQueryTimer();
-            break;
+    case SelectedTimer::kPeriodicQueryTimer:
+        StopPeriodicQueryTimer();
+        StartWatchdogTimer();
+        break;
+    case SelectedTimer::kWatchdogTimer:
+        StopWatchdogTimer();
+        StartPeriodicQueryTimer();
+        break;
     }
 }
 
