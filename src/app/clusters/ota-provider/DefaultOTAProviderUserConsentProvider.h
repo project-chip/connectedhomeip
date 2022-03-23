@@ -17,21 +17,34 @@
  */
 #pragma once
 
+#include <app/clusters/ota-provider/OTAProviderUserConsentDelegate.h>
 #include <lib/core/CHIPError.h>
-#include <platform/UserConsentDelegate.h>
 
 namespace chip {
 namespace ota {
 
-class DefaultUserConsentProvider : public UserConsentDelegate
+class DefaultOTAProviderUserConsentProvider : public OTAProviderUserConsentDelegate
 {
 public:
-    DefaultUserConsentProvider() = default;
+    DefaultOTAProviderUserConsentProvider() = default;
 
-    ~DefaultUserConsentProvider() = default;
+    ~DefaultOTAProviderUserConsentProvider() = default;
 
     // This method returns kGranted unless explicitly set by the user by calling SetGlobalUserConsentState()
-    UserConsentState GetUserConsentState(const UserConsentSubject & subject) override;
+    UserConsentState GetUserConsentState(const UserConsentSubject & subject) override
+    {
+        subject.Log();
+
+        if (mUseGlobalConsent)
+        {
+            // Reset mGlobalConsentState to success case after returning other possible values once.
+            UserConsentState curGlobalConsentState = mGlobalConsentState;
+            mGlobalConsentState                    = UserConsentState::kGranted;
+            return curGlobalConsentState;
+        }
+
+        return UserConsentState::kGranted;
+    }
 
     // If this is set to true, all the user consent requests will be replied with global consent.
     void SetGlobalUserConsentState(UserConsentState state)

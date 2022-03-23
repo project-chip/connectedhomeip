@@ -17,8 +17,8 @@
  */
 #pragma once
 
+#include <app/clusters/ota-requestor/OTARequestorUserConsentDelegate.h>
 #include <lib/core/CHIPError.h>
-#include <platform/OTARequestorUserConsentDelegate.h>
 
 namespace chip {
 namespace ota {
