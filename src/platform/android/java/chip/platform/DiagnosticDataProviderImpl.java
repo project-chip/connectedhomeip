@@ -19,7 +19,6 @@ package chip.platform;
 
 import android.content.Context;
 import android.util.Log;
-
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -77,7 +76,7 @@ public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
               if (anInterface.ipv4Address == null) {
                 anInterface.ipv4Address = ip.getAddress();
               }
-            } else if (ip instanceof  InetAddress) {
+            } else if (ip instanceof InetAddress) {
               if (anInterface.ipv6Address == null) {
                 anInterface.ipv6Address = ip.getAddress();
               }
