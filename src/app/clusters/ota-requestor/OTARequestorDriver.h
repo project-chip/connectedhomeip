@@ -81,7 +81,7 @@ enum class SelectedTimer
 class OTARequestorDriver
 {
 public:
-    using OTAUpdateStateEnum   = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using OTAUpdateStateEnum  = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
@@ -98,7 +98,8 @@ public:
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 
     /// Called when OTA Requestor has a state transition for which the driver may need to take various actions
-    virtual void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR) = 0;
+    virtual void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState,
+                                       OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR) = 0;
 
     // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
     virtual void HandleIdleState(IdleStateReason reason) = 0;

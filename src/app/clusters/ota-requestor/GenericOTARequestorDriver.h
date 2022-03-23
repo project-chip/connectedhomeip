@@ -56,7 +56,8 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
-    void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR) override;
+    void HandleStateTransition(OTAUpdateStateEnum currentUpdateState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                               CHIP_ERROR error = CHIP_NO_ERROR) override;
     void HandleIdleState(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;

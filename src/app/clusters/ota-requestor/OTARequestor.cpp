@@ -644,12 +644,12 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    //if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
+    // if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     //{
     //    IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
-        // Inform the driver that the OTARequestor has entered the Idle state
-        //mOtaRequestorDriver->HandleIdleState(idleStateReason);
+    // Inform the driver that the OTARequestor has entered the Idle state
+    // mOtaRequestorDriver->HandleIdleState(idleStateReason);
     //}
     mOtaRequestorDriver->HandleStateTransition(mCurrentUpdateState, newState, reason, error);
 
