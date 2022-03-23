@@ -127,7 +127,7 @@ public:
 
         /*
          * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
-         * after they had been fully established. This criteria includes a successful response to a call to
+         * after they had been fully established (and therefore had called OnSubscriptionEstablished).
          * OnSubscriptionEstablishment().
          */
         virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};

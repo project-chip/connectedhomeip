@@ -705,7 +705,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
 
     //
-    // Consult the application (if requested) of the impending subscription and whether we should still proceed to set it up.
+    // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
     // This also provides the application an opportunity to modify the negotiated min/max intervals set above.
     //
     if (mpApplicationCallback)
