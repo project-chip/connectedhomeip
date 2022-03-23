@@ -21,6 +21,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -33,6 +34,13 @@
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 namespace {
+
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    return &attestationTrustStore;
+}
 
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
@@ -112,8 +120,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Crypto::P256Keypair ephemeralKey;
 
         // Initialize device attestation verifier
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        // TODO: add option to pass in custom PAA Trust Store path to the python controller app
+        const chip::Credentials::AttestationTrustStore * testingRootStore =
+            GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
