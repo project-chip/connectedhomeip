@@ -81,5 +81,6 @@ static_library("ESP32") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    configs -= [ "${chip_root}/build/config/compiler:warnings_default", ]
   }
 }
