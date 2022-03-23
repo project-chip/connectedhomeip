@@ -85,7 +85,7 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     else
     {
         // Start the first periodic query timer
-        StartPeriodicQueryTimer();
+        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
     }
 }
 
@@ -343,7 +343,7 @@ void GenericOTARequestorDriver::SendQueryImage()
 
     // Default provider timer only runs when there is no ongoing query/update; must stop it now.
     // TriggerImmediateQueryInternal() will cause the state to change from kIdle
-    StopSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+    StartSelectedTimer(SelectedTimer::kWatchdogTimer);
 
     mProviderRetryCount++;
 
@@ -400,8 +400,9 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     {
     case OTAUpdateStateEnum::kIdle:
     case OTAUpdateStateEnum::kUnknown:
-        // OTA Requestor is not stuck in non-idle state.  Restart watchdog timer.
-        StartWatchdogTimer();
+        // Watchdog timer should not expire in Idle state and periodic timer should already be scheduled.
+        // Scheduling periodic timer here just in case.
+        StartPeriodicQueryTimer();
         break;
     case OTAUpdateStateEnum::kQuerying:
     case OTAUpdateStateEnum::kDelayedOnQuery:
@@ -410,7 +411,6 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     case OTAUpdateStateEnum::kDelayedOnApply:
         UpdateDiscontinued();
         mRequestor->CancelImageUpdate();
-        mRequestor->Reset();
         StartPeriodicQueryTimer();
         break;
     case OTAUpdateStateEnum::kRollingBack:
@@ -453,21 +453,6 @@ void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
     case SelectedTimer::kWatchdogTimer:
         StopPeriodicQueryTimer();
         StartWatchdogTimer();
-        break;
-    }
-}
-
-void GenericOTARequestorDriver::StopSelectedTimer(SelectedTimer timer)
-{
-    switch (timer)
-    {
-    case SelectedTimer::kPeriodicQueryTimer:
-        StopPeriodicQueryTimer();
-        StartWatchdogTimer();
-        break;
-    case SelectedTimer::kWatchdogTimer:
-        StopWatchdogTimer();
-        StartPeriodicQueryTimer();
         break;
     }
 }

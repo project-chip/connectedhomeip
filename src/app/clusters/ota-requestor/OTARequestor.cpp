@@ -658,6 +658,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
+    // Issue#16151 tracks re-factoring error and state transitioning handling.
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
@@ -665,8 +666,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
         // Inform the driver that the OTARequestor has entered the Idle state
         mOtaRequestorDriver->HandleIdleState(idleStateReason);
     }
-    else if (((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) || (mCurrentUpdateState == OTAUpdateStateEnum::kUnknown)) &&
-             (newState != OTAUpdateStateEnum::kIdle))
+    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {
         mOtaRequestorDriver->HandleIdleStateExit();
     }

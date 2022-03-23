@@ -79,7 +79,6 @@ protected:
     void StopWatchdogTimer();
     void WatchdogTimerHandler(System::Layer * systemLayer, void * appState);
     void StartSelectedTimer(SelectedTimer timer);
-    void StopSelectedTimer(SelectedTimer timer);
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
