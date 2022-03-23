@@ -29,7 +29,6 @@ tests:
                 value: nodeId
 
     - label: "read the mandatory attribute: MinMeasuredValue"
-      disabled: true
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -39,7 +38,6 @@ tests:
               maxValue: 32766
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
-      disabled: true
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -48,7 +46,6 @@ tests:
               minValue: -27314
               maxValue: 32767
 
-    #Disabled as values needs to be stored for comparison
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -62,7 +59,6 @@ tests:
       disabled: true
       PICS: MANUAL_TEMPERATURE_CHANGE
 
-    #Disabled as values needs to be compared with the value read in step 2
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"

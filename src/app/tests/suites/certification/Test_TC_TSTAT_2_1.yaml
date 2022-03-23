@@ -28,13 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue  #11524 disabled steps are for attributes not supported in YAML framework
-    - label: "Reads mandatory attributes from DUT: LocalTemperature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "local temperature"
-      response:
-          value: null
+    #issue  #11524 below disabled steps are for attributes not supported in YAML framework
 
     - label:
           "Reads constraints of mandatory attributes from DUT: LocalTemperature"
@@ -67,8 +61,9 @@ tests:
               maxValue: 3000
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
+          "Reads constraints of optional attributes from DUT:
           AbsMinCoolSetpointLimit"
+      optional: true
       command: "readAttribute"
       attribute: "abs min cool setpoint limit"
       response:
@@ -78,8 +73,9 @@ tests:
               maxValue: 3200
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
+          "Reads constraints of optional attributes from DUT:
           AbsMaxCoolSetpointLimit"
+      optional: true
       command: "readAttribute"
       attribute: "abs max cool setpoint limit"
       response:
@@ -111,8 +107,9 @@ tests:
               maxValue: 100
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
+          "Reads constraints of optional attributes from DUT:
           OccupiedCoolingSetpoint"
+      optional: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
       response:
@@ -179,8 +176,9 @@ tests:
               maxValue: 3000
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
+          "Reads constraints of optional attributes from DUT:
           MinCoolSetpointLimit"
+      optional: true
       command: "readAttribute"
       attribute: "min cool setpoint limit"
       response:
@@ -190,8 +188,9 @@ tests:
               maxValue: 3200
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
+          "Reads constraints of optional attributes from DUT:
           MaxCoolSetpointLimit"
+      optional: true
       command: "readAttribute"
       attribute: "max cool setpoint limit"
       response:
