@@ -175,7 +175,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::EventLoopTaskMain(void * thisPtr, void *, void *)
 {
-    ChipLogDetail(DeviceLayer, "CHIP task running");
+    ChipLogProgress(DeviceLayer, "CHIP task running");
     static_cast<GenericPlatformManagerImpl_Zephyr<ImplClass> *>(thisPtr)->Impl()->RunEventLoop();
 }
 

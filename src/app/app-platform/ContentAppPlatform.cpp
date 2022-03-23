@@ -52,7 +52,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    ChipLogProgress(DeviceLayer, "emberAfExternalAttributeReadCallback endpoint %d ", endpointIndex);
+    ChipLogDetail(DeviceLayer, "emberAfExternalAttributeReadCallback endpoint %d ", endpointIndex);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -70,7 +70,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    ChipLogProgress(DeviceLayer, "emberAfExternalAttributeWriteCallback endpoint %d ", endpointIndex);
+    ChipLogDetail(DeviceLayer, "emberAfExternalAttributeWriteCallback endpoint %d ", endpointIndex);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -124,7 +124,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 }
                 else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
                 {
-                    ChipLogProgress(DeviceLayer, "Adding ContentApp error=%d", ret);
+                    ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
                     return kNoCurrentEndpointId;
                 }
                 // Handle wrap condition
@@ -136,7 +136,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         }
         index++;
     }
-    ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
+    ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
     return kNoCurrentEndpointId;
 }
 
@@ -168,7 +168,7 @@ EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
 
 void ContentAppPlatform::SetupAppPlatform()
 {
-    ChipLogProgress(DeviceLayer, "AppPlatform::SetupAppPlatform()");
+    ChipLogDetail(DeviceLayer, "AppPlatform::SetupAppPlatform()");
 
     // Clear out the device database
     uint8_t index = 0;
@@ -189,8 +189,8 @@ void ContentAppPlatform::SetupAppPlatform()
         mCurrentEndpointId = emberAfFixedEndpointCount();
     }
 
-    ChipLogProgress(DeviceLayer, "emberAfFixedEndpointCount()=%d mCurrentEndpointId=%d", emberAfFixedEndpointCount(),
-                    mCurrentEndpointId);
+    ChipLogDetail(DeviceLayer, "emberAfFixedEndpointCount()=%d mCurrentEndpointId=%d", emberAfFixedEndpointCount(),
+                  mCurrentEndpointId);
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
@@ -238,8 +238,8 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d",
-                        vendorId, productId);
+        ChipLogError(DeviceLayer, "GetLoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d", vendorId,
+                     productId);
         return nullptr;
     }
     return LoadContentAppInternal(&vendorApp);
@@ -255,8 +255,8 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorA
     CHIP_ERROR err = mContentAppFactory->ConvertToPlatformCatalogVendorApp(vendorApp, &destinationApp);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "GetLoadContentApp() - failed to find an app for catalog vendorId %d, appId %s",
-                        vendorApp.catalogVendorId, vendorApp.applicationId);
+        ChipLogError(DeviceLayer, "GetLoadContentApp() - failed to find an app for catalog vendorId %d, appId %s",
+                     vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
     return LoadContentAppInternal(&destinationApp);
@@ -272,8 +272,8 @@ ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorAp
     CHIP_ERROR err = mContentAppFactory->ConvertToPlatformCatalogVendorApp(vendorApp, &destinationApp);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "GetContentApp() - failed to find an app for catalog vendorId %d, appId %s",
-                        vendorApp.catalogVendorId, vendorApp.applicationId);
+        ChipLogError(DeviceLayer, "GetContentApp() - failed to find an app for catalog vendorId %d, appId %s",
+                     vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
     return GetContentAppInternal(&destinationApp);
