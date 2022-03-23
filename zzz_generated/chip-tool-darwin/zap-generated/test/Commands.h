@@ -28869,20 +28869,28 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            if (ShouldSkip("A_TEMPERATURE")) {
-                NextTest();
-                return;
-            }
-            err = TestReadsMeasuredValueAttributeFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the mandatory attribute: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMinMeasuredValue_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMaxMeasuredValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads MeasuredValue attribute from DUT\n");
             if (ShouldSkip("A_TEMPERATURE")) {
                 NextTest();
                 return;
             }
-            err = TestReadTheMandatoryAttributeMeasuredValue_2();
+            err = TestReadsMeasuredValueAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the mandatory attribute: MeasuredValue\n");
+            if (ShouldSkip("A_TEMPERATURE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadTheMandatoryAttributeMeasuredValue_4();
             break;
         }
 
@@ -28899,7 +28907,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28912,7 +28920,61 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
+    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("minMeasuredValue", [value shortValue], -27315));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minMeasuredValue", [value shortValue], 32766));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxMeasuredValue", [value shortValue], -27314));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxMeasuredValue", [value shortValue], 32767));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -28932,7 +28994,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -29145,18 +29207,18 @@ public:
             break;
         case 4:
             ChipLogProgress(
-                chipTool, " ***** Test Step 4 : Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinCoolSetpointLimit_4();
+                chipTool, " ***** Test Step 4 : Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutAbsMinCoolSetpointLimit_4();
             break;
         case 5:
             ChipLogProgress(
-                chipTool, " ***** Test Step 5 : Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_5();
+                chipTool, " ***** Test Step 5 : Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutAbsMaxCoolSetpointLimit_5();
             break;
         case 6:
             ChipLogProgress(
-                chipTool, " ***** Test Step 6 : Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedCoolingSetpoint_6();
+                chipTool, " ***** Test Step 6 : Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutOccupiedCoolingSetpoint_6();
             break;
         case 7:
             ChipLogProgress(
@@ -29175,13 +29237,13 @@ public:
             break;
         case 10:
             ChipLogProgress(
-                chipTool, " ***** Test Step 10 : Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMinCoolSetpointLimit_10();
+                chipTool, " ***** Test Step 10 : Reads constraints of optional attributes from DUT: MinCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutMinCoolSetpointLimit_10();
             break;
         case 11:
             ChipLogProgress(
-                chipTool, " ***** Test Step 11 : Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMaxCoolSetpointLimit_11();
+                chipTool, " ***** Test Step 11 : Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutMaxCoolSetpointLimit_11();
             break;
         case 12:
             ChipLogProgress(
@@ -29307,14 +29369,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinCoolSetpointLimit_4()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutAbsMinCoolSetpointLimit_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29332,14 +29399,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_5()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutAbsMaxCoolSetpointLimit_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29357,14 +29429,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedCoolingSetpoint_6()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutOccupiedCoolingSetpoint_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29457,14 +29534,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinCoolSetpointLimit_10()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMinCoolSetpointLimit_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: MinCoolSetpointLimit Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29482,14 +29564,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxCoolSetpointLimit_11()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMaxCoolSetpointLimit_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30182,6 +30269,11 @@ private:
             NSLog(@"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@",
                 err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             {
@@ -30217,6 +30309,11 @@ private:
                                                         @"OccupiedCoolingSetpoint attribute Error: %@",
                                                       err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -30233,6 +30330,11 @@ private:
 
         [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30261,6 +30363,11 @@ private:
                                                         @"attribute Error: %@",
                                                       err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -30282,6 +30389,11 @@ private:
                                                   NSLog(@"Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint "
                                                         @"attribute Error: %@",
                                                       err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30658,6 +30770,11 @@ private:
             NSLog(
                 @"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             {
@@ -30693,6 +30810,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -30709,6 +30831,11 @@ private:
 
         [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30737,6 +30864,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -30759,6 +30891,11 @@ private:
                                                      @"Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -30776,6 +30913,11 @@ private:
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(
                 @"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30812,6 +30954,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -30828,6 +30975,11 @@ private:
 
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30856,6 +31008,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -30877,6 +31034,11 @@ private:
                                                NSLog(@"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute "
                                                      @"Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30988,6 +31150,11 @@ private:
                                                      @"MinCoolSetpointLimit attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31009,6 +31176,11 @@ private:
                                                NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to "
                                                      @"MinCoolSetpointLimit attribute Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31032,6 +31204,11 @@ private:
                                                      @"MaxCoolSetpointLimit attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31053,6 +31230,11 @@ private:
                                                NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to "
                                                      @"MaxCoolSetpointLimit attribute Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31190,6 +31372,11 @@ private:
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -31210,6 +31397,11 @@ private:
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -31229,6 +31421,11 @@ private:
         [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31269,6 +31466,11 @@ private:
         [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -32324,6 +32526,22 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads NetworkInterface structure attribute from DUT\n");
             err = TestReadsNetworkInterfaceStructureAttributeFromDut_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads SecurityType attribute constraints\n");
+            err = TestReadsSecurityTypeAttributeConstraints_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads WiFiVersion attribute constraints\n");
+            err = TestReadsWiFiVersionAttributeConstraints_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads ChannelNumber attribute constraints\n");
+            err = TestReadsChannelNumberAttributeConstraints_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads RSSI attribute constraints\n");
+            err = TestReadsRssiAttributeConstraints_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -32339,7 +32557,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -32366,6 +32584,93 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("networkInterfaces", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsSecurityTypeAttributeConstraints_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeSecurityTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads SecurityType attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("securityType", "", "enum"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsWiFiVersionAttributeConstraints_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeWiFiVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads WiFiVersion attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("wiFiVersion", "", "enum"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsChannelNumberAttributeConstraints_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeChannelNumberWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads ChannelNumber attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("channelNumber", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsRssiAttributeConstraints_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRssiWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads RSSI attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rssi", "", "int8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int8_t>("rssi", [value charValue], -120));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int8_t>("rssi", [value charValue], 0));
+            }
+
             NextTest();
         }];
 

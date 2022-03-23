@@ -22389,6 +22389,74 @@ NSNumber * _Nonnull OccupancyValue;
 }
 - (void)testSendClusterTest_TC_TM_2_2_000001_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the mandatory attribute: MinMeasuredValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], -27315);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 32766);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TM_2_2_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the mandatory attribute: MaxMeasuredValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], -27314);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 32767);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TM_2_2_000003_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads MeasuredValue attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -22408,7 +22476,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_TM_2_2_000002_ReadAttribute
+- (void)testSendClusterTest_TC_TM_2_2_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: MeasuredValue"];
 
@@ -22594,7 +22662,7 @@ NSNumber * _Nonnull OccupancyValue;
 - (void)testSendClusterTest_TC_TSTAT_2_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit"];
+        [self expectationWithDescription:@"Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -22602,7 +22670,12 @@ NSNumber * _Nonnull OccupancyValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
+        NSLog(@"Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -22627,7 +22700,7 @@ NSNumber * _Nonnull OccupancyValue;
 - (void)testSendClusterTest_TC_TSTAT_2_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit"];
+        [self expectationWithDescription:@"Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -22635,7 +22708,12 @@ NSNumber * _Nonnull OccupancyValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
+        NSLog(@"Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -22660,7 +22738,7 @@ NSNumber * _Nonnull OccupancyValue;
 - (void)testSendClusterTest_TC_TSTAT_2_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint"];
+        [self expectationWithDescription:@"Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -22668,7 +22746,12 @@ NSNumber * _Nonnull OccupancyValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
+        NSLog(@"Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -22792,7 +22875,7 @@ NSNumber * _Nonnull OccupancyValue;
 - (void)testSendClusterTest_TC_TSTAT_2_1_000010_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit"];
+        [self expectationWithDescription:@"Reads constraints of optional attributes from DUT: MinCoolSetpointLimit"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -22800,7 +22883,12 @@ NSNumber * _Nonnull OccupancyValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
+        NSLog(@"Reads constraints of optional attributes from DUT: MinCoolSetpointLimit Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -22825,7 +22913,7 @@ NSNumber * _Nonnull OccupancyValue;
 - (void)testSendClusterTest_TC_TSTAT_2_1_000011_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit"];
+        [self expectationWithDescription:@"Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -22833,7 +22921,12 @@ NSNumber * _Nonnull OccupancyValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
+        NSLog(@"Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23071,6 +23164,11 @@ NSNumber * _Nonnull OccupancyValue;
         NSLog(
             @"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
@@ -23113,6 +23211,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                     @"attribute Error: %@",
                                                   err);
 
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
+
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
@@ -23132,6 +23236,11 @@ NSNumber * _Nonnull OccupancyValue;
 
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23163,6 +23272,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                     @"attribute Error: %@",
                                                   err);
 
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
+
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
@@ -23187,6 +23302,12 @@ NSNumber * _Nonnull OccupancyValue;
                                               NSLog(@"Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint "
                                                     @"attribute Error: %@",
                                                   err);
+
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
 
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23624,6 +23745,11 @@ NSNumber * _Nonnull OccupancyValue;
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
@@ -23666,6 +23792,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"attribute Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -23685,6 +23817,11 @@ NSNumber * _Nonnull OccupancyValue;
 
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23716,6 +23853,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -23741,6 +23884,12 @@ NSNumber * _Nonnull OccupancyValue;
                                       NSLog(@"Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute Error: %@",
                                           err);
 
+                                      if (err.domain == MatterInteractionErrorDomain
+                                          && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                          [expectation fulfill];
+                                          return;
+                                      }
+
                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
@@ -23761,6 +23910,11 @@ NSNumber * _Nonnull OccupancyValue;
 
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23804,6 +23958,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"attribute Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -23823,6 +23983,11 @@ NSNumber * _Nonnull OccupancyValue;
 
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute Error: %@", err);
+
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -23854,6 +24019,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -23878,6 +24049,12 @@ NSNumber * _Nonnull OccupancyValue;
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute Error: %@",
                                           err);
+
+                                      if (err.domain == MatterInteractionErrorDomain
+                                          && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                          [expectation fulfill];
+                                          return;
+                                      }
 
                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -24004,6 +24181,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"attribute Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -24028,6 +24211,12 @@ NSNumber * _Nonnull OccupancyValue;
                                            NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit "
                                                  @"attribute Error: %@",
                                                err);
+
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
 
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -24054,6 +24243,12 @@ NSNumber * _Nonnull OccupancyValue;
                                                  @"attribute Error: %@",
                                                err);
 
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
+
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
@@ -24078,6 +24273,12 @@ NSNumber * _Nonnull OccupancyValue;
                                            NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit "
                                                  @"attribute Error: %@",
                                                err);
+
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                               [expectation fulfill];
+                                               return;
+                                           }
 
                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -24231,6 +24432,12 @@ NSNumber * _Nonnull OccupancyValue;
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
+
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
@@ -24253,6 +24460,12 @@ NSNumber * _Nonnull OccupancyValue;
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
+
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
@@ -24274,6 +24487,12 @@ NSNumber * _Nonnull OccupancyValue;
     [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
 
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -24318,6 +24537,12 @@ NSNumber * _Nonnull OccupancyValue;
     [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                              if (err.domain == MatterInteractionErrorDomain
+                                                  && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                  [expectation fulfill];
+                                                  return;
+                                              }
 
                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -27414,6 +27639,103 @@ NSNumber * _Nonnull OccupancyValue;
         NSLog(@"Reads NetworkInterface structure attribute from DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WIFIDIAG_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads SecurityType attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSecurityTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads SecurityType attribute constraints Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WIFIDIAG_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads WiFiVersion attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeWiFiVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads WiFiVersion attribute constraints Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WIFIDIAG_1_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads ChannelNumber attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeChannelNumberWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads ChannelNumber attribute constraints Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WIFIDIAG_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads RSSI attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRssiWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads RSSI attribute constraints Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue charValue], -120);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue charValue], 0);
+            }
+        }
 
         [expectation fulfill];
     }];
