@@ -25,7 +25,7 @@
 
 #include <platform/CYW30739/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <hal/wiced_memory.h>

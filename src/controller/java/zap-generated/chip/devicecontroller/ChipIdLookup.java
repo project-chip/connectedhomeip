@@ -1433,19 +1433,22 @@ public final class ChipIdLookup {
     }
     if (clusterId == 80L) {
       if (attributeId == 0L) {
-        return "CurrentMode";
+        return "Description";
       }
       if (attributeId == 1L) {
-        return "SupportedModes";
+        return "StandardNamespace";
       }
       if (attributeId == 2L) {
-        return "OnMode";
+        return "SupportedModes";
       }
       if (attributeId == 3L) {
-        return "StartUpMode";
+        return "CurrentMode";
       }
       if (attributeId == 4L) {
-        return "Description";
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1455,6 +1458,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 65531L) {
         return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";

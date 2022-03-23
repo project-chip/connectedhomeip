@@ -182,6 +182,7 @@ private:
     uint16_t mListenPort;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
+    bool mEnableServerInteractions                        = false;
 };
 
 } // namespace Controller

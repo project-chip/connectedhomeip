@@ -15601,11 +15601,12 @@ class ModeSelect(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000001, Type=typing.List[ModeSelect.Structs.ModeOptionStruct]),
-                ClusterObjectFieldDescriptor(Label="onMode", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="description", Tag=0x00000004, Type=str),
+                ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
+                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[ModeSelect.Structs.ModeOptionStruct]),
+                ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="onMode", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -15613,11 +15614,12 @@ class ModeSelect(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentMode: 'uint' = None
-    supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
-    onMode: 'typing.Optional[uint]' = None
-    startUpMode: 'uint' = None
     description: 'str' = None
+    standardNamespace: 'typing.Union[Nullable, uint]' = None
+    supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
+    currentMode: 'uint' = None
+    startUpMode: 'typing.Union[None, Nullable, uint]' = None
+    onMode: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -15675,7 +15677,7 @@ class ModeSelect(Cluster):
 
     class Attributes:
         @dataclass
-        class CurrentMode(ClusterAttributeDescriptor):
+        class Description(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0050
@@ -15686,12 +15688,12 @@ class ModeSelect(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'uint' = 0
+            value: 'str' = ""
 
         @dataclass
-        class SupportedModes(ClusterAttributeDescriptor):
+        class StandardNamespace(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0050
@@ -15702,12 +15704,12 @@ class ModeSelect(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ModeSelect.Structs.ModeOptionStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
-        class OnMode(ClusterAttributeDescriptor):
+        class SupportedModes(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0050
@@ -15718,12 +15720,12 @@ class ModeSelect(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ModeSelect.Structs.ModeOptionStruct])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class StartUpMode(ClusterAttributeDescriptor):
+        class CurrentMode(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0050
@@ -15739,7 +15741,7 @@ class ModeSelect(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class Description(ClusterAttributeDescriptor):
+        class StartUpMode(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0050
@@ -15750,9 +15752,25 @@ class ModeSelect(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=str)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'str' = ""
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class OnMode(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0050
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

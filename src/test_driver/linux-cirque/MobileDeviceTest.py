@@ -38,6 +38,7 @@ CIRQUE_URL = "http://localhost:5000"
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
+TEST_DISCRIMINATOR = 3840
 
 DEVICE_CONFIG = {
     'device0': {
@@ -81,8 +82,8 @@ class TestPythonController(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app")))
+            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread --discriminator {}".format(
+                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
 
         self.reset_thread_devices(server_ids)
 

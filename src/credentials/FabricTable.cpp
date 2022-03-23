@@ -677,6 +677,31 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
 {
     VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+
+    // Check whether we already have a matching fabric.  An incoming fabric does
+    // not have its fabric id set yet, so we have to extract it here to do the
+    // comparison.
+    FabricId fabricId;
+    {
+        ByteSpan noc;
+        ReturnErrorOnFailure(newFabric.GetNOCCert(noc));
+        NodeId unused;
+        ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(noc, &unused, &fabricId));
+    }
+    for (auto & existingFabric : *this)
+    {
+        if (existingFabric.GetFabricId() == fabricId)
+        {
+            P256PublicKeySpan existingRootKey, newRootKey;
+            ReturnErrorOnFailure(existingFabric.GetRootPubkey(existingRootKey));
+            ReturnErrorOnFailure(newFabric.GetRootPubkey(newRootKey));
+            if (existingRootKey.data_equal(newRootKey))
+            {
+                return CHIP_ERROR_FABRIC_EXISTS;
+            }
+        }
+    }
+
     for (FabricIndex i = mNextAvailableFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
         FabricInfo * fabric = FindFabricWithIndex(i);
