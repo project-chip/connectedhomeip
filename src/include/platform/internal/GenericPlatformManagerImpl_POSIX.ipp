@@ -30,7 +30,7 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>

@@ -52,8 +52,6 @@ constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionUpdateAction              = 'a';
 constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
 constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
-constexpr uint16_t kOptionSoftwareVersion           = 's';
-constexpr uint16_t kOptionSoftwareVersionStr        = 'S';
 constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 
 OTAProviderExample gOtaProvider;
@@ -68,10 +66,8 @@ static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
 static bool gUserConsentNeeded                                        = false;
-static chip::Optional<uint32_t> gSoftwareVersion;
-static const char * gSoftwareVersionString = nullptr;
-static uint32_t gIgnoreQueryImageCount     = 0;
-static uint32_t gIgnoreApplyUpdateCount    = 0;
+static uint32_t gIgnoreQueryImageCount                                = 0;
+static uint32_t gIgnoreApplyUpdateCount                               = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -252,27 +248,8 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
-    case kOptionSoftwareVersion:
-        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtoul(aValue, NULL, 0)));
-        break;
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
-        break;
-    case kOptionSoftwareVersionStr:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL SoftwareVersionStr parameter\n", aProgram);
-            retval = false;
-        }
-        else if ((strlen(aValue) < 1 || strlen(aValue) > 64))
-        {
-            PrintArgError("%s: ERROR: SoftwareVersionStr parameter length is out of range \n", aProgram);
-            retval = false;
-        }
-        else
-        {
-            gSoftwareVersionString = aValue;
-        }
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -293,8 +270,6 @@ OptionDef cmdLineOptionsDef[] = {
     { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
     { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
-    { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
-    { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
     { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
@@ -327,12 +302,6 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        denied: Status field in QueryImageResponse is set to updateNotAvailable\n"
                              "        deferred: Status field in QueryImageResponse is set to busy\n"
                              "        -q/--queryImageStatus overrides this option\n"
-                             "  -s/--softwareVersion <version>\n"
-                             "        Value for the SoftwareVersion field in the QueryImageResponse\n"
-                             "        -o/--otaImageList overrides this option\n"
-                             "  -S/--softwareVersionStr <version string>\n"
-                             "        Value for the SoftwareVersionString field in the QueryImageResponse\n"
-                             "        -o/--otaImageList overrides this option\n"
                              "  -c/--UserConsentNeeded\n"
                              "        If provided, and value of RequestorCanConsent field in QueryImage Command is true,\n"
                              "        then value of UserConsentNeeded field in the QueryImageResponse is set to true.\n"
@@ -367,14 +336,6 @@ void ApplicationInit()
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
     gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
     gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
-    if (gSoftwareVersion.HasValue())
-    {
-        gOtaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
-    }
-    if (gSoftwareVersionString)
-    {
-        gOtaProvider.SetSoftwareVersionString(gSoftwareVersionString);
-    }
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {

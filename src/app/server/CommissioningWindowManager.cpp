@@ -55,17 +55,13 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(AppServer, "Commissioning completed successfully");
-            Cleanup();
-        }
-        else
-        {
-            ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.Status.Format());
-            OnSessionEstablishmentError(event->CommissioningComplete.Status);
-        }
+        ChipLogProgress(AppServer, "Commissioning completed successfully");
+        Cleanup();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        ChipLogError(AppServer, "Failsafe timer expired");
+        OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {

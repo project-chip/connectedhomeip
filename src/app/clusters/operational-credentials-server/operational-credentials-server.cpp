@@ -267,12 +267,12 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
 
-    FabricIndex fabricIndex = event->CommissioningComplete.PeerFabricIndex;
+    FabricIndex fabricIndex = event->FailSafeTimerExpired.PeerFabricIndex;
 
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
     // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
     // Session Context at the Server.
-    if (event->CommissioningComplete.AddNocCommandHasBeenInvoked || event->CommissioningComplete.UpdateNocCommandHasBeenInvoked)
+    if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked || event->FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked)
     {
         CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
         if (caseSessionManager)
@@ -289,7 +289,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
     // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
     // command.
-    if (event->CommissioningComplete.AddNocCommandHasBeenInvoked)
+    if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked)
     {
         Server::GetInstance().GetFabricTable().Delete(fabricIndex);
     }
@@ -297,7 +297,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
     // Fabric to the state prior to the Fail-Safe timer being armed, for the Fabric Index that was the subject of the UpdateNOC
     // command.
-    if (event->CommissioningComplete.UpdateNocCommandHasBeenInvoked)
+    if (event->FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked)
     {
         // TODO: Revert the state of operational key pair, NOC and ICAC
     }
@@ -305,12 +305,9 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 
 void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
-        {
-            FailSafeCleanup(event);
-        }
+        FailSafeCleanup(event);
     }
 }
 
@@ -566,6 +563,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     else if (err == CHIP_ERROR_NO_MEMORY)
     {
         return OperationalCertStatus::kTableFull;
+    }
+    else if (err == CHIP_ERROR_FABRIC_EXISTS)
+    {
+        return OperationalCertStatus::kFabricConflict;
     }
 
     return OperationalCertStatus::kInvalidNOC;

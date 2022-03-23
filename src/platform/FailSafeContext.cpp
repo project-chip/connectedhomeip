@@ -30,18 +30,17 @@ namespace DeviceLayer {
 void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 {
     FailSafeContext * context = reinterpret_cast<FailSafeContext *>(aAppState);
-    context->CommissioningFailedTimerComplete();
+    context->FailSafeTimerExpired();
 }
 
-void FailSafeContext::CommissioningFailedTimerComplete()
+void FailSafeContext::FailSafeTimerExpired()
 {
     ChipDeviceEvent event;
-    event.Type                                                 = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerFabricIndex                = mFabricIndex;
-    event.CommissioningComplete.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
-    event.CommissioningComplete.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
-    event.CommissioningComplete.Status                         = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                                          = PlatformMgr().PostEvent(&event);
+    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
+    event.FailSafeTimerExpired.PeerFabricIndex                = mFabricIndex;
+    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
+    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
+    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;

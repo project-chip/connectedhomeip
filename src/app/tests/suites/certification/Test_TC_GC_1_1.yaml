@@ -128,7 +128,7 @@ tests:
           CHIP:DMG: InteractionModelRevision = 1 [1646202241.425702][2879:2884]
           CHIP:DMG: } [1646202241.426186][2879:2884] CHIP:TOO: Endpoint: 0
           Cluster: 0x0000_0030 Attribute 0x0000_FFF8 DataVersion: 1894223167
-          [1646202241.426293][2879:2884] CHIP:TOO: ServerGeneratedCommandList: 2
+          [1646202241.426293][2879:2884] CHIP:TOO: GeneratedCommandList: 2
           entries [1646202241.426379][2879:2884] CHIP:TOO: [1]:
           1[1646202241.426420][2879:2884] CHIP:TOO: [2]: 5
           [1646202241.426512][2879:2884] CHIP:EM: Sending Standalone Ack for
@@ -143,7 +143,7 @@ tests:
           CHIP:DMG: InteractionModelRevision = 1 [1646202324.586198][2908:2913]
           CHIP:DMG: } [1646202324.587108][2908:2913] CHIP:TOO: Endpoint: 0
           Cluster: 0x0000_0030 Attribute 0x0000_FFF9 DataVersion: 1894223167
-          [1646202324.587242][2908:2913] CHIP:TOO: ClientGeneratedCommandList: 4
+          [1646202324.587242][2908:2913] CHIP:TOO: AcceptedCommandList: 4
           entries [1646202324.587385][2908:2913] CHIP:TOO: [1]: 0
           [1646202324.587438][2908:2913] CHIP:TOO: [2]: 2
           [1646202324.587546][2908:2913] CHIP:TOO: [3]: 3

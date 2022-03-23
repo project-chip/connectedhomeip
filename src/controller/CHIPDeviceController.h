@@ -687,7 +687,8 @@ public:
 private:
     DevicePairingDelegate * mPairingDelegate;
 
-    CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
+    DeviceProxy * mDeviceBeingCommissioned               = nullptr;
+    CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
@@ -705,8 +706,6 @@ private:
     DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
     uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
-    void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
@@ -740,7 +739,7 @@ private:
        the operational credential provisioning process.
        The function does not hold a reference to the device object.
        */
-    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(DeviceProxy * device);
 
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, CHIP_ERROR error);

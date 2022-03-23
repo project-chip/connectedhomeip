@@ -120,6 +120,32 @@ The endpoint id must be between 1 and 240.
 
 The client will send a single command packet and then exit.
 
+## Configuring the server side for Group Commands
+
+1. Commission and pair device with nodeId 1234
+
+2. Add Group to device
+
+    ```
+    $ chip-tool groups add-group 0x4141 Light 1234 1
+    ```
+
+3. Add group Keyset to device
+
+    ```
+    $ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+    "groupKeySecurityPolicy": 0, "epochKey0":
+    "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+    "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, }' 1234 0
+    ```
+
+4. Bind Key to group
+    ```
+    $ chip-tool groupkeymanagement write group-key-map
+    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
+    ```
+
 ## Configuring the client for Group Commands
 
 Prior to sending a Group command, both the end device and the Client (Chip-tool)

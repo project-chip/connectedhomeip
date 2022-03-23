@@ -38733,12 +38733,12 @@ public:
             err = TestReadAttributeThatReturnsClusterSpecificStatusOnRead_477();
             break;
         case 478:
-            ChipLogProgress(chipTool, " ***** Test Step 478 : read ClientGeneratedCommandList attribute\n");
-            err = TestReadClientGeneratedCommandListAttribute_478();
+            ChipLogProgress(chipTool, " ***** Test Step 478 : read AcceptedCommandList attribute\n");
+            err = TestReadAcceptedCommandListAttribute_478();
             break;
         case 479:
-            ChipLogProgress(chipTool, " ***** Test Step 479 : read ServerGeneratedCommandList attribute\n");
-            err = TestReadServerGeneratedCommandListAttribute_479();
+            ChipLogProgress(chipTool, " ***** Test Step 479 : read GeneratedCommandList attribute\n");
+            err = TestReadGeneratedCommandListAttribute_479();
             break;
         case 480:
             ChipLogProgress(chipTool, " ***** Test Step 480 : Write struct-typed attribute\n");
@@ -49832,74 +49832,72 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadClientGeneratedCommandListAttribute_478()
+    CHIP_ERROR TestReadAcceptedCommandListAttribute_478()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ClientGeneratedCommandList attribute Error: %@", err);
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read AcceptedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("ClientGeneratedCommandList", [actualValue count], static_cast<uint32_t>(18)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
-                    VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
-                    VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
-                    VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
-                    VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
-                    VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
-                    VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
-                    VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
-                    VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
-                    VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(18)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 7UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 8UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
+                VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
+                VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
+                VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
+                VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
+                VerifyOrReturn(CheckValue("", actualValue[13], 17UL));
+                VerifyOrReturn(CheckValue("", actualValue[14], 18UL));
+                VerifyOrReturn(CheckValue("", actualValue[15], 19UL));
+                VerifyOrReturn(CheckValue("", actualValue[16], 20UL));
+                VerifyOrReturn(CheckValue("", actualValue[17], 21UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadServerGeneratedCommandListAttribute_479()
+    CHIP_ERROR TestReadGeneratedCommandListAttribute_479()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
-        [cluster
-            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read ServerGeneratedCommandList attribute Error: %@", err);
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read GeneratedCommandList attribute Error: %@", err);
 
-                VerifyOrReturn(CheckValue("status", err, 0));
+            VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("ServerGeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
-                    VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                    VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                    VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
-                    VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
-                    VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
-                    VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
-                    VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
-                    VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
-                }
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(8)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 6UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 9UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 11UL));
+            }
 
-                NextTest();
-            }];
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -55831,36 +55829,72 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read CurrentMode\n");
-            err = TestReadCurrentMode_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read Description\n");
+            err = TestReadDescription_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read OnMode\n");
-            err = TestReadOnMode_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read StandardNamespace\n");
+            err = TestReadStandardNamespace_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read StartUpMode\n");
-            err = TestReadStartUpMode_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read SupportedModes\n");
+            err = TestReadSupportedModes_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read Description\n");
-            err = TestReadDescription_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read CurrentMode\n");
+            err = TestReadCurrentMode_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read SupportedModes\n");
-            err = TestReadSupportedModes_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read StartUpMode\n");
+            err = TestReadStartUpMode_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Change to Supported Mode\n");
-            err = TestChangeToSupportedMode_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read OnMode\n");
+            err = TestReadOnMode_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify Current Mode Change\n");
-            err = TestVerifyCurrentModeChange_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Change to Supported Mode\n");
+            err = TestChangeToSupportedMode_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Change to Unsupported Mode\n");
-            err = TestChangeToUnsupportedMode_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Verify Current Mode Change\n");
+            err = TestVerifyCurrentModeChange_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Change to Unsupported Mode\n");
+            err = TestChangeToUnsupportedMode_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Toggle OnOff\n");
+            err = TestToggleOnOff_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Toggle OnOff\n");
+            err = TestToggleOnOff_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Verify Current Mode does not change when OnMode is null\n");
+            err = TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Change OnMode\n");
+            err = TestChangeOnMode_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Verify OnMode\n");
+            err = TestVerifyOnMode_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Toggle OnOff\n");
+            err = TestToggleOnOff_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Toggle OnOff\n");
+            err = TestToggleOnOff_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Verify Current Mode Changes if OnMode is not null\n");
+            err = TestVerifyCurrentModeChangesIfOnModeIsNotNull_17();
             break;
         }
 
@@ -55877,7 +55911,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -55890,73 +55924,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadCurrentMode_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read CurrentMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadOnMode_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read OnMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("OnMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadStartUpMode_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read StartUpMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadDescription_4()
+    CHIP_ERROR TestReadDescription_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -55978,7 +55946,30 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadSupportedModes_5()
+    CHIP_ERROR TestReadStandardNamespace_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read StandardNamespace Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StandardNamespace", actualValue));
+                VerifyOrReturn(CheckValue("StandardNamespace", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadSupportedModes_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56015,7 +56006,74 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestChangeToSupportedMode_6()
+    CHIP_ERROR TestReadCurrentMode_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read CurrentMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadStartUpMode_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read StartUpMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StartUpMode", actualValue));
+                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadOnMode_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read OnMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNull("OnMode", actualValue));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeToSupportedMode_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56034,8 +56092,9 @@ private:
 
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull currentModeBeforeToggle;
 
-    CHIP_ERROR TestVerifyCurrentModeChange_7()
+    CHIP_ERROR TestVerifyCurrentModeChange_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56050,6 +56109,9 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("CurrentMode", actualValue, 4));
             }
+            {
+                currentModeBeforeToggle = value;
+            }
 
             NextTest();
         }];
@@ -56057,7 +56119,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestChangeToUnsupportedMode_8()
+    CHIP_ERROR TestChangeToUnsupportedMode_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56072,6 +56134,165 @@ private:
                           VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
                           NextTest();
                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify Current Mode does not change when OnMode is null Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, currentModeBeforeToggle));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeOnMode_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id onModeArgument;
+        onModeArgument = [NSNumber numberWithUnsignedChar:7];
+        [cluster writeAttributeOnModeWithValue:onModeArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Change OnMode Error: %@", err);
+
+                                 VerifyOrReturn(CheckValue("status", err, 0));
+
+                                 NextTest();
+                             }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nullable OnModeValue;
+
+    CHIP_ERROR TestVerifyOnMode_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify OnMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("OnMode", actualValue));
+                VerifyOrReturn(CheckValue("OnMode", actualValue, 7));
+            }
+            {
+                OnModeValue = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestToggleOnOff_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"Toggle OnOff Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyCurrentModeChangesIfOnModeIsNotNull_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify Current Mode Changes if OnMode is not null Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CurrentMode", actualValue, OnModeValue));
+            }
+
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }

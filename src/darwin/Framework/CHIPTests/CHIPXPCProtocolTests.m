@@ -90,18 +90,24 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     (uint64_t fabricId, void (^completion)(id _Nullable controller, NSError * _Nullable error));
 @property (readwrite, strong) void (^handleGetAnySharedRemoteController)
     (void (^completion)(id _Nullable controller, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleReadAttribute)(id controller, uint64_t nodeId, NSUInteger endpointId,
-    NSUInteger clusterId, NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleWriteAttribute)(id controller, uint64_t nodeId, NSUInteger endpointId,
-    NSUInteger clusterId, NSUInteger attributeId, id value, void (^completion)(id _Nullable values, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleInvokeCommand)(id controller, uint64_t nodeId, NSUInteger endpointId,
-    NSUInteger clusterId, NSUInteger commandId, id fields, void (^completion)(id _Nullable values, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleSubscribeAttribute)(id controller, uint64_t nodeId, NSUInteger endpointId,
-    NSUInteger clusterId, NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void));
+@property (readwrite, strong) void (^handleReadAttribute)(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId,
+    NSNumber * _Nullable clusterId, NSNumber * _Nullable attributeId, CHIPReadParams * _Nullable params,
+    void (^completion)(id _Nullable values, NSError * _Nullable error));
+@property (readwrite, strong) void (^handleWriteAttribute)
+    (id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId, id value,
+        NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error));
+@property (readwrite, strong) void (^handleInvokeCommand)
+    (id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id fields,
+        NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error));
+@property (readwrite, strong) void (^handleSubscribeAttribute)(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId,
+    NSNumber * _Nullable clusterId, NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval,
+    CHIPSubscribeParams * _Nullable params, void (^establishedHandler)(void));
+@property (readwrite, strong) void (^handleStopReports)(id controller, uint64_t nodeId, void (^completion)(void));
 @property (readwrite, strong) void (^handleSubscribeAttributeCache)
-    (id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error));
-@property (readwrite, strong) void (^handleReadAttributeCache)(id controller, uint64_t nodeId, NSUInteger endpointId,
-    NSUInteger clusterId, NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
+    (id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error));
+@property (readwrite, strong) void (^handleReadAttributeCache)
+    (id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
 
 @end
 
@@ -147,76 +153,90 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
 - (void)readAttributeWithController:(id)controller
                              nodeId:(uint64_t)nodeId
-                         endpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+                         endpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(NSDictionary<NSString *, id> * _Nullable)params
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleReadAttribute);
-        self.handleReadAttribute(controller, nodeId, endpointId, clusterId, attributeId, completion);
+        self.handleReadAttribute(
+            controller, nodeId, endpointId, clusterId, attributeId, [CHIPDeviceController decodeXPCReadParams:params], completion);
     });
 }
 
 - (void)writeAttributeWithController:(id)controller
                               nodeId:(uint64_t)nodeId
-                          endpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+                          endpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                           completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleWriteAttribute);
-        self.handleWriteAttribute(controller, nodeId, endpointId, clusterId, attributeId, value, completion);
+        self.handleWriteAttribute(controller, nodeId, endpointId, clusterId, attributeId, value, timeoutMs, completion);
     });
 }
 
 - (void)invokeCommandWithController:(id)controller
                              nodeId:(uint64_t)nodeId
-                         endpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+                         endpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                              fields:(id)fields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleInvokeCommand);
-        self.handleInvokeCommand(controller, nodeId, endpointId, clusterId, commandId, fields, completion);
+        self.handleInvokeCommand(controller, nodeId, endpointId, clusterId, commandId, fields, timeoutMs, completion);
     });
 }
 
 - (void)subscribeAttributeWithController:(id)controller
                                   nodeId:(uint64_t)nodeId
-                              endpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(NSDictionary<NSString *, id> * _Nullable)params
                       establishedHandler:(void (^)(void))establishedHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAttribute);
-        self.handleSubscribeAttribute(
-            controller, nodeId, endpointId, clusterId, attributeId, minInterval, maxInterval, establishedHandler);
+        self.handleSubscribeAttribute(controller, nodeId, endpointId, clusterId, attributeId, minInterval, maxInterval,
+            [CHIPDeviceController decodeXPCSubscribeParams:params], establishedHandler);
+    });
+}
+
+- (void)stopReportsWithController:(id)controller nodeId:(uint64_t)nodeId completion:(void (^)(void))completion
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        XCTAssertNotNil(self.handleStopReports);
+        self.handleStopReports(controller, nodeId, completion);
     });
 }
 
 - (void)subscribeAttributeCacheWithController:(id _Nullable)controller
                                        nodeId:(uint64_t)nodeId
+                                       params:(NSDictionary<NSString *, id> * _Nullable)params
                                    completion:(void (^)(NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAttributeCache);
-        self.handleSubscribeAttributeCache(controller, nodeId, completion);
+        self.handleSubscribeAttributeCache(controller, nodeId, [CHIPDeviceController decodeXPCSubscribeParams:params], completion);
     });
 }
 
 - (void)readAttributeCacheWithController:(id _Nullable)controller
                                   nodeId:(uint64_t)nodeId
-                              endpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
                               completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -253,13 +273,13 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testReadAttributeSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -267,13 +287,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleReadAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger attributeId,
+    _handleReadAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, CHIPReadParams * _Nullable params,
         void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         completion([CHIPDeviceController encodeXPCResponseValues:myValues], nil);
     };
@@ -287,6 +309,69 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                   [device readAttributeWithEndpointId:myEndpointId
                                                             clusterId:myClusterId
                                                           attributeId:myAttributeId
+                                                               params:nil
+                                                          clientQueue:dispatch_get_main_queue()
+                                                           completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"Read value: %@", value);
+                                                               XCTAssertNotNil(value);
+                                                               XCTAssertNil(error);
+                                                               XCTAssertTrue([myValues isEqualTo:value]);
+                                                               [responseExpectation fulfill];
+                                                               self.xpcDisconnectExpectation =
+                                                                   [self expectationWithDescription:@"XPC Disconnected"];
+                                                           }];
+                              }];
+
+    [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
+
+    // When read is done, connection should have been released
+    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testReadAttributeWithParamsSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSArray * myValues = @[ @{
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
+        @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
+    } ];
+    CHIPReadParams * myParams = [[CHIPReadParams alloc] init];
+    myParams.fabricFiltered = @NO;
+
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleReadAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, CHIPReadParams * _Nullable params,
+        void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertNotNil(params);
+        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+        [callExpectation fulfill];
+        completion([CHIPDeviceController encodeXPCResponseValues:myValues], nil);
+    };
+
+    [_remoteDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  XCTAssertNotNil(device);
+                                  XCTAssertNil(error);
+                                  NSLog(@"Device acquired. Reading...");
+                                  [device readAttributeWithEndpointId:myEndpointId
+                                                            clusterId:myClusterId
+                                                          attributeId:myAttributeId
+                                                               params:myParams
                                                           clientQueue:dispatch_get_main_queue()
                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"Read value: %@", value);
@@ -309,21 +394,23 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testReadAttributeFailure
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSError * myError = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleReadAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger attributeId,
+    _handleReadAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, CHIPReadParams * _Nullable params,
         void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         completion(nil, myError);
     };
@@ -337,6 +424,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                   [device readAttributeWithEndpointId:myEndpointId
                                                             clusterId:myClusterId
                                                           attributeId:myAttributeId
+                                                               params:nil
                                                           clientQueue:dispatch_get_main_queue()
                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"Read value: %@", value);
@@ -358,29 +446,30 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testWriteAttributeSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSDictionary * myValue =
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
     NSArray * myResults = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]]
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId]
     } ];
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleWriteAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger attributeId,
-        id value, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+    _handleWriteAttribute = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         XCTAssertTrue([value isEqualTo:myValue]);
+        XCTAssertNil(timedWriteTimeout);
         [callExpectation fulfill];
         completion([CHIPDeviceController encodeXPCResponseValues:myResults], nil);
     };
@@ -395,6 +484,70 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                              clusterId:myClusterId
                                                            attributeId:myAttributeId
                                                                  value:myValue
+                                                     timedWriteTimeout:nil
+                                                           clientQueue:dispatch_get_main_queue()
+                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"Write response: %@", value);
+                                                                XCTAssertNotNil(value);
+                                                                XCTAssertNil(error);
+                                                                XCTAssertTrue([myResults isEqualTo:value]);
+                                                                [responseExpectation fulfill];
+                                                                self.xpcDisconnectExpectation =
+                                                                    [self expectationWithDescription:@"XPC Disconnected"];
+                                                            }];
+                              }];
+
+    [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
+
+    // When write is done, connection should have been released
+    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testTimedWriteAttributeSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSDictionary * myValue =
+        [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
+    NSNumber * myTimedWriteTimeout = @1234;
+    NSArray * myResults = @[ @{
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId]
+    } ];
+
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleWriteAttribute = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertTrue([value isEqualTo:myValue]);
+        XCTAssertNotNil(timedWriteTimeout);
+        XCTAssertEqual([timedWriteTimeout unsignedShortValue], [myTimedWriteTimeout unsignedShortValue]);
+        [callExpectation fulfill];
+        completion([CHIPDeviceController encodeXPCResponseValues:myResults], nil);
+    };
+
+    [_remoteDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  XCTAssertNotNil(device);
+                                  XCTAssertNil(error);
+                                  NSLog(@"Device acquired. Writing...");
+                                  [device writeAttributeWithEndpointId:myEndpointId
+                                                             clusterId:myClusterId
+                                                           attributeId:myAttributeId
+                                                                 value:myValue
+                                                     timedWriteTimeout:myTimedWriteTimeout
                                                            clientQueue:dispatch_get_main_queue()
                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Write response: %@", value);
@@ -417,9 +570,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testWriteAttributeFailure
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSDictionary * myValue =
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
     NSError * myError = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil];
@@ -427,14 +580,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleWriteAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger attributeId,
-        id value, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+    _handleWriteAttribute = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         XCTAssertTrue([value isEqualTo:myValue]);
+        XCTAssertNil(timedWriteTimeout);
         [callExpectation fulfill];
         completion(nil, myError);
     };
@@ -449,6 +603,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                              clusterId:myClusterId
                                                            attributeId:myAttributeId
                                                                  value:myValue
+                                                     timedWriteTimeout:nil
                                                            clientQueue:dispatch_get_main_queue()
                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Write response: %@", value);
@@ -470,33 +625,33 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testInvokeCommandSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myCommandId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myCommandId = @300;
     NSDictionary * myFields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type",
                                             [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"Type",
                                                                                    [NSNumber numberWithFloat:1.0], @"value", nil]],
                                             @"value", nil];
-    NSArray * myResults = @[ @{
-        @"commandPath" : [CHIPCommandPath commandPathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                          clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                          commandId:[NSNumber numberWithUnsignedInteger:myCommandId]]
-    } ];
+    NSArray * myResults = @[
+        @{ @"commandPath" : [CHIPCommandPath commandPathWithEndpointId:myEndpointId clusterId:myClusterId commandId:myCommandId] }
+    ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleInvokeCommand = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger commandId,
-        id commandFields, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(commandId, myCommandId);
-        XCTAssertTrue([commandFields isEqualTo:myFields]);
-        [callExpectation fulfill];
-        completion([CHIPDeviceController encodeXPCResponseValues:myResults], nil);
-    };
+    _handleInvokeCommand
+        = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+              XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+              XCTAssertEqual([commandId unsignedLongValue], [myCommandId unsignedLongValue]);
+              XCTAssertTrue([commandFields isEqualTo:myFields]);
+              XCTAssertNil(timedInvokeTimeout);
+              [callExpectation fulfill];
+              completion([CHIPDeviceController encodeXPCResponseValues:myResults], nil);
+          };
 
     [_remoteDeviceController getConnectedDevice:myNodeId
                                           queue:dispatch_get_main_queue()
@@ -508,6 +663,70 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                             clusterId:myClusterId
                                                             commandId:myCommandId
                                                         commandFields:myFields
+                                                   timedInvokeTimeout:nil
+                                                          clientQueue:dispatch_get_main_queue()
+                                                           completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"Command response: %@", value);
+                                                               XCTAssertNotNil(value);
+                                                               XCTAssertNil(error);
+                                                               XCTAssertTrue([myResults isEqualTo:value]);
+                                                               [responseExpectation fulfill];
+                                                               self.xpcDisconnectExpectation =
+                                                                   [self expectationWithDescription:@"XPC Disconnected"];
+                                                           }];
+                              }];
+
+    [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
+
+    // When command is done, connection should have been released
+    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testTimedInvokeCommandSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myCommandId = @300;
+    NSNumber * myTimedInvokeTimeout = @5678;
+    NSDictionary * myFields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type",
+                                            [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"Type",
+                                                                                   [NSNumber numberWithFloat:1.0], @"value", nil]],
+                                            @"value", nil];
+    NSArray * myResults = @[
+        @{ @"commandPath" : [CHIPCommandPath commandPathWithEndpointId:myEndpointId clusterId:myClusterId commandId:myCommandId] }
+    ];
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleInvokeCommand
+        = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+              XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+              XCTAssertEqual([commandId unsignedLongValue], [myCommandId unsignedLongValue]);
+              XCTAssertTrue([commandFields isEqualTo:myFields]);
+              XCTAssertNotNil(timedInvokeTimeout);
+              XCTAssertEqual([timedInvokeTimeout unsignedShortValue], [myTimedInvokeTimeout unsignedShortValue]);
+              [callExpectation fulfill];
+              completion([CHIPDeviceController encodeXPCResponseValues:myResults], nil);
+          };
+
+    [_remoteDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  XCTAssertNotNil(device);
+                                  XCTAssertNil(error);
+                                  NSLog(@"Device acquired. Invoking command...");
+                                  [device invokeCommandWithEndpointId:myEndpointId
+                                                            clusterId:myClusterId
+                                                            commandId:myCommandId
+                                                        commandFields:myFields
+                                                   timedInvokeTimeout:myTimedInvokeTimeout
                                                           clientQueue:dispatch_get_main_queue()
                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"Command response: %@", value);
@@ -530,9 +749,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testInvokeCommandFailure
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myCommandId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myCommandId = @300;
     NSDictionary * myFields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type",
                                             [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"Type",
                                                                                    [NSNumber numberWithFloat:1.0], @"value", nil]],
@@ -542,17 +761,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleInvokeCommand = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId, NSUInteger commandId,
-        id commandFields, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(commandId, myCommandId);
-        XCTAssertTrue([commandFields isEqualTo:myFields]);
-        [callExpectation fulfill];
-        completion(nil, myError);
-    };
+    _handleInvokeCommand
+        = ^(id controller, uint64_t nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+              XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+              XCTAssertEqual([commandId unsignedLongValue], [myCommandId unsignedLongValue]);
+              XCTAssertTrue([commandFields isEqualTo:myFields]);
+              XCTAssertNil(timedInvokeTimeout);
+              [callExpectation fulfill];
+              completion(nil, myError);
+          };
 
     [_remoteDeviceController getConnectedDevice:myNodeId
                                           queue:dispatch_get_main_queue()
@@ -564,6 +785,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                             clusterId:myClusterId
                                                             commandId:myCommandId
                                                         commandFields:myFields
+                                                   timedInvokeTimeout:nil
                                                           clientQueue:dispatch_get_main_queue()
                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"Command response: %@", value);
@@ -585,15 +807,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testSubscribeAttributeSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -601,15 +823,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Report sent"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -628,6 +852,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -656,9 +881,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -668,6 +893,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -681,41 +915,45 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
-- (void)testBadlyFormattedReport
+- (void)testSubscribeAttributeWithParamsSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
-    // Incorrect serialized report value. Report should have ben a single NSDictionary
-    __block id myReport = @{
-        @"attributePath" : @[
-            [NSNumber numberWithUnsignedInteger:myEndpointId], [NSNumber numberWithUnsignedInteger:myClusterId],
-            [NSNumber numberWithUnsignedInteger:myAttributeId]
-        ],
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
+    CHIPSubscribeParams * myParams = [[CHIPSubscribeParams alloc] init];
+    myParams.fabricFiltered = @NO;
+    myParams.keepPreviousSubscriptions = @NO;
+    __block NSArray * myReport = @[ @{
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
-    };
+    } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * establishExpectation = [self expectationWithDescription:@"Established called"];
-    __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Unexpected report sent"];
-    reportExpectation.inverted = YES;
+    __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Report sent"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNotNil(params);
+        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -734,6 +972,122 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:myParams
+                 clientQueue:dispatch_get_main_queue()
+                 reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                     NSLog(@"Report value: %@", values);
+                     XCTAssertNotNil(values);
+                     XCTAssertNil(error);
+                     XCTAssertTrue([myReport isEqualTo:values]);
+                     [reportExpectation fulfill];
+                 }
+                 subscriptionEstablished:^{
+                     [establishExpectation fulfill];
+                 }];
+         }];
+
+    [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
+
+    // Inject report
+    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    [clientObject handleReportWithController:uuid
+                                      nodeId:myNodeId
+                                      values:[CHIPDeviceController encodeXPCResponseValues:myReport]
+                                       error:nil];
+
+    // Wait for report
+    [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Inject another report
+    reportExpectation = [self expectationWithDescription:@"2nd report sent"];
+    myReport = @[ @{
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
+        @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
+    } ];
+    [clientObject handleReportWithController:uuid
+                                      nodeId:myNodeId
+                                      values:[CHIPDeviceController encodeXPCResponseValues:myReport]
+                                       error:nil];
+
+    // Wait for report
+    [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
+
+    // Deregister report handler
+    [_remoteDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  NSLog(@"Device acquired. Deregistering...");
+                                  [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
+                                                                       completion:^{
+                                                                           NSLog(@"Deregistered");
+                                                                       }];
+                              }];
+
+    // Wait for disconnection
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testBadlyFormattedReport
+{
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
+    // Incorrect serialized report value. Report should have ben a single NSDictionary
+    __block id myReport = @{
+        @"attributePath" : @[ myEndpointId, myClusterId, myAttributeId ],
+        @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
+    };
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * establishExpectation = [self expectationWithDescription:@"Established called"];
+    __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Unexpected report sent"];
+    reportExpectation.inverted = YES;
+
+    __auto_type uuid = self.controllerUUID;
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
+        [callExpectation fulfill];
+        establishedHandler();
+    };
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+
+    [_remoteDeviceController
+        getConnectedDevice:myNodeId
+                     queue:dispatch_get_main_queue()
+         completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+             XCTAssertNotNil(device);
+             XCTAssertNil(error);
+             NSLog(@"Device acquired. Subscribing...");
+             [device subscribeAttributeWithEndpointId:myEndpointId
+                 clusterId:myClusterId
+                 attributeId:myAttributeId
+                 minInterval:myMinInterval
+                 maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -759,9 +1113,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"Report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -771,6 +1125,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     _xpcDisconnectExpectation.inverted = NO;
@@ -785,22 +1148,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testReportWithUnrelatedEndpointId
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId + 1]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:@([myEndpointId unsignedShortValue] + 1)
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -809,15 +1172,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation.inverted = YES;
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -836,6 +1201,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -864,9 +1230,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -876,6 +1242,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -889,22 +1264,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testReportWithUnrelatedClusterId
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId + 1]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:@([myClusterId unsignedLongValue] + 1)
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -913,15 +1288,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation.inverted = YES;
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -940,6 +1317,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -968,9 +1346,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -980,6 +1358,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -993,22 +1380,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testReportWithUnrelatedAttributeId
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId + 1]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:@([myAttributeId unsignedLongValue] + 1)],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1017,15 +1404,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation.inverted = YES;
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1044,6 +1433,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -1072,9 +1462,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1084,6 +1474,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -1097,22 +1496,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testReportWithUnrelatedNode
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1121,15 +1520,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation.inverted = YES;
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1148,6 +1549,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -1176,9 +1578,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1188,6 +1590,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -1201,22 +1612,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testSubscribeMultiEndpoints
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1224,15 +1635,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Report sent"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, 0xffff);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertNil(endpointId);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1246,11 +1659,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
              XCTAssertNotNil(device);
              XCTAssertNil(error);
              NSLog(@"Device acquired. Subscribing...");
-             [device subscribeAttributeWithEndpointId:0xffff
+             [device subscribeAttributeWithEndpointId:nil
                  clusterId:myClusterId
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -1279,9 +1693,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1291,6 +1705,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -1304,22 +1727,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testSubscribeMultiClusters
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1327,15 +1750,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Report sent"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, 0xffffffff);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertNil(clusterId);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1350,10 +1775,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
              XCTAssertNil(error);
              NSLog(@"Device acquired. Subscribing...");
              [device subscribeAttributeWithEndpointId:myEndpointId
-                 clusterId:0xffffffff
+                 clusterId:nil
                  attributeId:myAttributeId
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -1382,9 +1808,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1394,6 +1820,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -1407,22 +1842,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testSubscribeMultiAttributes
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
-    NSUInteger myMinInterval = 5;
-    NSUInteger myMaxInterval = 60;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSNumber * myMinInterval = @5;
+    NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1430,15 +1865,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __block XCTestExpectation * reportExpectation = [self expectationWithDescription:@"Report sent"];
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, 0xffffffff);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertNil(attributeId);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1454,9 +1891,10 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
              NSLog(@"Device acquired. Subscribing...");
              [device subscribeAttributeWithEndpointId:myEndpointId
                  clusterId:myClusterId
-                 attributeId:0xffffffff
+                 attributeId:nil
                  minInterval:myMinInterval
                  maxInterval:myMaxInterval
+                 params:nil
                  clientQueue:dispatch_get_main_queue()
                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                      NSLog(@"Report value: %@", values);
@@ -1485,9 +1923,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1497,6 +1935,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion();
+        [stopExpectation fulfill];
+    };
 
     // Deregister report handler
     [_remoteDeviceController getConnectedDevice:myNodeId
@@ -1510,39 +1957,41 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for disconnection
-    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
 - (void)testMutiSubscriptions
 {
     uint64_t nodeIds[] = { 9876543210, 9876543211 };
-    NSUInteger endpointIds[] = { 100, 150 };
-    NSUInteger clusterIds[] = { 200, 250 };
-    NSUInteger attributeIds[] = { 300, 350 };
-    NSUInteger minIntervals[] = { 5, 7 };
-    NSUInteger maxIntervals[] = { 60, 68 };
+    NSNumber * endpointIds[] = { @100, @150 };
+    NSNumber * clusterIds[] = { @200, @250 };
+    NSNumber * attributeIds[] = { @300, @350 };
+    NSNumber * minIntervals[] = { @5, @7 };
+    NSNumber * maxIntervals[] = { @60, @68 };
     __block uint64_t myNodeId = nodeIds[0];
-    __block NSUInteger myEndpointId = endpointIds[0];
-    __block NSUInteger myClusterId = clusterIds[0];
-    __block NSUInteger myAttributeId = attributeIds[0];
-    __block NSUInteger myMinInterval = minIntervals[0];
-    __block NSUInteger myMaxInterval = maxIntervals[0];
+    __block NSNumber * myEndpointId = endpointIds[0];
+    __block NSNumber * myClusterId = clusterIds[0];
+    __block NSNumber * myAttributeId = attributeIds[0];
+    __block NSNumber * myMinInterval = minIntervals[0];
+    __block NSNumber * myMaxInterval = maxIntervals[0];
     __block NSArray<NSArray *> * myReports;
     __block XCTestExpectation * callExpectation;
     __block XCTestExpectation * establishExpectation;
     __block NSArray<XCTestExpectation *> * reportExpectations;
 
     __auto_type uuid = self.controllerUUID;
-    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void)) {
+    _handleSubscribeAttribute = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, CHIPSubscribeParams * _Nullable params,
+        void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
-        XCTAssertEqual(minInterval, myMinInterval);
-        XCTAssertEqual(maxInterval, myMaxInterval);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertNil(params);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1571,6 +2020,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                      attributeId:myAttributeId
                      minInterval:myMinInterval
                      maxInterval:myMaxInterval
+                     params:nil
                      clientQueue:dispatch_get_main_queue()
                      reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                          NSLog(@"Subscriber [%d] report value: %@", i, values);
@@ -1597,17 +2047,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             [self expectationWithDescription:[NSString stringWithFormat:@"Report(%d) for second subscriber sent", count]], nil];
         myReports = @[
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[0]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[0]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[0]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[0]
+                                                                        clusterId:clusterIds[0]
+                                                                      attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[1]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[1]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[1]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[1]
+                                                                        clusterId:clusterIds[1]
+                                                                      attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123457 + count * 100] }
             } ]
         ];
@@ -1623,9 +2071,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [self waitForExpectations:reportExpectations timeout:kTimeoutInSeconds];
     }
 
+    // Setup stop report handler
+    XCTestExpectation * stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    __auto_type nodeToStop = nodeIds[0];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, nodeToStop);
+        completion();
+        [stopExpectation fulfill];
+    };
+
     // Deregister report handler for first subscriber
     __auto_type deregisterExpectation = [self expectationWithDescription:@"First subscriber deregistered"];
-    [_remoteDeviceController getConnectedDevice:nodeIds[0]
+    [_remoteDeviceController getConnectedDevice:nodeToStop
                                           queue:dispatch_get_main_queue()
                               completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                                   NSLog(@"Device acquired. Deregistering...");
@@ -1636,7 +2094,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                                        }];
                               }];
 
-    [self waitForExpectations:[NSArray arrayWithObject:deregisterExpectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ stopExpectation, deregisterExpectation ] timeout:kTimeoutInSeconds];
 
     // Inject reports
     for (int count = 0; count < 1; count++) {
@@ -1647,17 +2105,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         reportExpectations[0].inverted = YES;
         myReports = @[
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[0]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[0]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[0]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[0]
+                                                                        clusterId:clusterIds[0]
+                                                                      attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[1]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[1]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[1]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[1]
+                                                                        clusterId:clusterIds[1]
+                                                                      attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -1673,9 +2129,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [self waitForExpectations:reportExpectations timeout:kTimeoutInSeconds];
     }
 
+    // Setup stop report handler
+    stopExpectation = [self expectationWithDescription:@"Reports stopped"];
+    nodeToStop = nodeIds[1];
+    _handleStopReports = ^(id _Nullable controller, uint64_t nodeId, void (^completion)(void)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, nodeToStop);
+        completion();
+        [stopExpectation fulfill];
+    };
+
     // Deregister report handler for second subscriber
     __auto_type secondDeregisterExpectation = [self expectationWithDescription:@"Second subscriber deregistered"];
-    [_remoteDeviceController getConnectedDevice:nodeIds[1]
+    [_remoteDeviceController getConnectedDevice:nodeToStop
                                           queue:dispatch_get_main_queue()
                               completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                                   NSLog(@"Device acquired. Deregistering...");
@@ -1687,7 +2153,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }];
 
     // Wait for deregistration and disconnection
-    [self waitForExpectations:[NSArray arrayWithObjects:secondDeregisterExpectation, _xpcDisconnectExpectation, nil]
+    [self waitForExpectations:@[ secondDeregisterExpectation, _xpcDisconnectExpectation, stopExpectation ]
                       timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 
@@ -1701,17 +2167,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         reportExpectations[1].inverted = YES;
         myReports = @[
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[0]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[0]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[0]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[0]
+                                                                        clusterId:clusterIds[0]
+                                                                      attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" :
-                    [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:endpointIds[1]]
-                                                         clusterId:[NSNumber numberWithUnsignedInteger:clusterIds[1]]
-                                                       attributeId:[NSNumber numberWithUnsignedInteger:attributeIds[1]]],
+                @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:endpointIds[1]
+                                                                        clusterId:clusterIds[1]
+                                                                      attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -1767,17 +2231,58 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
-        NSLog(@"Subscribe attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        [callExpectation fulfill];
-        completion(nil);
-    };
+    _handleSubscribeAttributeCache
+        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
+              NSLog(@"Subscribe attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertNil(params);
+              [callExpectation fulfill];
+              completion(nil);
+          };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                   deviceId:myNodeId
+                                                    params:nil
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscribe completion called with error: %@", error);
+                                                    XCTAssertNil(error);
+                                                    [responseExpectation fulfill];
+                                                }];
+
+    [self waitForExpectations:@[ callExpectation, responseExpectation, self.xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testSubscribeAttributeCacheWithParamsSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    CHIPSubscribeParams * myParams = [[CHIPSubscribeParams alloc] init];
+    myParams.fabricFiltered = @YES;
+    myParams.keepPreviousSubscriptions = @YES;
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    _handleSubscribeAttributeCache
+        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
+              NSLog(@"Subscribe attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertNotNil(params);
+              XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+              XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+              [callExpectation fulfill];
+              completion(nil);
+          };
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                  deviceId:myNodeId
+                                                    params:myParams
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
                                                     NSLog(@"Subscribe completion called with error: %@", error);
@@ -1798,17 +2303,20 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
-        NSLog(@"Subscribe attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        [callExpectation fulfill];
-        completion(myError);
-    };
+    _handleSubscribeAttributeCache
+        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
+              NSLog(@"Subscribe attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertNil(params);
+              [callExpectation fulfill];
+              completion(myError);
+          };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                   deviceId:myNodeId
+                                                    params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
                                                     NSLog(@"Subscribe completion called with error: %@", error);
@@ -1823,13 +2331,13 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testReadAttributeCacheSuccess
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
-        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:[NSNumber numberWithUnsignedInteger:myEndpointId]
-                                                                clusterId:[NSNumber numberWithUnsignedInteger:myClusterId]
-                                                              attributeId:[NSNumber numberWithUnsignedInteger:myAttributeId]],
+        @"attributePath" : [CHIPAttributePath attributePathWithEndpointId:myEndpointId
+                                                                clusterId:myClusterId
+                                                              attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -1839,27 +2347,30 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
-        NSLog(@"Subscribe attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        completion(nil);
-    };
+    _handleSubscribeAttributeCache
+        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
+              NSLog(@"Subscribe attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertNil(params);
+              completion(nil);
+          };
 
-    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         NSLog(@"Read attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         [callExpectation fulfill];
         completion([CHIPDeviceController encodeXPCResponseValues:myValues], nil);
     };
 
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                   deviceId:myNodeId
+                                                    params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
                                                     NSLog(@"Subscribe completion called with error: %@", error);
@@ -1888,9 +2399,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testReadAttributeCacheFailure
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     NSError * myError = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil];
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Cache subscription complete"];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1898,27 +2409,30 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
-        NSLog(@"Subscribe attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual(nodeId, myNodeId);
-        completion(nil);
-    };
+    _handleSubscribeAttributeCache
+        = ^(id controller, uint64_t nodeId, CHIPSubscribeParams * _Nullable params, void (^completion)(NSError * _Nullable error)) {
+              NSLog(@"Subscribe attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual(nodeId, myNodeId);
+              XCTAssertNil(params);
+              completion(nil);
+          };
 
-    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
-        NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
         NSLog(@"Read attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual(nodeId, myNodeId);
-        XCTAssertEqual(endpointId, myEndpointId);
-        XCTAssertEqual(clusterId, myClusterId);
-        XCTAssertEqual(attributeId, myAttributeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         [callExpectation fulfill];
         completion(nil, myError);
     };
 
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                   deviceId:myNodeId
+                                                    params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
                                                     NSLog(@"Subscribe completion called with error: %@", error);
@@ -1946,9 +2460,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testXPCConnectionFailure
 {
     uint64_t myNodeId = 9876543210;
-    NSUInteger myEndpointId = 100;
-    NSUInteger myClusterId = 200;
-    NSUInteger myAttributeId = 300;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"Read response received"];
 
     // Test with a device controller which wouldn't connect to XPC listener successfully
@@ -1966,6 +2480,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                   [device readAttributeWithEndpointId:myEndpointId
                                                             clusterId:myClusterId
                                                           attributeId:myAttributeId
+                                                               params:nil
                                                           clientQueue:dispatch_get_main_queue()
                                                            completion:^(id _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"Read value: %@", value);

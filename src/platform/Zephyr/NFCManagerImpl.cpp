@@ -81,7 +81,7 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
 
 exit:
     if (error != CHIP_NO_ERROR)
-        ChipLogProgress(DeviceLayer, "Starting NFC Tag emulation failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "Starting NFC Tag emulation failed: %s", chip::ErrorStr(error));
     return error;
 }
 

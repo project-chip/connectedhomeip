@@ -199,6 +199,29 @@ class BaseTestHelper:
         self.logger.info(f"Found device at {res}")
         return res
 
+    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        if self.devCtrl.EstablishPASESessionIP(
+                ip.encode("utf-8"), setuppin, nodeid) is not None:
+            self.logger.info(
+                "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+            return False
+        self.logger.info(
+            "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        return True
+
+    def TestCommissionOnly(self, nodeid: int):
+        self.logger.info(
+            "Commissioning device with id {}".format(nodeid))
+        if not self.devCtrl.Commission(nodeid):
+            self.logger.info(
+                "Failed to commission device with id {}".format(str(nodeid)))
+            return False
+        self.logger.info(
+            "Successfully commissioned device with id {}".format(str(nodeid)))
+        return True
+
     def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
             "Conducting key exchange with device {}".format(discriminator))

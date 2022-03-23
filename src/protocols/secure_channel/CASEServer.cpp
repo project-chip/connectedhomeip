@@ -114,7 +114,7 @@ void CASEServer::Cleanup()
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    ChipLogProgress(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
+    ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
     mSessionIDAllocator.Free(mSessionKeyId);
     Cleanup();
 }

@@ -1500,77 +1500,28 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_TAG_NOT_FOUND                           CHIP_CORE_ERROR(0x76)
 
-/**
- *  @def CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE
- *
- *  @brief
- *    A token pairing bundle is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE                  CHIP_CORE_ERROR(0x77)
+// unused CHIP_CORE_ERROR(0x77)
+
+// unused CHIP_CORE_ERROR(0x78)
+
+// unused CHIP_CORE_ERROR(0x79)
+
+// unused CHIP_CORE_ERROR(0x7a)
+
+// unused CHIP_CORE_ERROR(0x7b)
+
+// unused CHIP_CORE_ERROR(0x7c)
+
+// unused CHIP_CORE_ERROR(0x7d)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION
+ *  @def CHIP_ERROR_FABRIC_EXISTS
  *
  *  @brief
- *    A token pairing bundle is invalid.
+ *    The fabric with the given fabric id and root public key already exists.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION      CHIP_CORE_ERROR(0x78)
-
-/**
- *  @def CHIP_ERROR_NO_TAKE_AUTH_DELEGATE
- *
- *  @brief
- *    No TAKE authentication delegate is set.
- *
- */
-#define CHIP_ERROR_NO_TAKE_AUTH_DELEGATE                       CHIP_CORE_ERROR(0x79)
-
-/**
- *  @def CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED
- *
- *  @brief
- *    TAKE requires a reconfigure.
- *
- */
-#define CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED                   CHIP_CORE_ERROR(0x7a)
-
-/**
- *  @def CHIP_ERROR_TAKE_REAUTH_POSSIBLE
- *
- *  @brief
- *    TAKE can do a reauthentication.
- *
- */
-#define CHIP_ERROR_TAKE_REAUTH_POSSIBLE                        CHIP_CORE_ERROR(0x7b)
-
-/**
- *  @def CHIP_ERROR_INVALID_TAKE_PARAMETER
- *
- *  @brief
- *    Received an invalid TAKE parameter.
- *
- */
-#define CHIP_ERROR_INVALID_TAKE_PARAMETER                      CHIP_CORE_ERROR(0x7c)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION
- *
- *  @brief
- *    This configuration is not supported by TAKE.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION              CHIP_CORE_ERROR(0x7d)
-
-/**
- *  @def CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED
- *
- *  @brief
- *    The TAKE Token Identification failed.
- *
- */
-#define CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED            CHIP_CORE_ERROR(0x7e)
+#define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
 /**
  *  @def CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER
