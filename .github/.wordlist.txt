@@ -1437,3 +1437,4 @@ UTF
 localedef
 nameserver
 nmcli
+tsan
