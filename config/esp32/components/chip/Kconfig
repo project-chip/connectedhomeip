@@ -506,6 +506,18 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "CHIP Thread Options"
+        visible if OPENTHREAD_ENABLED
+
+        config THREAD_TASK_STACK_SIZE
+            int "Thread task stack size"
+            default 5120
+            depends on OPENTHREAD_ENABLED
+            help
+                Stack size of Thread task.
+
+    endmenu
+
     menu "CHIP Trait Manager"
 
         config ENABLE_TRAIT_MANAGER

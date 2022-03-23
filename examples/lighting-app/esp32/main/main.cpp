@@ -31,6 +31,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -56,10 +57,11 @@ LEDWidget AppLED;
 static const char * TAG = "light-app";
 
 static DeviceCallbacks EchoCallbacks;
-
 namespace {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#endif
 } // namespace
 
 static void InitOTARequestor(void)
@@ -83,8 +85,17 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
+        (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
+    {
+        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
+        chip::app::DnssdServer::Instance().StartServer();
+    }
+#endif
 }
 
 extern "C" void app_main()
@@ -113,7 +124,18 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize Thread stack");
+        return;
+    }
+    if (ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to launch Thread task");
+        return;
+    }
+#endif
     AppLED.Init();
 
     InitOTARequestor();

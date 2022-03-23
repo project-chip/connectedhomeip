@@ -78,10 +78,12 @@ static_library("ESP32") {
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
-      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
-      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      "OpenthreadConfig.h",
+      "OpenthreadLauncher.c",
+      "OpenthreadLauncher.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
   }
 }
