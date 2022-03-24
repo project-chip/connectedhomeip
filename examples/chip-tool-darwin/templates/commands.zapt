@@ -235,7 +235,9 @@ public:
                                             params:params
                                 subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
-        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+        if (error || !mWait){
+            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+        }
          }];
 
         return CHIP_NO_ERROR;
