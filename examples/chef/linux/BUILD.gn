@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 import("sample.gni")
 
 assert(chip_build_tools)
@@ -34,12 +34,12 @@ executable("${sample_name}") {
   sources = [ "${project_dir}/linux/main.cpp" ]
 
   deps = [
+    ":chef-data-model",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/controller",
     "${project_dir}/shell_common:shell_common",
-    ":chef-data-model",
   ]
 
   cflags = [ "-Wconversion" ]
