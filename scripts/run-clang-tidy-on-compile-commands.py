@@ -73,13 +73,14 @@ class ClangTidyEntry:
 
         command = json_entry["command"]
 
-        compiler = os.path.basename(command.split(' ')[0])
+        command_items = shlex.split(command)
+        compiler = os.path.basename(command_items[0])
 
         # Allow gcc/g++ invocations to also be tidied - arguments should be
-        # compatible and on darwin, gcc/g++ is actually a symlink to clang
+        # compatible and on darwin gcc/g++ is actually a symlink to clang
         if compiler in ['clang++', 'clang', 'gcc', 'g++']:
             self.valid = True
-            self.clang_arguments = shlex.split(command[command.find(" "):])
+            self.clang_arguments = command_items[1:]
         else:
             logging.warning(
                 "Cannot tidy %s - not a clang compile command", self.file)
