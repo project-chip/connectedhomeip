@@ -247,7 +247,7 @@ class TestDefinition:
 
             runner.RunSubprocess(
                 tool_cmd + ['tests', self.run_name] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] + 
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] +
                 ['--PICS', pics_file],
                 name='TEST', dependencies=[apps_register])
 
