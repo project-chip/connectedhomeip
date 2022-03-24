@@ -637,19 +637,21 @@ constexpr AttributeIdWithEndpointId AttrOnEp1 = AttributeIdWithEndpointId(kTestE
 template <AttributeId id>
 constexpr AttributeIdWithEndpointId AttrOnEp5 = AttributeIdWithEndpointId(kTestEndpointId5, id);
 
-template <AttributeId id, uint8_t val>
-void WriteAttrOnEndpoint5()
+template <AttributeIdWithEndpointId attr, uint8_t val>
+void WriteAttr()
 {
-    gMutableAttrAccess.SetVal(id, val);
+    static_assert(attr.first == kTestEndpointId5, "Only TestCluster on endpoint 5 is mutable.");
+    gMutableAttrAccess.SetVal(attr.second, val);
 }
 
-template <AttributeId id>
-void TouchAttrOnEndpoint1()
+template <AttributeIdWithEndpointId attr>
+void TouchAttr()
 {
+    static_assert(attr.first == kTestEndpointId, "Only TestCluster on endpoint 1 can be accessed by TouchAttr.");
     app::ClusterInfo path;
-    path.mEndpointId  = kTestEndpointId;
+    path.mEndpointId  = attr.first;
     path.mClusterId   = TestCluster::Id;
-    path.mAttributeId = 1;
+    path.mAttributeId = attr.second;
     gIterationCount++;
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
 }
@@ -666,9 +668,13 @@ using AttributesList     = std::vector<AttributeIdWithEndpointId>;
 
 struct Instruction
 {
+    // The maximum number of attributes should be iterated in a single report chunk.
     uint32_t chunksize;
+    // A list of functions that will be executed before driving the main loop.
     std::vector<std::function<void()>> preworks;
+    // A list of pair for attributes and their expected values in the report.
     std::vector<AttributeWithValue> expectedValues;
+    // A list of list of various attributes which should have the same data version in the report.
     std::vector<AttributesList> attributesWithSameDataVersion;
 };
 
@@ -765,7 +771,8 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
         readParams.mMinIntervalFloorSeconds     = 0;
         readParams.mMaxIntervalCeilingSeconds   = 2;
 
-        //// TEST 1 -- Read using wildcard paths
+        // TEST 1 -- Read using wildcard paths
+        ChipLogProgress(DataManagement, "Test 1: Read using wildcard paths.");
         {
             TestMutableReadCallback readCallback;
 
@@ -776,46 +783,59 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
 
             NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-            // When the report engine starts to report attributes in endpoint 5, mark cluster 1 as dirty.
-            // The report engine should NOT include it in initial report to reduce traffic.
-            // We are expected to miss attributes on kTestEndpointId during initial reports.
-            ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
-            readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttrOnEndpoint1<Attr1>;
-            DriveIOUntilSubscriptionEstablished(&readCallback);
-            CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
+            // CASE 1 -- Touch an attribute during priming report, then verify it is included in first report after priming report.
+            {
+                // When the report engine starts to report attributes in endpoint 5, mark cluster 1 as dirty.
+                // The report engine should NOT include it in initial report to reduce traffic.
+                // We are expected to miss attributes on kTestEndpointId during initial reports.
+                ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
+                readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttr<AttrOnEp1<Attr1>>;
+                DriveIOUntilSubscriptionEstablished(&readCallback);
+                CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
 
-            ChipLogProgress(DataManagement, "Case 1-1: Check for attributes missed last report.");
-            DoTest(&readCallback, { .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+                ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
+                DoTest(&readCallback, { .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+            }
 
-            ChipLogProgress(DataManagement, "Case 1-2: Set dirty during chunked report by wildcard path.");
-            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOnEndpoint5<Attr3, 3>;
-            DoTest(&readCallback,
-                   { .chunksize = 2,
-                     .preworks = { WriteAttrOnEndpoint5<Attr1, 2>, WriteAttrOnEndpoint5<Attr2, 2>, WriteAttrOnEndpoint5<Attr3, 2> },
-                     .expectedValues                = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
-                     .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+            // CASE 2 -- Set dirty during chunked report, the attribute is already dirty.
+            {
+                ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 3>;
+                DoTest(&readCallback,
+                       { .chunksize      = 2,
+                         .preworks       = { WriteAttr<AttrOnEp5<Attr1>, 2>, WriteAttr<AttrOnEp5<Attr2>, 2>,
+                                       WriteAttr<AttrOnEp5<Attr3>, 2> },
+                         .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
+                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+            }
 
-            ChipLogProgress(DataManagement, "Case 1-3: Set dirty during chunked report by wildcard path -- new dirty attribute.");
+            // CASE 3 -- Set dirty during chunked report, the attribute is not dirty, and it may catch / missed the current report.
+            {
+                ChipLogProgress(DataManagement,
+                                "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 4>;
+                DoTest(&readCallback,
+                       { .chunksize      = 1,
+                         .preworks       = { WriteAttr<AttrOnEp5<Attr1>, 4>, WriteAttr<AttrOnEp5<Attr2>, 4> },
+                         .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
+                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
 
-            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOnEndpoint5<Attr3, 4>;
-            DoTest(&readCallback,
-                   { .chunksize                     = 1,
-                     .preworks                      = { WriteAttrOnEndpoint5<Attr1, 4>, WriteAttrOnEndpoint5<Attr2, 4> },
-                     .expectedValues                = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
-                     .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
-
-            ChipLogProgress(DataManagement, "Case 1-4: Set dirty during chunked report by wildcard path -- new dirty attribute.");
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
-            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOnEndpoint5<Attr1, 5>;
-            DoTest(&readCallback,
-                   { .chunksize                     = 1,
-                     .preworks                      = { WriteAttrOnEndpoint5<Attr2, 5>, WriteAttrOnEndpoint5<Attr3, 5> },
-                     .expectedValues                = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
-                     .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+                ChipLogProgress(DataManagement,
+                                "Case 3-2: Set dirty during chunked report by wildcard path -- new dirty attribute.");
+                app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr1>, 5>;
+                DoTest(&readCallback,
+                       { .chunksize      = 1,
+                         .preworks       = { WriteAttr<AttrOnEp5<Attr2>, 5>, WriteAttr<AttrOnEp5<Attr3>, 5> },
+                         .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
+                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+            }
         }
     }
     // The read client is destructed, server will shutdown the corresponding subscription later.
 
+    // TEST 2 -- Read using concrete paths.
+    ChipLogProgress(DataManagement, "Test 2: Read using concrete paths.");
     {
         app::AttributePathParams attributePath[3];
         app::ReadPrepareParams readParams(sessionHandle);
@@ -830,7 +850,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
         readParams.mMaxIntervalCeilingSeconds   = 2;
         gMutableAttrAccess.Reset();
 
-        //// TEST 2 -- Read using concrete paths
+        // CASE 1 -- Touch an attribute during priming report, then verify it is included in first report after priming report.
         {
             TestMutableReadCallback readCallback;
 
@@ -843,15 +863,15 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
 
             // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
             // In this case, we won't reset the path iterator.
-            ChipLogProgress(DataManagement, "Case 2-1: Test set dirty during reports generated by concrete paths.");
-            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOnEndpoint5<Attr3, 4>;
+            ChipLogProgress(DataManagement, "Case 1-1: Test set dirty during reports generated by concrete paths.");
+            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 4>;
             DoTest(&readCallback,
                    { .chunksize = 1,
-                     .preworks = { WriteAttrOnEndpoint5<Attr1, 3>, WriteAttrOnEndpoint5<Attr2, 3>, WriteAttrOnEndpoint5<Attr3, 3> },
+                     .preworks = { WriteAttr<AttrOnEp5<Attr1>, 3>, WriteAttr<AttrOnEp5<Attr2>, 3>, WriteAttr<AttrOnEp5<Attr3>, 3> },
                      .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.
-            ChipLogProgress(DataManagement, "Case 2-1: Check for attributes missed last report.");
+            ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
             DoTest(&readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
         }
     }
