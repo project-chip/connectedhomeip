@@ -661,6 +661,12 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }

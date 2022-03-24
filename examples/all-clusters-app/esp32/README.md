@@ -148,18 +148,14 @@ that are currently supported include `ESP32-DevKitC` (default),
 
 ## Commissioning and cluster control
 
-Commissioning can be carried out using WiFi, BLE or Bypass.
+Commissioning can be carried out using WiFi or BLE.
 
 1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
     Rendezvous mode is BLE.
 
          $ idf.py menuconfig
 
-Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
-ByPass then set the credentials of the WiFi Network (i.e. SSID and Password from
-menuconfig).
-
-`idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`.
 
 NOTE: to avoid build error
 `undefined reference to 'chip::DevelopmentCerts::kDacPublicKey'`, set VID to

@@ -122,8 +122,8 @@ void CustomOTARequestorDriver::UpdateDownloaded()
     }
     else
     {
-        // Cancelling will put the state back to idle
-        gRequestorCore.CancelImageUpdate();
+        // Reset to put the state back to idle to allow the next OTA update to occur
+        gRequestorCore.Reset();
     }
 }
 

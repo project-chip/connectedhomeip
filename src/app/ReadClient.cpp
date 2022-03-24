@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
+#include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 

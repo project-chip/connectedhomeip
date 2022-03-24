@@ -77,6 +77,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
     err = CHIP_NO_ERROR;
 
+exit:
     return err;
 }
 

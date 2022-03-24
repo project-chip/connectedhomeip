@@ -509,15 +509,6 @@ FabricTable::~FabricTable()
     }
 }
 
-void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
-{
-    FabricInfo * fabric = FindFabricWithIndex(fabricIndex);
-    if (fabric != nullptr)
-    {
-        fabric->Reset();
-    }
-}
-
 FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
@@ -750,7 +741,9 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     }
     ReturnErrorOnFailure(err);
 
-    ReleaseFabricIndex(index);
+    // Since fabricIsInitialized was true, fabric is not null.
+    fabric->Reset();
+
     if (mDelegate != nullptr)
     {
         if (mFabricCount == 0)

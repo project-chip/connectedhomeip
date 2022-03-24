@@ -41,10 +41,18 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
+    CHIP_ERROR err;
+
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CC13X2_26X2Config::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
+    err = CC13X2_26X2Config::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)

@@ -234,7 +234,6 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
-    'TestModeSelectCluster',
     'TestBinding',
   ];
 

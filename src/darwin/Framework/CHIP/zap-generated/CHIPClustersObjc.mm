@@ -26927,6 +26927,29 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ModeSelect::Attributes::StartUpMode::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)subscribeAttributeStartUpModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
@@ -29802,10 +29825,10 @@ using namespace chip::app::Clusters;
 - (void)readAttributeStartUpOnOffWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPNullableInt8uAttributeCallbackBridge(
+    new CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
-            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -29826,7 +29849,7 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.unsignedCharValue;
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -29840,7 +29863,7 @@ using namespace chip::app::Clusters;
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPNullableInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -29848,11 +29871,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
-            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPNullableInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -29865,23 +29888,24 @@ using namespace chip::app::Clusters;
                                   completionHandler:
                                       (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPNullableInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        if (attributeCacheContainer.cppAttributeCache) {
-            chip::app::ConcreteAttributePath path;
-            using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
-            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-            path.mClusterId = TypeInfo::GetClusterId();
-            path.mAttributeId = TypeInfo::GetAttributeId();
-            TypeInfo::DecodableType value;
-            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
-            if (err == CHIP_NO_ERROR) {
-                successFn->mCall(successFn->mContext, value);
+    new CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(
+        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            if (attributeCacheContainer.cppAttributeCache) {
+                chip::app::ConcreteAttributePath path;
+                using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
+                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+                path.mClusterId = TypeInfo::GetClusterId();
+                path.mAttributeId = TypeInfo::GetAttributeId();
+                TypeInfo::DecodableType value;
+                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+                auto successFn = Callback<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>::FromCancelable(success);
+                if (err == CHIP_NO_ERROR) {
+                    successFn->mCall(successFn->mContext, value);
+                }
+                return err;
             }
-            return err;
-        }
-        return CHIP_ERROR_NOT_FOUND;
-    });
+            return CHIP_ERROR_NOT_FOUND;
+        });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
