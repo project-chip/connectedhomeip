@@ -38,8 +38,8 @@
 
 /* Platform include headers */
 #if CHIP_HAVE_CONFIG_H
-#include <system/SystemBuildConfig.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <system/SystemBuildConfig.h>
 #endif
 
 /* Include a CHIP project-specific configuration file, if defined.
