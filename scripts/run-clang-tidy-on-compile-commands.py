@@ -59,7 +59,7 @@ class ClangTidyEntry:
     on a compile_commands.json item.
     """
 
-    def __init__(self, json_entry):
+    def __init__(self, json_entry, gcc_sysroot=None):
         # Entries in compile_commands:
         #    - "directory": location to run the compile
         #    - "file": a relative path to directory
@@ -86,13 +86,8 @@ class ClangTidyEntry:
                 "Cannot tidy %s - not a clang compile command", self.file)
             return
 
-        if compiler in ['gcc', 'g++'] and sys.platform == 'darwin':
-          # Darwin gcc invocation will auto select a system root, howeve clang requires an explicit path since
-          # we are using the built-in pigweed clang-tidy.
-          #
-          # TODO: this should be actually inferred, however I am not clear how
-          sysroot = '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
-          self.clang_arguments.insert(0, '--sysroot='+sysroot)
+        if compiler in ['gcc', 'g++'] and gcc_sysroot:
+          self.clang_arguments.insert(0, '--sysroot='+gcc_sysroot)
 
 
     @property
@@ -157,18 +152,43 @@ class TidyState:
             logging.error("Failed to process %s", path)
 
 
+def find_darwin_gcc_sysroot():
+  for line in subprocess.check_output('xcodebuild -sdk -version'.split()).decode('utf8').split('\n'):
+    if not line.startswith('Path: '):
+      continue
+    path = line[line.find(': ')+2:]
+    if not '/MacOSX.platform/' in path:
+      continue
+    logging.info("Found %s" % path)
+    return path
+
+  # A hard-coded value that works on default installations
+  logging.warning("Using default platform sdk path. This may be incorrect.")
+  return '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
+
+
 class ClangTidyRunner:
     """Handles running clang-tidy"""
 
     def __init__(self):
         self.entries = []
         self.state = TidyState()
+        self.gcc_sysroot = None
+
+        if sys.platform == 'darwin':
+          # Darwin gcc invocation will auto select a system root, howeve clang requires an explicit path since
+          # we are using the built-in pigweed clang-tidy.
+          logging.info('Searching for a MacOS system root for gcc invocations...');
+          self.gcc_sysroot = find_darwin_gcc_sysroot()
+          logging.info('  Chose: %s' % self.gcc_sysroot);
+
+
 
     def AddDatabase(self, compile_commands_json):
         database = json.load(open(compile_commands_json))
 
         for entry in database:
-            item = ClangTidyEntry(entry)
+            item = ClangTidyEntry(entry, self.gcc_sysroot)
             if not item.valid:
                 continue
 
