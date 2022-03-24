@@ -168,7 +168,7 @@ jobs:
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
             - name: Clang-tidy validation
-              timeout-minutes: 20
+              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
@@ -351,7 +351,7 @@ jobs:
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
             - name: Clang-tidy validation
-              timeout-minutes: 20
+              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
