@@ -60,10 +60,10 @@ public:
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
     /// Sets the factory-new state commissionable node discovery timeout
-    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
+    void SetDiscoveryTimeoutSecs(int32_t secs) { mDiscoveryTimeoutSecs = secs; }
 
     /// Gets the factory-new state commissionable node discovery timeout
-    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
+    int32_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
 
     //
     // Override the referenced fabric table from the default that is present
@@ -88,7 +88,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
-    void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
+    void SetExtendedDiscoveryTimeoutSecs(int32_t secs);
 
     /// Callback from Extended Discovery Expiration timer
     /// Checks if extended discovery has expired and if so,
@@ -165,7 +165,7 @@ private:
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();
-    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
+    int32_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
     System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
 
     /// return true if expirationMs is valid (not cleared and not in the future)
@@ -173,7 +173,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// get the current extended discovery timeout (from persistent storage)
-    int16_t GetExtendedDiscoveryTimeoutSecs();
+    int32_t GetExtendedDiscoveryTimeoutSecs();
 
     /// schedule next extended discovery expiration
     CHIP_ERROR ScheduleExtendedDiscoveryExpiration();
