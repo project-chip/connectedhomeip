@@ -198,12 +198,17 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 
 Inet::IPAddressType MapAddressType(mdns_ip_protocol_t ip_protocol)
 {
-    if (ip_protocol == MDNS_IP_PROTOCOL_V4)
+    switch (ip_protocol)
+    {
+#if INET_CONFIG_ENABLE_IPV4
+    case MDNS_IP_PROTOCOL_V4:
         return Inet::IPAddressType::kIPv4;
-    else if (ip_protocol == MDNS_IP_PROTOCOL_V6)
+#endif
+    case MDNS_IP_PROTOCOL_V6:
         return Inet::IPAddressType::kIPv6;
-    else
+    default:
         return Inet::IPAddressType::kAny;
+    }
 }
 
 TextEntry * GetTextEntry(mdns_txt_item_t * txt_array, uint8_t * txt_value_len, size_t txt_count)
