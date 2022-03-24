@@ -138,6 +138,8 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
+    const DeviceControllerSystemState * GetSystemState() { return mSystemState; }
+
     class ControllerFabricDelegate final : public FabricTableDelegate
     {
     public:
