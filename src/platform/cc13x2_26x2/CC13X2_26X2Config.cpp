@@ -212,6 +212,7 @@ CHIP_ERROR CC13X2_26X2Config::ReadKVS(const char * key, void * value, size_t val
     NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
     uint16_t subID;
     size_t len;
+    uint16_t read_len;
 
     VerifyOrExit(FindKVSSubID(key, subID) == NVINTF_SUCCESS, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
@@ -220,19 +221,22 @@ CHIP_ERROR CC13X2_26X2Config::ReadKVS(const char * key, void * value, size_t val
     len = sNvoctpFps.getItemLen(val_item);
     VerifyOrExit(len > 0, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // key not found
 
-    VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, (uint16_t) value_size, value) == NVINTF_SUCCESS,
+    if ((offset_bytes + value_size) > len)
+    {
+        // trying to read up to the end of the element
+        read_len = len - offset_bytes;
+    }
+    else
+    {
+        read_len = value_size;
+    }
+
+    VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, read_len, value) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     if (read_bytes_size)
     {
-        if (len - offset_bytes > value_size)
-        {
-            *read_bytes_size = value_size;
-        }
-        else
-        {
-            *read_bytes_size = len - offset_bytes;
-        }
+        *read_bytes_size = read_len;
     }
 
 exit:

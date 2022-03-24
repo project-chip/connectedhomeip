@@ -36,6 +36,7 @@
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/java/AndroidClusterExceptions.h>
+#include <credentials/CHIPCert.h>
 #include <jni.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -58,6 +59,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
@@ -65,8 +67,7 @@ using namespace chip::Controller;
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
 static void * IOThreadMain(void * arg);
-static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray pakeVerifier,
-                                         jobject & outParams);
+static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
 static CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobject & outLocation);
 static CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue);
 static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
@@ -159,9 +160,9 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     ChipLogProgress(Controller, "newDeviceController() called");
     std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
         new chip::Controller::AndroidOperationalCredentialsIssuer());
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
-                                                          DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(),
-                                                          std::move(opCredsIssuer), &err);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, chip::kUndefinedCATs,
+                                                          &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
+                                                          DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -336,6 +337,40 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     }
 }
 
+JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
+(JNIEnv * env, jobject self, jbyteArray x509Cert)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    uint32_t allocatedCertLength = chip::Credentials::kMaxCHIPCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outJbytes = nullptr;
+    JniByteArray x509CertBytes(env, x509Cert);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
+
+        err = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes.byteSpan(), outBytes);
+        SuccessOrExit(err);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), outBytes.size(), outJbytes);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to convert X509 cert to CHIP cert. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outJbytes;
+}
+
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -463,6 +498,29 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 
     addr.ToString(addrStr);
     return env->NewStringUTF(addrStr);
+}
+
+JNI_METHOD(jlong, generateCompressedFabricId)
+(JNIEnv * env, jobject self, jbyteArray rcac, jbyteArray noc)
+{
+    chip::DeviceLayer::StackLock lock;
+    CompressedFabricId compressedFabricId;
+    FabricId fabricId;
+    NodeId nodeId;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::JniByteArray jniRcac(env, rcac);
+    chip::JniByteArray jniNoc(env, noc);
+    err = ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(jniRcac.byteSpan(), jniNoc.byteSpan(), compressedFabricId, fabricId,
+                                                             nodeId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to extract compressed fabric ID.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return static_cast<jlong>(compressedFabricId);
 }
 
 JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
@@ -633,7 +691,6 @@ JNI_METHOD(jobject, computePaseVerifier)
     CHIP_ERROR err = CHIP_NO_ERROR;
     jobject params;
     jbyteArray verifierBytes;
-    PasscodeId passcodeId;
     Spake2pVerifier verifier;
     Spake2pVerifierSerialized serializedVerifier;
     MutableByteSpan serializedVerifierSpan(serializedVerifier);
@@ -642,7 +699,7 @@ JNI_METHOD(jobject, computePaseVerifier)
     ChipLogProgress(Controller, "computePaseVerifier() called");
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
+    err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier);
     SuccessOrExit(err);
 
     err = verifier.Serialize(serializedVerifierSpan);
@@ -651,7 +708,7 @@ JNI_METHOD(jobject, computePaseVerifier)
     err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, kSpake2p_VerifierSerialized_Length, verifierBytes);
     SuccessOrExit(err);
 
-    err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);
+    err = N2J_PaseVerifierParams(env, setupPincode, verifierBytes, params);
     SuccessOrExit(err);
     return params;
 exit:
@@ -873,7 +930,7 @@ void * IOThreadMain(void * arg)
     return NULL;
 }
 
-CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray paseVerifier, jobject & outParams)
+CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray paseVerifier, jobject & outParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID constructor;
@@ -887,7 +944,7 @@ CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcod
     constructor = env->GetMethodID(paramsClass, "<init>", "(JI[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, passcodeId, paseVerifier);
+    outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, paseVerifier);
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:

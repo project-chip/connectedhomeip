@@ -24,7 +24,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}}{{additionalArguments}});
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -53,15 +53,11 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
     {{#chip_tests_item_parameters}}
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
     {{/chip_tests_item_parameters}}
-    {{#if_is_fabric_scoped_struct attributeObject.type}}
-    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
     params.fabricFiltered = [NSNumber numberWithBool:{{fabricFiltered}}];
-    {{/if_is_fabric_scoped_struct}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:@(minIntervalArgument)
                                                                  maxInterval:@(maxIntervalArgument)
-          {{#if_is_fabric_scoped_struct attributeObject.type}}
                                                                       params:params
-          {{/if_is_fabric_scoped_struct}}
                                                      subscriptionEstablished:^{
         XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
         [expectation fulfill];

@@ -1205,17 +1205,6 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
- *
- * @brief Define the size of the pool used for tracking CHIP groups.
- *        Given the ephemeral nature of groups session, no need to support
- *        a large pool size.
- */
-#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 4
-#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-
-/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -1341,7 +1330,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  */
 #ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
-#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 0
 #endif
 /**
  *  @name Interaction Model object pool configuration.

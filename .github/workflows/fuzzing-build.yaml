@@ -31,19 +31,23 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.58
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - run: apt-get update
             - run: apt-get install --fix-missing llvm-10 clang-10
-            - name:
-                  Try to ensure the objdir-clone dir exists
+            - name: Try to ensure the objdir-clone dir exists
               run: |
                   mkdir objdir-clone || true
             - name: Bootstrap
@@ -55,8 +59,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build all-clusters-app
               timeout-minutes: 20
               run: |
@@ -70,8 +74,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name:
-                      objdir-linux
+                  name: objdir-linux
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -83,10 +86,15 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Setup Environment
               run: brew install openssl pkg-config llvm
             - name: Try to ensure the objdir-clone dir exists
@@ -109,14 +117,14 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build all-clusters-app
               timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-all-clusters-no-ble-asan-libfuzzer \
+                        --target darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -124,8 +132,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name:
-                      crash-darwin
+                  name: crash-darwin
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

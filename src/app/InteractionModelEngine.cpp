@@ -175,6 +175,24 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
+{
+    //
+    // Walk through all existing subscriptions and shut down those whose subscriber matches
+    // that which just came in.
+    //
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
+            mReadHandlers.ReleaseObject(handler);
+        }
+
+        return Loop::Continue;
+    });
+}
+
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
@@ -297,7 +315,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
         !HasActiveRead())
     {
-        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        ChipLogDetail(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
         return CHIP_NO_ERROR;
     }
@@ -456,8 +474,8 @@ exit:
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(ec));
+    ChipLogError(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(ec));
 }
 
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
@@ -522,6 +540,22 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
         pListItem = pListItem->GetNextClient();
     }
 
+    return false;
+}
+
+bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath)
+{
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (writeHandler.IsFree() || &writeHandler == apWriteHandler)
+        {
+            continue;
+        }
+        if (writeHandler.IsCurrentlyProcessingWritePath(aPath))
+        {
+            return true;
+        }
+    }
     return false;
 }
 

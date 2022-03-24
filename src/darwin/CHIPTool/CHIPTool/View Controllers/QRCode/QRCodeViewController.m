@@ -479,10 +479,20 @@
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_deviceList refreshDeviceList];
-            [self retrieveAndSendWiFiCredentials];
-        });
+        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        uint64_t deviceId = CHIPGetLastPairedDeviceId();
+        if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self->_deviceList refreshDeviceList];
+                [self retrieveAndSendWiFiCredentials];
+            });
+        } else {
+            CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+            NSError * error;
+            if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
+                NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
+            }
+        }
     }
 }
 
@@ -788,10 +798,18 @@
     return peripheralFullName;
 }
 
+- (void)_restartMatterStack
+{
+    CHIPRestartController(self.chipController);
+}
+
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+
+    // restart the Matter Stack before pairing (for reliability + testing restarts)
+    [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;

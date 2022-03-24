@@ -143,6 +143,7 @@ limitations under the License.
     <item name="Down" value="0x1"/>
   </enum>
   <enum name="ThermostatControlSequence" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="coolingOnly" value="0x0"/>
     <item name="coolingWithReheat" value="0x1"/>
     <item name="heatingOnly" value="0x2"/>
@@ -151,6 +152,7 @@ limitations under the License.
     <item name="coolingAndHeatingWithReheat" value="0x5"/>
   </enum>
   <enum name="ThermostatSystemMode" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="off" value="0x0"/>
     <item name="auto" value="0x1"/>
     <item name="cool" value="0x3"/>
@@ -662,6 +664,7 @@ limitations under the License.
     <item name="IdDeleted" value="0x06"/>
   </enum>
   <enum name="ThermostatRunningMode" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
     <item name="Cool" value="0x03"/>
     <item name="Heat" value="0x04"/>
@@ -810,7 +813,6 @@ limitations under the License.
     <item name="SetToOn" value="0x01"/>
     <item name="SetToToggle" value="0x02"/>
     <!-- 0x03-0xFF reserved -->
-    <item name="SetToPrevious" value="0xFF"/>
   </enum>
   <enum name="LevelControlOptions" type="BITMAP8">
     <item name="ExecuteIfOff" value="0x1"/>

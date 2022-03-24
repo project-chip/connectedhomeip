@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
+#include <trace/trace.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -131,13 +132,30 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
-
+    MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
+    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+
+    /*
+     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+
+    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+
+    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
+    {
+        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                     Failure);
+        response.errorCode = CommissioningError::kOk;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
+    else
+    {
+        response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
 
     return true;
 }
@@ -146,6 +164,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
+    MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
     /*
@@ -159,7 +178,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
@@ -169,6 +187,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
+    MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
     CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
@@ -176,7 +195,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;

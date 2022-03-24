@@ -33,6 +33,8 @@ using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::Controller::CommandResponseFailureCallback;
 using chip::Controller::CommandResponseSuccessCallback;
 
+using BindingListType = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::Type;
+
 namespace chip {
 namespace AppPlatform {
 
@@ -119,23 +121,20 @@ public:
 
     /**
      * @brief
-     *   Add a binding.
+     *   Add ACLs on this device for the given client,
+     *   and create bindings on the given client so that it knows what it has access to.
      *
-     * @param[in] device             OperationalDeviceProxy for the target device.
-     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
-     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
-     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
-     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
-     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
+     * @param[in] targetDeviceProxy  OperationalDeviceProxy for the target device.
+     * @param[in] targetVendorId     Vendor ID for the target device.
+     * @param[in] localNodeId        The NodeId for the local device.
      * @param[in] successCb          The function to be called on success of adding the binding.
      * @param[in] failureCb          The function to be called on failure of adding the binding.
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId, NodeId bindingNodeId,
-                                         GroupId bindingGroupId, EndpointId bindingEndpointId, ClusterId bindingClusterId,
-                                         Controller::WriteResponseSuccessCallback successCb,
-                                         Controller::WriteResponseFailureCallback failureCb);
+    CHIP_ERROR ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId, NodeId localNodeId,
+                                  Controller::WriteResponseSuccessCallback successCb,
+                                  Controller::WriteResponseFailureCallback failureCb);
 
 protected:
     // requires vendorApp to be in the catalog of the platform

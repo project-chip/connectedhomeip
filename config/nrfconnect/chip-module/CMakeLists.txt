@@ -30,6 +30,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
+include(ota-content-header.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants
@@ -62,8 +63,8 @@ macro(chip_gn_arg_string ARG STRING)
     string(APPEND CHIP_GN_ARGS "--arg-string\n${ARG}\n${STRING}\n")
 endmacro()
 
-macro(chip_gn_arg_bool ARG BOOLEAN)
-    if (${BOOLEAN})
+macro(chip_gn_arg_bool ARG)
+    if (${ARGN})
         string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\ntrue\n")
     else()
         string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\nfalse\n")
@@ -213,6 +214,10 @@ chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
+chip_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
+chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
+chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
+chip_gn_arg_bool  ("chip_automation_logging"                "false")
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
@@ -291,6 +296,7 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/third_party/nlio/repo/include
     ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
@@ -308,11 +314,32 @@ add_dependencies(chip chip-gn)
 # ==============================================================================
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/app_update.bin
-        OUTPUT_FILE ${PROJECT_BINARY_DIR}/matter_ota.bin
+    if (CONFIG_CHIP_OTA_IMAGE_INCLUDE_MCUBOOT)
+        list(APPEND CHIP_IMAGE_TYPES "mcuboot")
+        list(APPEND CHIP_IMAGE_PATHS "${APPLICATION_BINARY_DIR}/mcuboot/zephyr/zephyr.bin")
+    endif()
+
+    list(APPEND CHIP_IMAGE_TYPES "app_mcuboot")
+    list(APPEND CHIP_IMAGE_PATHS "${PROJECT_BINARY_DIR}/app_update.bin")
+
+    if (CONFIG_NRF53_UPGRADE_NETWORK_CORE)
+        list(APPEND CHIP_IMAGE_TYPES "net_mcuboot")
+        list(APPEND CHIP_IMAGE_PATHS "${PROJECT_BINARY_DIR}/net_core_app_update.bin")
+    endif()
+
+    chip_ota_content_header(chip-ota-content-header
+        FILE_TYPES ${CHIP_IMAGE_TYPES}
+        FILE_PATHS ${CHIP_IMAGE_PATHS}
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}.content
     )
-    add_dependencies(chip-ota-image mcuboot_sign_target)
+
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}.content ${CHIP_IMAGE_PATHS}
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+    )
+
+    add_dependencies(chip-ota-content-header mcuboot_sign_target)
+    add_dependencies(chip-ota-image chip-ota-content-header)
 endif()
 
 endif() # CONFIG_CHIP

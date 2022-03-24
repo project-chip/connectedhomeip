@@ -77,22 +77,24 @@ SessionManager::~SessionManager() {}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager,
-                                chip::PersistentStorageDelegate * storageDelegate)
+                                chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
+    mFabricTable           = fabricTable;
 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
 
-    mGroupClientCounter.Init(storageDelegate);
+    ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
 
     ScheduleExpiryTimer();
 
@@ -115,6 +117,17 @@ void SessionManager::Shutdown()
     mCB           = nullptr;
 }
 
+/**
+ * @brief Notification that a fabric was removed.
+ *        This function doesn't call ExpireAllPairingsForFabric
+ *        since the CASE session might still be open to send a response
+ *        on the removed fabric.
+ */
+void SessionManager::FabricRemoved(FabricIndex fabricIndex)
+{
+    mGroupPeerMsgCounter.FabricRemoved(fabricIndex);
+}
+
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
@@ -132,8 +145,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
@@ -249,8 +262,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         destination       = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -258,11 +271,11 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
-                        " at monotonic time: %" PRId64
+                        " at monotonic time: " ChipLogFormatX64
                         " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count(), addressStr, groupSession->GetGroupId(),
-                        groupSession->GetFabricIndex());
+                        "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
+                        groupSession->GetGroupId(), groupSession->GetFabricIndex());
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -276,10 +289,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " (%u) at monotonic time: %" PRId64 " msec",
+                        " (%u) at monotonic time: " ChipLogFormatX64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
                         ChipLogValueX64(secure->GetPeerNodeId()), secure->GetFabricIndex(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count());
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
@@ -289,9 +302,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at monotonic time: %" PRId64 " msec",
+                        " at monotonic time: " ChipLogFormatX64 " msec",
                         sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(kUndefinedNodeId), System::SystemClock().GetMonotonicMilliseconds64().count());
+                        ChipLogValueX64(kUndefinedNodeId),
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
     }
     break;
     default:
@@ -306,11 +320,9 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
         return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
     }
-    else
-    {
-        ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+
+    ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
@@ -379,7 +391,7 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
 
     ReturnErrorOnFailure(pairing->DeriveSecureSession(secureSession->GetCryptoContext(), direction));
 
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
 }
@@ -502,7 +514,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     // Verify message counter
-    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
+    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyUnencrypted(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
@@ -512,17 +524,12 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
         isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
-    if (err != CHIP_NO_ERROR)
+    else
     {
-        ChipLogProgress(Inet,
-                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64
-                        " MessageCounter verify failed err = %" CHIP_ERROR_FORMAT,
-                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)),
-                        err.Format());
-        return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
+        // VerifyUnencrypted always returns one of CHIP_NO_ERROR or
+        // CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.
+        unsecuredSession->GetPeerMessageCounter().CommitUnencrypted(packetHeader.GetMessageCounter());
     }
-
-    unsecuredSession->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
@@ -562,7 +569,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    err = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
+    err =
+        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().VerifyEncryptedUnicast(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
@@ -587,7 +595,10 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
+    if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
+    {
+        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+    }
 
     // TODO: once mDNS address resolution is available reconsider if this is required
     // This updates the peer address once a packet is received from a new address
@@ -692,9 +703,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
                                            packetHeader.IsSecureSessionControlMsg(), counter))
     {
 
-        if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
+        if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
-            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
+            err = counter->VerifyOrTrustFirstGroup(packetHeader.GetMessageCounter());
         }
         else
         {
@@ -704,7 +715,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             return;
 
             // cache and sync
-            // err = counter->Verify(packetHeader.GetMessageCounter(), true);
+            // err = counter->VerifyGroup(packetHeader.GetMessageCounter());
         }
 
         if (err != CHIP_NO_ERROR)
@@ -721,22 +732,16 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    counter->CommitWithRollOver(packetHeader.GetMessageCounter());
+    counter->CommitGroup(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logic
-        Optional<SessionHandle> session =
-            CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
-
-        VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
-        Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
-
-        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress,
+        Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
+                                                     packetHeader.GetSourceNodeId().Value());
+        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession), peerAddress,
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
-
-        RemoveGroupSession(groupSession);
     }
 }
 

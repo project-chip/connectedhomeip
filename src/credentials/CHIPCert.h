@@ -231,6 +231,15 @@ public:
     CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
 
     /**
+     * @brief Add CASE Authenticated Tags (CATs) attributes to the DN.
+     *
+     * @param cats    Array of CAT values.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR AddCATs(const chip::CATValues & cats);
+
+    /**
      * @brief Add string attribute to the DN.
      *
      * @param oid     String OID for DN attribute.
@@ -781,7 +790,7 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::T
  * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
  * cannot be used for such certificates.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have RDN
  * corresponding to FabricID.
  */
 CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
@@ -790,7 +799,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
  * Extract Node ID and Fabric ID from an operational certificate that has already been
  * parsed.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have at
  * least one NodeId RDN and one FabricId RDN in the Subject DN.  No other
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.

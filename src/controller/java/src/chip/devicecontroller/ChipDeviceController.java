@@ -278,6 +278,16 @@ public class ChipDeviceController {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
+  /**
+   * Returns the compressed fabric ID based on the given root certificate and node operational
+   * credentials.
+   *
+   * @param rcac the root certificate (in Matter cert form)
+   * @param noc the NOC (in Matter cert form)
+   * @see #convertX509CertToMatterCert(byte[])
+   */
+  public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
@@ -339,7 +349,15 @@ public class ChipDeviceController {
   }
 
   /**
-   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use

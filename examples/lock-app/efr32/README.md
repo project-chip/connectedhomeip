@@ -12,6 +12,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -289,3 +291,33 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options :
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"

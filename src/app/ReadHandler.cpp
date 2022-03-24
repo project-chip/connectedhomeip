@@ -273,7 +273,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     return err;
 }
 
-bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
+bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const
 {
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
@@ -290,8 +290,8 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
     Close();
 }
 
@@ -515,6 +515,13 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         }
         ReturnErrorOnFailure(err);
 
+        err = path.GetIsUrgent(&(clusterInfo.mIsUrgentEvent));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo));
     }
 
@@ -699,7 +706,7 @@ void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, voi
 {
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
-    ChipLogProgress(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
+    ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
     readHandler->mHoldReport = false;
     if (readHandler->mDirty)
     {
@@ -715,14 +722,14 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->mHoldSync    = false;
-    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
-                    readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds);
+    ChipLogDetail(DataManagement, "Refresh subscribe timer sync after %d seconds",
+                  readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxIntervalCeilingSeconds);
+    ChipLogDetail(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxIntervalCeilingSeconds);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(

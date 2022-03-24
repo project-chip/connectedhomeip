@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -75,7 +76,7 @@ public:
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
-    virtual ~WriteHandler() = default;
+    ~WriteHandler() override = default;
 
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
@@ -112,6 +113,11 @@ public:
         return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
     }
 
+    bool IsCurrentlyProcessingWritePath(const ConcreteAttributePath & aPath)
+    {
+        return mProcessingAttributePath.HasValue() && mProcessingAttributePath.Value() == aPath;
+    }
+
 private:
     enum class State
     {
@@ -143,9 +149,11 @@ private: // ExchangeDelegate
 private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    State mState                                  = State::Uninitialized;
-    bool mIsTimedRequest                          = false;
-    bool mHasMoreChunks                           = false;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mSuppressResponse = false;
+    bool mHasMoreChunks    = false;
+    Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app

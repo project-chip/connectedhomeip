@@ -44,8 +44,10 @@ chip_test_suite("tests") {
     "TestSpan.cpp",
     "TestStateMachine.cpp",
     "TestStringBuilder.cpp",
+    "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
+    "TestTlvToJson.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
@@ -67,7 +69,9 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]

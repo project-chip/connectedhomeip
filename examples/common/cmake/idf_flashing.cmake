@@ -84,6 +84,7 @@ macro(flashing_script)
             --use-sdkconfig ${project_path}/sdkconfig
     WORKING_DIRECTORY ${build_dir}
     DEPENDS "${build_dir}/${board_firmware_utils}"
+            "${build_dir}/${partition_table}"
             "${build_dir}/firmware_utils.py"
             "${build_dir_deps}"
     COMMENT "To flash ${build_dir}/${CMAKE_PROJECT_NAME}.bin run ./build/${CMAKE_PROJECT_NAME}.flash.py"

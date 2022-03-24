@@ -22,6 +22,9 @@
 #pragma once
 
 #include <app/util/af-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
 
@@ -47,11 +50,11 @@ public:
 
         Iterator operator++();
 
-        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+        bool operator==(const Iterator & rhs) const { return mIndex == rhs.mIndex; }
 
-        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+        bool operator!=(const Iterator & rhs) const { return mIndex != rhs.mIndex; }
 
-        uint8_t GetIndex() { return mIndex; }
+        uint8_t GetIndex() const { return mIndex; }
 
     private:
         BindingTable * mTable;
@@ -63,31 +66,58 @@ public:
 
     const EmberBindingTableEntry & GetAt(uint8_t index);
 
-    // The RemoveAt function shares the same sematics as the std::list::remove.
-    // It returns the next iterator after removal and the old iterator is no loger valid.
-    Iterator RemoveAt(Iterator iter);
+    // The iter will be moved to the next item in the table after calling RemoveAt.
+    CHIP_ERROR RemoveAt(Iterator & iter);
 
     // Returns the number of active entries in the binding table.
     // *NOTE* The function does not return the capacity of the binding table.
-    uint8_t Size() { return mSize; }
+    uint8_t Size() const { return mSize; }
 
     Iterator begin();
 
     Iterator end();
+
+    void SetPersistentStorage(PersistentStorageDelegate * storage) { mStorage = storage; }
+
+    CHIP_ERROR LoadFromStorage();
 
     static BindingTable & GetInstance() { return sInstance; }
 
 private:
     static BindingTable sInstance;
 
+    static constexpr uint32_t kStorageVersion  = 1;
+    static constexpr uint8_t kEntryStorageSize = TLV::EstimateStructOverhead(
+        sizeof(FabricIndex), sizeof(EndpointId), sizeof(ClusterId), sizeof(EndpointId), sizeof(NodeId), sizeof(uint8_t));
+    static constexpr uint8_t kListInfoStorageSize = TLV::EstimateStructOverhead(sizeof(kStorageVersion), sizeof(uint8_t));
+
+    static constexpr uint8_t kTagStorageVersion = 1;
+    static constexpr uint8_t kTagHead           = 2;
+    static constexpr uint8_t kTagFabricIndex    = 1;
+    static constexpr uint8_t kTagLocalEndpoint  = 2;
+    static constexpr uint8_t kTagCluster        = 3;
+    static constexpr uint8_t kTagRemoteEndpoint = 4;
+    static constexpr uint8_t kTagNodeId         = 5;
+    static constexpr uint8_t kTagGroupId        = 6;
+    static constexpr uint8_t kTagNextEntry      = 7;
+    static constexpr uint8_t kNextNullIndex     = 255;
+
     uint8_t GetNextAvaiableIndex();
+
+    CHIP_ERROR SaveEntryToStorage(uint8_t index, uint8_t nextIndex);
+    CHIP_ERROR SaveListInfo(uint8_t head);
+
+    CHIP_ERROR LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex);
 
     EmberBindingTableEntry mBindingTable[EMBER_BINDING_TABLE_SIZE];
     uint8_t mNextIndex[EMBER_BINDING_TABLE_SIZE];
 
-    uint8_t mHead = EMBER_BINDING_TABLE_SIZE;
-    uint8_t mTail = EMBER_BINDING_TABLE_SIZE;
+    uint8_t mHead = kNextNullIndex;
+    uint8_t mTail = kNextNullIndex;
     uint8_t mSize = 0;
+
+    PersistentStorageDelegate * mStorage;
+    DefaultStorageKeyAllocator mKeyAllocator;
 };
 
 } // namespace chip

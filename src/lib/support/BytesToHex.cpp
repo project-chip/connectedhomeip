@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 #include "BytesToHex.h"
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 
 #include <cstring>
 #include <stdio.h>
@@ -32,13 +34,11 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
     {
         return static_cast<char>((x - 10) + (uppercase ? 'A' : 'a'));
     }
-    else
-    {
-        return static_cast<char>(x + '0');
-    }
+
+    return static_cast<char>(x + '0');
 }
 
-CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * val)
+CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * val, BitFlags<HexFlags> flags)
 {
     if (srcLen != 2)
     {
@@ -54,12 +54,12 @@ CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * v
         {
             ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('0'));
         }
-        // Only uppercase is supported according to spec.
         else if (c >= 'A' && c <= 'F')
         {
             ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('A') + 0xA);
         }
-        else if (c >= 'a' && c <= 'f')
+        // If kUppercase flag is not set then lowercase are also allowed.
+        else if (!flags.Has(HexFlags::kUppercase) && c >= 'a' && c <= 'f')
         {
             ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('a') + 0xA);
         }
@@ -72,6 +72,28 @@ CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * v
     return CHIP_NO_ERROR;
 }
 
+size_t HexToBytes(const char * src_hex, const size_t src_size, uint8_t * dest_bytes, size_t dest_size_max, BitFlags<HexFlags> flags)
+{
+    if ((src_hex == nullptr) || (dest_bytes == nullptr))
+    {
+        return 0;
+    }
+    // Octet string where each octet is 2 ascii digits representing the hex value
+    // Each is represented by two ascii chars, so must be even number
+    if ((src_size & 0x1) != 0 || src_size > dest_size_max * 2)
+    {
+        return 0;
+    }
+
+    size_t bytesFilled = 0;
+    for (size_t i = 0; i < src_size; i += 2)
+    {
+        VerifyOrReturnError(MakeU8FromAsciiHex(src_hex + i, 2, &dest_bytes[i / 2], flags) == CHIP_NO_ERROR, 0);
+        bytesFilled++;
+    }
+    return bytesFilled;
+}
+
 } // namespace
 
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
@@ -80,7 +102,7 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (src_size > ((SIZE_MAX - 1) / 2u))
+    if (src_size > ((SIZE_MAX - 1) / 2u))
     {
         // Output would overflow a size_t, let's bail out to avoid computation wraparounds below.
         // This condition will hit with slightly less than the very max, but is unlikely to
@@ -111,44 +133,66 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BytesToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
+CHIP_ERROR Uint64ToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
 {
-    uint8_t buf[8];
-    for (int i = 7; i >= 0; --i)
-    {
-        buf[i] = src & 0xFF;
-        src    = src >> 8;
-    }
-
-    return BytesToHex(buf, 8, dest_hex, dest_size_max, flags);
+    uint8_t buf[sizeof(src)] = { 0 };
+    Encoding::BigEndian::Put64(buf, src);
+    return BytesToHex(buf, sizeof(buf), dest_hex, dest_size_max, flags);
 }
 
-size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen)
+CHIP_ERROR Uint32ToHex(uint32_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
 {
-    if ((srcHex == nullptr) || (destBytes == nullptr))
+    uint8_t buf[sizeof(src)] = { 0 };
+    Encoding::BigEndian::Put32(buf, src);
+    return BytesToHex(buf, sizeof(buf), dest_hex, dest_size_max, flags);
+}
+
+CHIP_ERROR Uint16ToHex(uint16_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
+{
+    uint8_t buf[sizeof(src)] = { 0 };
+    Encoding::BigEndian::Put16(buf, src);
+    return BytesToHex(buf, sizeof(buf), dest_hex, dest_size_max, flags);
+}
+
+size_t HexToBytes(const char * src_hex, const size_t src_size, uint8_t * dest_bytes, size_t dest_size_max)
+{
+    return HexToBytes(src_hex, src_size, dest_bytes, dest_size_max, HexFlags::kNone);
+}
+
+size_t UppercaseHexToUint64(const char * src_hex, const size_t src_size, uint64_t & dest)
+{
+    uint8_t buf[sizeof(uint64_t)] = { 0 };
+    size_t decoded_size           = HexToBytes(src_hex, src_size, buf, sizeof(buf), HexFlags::kUppercase);
+    if (decoded_size != sizeof(buf))
     {
         return 0;
     }
-    // Octet string where each octet is 2 ascii digits representing the hex value
-    // Each is represented by two ascii chars, so must be even number
-    if ((srcLen & 0x1) != 0 || srcLen > destMaxLen * 2)
+    dest = Encoding::BigEndian::Get64(buf);
+    return decoded_size;
+}
+
+size_t UppercaseHexToUint32(const char * src_hex, const size_t src_size, uint32_t & dest)
+{
+    uint8_t buf[sizeof(uint32_t)] = { 0 };
+    size_t decoded_size           = HexToBytes(src_hex, src_size, buf, sizeof(buf), HexFlags::kUppercase);
+    if (decoded_size != sizeof(buf))
     {
         return 0;
     }
+    dest = Encoding::BigEndian::Get32(buf);
+    return decoded_size;
+}
 
-    memset(destBytes, 0, destMaxLen);
-    size_t bytesFilled = 0;
-
-    for (size_t i = 0; i < srcLen; i += 2)
+size_t UppercaseHexToUint16(const char * src_hex, const size_t src_size, uint16_t & dest)
+{
+    uint8_t buf[sizeof(uint16_t)] = { 0 };
+    size_t decoded_size           = HexToBytes(src_hex, src_size, buf, sizeof(buf), HexFlags::kUppercase);
+    if (decoded_size != sizeof(buf))
     {
-        if (MakeU8FromAsciiHex(srcHex + i, 2, &destBytes[i / 2]) != CHIP_NO_ERROR)
-        {
-            memset(destBytes, 0, destMaxLen);
-            return 0;
-        }
-        bytesFilled++;
+        return 0;
     }
-    return bytesFilled;
+    dest = Encoding::BigEndian::Get16(buf);
+    return decoded_size;
 }
 
 } // namespace Encoding

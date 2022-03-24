@@ -47,12 +47,15 @@ class PrintOutNodeListener : public chip::AddressResolve::NodeListener
 public:
     PrintOutNodeListener() { mSelfHandle.SetListener(this); }
 
-    void OnNodeAddressResolved(const PeerId & peerId, const PeerAddress & address) override
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override
     {
         char addr_string[PeerAddress::kMaxToStringSize];
-        address.ToString(addr_string);
+        result.address.ToString(addr_string);
 
         ChipLogProgress(Discovery, "Resolve completed: %s", addr_string);
+        ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
+        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpConfig.mActiveRetransTimeout.count());
         NotifyDone();
     }
 
@@ -138,7 +141,7 @@ extern "C" int main(int argc, const char ** argv)
         ChipLogError(NotSpecified, "Please specify a command, or 'help' for help.");
         return -1;
     }
-    else if (strcasecmp(argv[1], "help") == 0 || strcasecmp(argv[1], "--help") == 0 || strcasecmp(argv[1], "-h") == 0)
+    if (strcasecmp(argv[1], "help") == 0 || strcasecmp(argv[1], "--help") == 0 || strcasecmp(argv[1], "-h") == 0)
     {
         fputs(sHelp, stdout);
         return 0;
@@ -155,9 +158,7 @@ extern "C" int main(int argc, const char ** argv)
     {
         return Cmd_Node(argc - 2, argv + 2) ? 0 : 1;
     }
-    else
-    {
-        ChipLogError(NotSpecified, "Unrecognized command: %s", argv[1]);
-        return 1;
-    }
+
+    ChipLogError(NotSpecified, "Unrecognized command: %s", argv[1]);
+    return 1;
 }

@@ -83,6 +83,26 @@ protected:
         return CheckValue(itemName, current.Raw(), expected);
     }
 
+    // Allow an expected value that is a nullable wrapped around the actual
+    // value (e.g. a SaveAs from reading a different attribute that has a value
+    // space that includes null).  In that case we check that:
+    // 1) The nullable is not in fact null.
+    //
+    // 2) The value in the nullable matches our test value.
+    template <typename T>
+    bool CheckValue(const char * itemName, T current, const chip::app::DataModel::Nullable<T> & expected)
+    {
+        auto nullableName = std::string(itemName);
+        nullableName += " expected value";
+        return CheckValueNonNull(nullableName.c_str(), expected) && CheckValue(itemName, current, expected.Value());
+    }
+
+    template <typename T>
+    bool CheckValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected.Raw());
+    }
+
     template <typename T>
     bool CheckValuePresent(const char * itemName, const chip::Optional<T> & value)
     {

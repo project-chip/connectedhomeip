@@ -30,6 +30,7 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
+import com.tcl.chip.tvapp.DACProviderStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
@@ -52,6 +53,11 @@ public class MatterServant {
   }
 
   public void init(@NonNull Context context) {
+    // The order is important, must
+    // first new TvApp to load dynamic library
+    // then chipPlatform to prepare platform
+    // then TvApp.postInit to init app which needs platform
+    // then start ChipAppServer
     TvApp tvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
@@ -79,6 +85,7 @@ public class MatterServant {
                   break;
               }
             });
+    tvApp.setDACProvider(new DACProviderStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
@@ -89,6 +96,8 @@ public class MatterServant {
             new NsdManagerServiceResolver(applicationContext),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
+
+    tvApp.postInit();
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();

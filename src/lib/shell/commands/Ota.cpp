@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip::DeviceLayer;
 
@@ -34,7 +34,7 @@ Shell::Engine sSubShell;
 CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
     PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
     return CHIP_NO_ERROR;
 }
@@ -42,7 +42,7 @@ CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
     PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
     return CHIP_NO_ERROR;
 }
@@ -50,19 +50,16 @@ CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    const intptr_t version = static_cast<intptr_t>(strtoul(argv[0], nullptr, 10));
-
-    PlatformMgr().ScheduleWork([](intptr_t arg) { GetRequestorInstance()->NotifyUpdateApplied(static_cast<uint32_t>(arg)); },
-                               version);
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->NotifyUpdateApplied(); });
     return CHIP_NO_ERROR;
 }
 
 static void HandleState(intptr_t context)
 {
     app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state;
-    CHIP_ERROR err = GetRequestorInstance()->GetState(0, state);
+    CHIP_ERROR err = GetRequestorInstance()->GetUpdateStateAttribute(0, state);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -111,7 +108,7 @@ static void HandleState(intptr_t context)
 static void HandleProgress(intptr_t context)
 {
     chip::app::DataModel::Nullable<uint8_t> progress;
-    CHIP_ERROR err = GetRequestorInstance()->GetUpdateProgress(0, progress);
+    CHIP_ERROR err = GetRequestorInstance()->GetUpdateStateProgressAttribute(0, progress);
 
     if (err == CHIP_NO_ERROR)
     {

@@ -41,7 +41,7 @@ class LayerImplSelect : public LayerSocketsLoop
 {
 public:
     LayerImplSelect() = default;
-    ~LayerImplSelect() { VerifyOrDie(mLayerState.Destroy()); }
+    ~LayerImplSelect() override { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
     CHIP_ERROR Init() override;

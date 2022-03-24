@@ -20,7 +20,7 @@ config:
     endpoint: 0
 
 tests:
-    #issue #11725 Reading the List is not implemented in YAML framework
+    #Disabled due to issue #11343
     - label: "Reads a list of SoftwareFault struct from DUT"
       disabled: true
       command: "readAttribute"
@@ -28,4 +28,4 @@ tests:
       PICS: E_SOFTWAREFAULT
       response:
           constraints:
-              value: 0
+              type: list

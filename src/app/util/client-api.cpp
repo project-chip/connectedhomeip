@@ -45,14 +45,14 @@
 
 using namespace chip;
 
-uint8_t * emAfZclBuffer   = NULL;
+uint8_t * emAfZclBuffer   = nullptr;
 uint16_t emAfZclBufferLen = 0;
 
 // Pointer to where this API should put the length
-uint16_t * emAfResponseLengthPtr = NULL;
+uint16_t * emAfResponseLengthPtr = nullptr;
 
 // Pointer to where the API should put the cluster ID
-EmberApsFrame * emAfCommandApsFrame = NULL;
+EmberApsFrame * emAfCommandApsFrame = nullptr;
 
 /////////////////
 
@@ -101,7 +101,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         char cmd;
         value    = 0;
         valueLen = 0;
-        data     = 0;
+        data     = nullptr;
         cmd      = format[i];
         if (cmd <= 's')
         {
@@ -231,7 +231,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // explicit check.
         if (dataLen != 0)
         {
-            if (data == NULL)
+            if (data == nullptr)
             {
                 emberAfDebugPrintln("ERR: Missing data for %d bytes for format '%c'", dataLen, cmd);
                 return 0;

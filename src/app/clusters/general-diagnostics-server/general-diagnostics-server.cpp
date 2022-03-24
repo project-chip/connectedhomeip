@@ -189,7 +189,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
     }
@@ -197,7 +197,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Gets called when the device has been rebooted.
     void OnDeviceRebooted(chip::DeviceLayer::BootReasonType bootReason) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
 
@@ -206,7 +206,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
         Events::BootReason::Type event{ static_cast<EmberAfBootReasonType>(bootReason) };
         EventNumber eventNumber;
 
-        CHIP_ERROR err = LogEvent(event, 0, eventNumber, EventOptions::Type::kUrgent);
+        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -217,7 +217,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous,
                                   GeneralFaults<kMaxHardwareFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {
@@ -233,7 +233,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
             Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record HardwareFault event");
             }
@@ -243,7 +243,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Get called when the Node detects a radio fault has been raised.
     void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnRadioFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {
@@ -259,7 +259,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(previous.data()), previous.size());
             Events::RadioFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record RadioFault event");
             }
@@ -269,7 +269,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Get called when the Node detects a network fault has been raised.
     void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {
@@ -285,7 +285,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
             Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record NetworkFault event");
             }

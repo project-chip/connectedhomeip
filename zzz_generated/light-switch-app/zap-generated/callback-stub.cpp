@@ -62,6 +62,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
         emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
+    case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
+        emberAfGroupKeyManagementClusterInitCallback(endpoint);
+        break;
     case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
         break;
@@ -97,6 +100,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
+        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
@@ -165,6 +171,11 @@ void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -221,6 +232,11 @@ void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

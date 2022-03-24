@@ -17,10 +17,12 @@
  */
 
 #include "AppMain.h"
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/Linux/OTAImageProcessorImpl.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -33,7 +35,6 @@ using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
@@ -46,56 +47,109 @@ using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
+{
+public:
+    bool CanConsent() override;
+    void UpdateDownloaded() override;
+};
+
 OTARequestor gRequestorCore;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorStorage gRequestorStorage;
+CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsentProvider gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionDelayQuery          = 'q';
-constexpr uint16_t kOptionRequestorCanConsent = 'c';
+constexpr uint16_t kOptionUserConsentState     = 'u';
+constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr uint16_t kOptionAutoApplyImage       = 'a';
+constexpr size_t kMaxFilePathSize              = 256;
 
-uint16_t delayQueryTimeInSec = 0;
+uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
+static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
+bool gAutoApplyImage                           = false;
 
 OptionDef cmdLineOptionsDef[] = {
-    { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
+    { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
+    { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
+    { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -q/--delayQuery <Time in seconds>\n"
-                             "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered automatically. At "
-                             "least one provider location must be written to the DefaultOTAProviders attribute.\n"
+                             "  -p/--periodicQueryTimeout <Time in seconds>\n"
+                             "        Periodic timeout for querying providers in the default OTA provider list\n"
+                             "        If none or zero is supplied the timeout is set to every 24 hours. \n"
                              "  -c/--requestorCanConsent\n"
-                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
-                             "        Otherwise, the value is determined by the driver.\n " };
+                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to "
+                             "true.\n"
+                             "        Otherwise, the value is determined by the driver.\n "
+                             "  -f/--otaDownloadPath <file path>\n"
+                             "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
+                             "        Otherwise, the value defaults to /tmp/test.bin.\n "
+                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "        The user consent state for the first QueryImage command. For all\n"
+                             "        subsequent commands, the value of granted will be used.\n"
+                             "        granted: Authorize OTA requestor to download an OTA image\n"
+                             "        denied: Forbid OTA requestor to download an OTA image\n"
+                             "        deferred: Defer obtaining user consent \n"
+                             "  -a/--autoApplyImage\n"
+                             "        If supplied, apply the image immediately after download.\n"
+                             "        Otherwise, the OTA update is complete after image download.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
+
+bool CustomOTARequestorDriver::CanConsent()
+{
+    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+}
+
+void CustomOTARequestorDriver::UpdateDownloaded()
+{
+    if (gAutoApplyImage)
+    {
+        // Let the default driver take further action to apply the image
+        GenericOTARequestorDriver::UpdateDownloaded();
+    }
+    else
+    {
+        // Reset to put the state back to idle to allow the next OTA update to occur
+        gRequestorCore.Reset();
+    }
+}
 
 static void InitOTARequestor(void)
 {
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    // Periodic query timeout must be set prior to requestor being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
+
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
-    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
-    OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+    }
 }
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -104,11 +158,41 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionDelayQuery:
-        delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+    case kOptionPeriodicQueryTimeout:
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionRequestorCanConsent:
         gRequestorCanConsent.SetValue(true);
+        break;
+    case kOptionOtaDownloadPath:
+        chip::Platform::CopyString(gOtaDownloadPath, aValue);
+        break;
+    case kOptionUserConsentState:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
+            retval = false;
+        }
+        else if (strcmp(aValue, "granted") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+        else if (strcmp(aValue, "denied") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kDenied;
+        }
+        else if (strcmp(aValue, "deferred") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kObtaining;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid UserConsent parameter:  %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+    case kOptionAutoApplyImage:
+        gAutoApplyImage = true;
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -121,33 +205,29 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 void ApplicationInit()
 {
-    chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-
-    if (gRequestorCanConsent.HasValue())
-    {
-        gRequestorCore.SetRequestorCanConsent(gRequestorCanConsent.Value());
-    }
-
     // Initialize all OTA download components
     InitOTARequestor();
-
-    // If a delay is provided, after the timer expires, QueryImage from default OTA provider
-    if (delayQueryTimeInSec > 0)
-    {
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-                                                    OnStartDelayTimerHandler, nullptr);
-    }
 }
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
     ChipLinuxAppMainLoop();
-    return 0;
-}
 
-// Test mode operation
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
-{
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+    // If the event loop had been stopped due to an update being applied, boot into the new image
+    if (gRequestorCore.GetCurrentUpdateState() == OTARequestor::OTAUpdateStateEnum::kApplying)
+    {
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
+        {
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+            return -1;
+        }
+
+        argv[0] = kImageExecPath;
+        execv(argv[0], argv);
+
+        // If successfully executing the new iamge, execv should not return
+        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+    }
+    return 0;
 }

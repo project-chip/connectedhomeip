@@ -63,6 +63,7 @@ constexpr uint32_t kOff_ms{ 950 };
 } // namespace StatusLed
 } // namespace LedConsts
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -149,7 +150,8 @@ void AppTask::InitOTARequestor()
     mOTAImageProcessor.SetOTADownloader(&mBDXDownloader);
     mBDXDownloader.SetImageProcessorDelegate(&mOTAImageProcessor);
     mOTARequestorDriver.Init(&mOTARequestor, &mOTAImageProcessor);
-    mOTARequestor.Init(&chip::Server::GetInstance(), &mOTARequestorDriver, &mBDXDownloader);
+    mOTARequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    mOTARequestor.Init(chip::Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mBDXDownloader);
     chip::SetRequestorInstance(&mOTARequestor);
 #endif
 }
@@ -276,17 +278,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
+void AppTask::StartBLEAdvertisementHandler(AppEvent *)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
-        return;
-
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is already commissioned");
         return;
     }
 
@@ -296,7 +292,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }

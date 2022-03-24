@@ -189,26 +189,26 @@ limitations under the License.
       <description>
         Command description for AddGroup
       </description>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
     </command>
     <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
-      <arg name="groupList" type="INT16U" array="true"/>
+      <arg name="groupList" type="group_id" array="true"/>
     </command>
     <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
     </command>
     <command source="client" code="0x04" name="RemoveAllGroups" optional="false" cli="zcl groups rmall">
       <description>
@@ -219,7 +219,7 @@ limitations under the License.
       <description>
         Command description for AddGroupIfIdentifying
       </description>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
     <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
@@ -227,29 +227,29 @@ limitations under the License.
         Command description for AddGroupResponse
       </description>
       <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
     </command>
     <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for ViewGroupResponse
       </description>
       <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
     <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for GetGroupMembershipResponse
       </description>
-      <arg name="capacity" type="INT8U"/>
-      <arg name="groupList" type="INT16U" array="true"/>
+      <arg name="capacity" type="INT8U" isNullable="true"/>
+      <arg name="groupList" type="group_id" array="true"/>
     </command>
     <command source="server" code="0x03" name="RemoveGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for RemoveGroupResponse
       </description>
       <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="INT16U"/>
+      <arg name="groupId" type="group_id"/>
     </command>
   </cluster>
   <cluster>
@@ -401,7 +401,7 @@ limitations under the License.
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>
     
     <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="INT16U" writable="true" default="0x0000" optional="true">on off transition time</attribute>
-    <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" isNullable="true" writable="true" default="0xFE" optional="true">on level</attribute>
+    <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" isNullable="true" writable="true" optional="true">on level</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="INT16U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">on transition time</attribute>
     <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME" type="INT16U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">off transition time</attribute>
     <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE" type="INT8U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">default move rate</attribute>

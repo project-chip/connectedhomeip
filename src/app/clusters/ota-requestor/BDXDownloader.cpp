@@ -23,6 +23,7 @@
 #include <lib/support/BufferReader.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h> /* TODO:(#12520) remove */
 #include <system/SystemPacketBuffer.h>
@@ -34,6 +35,50 @@ using chip::app::DataModel::Nullable;
 using chip::bdx::TransferSession;
 
 namespace chip {
+
+void TransferTimeoutCheckHandler(System::Layer * systemLayer, void * appState)
+{
+    VerifyOrReturn(appState != nullptr);
+    BDXDownloader * bdxDownloader = static_cast<BDXDownloader *>(appState);
+
+    if (bdxDownloader->HasTransferTimedOut())
+    {
+        // End download if transfer timeout has been detected
+        bdxDownloader->OnDownloadTimeout();
+    }
+    else
+    {
+        // Else restart the timer
+        systemLayer->StartTimer(bdxDownloader->GetTimeout(), TransferTimeoutCheckHandler, appState);
+    }
+}
+
+System::Clock::Timeout BDXDownloader::GetTimeout()
+{
+    return mTimeout;
+}
+
+void BDXDownloader::Reset()
+{
+    mPrevBlockCounter = 0;
+    DeviceLayer::SystemLayer().CancelTimer(TransferTimeoutCheckHandler, this);
+}
+
+bool BDXDownloader::HasTransferTimedOut()
+{
+    uint32_t curBlockCounter = mBdxTransfer.GetNextQueryNum();
+
+    if (curBlockCounter > mPrevBlockCounter)
+    {
+        mPrevBlockCounter = curBlockCounter;
+        return false;
+    }
+    else
+    {
+        ChipLogError(BDX, "BDX transfer timeout");
+        return true;
+    }
+}
 
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
@@ -50,9 +95,11 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
     PollTransferSession();
 }
 
-CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData)
+CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData,
+                                       System::Clock::Timeout timeout)
 {
-    mState = State::kIdle;
+    mTimeout = timeout;
+    mState   = State::kIdle;
     mBdxTransfer.Reset();
 
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
@@ -69,6 +116,10 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
 {
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mPrevBlockCounter = 0;
+    DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
+
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
 
     SetState(State::kPreparing, OTAChangeReasonEnum::kSuccess);
@@ -90,6 +141,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     else
     {
         ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
+        Reset();
         mBdxTransfer.Reset();
         SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
     }
@@ -108,6 +160,8 @@ CHIP_ERROR BDXDownloader::FetchNextData()
 
 void BDXDownloader::OnDownloadTimeout()
 {
+    Reset();
+
     if (mState == State::kInProgress)
     {
         ChipLogDetail(BDX, "aborting due to timeout");
@@ -120,12 +174,14 @@ void BDXDownloader::OnDownloadTimeout()
     }
     else
     {
-        ChipLogError(BDX, "no download in progress");
+        ChipLogError(BDX, "No download in progress");
     }
 }
 
 void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
+    Reset();
+
     if (mState == State::kInProgress)
     {
         bdx::StatusCode status = bdx::StatusCode::kUnknown;
@@ -151,7 +207,7 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
     }
     else
     {
-        ChipLogError(BDX, "no download in progress");
+        ChipLogError(BDX, "No download in progress");
     }
 }
 
@@ -186,6 +242,8 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
+            Reset();
+
             // BDX transfer is not complete until BlockAckEOF has been sent
             SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         }
@@ -212,11 +270,13 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");
+        Reset();
         mBdxTransfer.Reset();
         ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
+        Reset();
         mBdxTransfer.Reset();
         ReturnErrorOnFailure(mImageProcessor->Abort());
         break;

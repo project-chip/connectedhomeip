@@ -29,7 +29,7 @@ class CASEServer : public SessionEstablishmentDelegate, public Messaging::Exchan
 {
 public:
     CASEServer() {}
-    ~CASEServer()
+    ~CASEServer() override
     {
         if (mExchangeManager != nullptr)
         {
@@ -38,8 +38,7 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics,
-                                             SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -62,10 +61,9 @@ private:
     Ble::BleLayer * mBleLayer        = nullptr;
 
     FabricTable * mFabrics = nullptr;
+    SessionIDAllocator mSessionIDAllocator;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
-
-    SessionIDAllocator * mIDAllocator = nullptr;
 
     void Cleanup();
 };

@@ -55,32 +55,29 @@ public class ChipStructs {
   }
 
   public static class AccessControlClusterAccessControlEntry {
-    public Integer fabricIndex;
     public Integer privilege;
     public Integer authMode;
     public @Nullable ArrayList<Object> subjects;
     public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
+    public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntry(
-        Integer fabricIndex,
         Integer privilege,
         Integer authMode,
         @Nullable ArrayList<Object> subjects,
-        @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets) {
-      this.fabricIndex = fabricIndex;
+        @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets,
+        Integer fabricIndex) {
       this.privilege = privilege;
       this.authMode = authMode;
       this.subjects = subjects;
       this.targets = targets;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("AccessControlClusterAccessControlEntry {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tprivilege: ");
       output.append(privilege);
       output.append("\n");
@@ -93,29 +90,32 @@ public class ChipStructs {
       output.append("\ttargets: ");
       output.append(targets);
       output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
   public static class AccessControlClusterExtensionEntry {
-    public Integer fabricIndex;
     public byte[] data;
+    public Integer fabricIndex;
 
-    public AccessControlClusterExtensionEntry(Integer fabricIndex, byte[] data) {
-      this.fabricIndex = fabricIndex;
+    public AccessControlClusterExtensionEntry(byte[] data, Integer fabricIndex) {
       this.data = data;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("AccessControlClusterExtensionEntry {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tdata: ");
       output.append(Arrays.toString(data));
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -226,32 +226,29 @@ public class ChipStructs {
   }
 
   public static class BindingClusterTargetStruct {
-    public Integer fabricIndex;
     public Optional<Long> node;
     public Optional<Integer> group;
     public Optional<Integer> endpoint;
     public Optional<Long> cluster;
+    public Integer fabricIndex;
 
     public BindingClusterTargetStruct(
-        Integer fabricIndex,
         Optional<Long> node,
         Optional<Integer> group,
         Optional<Integer> endpoint,
-        Optional<Long> cluster) {
-      this.fabricIndex = fabricIndex;
+        Optional<Long> cluster,
+        Integer fabricIndex) {
       this.node = node;
       this.group = group;
       this.endpoint = endpoint;
       this.cluster = cluster;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("BindingClusterTargetStruct {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tnode: ");
       output.append(node);
       output.append("\n");
@@ -263,6 +260,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tcluster: ");
       output.append(cluster);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -777,29 +777,26 @@ public class ChipStructs {
   }
 
   public static class GroupKeyManagementClusterGroupInfoMapStruct {
-    public Integer fabricIndex;
     public Integer groupId;
     public ArrayList<Object> endpoints;
     public Optional<String> groupName;
+    public Integer fabricIndex;
 
     public GroupKeyManagementClusterGroupInfoMapStruct(
-        Integer fabricIndex,
         Integer groupId,
         ArrayList<Object> endpoints,
-        Optional<String> groupName) {
-      this.fabricIndex = fabricIndex;
+        Optional<String> groupName,
+        Integer fabricIndex) {
       this.groupId = groupId;
       this.endpoints = endpoints;
       this.groupName = groupName;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("GroupKeyManagementClusterGroupInfoMapStruct {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tgroupId: ");
       output.append(groupId);
       output.append("\n");
@@ -809,35 +806,38 @@ public class ChipStructs {
       output.append("\tgroupName: ");
       output.append(groupName);
       output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
   public static class GroupKeyManagementClusterGroupKeyMapStruct {
-    public Integer fabricIndex;
     public Integer groupId;
     public Integer groupKeySetID;
+    public Integer fabricIndex;
 
     public GroupKeyManagementClusterGroupKeyMapStruct(
-        Integer fabricIndex, Integer groupId, Integer groupKeySetID) {
-      this.fabricIndex = fabricIndex;
+        Integer groupId, Integer groupKeySetID, Integer fabricIndex) {
       this.groupId = groupId;
       this.groupKeySetID = groupKeySetID;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("GroupKeyManagementClusterGroupKeyMapStruct {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tgroupId: ");
       output.append(groupId);
       output.append("\n");
       output.append("\tgroupKeySetID: ");
       output.append(groupKeySetID);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1155,29 +1155,29 @@ public class ChipStructs {
   }
 
   public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
-    public Integer fabricIndex;
     public Long providerNodeID;
     public Integer endpoint;
+    public Integer fabricIndex;
 
     public OtaSoftwareUpdateRequestorClusterProviderLocation(
-        Integer fabricIndex, Long providerNodeID, Integer endpoint) {
-      this.fabricIndex = fabricIndex;
+        Long providerNodeID, Integer endpoint, Integer fabricIndex) {
       this.providerNodeID = providerNodeID;
       this.endpoint = endpoint;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tproviderNodeID: ");
       output.append(providerNodeID);
       output.append("\n");
       output.append("\tendpoint: ");
       output.append(endpoint);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1185,35 +1185,32 @@ public class ChipStructs {
   }
 
   public static class OperationalCredentialsClusterFabricDescriptor {
-    public Integer fabricIndex;
     public byte[] rootPublicKey;
     public Integer vendorId;
     public Long fabricId;
     public Long nodeId;
     public String label;
+    public Integer fabricIndex;
 
     public OperationalCredentialsClusterFabricDescriptor(
-        Integer fabricIndex,
         byte[] rootPublicKey,
         Integer vendorId,
         Long fabricId,
         Long nodeId,
-        String label) {
-      this.fabricIndex = fabricIndex;
+        String label,
+        Integer fabricIndex) {
       this.rootPublicKey = rootPublicKey;
       this.vendorId = vendorId;
       this.fabricId = fabricId;
       this.nodeId = nodeId;
       this.label = label;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("OperationalCredentialsClusterFabricDescriptor {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\trootPublicKey: ");
       output.append(Arrays.toString(rootPublicKey));
       output.append("\n");
@@ -1229,35 +1226,38 @@ public class ChipStructs {
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
   public static class OperationalCredentialsClusterNOCStruct {
-    public Integer fabricIndex;
     public byte[] noc;
     public @Nullable byte[] icac;
+    public Integer fabricIndex;
 
     public OperationalCredentialsClusterNOCStruct(
-        Integer fabricIndex, byte[] noc, @Nullable byte[] icac) {
-      this.fabricIndex = fabricIndex;
+        byte[] noc, @Nullable byte[] icac, Integer fabricIndex) {
       this.noc = noc;
       this.icac = icac;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("OperationalCredentialsClusterNOCStruct {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tnoc: ");
       output.append(Arrays.toString(noc));
       output.append("\n");
       output.append("\ticac: ");
       output.append(Arrays.toString(icac));
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1517,6 +1517,68 @@ public class ChipStructs {
     }
   }
 
+  public static class TestClusterClusterTestFabricScoped {
+    public Integer fabricSensitiveInt8u;
+    public Optional<Integer> optionalFabricSensitiveInt8u;
+    public @Nullable Integer nullableFabricSensitiveInt8u;
+    public @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u;
+    public String fabricSensitiveCharString;
+    public ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct;
+    public ArrayList<Object> fabricSensitiveInt8uList;
+    public Integer fabricIndex;
+
+    public TestClusterClusterTestFabricScoped(
+        Integer fabricSensitiveInt8u,
+        Optional<Integer> optionalFabricSensitiveInt8u,
+        @Nullable Integer nullableFabricSensitiveInt8u,
+        @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u,
+        String fabricSensitiveCharString,
+        ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct,
+        ArrayList<Object> fabricSensitiveInt8uList,
+        Integer fabricIndex) {
+      this.fabricSensitiveInt8u = fabricSensitiveInt8u;
+      this.optionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u;
+      this.nullableFabricSensitiveInt8u = nullableFabricSensitiveInt8u;
+      this.nullableOptionalFabricSensitiveInt8u = nullableOptionalFabricSensitiveInt8u;
+      this.fabricSensitiveCharString = fabricSensitiveCharString;
+      this.fabricSensitiveStruct = fabricSensitiveStruct;
+      this.fabricSensitiveInt8uList = fabricSensitiveInt8uList;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TestClusterClusterTestFabricScoped {\n");
+      output.append("\tfabricSensitiveInt8u: ");
+      output.append(fabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\toptionalFabricSensitiveInt8u: ");
+      output.append(optionalFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tnullableFabricSensitiveInt8u: ");
+      output.append(nullableFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tnullableOptionalFabricSensitiveInt8u: ");
+      output.append(nullableOptionalFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tfabricSensitiveCharString: ");
+      output.append(fabricSensitiveCharString);
+      output.append("\n");
+      output.append("\tfabricSensitiveStruct: ");
+      output.append(fabricSensitiveStruct);
+      output.append("\n");
+      output.append("\tfabricSensitiveInt8uList: ");
+      output.append(fabricSensitiveInt8uList);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class TestClusterClusterNullablesAndOptionalsStruct {
     public @Nullable Integer nullableInt;
     public Optional<Integer> optionalInt;
@@ -1703,25 +1765,6 @@ public class ChipStructs {
       output.append("TestClusterClusterDoubleNestedStructList {\n");
       output.append("\ta: ");
       output.append(a);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class TestClusterClusterTestFabricScoped {
-    public Integer fabricIndex;
-
-    public TestClusterClusterTestFabricScoped(Integer fabricIndex) {
-      this.fabricIndex = fabricIndex;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestFabricScoped {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

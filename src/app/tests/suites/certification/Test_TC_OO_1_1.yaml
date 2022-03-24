@@ -73,18 +73,18 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ClientGeneratedCommandList"
+    - label: "Read the global attribute: AcceptedCommandList"
       disabled: true
       command: "readAttribute"
-      attribute: "ClientGeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ServerGeneratedCommandList"
+    - label: "Read the global attribute: GeneratedCommandList"
       disabled: true
       command: "readAttribute"
-      attribute: "ServerGeneratedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
@@ -93,7 +93,7 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 1
 
     - label: "Read the optional global attribute : FeatureMap"
       command: "readAttribute"
@@ -114,4 +114,4 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 1

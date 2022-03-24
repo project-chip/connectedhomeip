@@ -31,6 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -39,9 +40,6 @@ namespace Controller {
 
 struct SetupParams
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-#endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -60,6 +58,15 @@ struct SetupParams
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
 
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - CASEServer to listen for unsolicited Sigma1 messages.
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
+
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
@@ -68,7 +75,6 @@ struct SetupParams
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
-    FabricStorage * fabricStorage                                 = nullptr;
     System::Layer * systemLayer                                   = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
@@ -76,6 +82,14 @@ struct FactoryInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
 
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
@@ -124,6 +138,41 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
+    class ControllerFabricDelegate final : public FabricTableDelegate
+    {
+    public:
+        ControllerFabricDelegate() {}
+        ControllerFabricDelegate(SessionManager * sessionManager) : FabricTableDelegate(true), mSessionManager(sessionManager) {}
+
+        CHIP_ERROR Init(SessionManager * sessionManager)
+        {
+            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mSessionManager = sessionManager;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        {
+            if (mSessionManager != nullptr)
+            {
+                mSessionManager->FabricRemoved(fabricIndex);
+            }
+            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            if (groupDataProvider != nullptr)
+            {
+                groupDataProvider->RemoveFabric(fabricIndex);
+            }
+        };
+
+        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+    private:
+        SessionManager * mSessionManager = nullptr;
+    };
+
 private:
     DeviceControllerFactory(){};
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
@@ -131,9 +180,9 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    FabricStorage * mFabricStorage                        = nullptr;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
+    bool mEnableServerInteractions                        = false;
 };
 
 } // namespace Controller

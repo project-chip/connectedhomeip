@@ -27,7 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
 #include "fsl_power.h"

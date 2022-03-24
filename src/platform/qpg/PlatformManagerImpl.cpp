@@ -23,8 +23,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
@@ -46,6 +47,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

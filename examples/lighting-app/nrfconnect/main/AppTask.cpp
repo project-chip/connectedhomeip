@@ -41,8 +41,9 @@
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #endif
 
@@ -85,6 +86,7 @@ bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
 
 #if CONFIG_CHIP_OTA_REQUESTOR
+DefaultOTARequestorStorage sRequestorStorage;
 GenericOTARequestorDriver sOTARequestorDriver;
 OTAImageProcessorImpl sOTAImageProcessor;
 chip::BDXDownloader sBDXDownloader;
@@ -121,7 +123,11 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
+#ifdef CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
+#endif
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -199,7 +205,8 @@ void AppTask::InitOTARequestor()
     sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
     sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
-    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sOTARequestor.Init(Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
 #endif
 }
@@ -410,15 +417,11 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
+void AppTask::StartBLEAdvertisementHandler(AppEvent *)
 {
-    if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
-        return;
-
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is already commissioned");
         return;
     }
 
@@ -428,7 +431,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }

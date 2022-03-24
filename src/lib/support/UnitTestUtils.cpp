@@ -75,7 +75,7 @@ void SleepMillis(uint64_t millisecs)
 
 uint64_t TimeMonotonicMillis()
 {
-    return static_cast<uint64_t>(time(NULL) * 1000);
+    return static_cast<uint64_t>(time(nullptr) * 1000);
 }
 
 #endif

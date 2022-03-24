@@ -26,7 +26,9 @@
 #include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/ValueChecker.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,7 +38,12 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands, public DelayCommands
+class TestCommand : public PICSChecker,
+                    public LogCommands,
+                    public DiscoveryCommands,
+                    public DelayCommands,
+                    public ValueChecker,
+                    public ConstraintsChecker
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
@@ -75,7 +82,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Exit(std::string message)
+    void Exit(std::string message) override
     {
         ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);

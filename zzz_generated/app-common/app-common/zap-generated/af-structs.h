@@ -28,6 +28,32 @@
 
 #include "enums.h"
 
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    uint8_t a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    chip::CharSpan e;
+    uint8_t f;
+    float g;
+    double h;
+} SimpleStruct;
+
+// Struct for TestFabricScoped
+typedef struct _TestFabricScoped
+{
+    uint8_t fabricSensitiveInt8u;
+    uint8_t optionalFabricSensitiveInt8u;
+    uint8_t nullableFabricSensitiveInt8u;
+    uint8_t nullableOptionalFabricSensitiveInt8u;
+    chip::CharSpan fabricSensitiveCharString;
+    SimpleStruct fabricSensitiveStruct;
+    /* TYPE WARNING: array array defaults to */ uint8_t * fabricSensitiveInt8uList;
+    chip::FabricIndex fabricIndex;
+} TestFabricScoped;
+
 // Struct for Dimension
 typedef struct _Dimension
 {
@@ -42,19 +68,6 @@ typedef struct _AdditionalInfo
     chip::CharSpan name;
     chip::CharSpan value;
 } AdditionalInfo;
-
-// Struct for SimpleStruct
-typedef struct _SimpleStruct
-{
-    uint8_t a;
-    bool b;
-    uint8_t c;
-    chip::ByteSpan d;
-    chip::CharSpan e;
-    uint8_t f;
-    float g;
-    double h;
-} SimpleStruct;
 
 // Struct for NullablesAndOptionalsStruct
 typedef struct _NullablesAndOptionalsStruct
@@ -157,11 +170,11 @@ typedef struct _Target
 // Struct for AccessControlEntry
 typedef struct _AccessControlEntry
 {
-    chip::FabricIndex FabricIndex;
     uint8_t Privilege;
     uint8_t AuthMode;
     /* TYPE WARNING: array array defaults to */ uint8_t * Subjects;
     /* TYPE WARNING: array array defaults to */ uint8_t * Targets;
+    chip::FabricIndex FabricIndex;
 } AccessControlEntry;
 
 // Struct for ActionStruct
@@ -238,36 +251,36 @@ typedef struct _EndpointListStruct
 // Struct for ExtensionEntry
 typedef struct _ExtensionEntry
 {
-    chip::FabricIndex FabricIndex;
     chip::ByteSpan Data;
+    chip::FabricIndex FabricIndex;
 } ExtensionEntry;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {
-    chip::FabricIndex FabricIndex;
     chip::ByteSpan RootPublicKey;
     uint16_t VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::CharSpan Label;
+    chip::FabricIndex FabricIndex;
 } FabricDescriptor;
 
 // Struct for GroupInfoMapStruct
 typedef struct _GroupInfoMapStruct
 {
-    chip::FabricIndex FabricIndex;
     chip::GroupId GroupId;
     /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
     chip::CharSpan GroupName;
+    chip::FabricIndex FabricIndex;
 } GroupInfoMapStruct;
 
 // Struct for GroupKeyMapStruct
 typedef struct _GroupKeyMapStruct
 {
-    chip::FabricIndex FabricIndex;
     chip::GroupId GroupId;
     uint16_t GroupKeySetID;
+    chip::FabricIndex FabricIndex;
 } GroupKeyMapStruct;
 
 // Struct for GroupKeySetStruct
@@ -326,9 +339,9 @@ typedef struct _ModeOptionStruct
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
-    chip::FabricIndex FabricIndex;
     chip::ByteSpan NOC;
     chip::ByteSpan ICAC;
+    chip::FabricIndex FabricIndex;
 } NOCStruct;
 
 // Struct for NeighborTable
@@ -421,9 +434,9 @@ typedef struct _PowerProfileRecord
 // Struct for ProviderLocation
 typedef struct _ProviderLocation
 {
-    chip::FabricIndex FabricIndex;
     chip::NodeId ProviderNodeID;
     chip::EndpointId Endpoint;
+    chip::FabricIndex FabricIndex;
 } ProviderLocation;
 
 // Struct for ReadAttributeStatusRecord
@@ -512,18 +525,12 @@ typedef struct _TargetInfo
 // Struct for TargetStruct
 typedef struct _TargetStruct
 {
-    chip::FabricIndex FabricIndex;
     chip::NodeId Node;
     chip::GroupId Group;
     chip::EndpointId Endpoint;
     chip::ClusterId Cluster;
+    chip::FabricIndex FabricIndex;
 } TargetStruct;
-
-// Struct for TestFabricScoped
-typedef struct _TestFabricScoped
-{
-    chip::FabricIndex fabricIndex;
-} TestFabricScoped;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

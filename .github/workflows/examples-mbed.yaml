@@ -37,15 +37,30 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.52
+            image: connectedhomeip/chip-build-mbed-os:0.5.58
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      mbed:
+                        - '**/mbed/**'
+                      pigweedapp:
+                        - 'examples/pigweed-app/mbed/**'
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -63,8 +78,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
 
             - name: Build lock-app example
               timeout-minutes: 20
@@ -76,6 +91,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build lighting-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=lighting-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -85,6 +101,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build pigweed-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.pigweedapp == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -94,6 +111,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build all-clusters-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=all-clusters-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -103,6 +121,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build shell example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=shell -b=$APP_TARGET -p=$APP_PROFILE
@@ -112,6 +131,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build ota-requestor-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=ota-requestor-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -121,6 +141,8 @@ jobs:
                     /tmp/bloat_reports/
             
             - name: Build unit tests
+              # Temporarily disable build due to running out of flash space
+              if: false
               timeout-minutes: 20
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 

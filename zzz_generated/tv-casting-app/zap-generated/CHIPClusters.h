@@ -72,11 +72,25 @@ public:
     ~ContentLauncherCluster() {}
 };
 
+class DLL_EXPORT DescriptorCluster : public ClusterBase
+{
+public:
+    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
+    ~DescriptorCluster() {}
+};
+
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
 {
 public:
     KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
     ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT LevelControlCluster : public ClusterBase
+{
+public:
+    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
+    ~LevelControlCluster() {}
 };
 
 class DLL_EXPORT MediaInputCluster : public ClusterBase
@@ -91,6 +105,13 @@ class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
 public:
     MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
     ~MediaPlaybackCluster() {}
+};
+
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase

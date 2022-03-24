@@ -18,6 +18,7 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/support/IntrusiveList.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
@@ -25,7 +26,19 @@
 namespace chip {
 namespace AddressResolve {
 
-/// Represents an object intersted in callbacks for a resolve operation.
+/// Contains resolve information received from nodes. Contains all information
+/// bits that are considered useful but does not contain a full DNSSD data
+/// structure since not all DNSSD data is useful during operational processing.
+struct ResolveResult
+{
+    Transport::PeerAddress address;
+    ReliableMessageProtocolConfig mrpConfig;
+    bool supportsTcp = false;
+
+    ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
+};
+
+/// Represents an object interested in callbacks for a resolve operation.
 class NodeListener
 {
 public:
@@ -33,17 +46,17 @@ public:
     virtual ~NodeListener() = default;
 
     /// Callback executed once only for a lookup, when the final address of a
-    /// node is considered  to be the best choice for reachability.
+    /// node is considered to be the best choice for reachability.
     ///
-    /// The callback is expected to be executed within the chip event loop
+    /// The callback is expected to be executed within the CHIP event loop
     /// thread.
-    virtual void OnNodeAddressResolved(const PeerId & peerId, const Transport::PeerAddress & address) = 0;
+    virtual void OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result) = 0;
 
     /// Node resolution failure - occurs only once for a lookup, when an address
     /// could not be resolved - generally due to a timeout or due to DNSSD
     /// infrastructure returning an error.
     ///
-    /// The callback is expected to be executed within the chip event loop
+    /// The callback is expected to be executed within the CHIP event loop
     /// thread.
     virtual void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) = 0;
 };
@@ -59,7 +72,7 @@ public:
     NodeLookupHandleBase() {}
     virtual ~NodeLookupHandleBase() {}
 
-    // While active, resolve handles are maintain in an internal list
+    // While active, resolve handles are maintained in an internal list
     // to be processed, so copying their values (i.e. pointers) is not
     // allowed.
     NodeLookupHandleBase(const NodeLookupHandleBase &) = delete;
@@ -67,6 +80,9 @@ public:
 
     void SetListener(NodeListener * listener) { mListener = listener; }
     NodeListener * GetListener() { return mListener; }
+
+    /// Convenience method that is more readable than 'IsInList'
+    inline bool IsActive() const { return IntrusiveListNodeBase::IsInList(); }
 
 protected:
     NodeListener * mListener = nullptr;
@@ -92,7 +108,7 @@ public:
     /// queries even if a reply has already been received or to allow for
     /// additional heuristics regarding node choice to succeed.
     /// Example heuristics and considerations:
-    ///   - ping/ping6 could be used as an indicator of reacability. NOTE that
+    ///   - ping/ping6 could be used as an indicator of reachability. NOTE that
     ///     not all devices may respond to ping, so this would only be an
     ///     additional signal to accept/increase suitability score of an address
     ///     and should NOT be used as a reject if no ping response
@@ -126,7 +142,7 @@ public:
 
 private:
     static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 3000;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = 10000;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };
@@ -143,8 +159,8 @@ namespace Impl {
 // lookup metadata, so that resolvers do not need to maintain a likely unused
 // pool of 'active lookup' metadata.
 //
-// The sideffect of this is that the ImplNodeLookupHandle is exposed to clients
-// for sizeof() memory purposes.
+// The side-effect of this is that the Impl::NodeLookupHandle is exposed to
+// clients for sizeof() memory purposes.
 //
 // Clients MUST only use the interface in NodeLookupHandleBase and assume all
 // other methods/content is implementation defined.
@@ -155,10 +171,24 @@ class NodeLookupHandle;
 class Resolver
 {
 public:
+    /// Enumeration defining how to handle cancel callbacks during operation
+    /// cancellation.
+    enum class FailureCallback
+    {
+        Call, // Call the failure callback
+        Skip  // do not call the failure callback (generally silent operation)
+    };
+
     virtual ~Resolver();
 
-    /// Expected to be called exactly once before the resolver is ever
+    /// Expected to be called at least once before the resolver is ever
     /// used.
+    ///
+    /// Expected to override global setting of DNSSD callback for addres resolution
+    /// and may use the underlying system layer for timers and other functionality.
+    ///
+    /// If called multiple times, it is expected that the input systemLayer does
+    /// not change.
     virtual CHIP_ERROR Init(System::Layer * systemLayer) = 0;
 
     /// Initiate a node lookup for a particular node and use the specified
@@ -174,6 +204,21 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
+    /// Stops an active lookup request.
+    ///
+    /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
+    /// the `cancel_method` argument.
+    ///
+    /// Note that there is no default cancel_method on purpose, so that the caller has to make
+    /// a clear decision if the callback should or should not be invoked.
+    virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
+
+    /// Shut down any active resolves
+    ///
+    /// Will immediately fail any scheduled resolve calls and will refuse to register
+    /// any new lookups until re-initialized.
+    virtual void Shutdown() = 0;
+
     /// Expected to be provided by the implementation.
     static Resolver & Instance();
 };
@@ -184,7 +229,7 @@ public:
 // outside the open space, include the required platform headers for the
 // actual implementation.
 // Expectations of this include:
-//   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandle
+//   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandleBase
 //   - corresponding CPP file should provide a valid Resolver::Instance()
 //     implementation
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER

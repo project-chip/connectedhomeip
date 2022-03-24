@@ -788,6 +788,8 @@ int TestCHIPArgParser(void)
 
     printf("All tests succeeded\n");
 
+    chip::Platform::MemoryShutdown();
+
     return (EXIT_SUCCESS);
 }
 #else  // CHIP_CONFIG_ENABLE_ARG_PARSER

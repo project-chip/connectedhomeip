@@ -22,9 +22,9 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -200,7 +200,7 @@ void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUp
 {
     if (previousState == newState)
     {
-        ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
+        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
         return;
     }
 

@@ -24,7 +24,14 @@ limitations under the License.
 
   <struct name="TestFabricScoped">
     <cluster code="0x050F"/>
-    <item name="fabricIndex" type="fabric_idx"/>
+    <item fieldId="1" name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
+    <item fieldId="2" name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
+    <item fieldId="3" name="nullableFabricSensitiveInt8u" type="INT8U" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="nullableOptionalFabricSensitiveInt8u" type="INT8U" optional="true" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="5" name="fabricSensitiveCharString" type="CHAR_STRING" isFabricSensitive="true"/>
+    <item fieldId="6" name="fabricSensitiveStruct" type="SimpleStruct" isFabricSensitive="true"/>
+    <item fieldId="7" name="fabricSensitiveInt8uList" type="INT8U" array="true" isFabricSensitive="true"/>
+    <item fieldId="0xFE" name="fabricIndex" type="fabric_idx"/>
   </struct>
 
   <enum name="SimpleEnum" type="ENUM8">
@@ -98,6 +105,38 @@ limitations under the License.
           array="true" optional="true"/>
   </struct>
 
+    <bitmap name="Bitmap8MaskMap" type="BITMAP8">
+        <cluster code="0x050F" />
+        <field mask="0x01" name="MaskVal1" />
+        <field mask="0x02" name="MaskVal2" />
+        <field mask="0x04" name="MaskVal3" />
+        <field mask="0x40" name="MaskVal4" />
+    </bitmap>
+
+    <bitmap name="Bitmap16MaskMap" type="BITMAP16">
+        <cluster code="0x050F" />
+        <field mask="0x01" name="MaskVal1" />
+        <field mask="0x02" name="MaskVal2" />
+        <field mask="0x04" name="MaskVal3" />
+        <field mask="0x4000" name="MaskVal4" />
+    </bitmap>
+
+    <bitmap name="Bitmap32MaskMap" type="BITMAP32">
+        <cluster code="0x050F" />
+        <field mask="0x01" name="MaskVal1" />
+        <field mask="0x02" name="MaskVal2" />
+        <field mask="0x04" name="MaskVal3" />
+        <field mask="0x40000000" name="MaskVal4" />
+    </bitmap>
+    
+    <bitmap name="Bitmap64MaskMap" type="BITMAP64">
+        <cluster code="0x050F" />
+        <field mask="0x01" name="MaskVal1" />
+        <field mask="0x02" name="MaskVal2" />
+        <field mask="0x04" name="MaskVal3" />
+        <field mask="0x4000000000000000" name="MaskVal4" />
+    </bitmap>
+    
   <cluster>
     <domain>CHIP</domain>
     <name>Test Cluster</name>
@@ -106,10 +145,10 @@ limitations under the License.
     <description>The Test Cluster is meant to validate the generated code</description>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="false">boolean</attribute>
-    <attribute side="server" code="0x0001" define="BITMAP8" type="BITMAP8" writable="true" default="0" optional="false">bitmap8</attribute>
-    <attribute side="server" code="0x0002" define="BITMAP16" type="BITMAP16" writable="true" default="0" optional="false">bitmap16</attribute>
-    <attribute side="server" code="0x0003" define="BITMAP32" type="BITMAP32" writable="true" default="0" optional="false">bitmap32</attribute>
-    <attribute side="server" code="0x0004" define="BITMAP64" type="BITMAP64" writable="true" default="0" optional="false">bitmap64</attribute>
+    <attribute side="server" code="0x0001" define="BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" optional="false">bitmap8</attribute>
+    <attribute side="server" code="0x0002" define="BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" optional="false">bitmap16</attribute>
+    <attribute side="server" code="0x0003" define="BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" optional="false">bitmap32</attribute>
+    <attribute side="server" code="0x0004" define="BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" optional="false">bitmap64</attribute>
     <attribute side="server" code="0x0005" define="INT8U" type="INT8U" writable="true" default="0" optional="false">int8u</attribute>
     <attribute side="server" code="0x0006" define="INT16U" type="INT16U" writable="true" default="0" optional="false">int16u</attribute>
     <attribute side="server" code="0x0007" define="INT24U" type="INT24U" writable="true" default="0" optional="false">int24u</attribute>
@@ -150,7 +189,7 @@ limitations under the License.
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
     <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
     <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="true" optional="false">list_long_octet_string</attribute>
-    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="ARRAY" entryType="TestFabricScoped" length="10" writable="false" optional="false">list_fabric_scoped</attribute>
+    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="ARRAY" entryType="TestFabricScoped" length="10" writable="true" optional="false">list_fabric_scoped</attribute>
     <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
                type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
     <!-- Reading/writing the following two attributes will respond with a
@@ -161,10 +200,10 @@ limitations under the License.
                type="BOOLEAN" writable="true" optional="false">cluster_error_boolean</attribute>
 
     <attribute side="server" code="0x8000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
-    <attribute side="server" code="0x8001" define="NULLABLE_BITMAP8" type="BITMAP8" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
-    <attribute side="server" code="0x8002" define="NULLABLE_BITMAP16" type="BITMAP16" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap16</attribute>
-    <attribute side="server" code="0x8003" define="NULLABLE_BITMAP32" type="BITMAP32" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap32</attribute>
-    <attribute side="server" code="0x8004" define="NULLABLE_BITMAP64" type="BITMAP64" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap64</attribute>
+    <attribute side="server" code="0x8001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
+    <attribute side="server" code="0x8002" define="NULLABLE_BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap16</attribute>
+    <attribute side="server" code="0x8003" define="NULLABLE_BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap32</attribute>
+    <attribute side="server" code="0x8004" define="NULLABLE_BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap64</attribute>
     <attribute side="server" code="0x8005" define="NULLABLE_INT8U" type="INT8U" writable="true" default="0" isNullable="true" optional="false">nullable_int8u</attribute>
     <attribute side="server" code="0x8006" define="NULLABLE_INT16U" type="INT16U" writable="true" default="0" isNullable="true" optional="false">nullable_int16u</attribute>
     <attribute side="server" code="0x8007" define="NULLABLE_INT24U" type="INT24U" writable="true" default="0" isNullable="true" optional="false">nullable_int24u</attribute>
@@ -538,7 +577,7 @@ limitations under the License.
 
     <event code="0x0002" name="TestFabricScopedEvent" priority="info" side="server">
       <description>Example test event</description>
-      <field id="1" name="arg1" type="fabric_idx"/>
+      <field id="0xFE" name="arg1" type="fabric_idx"/>
     </event>
 
   </cluster>

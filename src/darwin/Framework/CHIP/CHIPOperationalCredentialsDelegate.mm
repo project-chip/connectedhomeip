@@ -188,7 +188,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
-    const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
+    const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
+    MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
 
@@ -203,11 +204,12 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     ChipDN noc_dn;
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
     ChipDN rcac_dn;
-    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
-    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
+    ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
+    ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
 
     X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
     ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc));
@@ -280,7 +282,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
 
     MutableByteSpan icac;
 
-    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcac, icac, noc));
+    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcac, icac, noc));
 
     onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac, Optional<AesCcm128KeySpan>(), Optional<NodeId>());
 

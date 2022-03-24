@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -37,6 +37,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <protocols/Protocols.h>
@@ -48,40 +49,6 @@ using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
 using namespace chip::Crypto;
-
-static CHIP_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
-{
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    const uint8_t * value = reader.GetValue();
-    uint32_t valueLen     = reader.GetValueLen();
-
-    chipAttrOut = 0;
-
-    VerifyOrExit(value != nullptr, err = ASN1_ERROR_INVALID_ENCODING);
-    VerifyOrExit(valueLen == kChip32bitAttrUTF8Length || valueLen == kChip64bitAttrUTF8Length, err = ASN1_ERROR_INVALID_ENCODING);
-
-    for (uint32_t i = 0; i < valueLen; i++)
-    {
-        chipAttrOut <<= 4;
-        uint8_t ch = value[i];
-        if (ch >= '0' && ch <= '9')
-        {
-            chipAttrOut |= (ch - '0');
-        }
-        // CHIP Id attribute encodings only support uppercase chars.
-        else if (ch >= 'A' && ch <= 'F')
-        {
-            chipAttrOut |= (ch - 'A' + 10);
-        }
-        else
-        {
-            ExitNow(err = ASN1_ERROR_INVALID_ENCODING);
-        }
-    }
-
-exit:
-    return err;
-}
 
 static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, Tag tag, uint64_t & subjectOrIssuer,
                                            Optional<uint64_t> & fabric)
@@ -133,17 +100,14 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         tlvTagNum |= 0x80;
                     }
 
-                    // If the attribute is a CHIP-defined attribute that contains a 64-bit or 32-bit value.
-                    if (IsChipDNAttr(attrOID))
+                    // If 64-bit CHIP attribute.
+                    if (IsChip64bitDNAttr(attrOID))
                     {
-                        // Parse the attribute string into a CHIP attribute.
                         uint64_t chipAttr;
-                        err = ParseChipAttribute(reader, chipAttr);
-                        SuccessOrExit(err);
-
-                        // Write the CHIP attribute value into the TLV.
-                        err = writer.Put(ContextTag(tlvTagNum), chipAttr);
-                        SuccessOrExit(err);
+                        VerifyOrReturnError(Encoding::UppercaseHexToUint64(reinterpret_cast<const char *>(reader.GetValue()),
+                                                                           static_cast<size_t>(reader.GetValueLen()),
+                                                                           chipAttr) == sizeof(uint64_t),
+                                            err = ASN1_ERROR_INVALID_ENCODING);
 
                         // Certificates use a combination of OIDs for Issuer and Subject.
                         // NOC: Issuer  = kOID_AttributeType_ChipRootId or kOID_AttributeType_ChipICAId
@@ -160,20 +124,37 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                             attrOID == chip::ASN1::kOID_AttributeType_ChipICAId ||
                             attrOID == chip::ASN1::kOID_AttributeType_ChipRootId)
                         {
+                            if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+                            {
+                                VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+                            }
                             subjectOrIssuer = chipAttr;
                         }
                         else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
                         {
+                            VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
                             fabric.SetValue(chipAttr);
                         }
-                    }
 
-                    //
+                        ReturnErrorOnFailure(writer.Put(ContextTag(tlvTagNum), chipAttr));
+                    }
+                    // If 32-bit CHIP attribute.
+                    else if (IsChip32bitDNAttr(attrOID))
+                    {
+                        CASEAuthTag chipAttr;
+                        VerifyOrReturnError(Encoding::UppercaseHexToUint32(reinterpret_cast<const char *>(reader.GetValue()),
+                                                                           reader.GetValueLen(), chipAttr) == sizeof(CASEAuthTag),
+                                            err = ASN1_ERROR_INVALID_ENCODING);
+
+                        VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+
+                        ReturnErrorOnFailure(writer.Put(ContextTag(tlvTagNum), chipAttr));
+                    }
+                    // Otherwise, it is a string.
                     else
                     {
-                        err =
-                            writer.PutString(ContextTag(tlvTagNum), Uint8::to_const_char(reader.GetValue()), reader.GetValueLen());
-                        SuccessOrExit(err);
+                        ReturnErrorOnFailure(
+                            writer.PutString(ContextTag(tlvTagNum), Uint8::to_const_char(reader.GetValue()), reader.GetValueLen()));
                     }
                 }
                 ASN1_EXIT_SEQUENCE;

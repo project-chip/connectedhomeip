@@ -25,6 +25,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -41,7 +42,7 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
     CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
     }
 
     PrintOnboardingCodes(payload);
@@ -78,16 +79,6 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
     {
         ChipLogError(AppServer, "Getting manual pairing code failed!");
     }
-
-    // Hand a copy of the payload to GetLongManualPairingCode.
-    if (GetLongManualPairingCode(manualPairingCode, chip::SetupPayload(payload)) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting long manual pairing code failed!");
-    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
@@ -107,31 +98,37 @@ CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousI
     aSetupPayload.version               = 0;
     aSetupPayload.rendezvousInformation = aRendezvousFlags;
 
-    err = ConfigurationMgr().GetSetupPinCode(aSetupPayload.setUpPINCode);
+    err = GetCommissionableDataProvider()->GetSetupPasscode(aSetupPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %s", chip::ErrorStr(err));
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+        ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
+                        static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
+        aSetupPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+#else
         return err;
+#endif
     }
 
-    err = ConfigurationMgr().GetSetupDiscriminator(aSetupPayload.discriminator);
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(aSetupPayload.discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
     err = ConfigurationMgr().GetVendorId(aSetupPayload.vendorID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
     err = ConfigurationMgr().GetProductId(aSetupPayload.productID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
@@ -145,7 +142,7 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
     CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
@@ -159,7 +156,7 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload)
     CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err));
         return err;
     }
 
@@ -187,39 +184,10 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::Rendezvo
     CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
         return err;
     }
     return GetManualPairingCode(aManualPairingCode, payload);
-}
-
-CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
-{
-    chip::SetupPayload payload;
-
-    CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-    return GetLongManualPairingCode(aLongManualPairingCode, std::move(payload));
-}
-
-CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::SetupPayload && payload)
-{
-    // To get payloadDecimalStringRepresentation to produce a long manual
-    // pairing code, the commissioning flow in the payload needs to be kCustom.
-    payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-
-    CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aLongManualPairingCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Generating long manual pairing code failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload)
@@ -227,7 +195,7 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::Se
     CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
         return err;
     }
 

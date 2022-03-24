@@ -11,6 +11,7 @@ Tested on:
 
 -   macOS 10.5
 -   Windows 10 Pro + WSL + Ubuntu 18 LTS
+-   Linux - Fedora Core 35 distribution
 
 ## Setup Steps
 
@@ -98,6 +99,47 @@ the same base debugging setup.
 -   [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 -   [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 -   [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
+
+## Docker FAQ
+
+### DNS problem: can't resolve archive.ubuntu.com
+
+A common problem encountered is that a container can't resolve
+`archive.ubuntu.com` and can't install anything via `apt-get`, during the
+creation of the container image, resulting in an error like:
+
+```
+E: Package 'locales' has no installation candidate
+The command '/bin/sh -c apt-get install -y locales && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8' returned a non-zero code: 100
+```
+
+Most common reason for this is that the DNS for docker daemon has not been set
+up correctly and is simply using a default: 8.8.8.8, which in many corporate or
+more secure environments is not accessible. A typical solution for this is to
+put a following key/value into your system-wide docker `daemon.json` (Typically
+located under `/etc/docker/daemon.json` on a Linux system):
+
+```
+"dns": ["<<IP ADDRESS OF YOUR NAMESERVER>>", "8.8.8.8"]
+```
+
+You can obtain the address you should put into that line of your nameserver by
+running:
+
+```
+nmcli dev show | grep 'IP4.DNS'
+```
+
+After you update the dns, you should restart docker, specific to your system. On
+a typical Linux workstation, you do this via:
+
+```
+sudo service docker restart
+```
+
+Alternatively, you can also pass the `--dns` argument to your docker daemon, but
+creating a `daemon.json` and following the above method will solve the problem
+system-wide.
 
 ## Visual Studio Code FAQ
 

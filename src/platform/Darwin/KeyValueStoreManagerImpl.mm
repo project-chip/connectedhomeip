@@ -152,9 +152,11 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
             NSURL * url = nullptr;
+            NSString * filepath = [NSString stringWithUTF8String:fileName];
+            ReturnErrorCodeIf(filepath == nil, CHIP_ERROR_INVALID_ARGUMENT);
 
             // relative paths are relative to Documents folder
-            if (fileName[0] != '/') {
+            if (![filepath hasPrefix:@"/"]) {
                 NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
                                                                                   inDomain:NSUserDomainMask
                                                                          appropriateForURL:nil
@@ -167,9 +169,9 @@ namespace DeviceLayer {
                 ChipLogProgress(
                     DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
 
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+                url = [NSURL URLWithString:filepath relativeToURL:documentsDirectory];
             } else {
-                url = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
+                url = [NSURL fileURLWithPath:filepath];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -220,22 +222,28 @@ namespace DeviceLayer {
                 return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
             }
 
+            __block NSData * itemValue = nil;
+            // can only access this object on the managed queue
+            [gContext performBlockAndWait:^{
+                itemValue = item.value;
+            }];
+
             if (read_bytes_size != nullptr) {
-                *read_bytes_size = item.value.length;
+                *read_bytes_size = itemValue.length;
             }
 
             if (value != nullptr) {
-                memcpy(value, item.value.bytes, std::min<size_t>((item.value.length), value_size));
+                memcpy(value, itemValue.bytes, std::min<size_t>((itemValue.length), value_size));
 #if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
                 fprintf(stderr, "GETTING VALUE FOR: '%s': ", key);
-                for (size_t i = 0; i < std::min<size_t>((item.value.length), value_size); ++i) {
+                for (size_t i = 0; i < std::min<size_t>((itemValue.length), value_size); ++i) {
                     fprintf(stderr, "%02x ", static_cast<uint8_t *>(value)[i]);
                 }
                 fprintf(stderr, "\n");
 #endif
             }
 
-            if (item.value.length > value_size) {
+            if (itemValue.length > value_size) {
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
 
@@ -274,14 +282,18 @@ namespace DeviceLayer {
 
             NSData * data = [[NSData alloc] initWithBytes:value length:value_size];
 
-            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
+            NSString * itemKey = [[NSString alloc] initWithUTF8String:key];
+            ReturnErrorCodeIf(itemKey == nil, CHIP_ERROR_INVALID_ARGUMENT);
+
+            KeyValueItem * item = FindItemForKey(itemKey, nil);
             if (!item) {
-                item = [[KeyValueItem alloc] initWithContext:gContext key:[[NSString alloc] initWithUTF8String:key] value:data];
                 [gContext performBlockAndWait:^{
-                    [gContext insertObject:item];
+                    [gContext insertObject:[[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data]];
                 }];
             } else {
-                item.value = data;
+                [gContext performBlockAndWait:^{
+                    item.value = data;
+                }];
             }
 
             __block BOOL success = NO;

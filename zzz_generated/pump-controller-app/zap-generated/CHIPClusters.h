@@ -37,11 +37,11 @@ public:
     ~FlowMeasurementCluster() {}
 };
 
-class DLL_EXPORT LevelControlCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
-    ~LevelControlCluster() {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

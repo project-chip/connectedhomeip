@@ -77,8 +77,8 @@ tests:
                 value: {
                         GroupKeySetID: 0x01a1,
                         #  TODO Revert this once MCSP is implemented
-                        # GroupKeySecurityPolicy: 0,
-                        GroupKeySecurityPolicy: 1, # 1 => LowLatency => TrustFirst
+                        # GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # 0 => TrustFirst
                         EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         EpochStartTime0: 1110000,
                         EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
@@ -93,10 +93,9 @@ tests:
       arguments:
           values:
               - name: "GroupKeySet"
-                value:
-                    {
+                value: {
                         GroupKeySetID: 0x01a2,
-                        GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # TrustFirst
                         EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
                         EpochStartTime0: 2220000,
                         EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
@@ -116,26 +115,26 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 
-    - label: "Install ACLs for test"
+    - label: "Install ACLs"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value: [
-                  # Any CASE can admin
+                  # Any CASE can administer
                   {
-                      FabricIndex: 1,
-                      Privilege: 5,
-                      AuthMode: 2,
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
                   },
-                  # These groups can operate
+                  # Any group can operate
                   {
-                      FabricIndex: 1,
-                      Privilege: 3,
-                      AuthMode: 3,
-                      Subjects: [0x0101, 0x0102],
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: null,
                       Targets: null,
                   },
               ]
@@ -185,3 +184,19 @@ tests:
       endpoint: 1
       response:
           value: 1
+
+    - label: "Cleanup ACLs"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]

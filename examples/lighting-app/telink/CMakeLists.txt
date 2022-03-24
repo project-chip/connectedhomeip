@@ -39,6 +39,11 @@ target_include_directories(app PRIVATE
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
+
+add_definitions(
+    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
+
 # TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -99,5 +104,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
                ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
                )

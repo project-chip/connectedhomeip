@@ -51,6 +51,23 @@ void ContentLauncherClusterAcceptHeaderListAttributeFilter(chip::TLV::TLVReader 
                                                            chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+void DescriptorClusterDeviceListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                    chip::Callback::Cancelable * onFailureCallback);
+typedef void (*DescriptorDeviceListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
+void DescriptorClusterServerListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                    chip::Callback::Cancelable * onFailureCallback);
+typedef void (*DescriptorServerListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
+void DescriptorClusterClientListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                    chip::Callback::Cancelable * onFailureCallback);
+typedef void (*DescriptorClientListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
+void DescriptorClusterPartsListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                   chip::Callback::Cancelable * onFailureCallback);
+typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
 void MediaInputClusterInputListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                    chip::Callback::Cancelable * onFailureCallback);
 typedef void (*MediaInputInputListListAttributeCallback)(

@@ -70,3 +70,15 @@ using namespace ::chip;
 }
 
 @end
+
+@implementation CHIPSubscribeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _keepPreviousSubscriptions = nil;
+        _autoResubscribe = nil;
+    }
+    return self;
+}
+
+@end

@@ -20,11 +20,11 @@
 #include <limits>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/dnssd/ActiveResolveAttempts.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
-#include <lib/dnssd/minimal_mdns/ActiveResolveAttempts.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -324,6 +324,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
         mDiscoveredNodeData.IsValid())
     {
+        activeAttempts.Complete(mDiscoveredNodeData);
         if (mCommissioningDelegate != nullptr)
         {
             mCommissioningDelegate->OnNodeDiscovered(mDiscoveredNodeData);
@@ -337,7 +338,6 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     {
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
-        mNodeData.PrioritizeAddresses();
 
         //
         // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
@@ -375,7 +375,6 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -385,11 +384,13 @@ private:
     ActiveResolveAttempts mActiveResolves;
 
     CHIP_ERROR SendPendingResolveQueries();
-    CHIP_ERROR ScheduleResolveRetries();
+    CHIP_ERROR SendPendingBrowseQueries();
+    CHIP_ERROR SendAllPendingQueries();
+    CHIP_ERROR ScheduleRetries();
 
-    static void ResolveRetryCallback(System::Layer *, void * self);
+    static void RetryCallback(System::Layer *, void * self);
 
-    CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
+    CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type, bool unicastResponse);
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
     mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
@@ -421,7 +422,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     else
     {
         reporter.OnComplete(mActiveResolves);
-        ScheduleResolveRetries();
+        ScheduleRetries();
     }
 }
 
@@ -444,7 +445,7 @@ void MinMdnsResolver::Shutdown()
     GlobalMinimalMdnsServer::Instance().ShutdownServer();
 }
 
-CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type)
+CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type, bool unicastResponse)
 {
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -454,13 +455,28 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     mdns::Minimal::Query query(qname);
     query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    query.SetAnswerViaUnicast(true);
+    query.SetAnswerViaUnicast(unicastResponse);
 
     builder.AddQuery(query);
 
     ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-    return GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort);
+    if (unicastResponse)
+    {
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+    }
+    else
+    {
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
+{
+    CHIP_ERROR browseErr  = SendPendingBrowseQueries();
+    CHIP_ERROR resolveErr = SendPendingResolveQueries();
+    return resolveErr == CHIP_NO_ERROR ? browseErr : resolveErr;
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -473,57 +489,87 @@ CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
-// TODO(cecille): Extend filter and use this for Resolve
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mDiscoveryType = type;
+    mActiveResolves.MarkPending(filter, type);
 
-    mdns::Minimal::FullQName qname;
+    return SendPendingBrowseQueries();
+}
 
-    switch (type)
+CHIP_ERROR MinMdnsResolver::SendPendingBrowseQueries()
+{
+    CHIP_ERROR returnErr = CHIP_NO_ERROR;
+    while (true)
     {
-    case DiscoveryType::kOperational:
-        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-        break;
-    case DiscoveryType::kCommissionableNode:
-        if (filter.type == DiscoveryFilterType::kNone)
-        {
-            qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else if (filter.type == DiscoveryFilterType::kInstanceName)
-        {
-            qname = CheckAndAllocateQName(filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else
-        {
-            char subtypeStr[Common::kSubTypeMaxLength + 1];
-            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
-            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
-                                          kLocalDomain);
-        }
-        break;
-    case DiscoveryType::kCommissionerNode:
-        if (filter.type == DiscoveryFilterType::kNone)
-        {
-            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else
-        {
-            char subtypeStr[Common::kSubTypeMaxLength + 1];
-            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
-            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
-                                          kLocalDomain);
-        }
-        break;
-    case DiscoveryType::kUnknown:
-        break;
-    }
-    if (!qname.nameCount)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+        Optional<ActiveResolveAttempts::ScheduledAttempt> attempt = mActiveResolves.NextScheduled();
 
-    return SendQuery(qname, mdns::Minimal::QType::ANY);
+        if (!attempt.HasValue())
+        {
+            break;
+        }
+        if (!attempt.Value().IsBrowse())
+        {
+            continue;
+        }
+
+        mdns::Minimal::FullQName qname;
+
+        switch (attempt.Value().browse.type)
+        {
+        case DiscoveryType::kOperational:
+            qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+            break;
+        case DiscoveryType::kCommissionableNode:
+            if (attempt.Value().browse.filter.type == DiscoveryFilterType::kNone)
+            {
+                qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+            }
+            else if (attempt.Value().browse.filter.type == DiscoveryFilterType::kInstanceName)
+            {
+                qname = CheckAndAllocateQName(attempt.Value().browse.filter.instanceName, kCommissionableServiceName,
+                                              kCommissionProtocol, kLocalDomain);
+            }
+            else
+            {
+                char subtypeStr[Common::kSubTypeMaxLength + 1];
+                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().browse.filter));
+                qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
+                                              kLocalDomain);
+            }
+            break;
+        case DiscoveryType::kCommissionerNode:
+            if (attempt.Value().browse.filter.type == DiscoveryFilterType::kNone)
+            {
+                qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
+            }
+            else
+            {
+                char subtypeStr[Common::kSubTypeMaxLength + 1];
+                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().browse.filter));
+                qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
+                                              kLocalDomain);
+            }
+            break;
+        case DiscoveryType::kUnknown:
+            break;
+        }
+        if (!qname.nameCount)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        bool unicastResponse = attempt.Value().firstSend;
+
+        CHIP_ERROR err = SendQuery(qname, mdns::Minimal::QType::ANY, unicastResponse);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We want to continue sending, but we do want this error returned
+            returnErr = err;
+        }
+    }
+    ReturnErrorOnFailure(ScheduleRetries());
+    return returnErr;
 }
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
@@ -534,16 +580,10 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
     return SendPendingResolveQueries();
 }
 
-bool MinMdnsResolver::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
-{
-    // MinMDNS does not do cache node address resolutions.
-    return false;
-}
-
-CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
+CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
+    mSystemLayer->CancelTimer(&RetryCallback, this);
 
     Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
@@ -552,23 +592,27 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delay.Value(), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delay.Value(), &RetryCallback, this);
 }
 
-void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
+void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
 {
-    reinterpret_cast<MinMdnsResolver *>(self)->SendPendingResolveQueries();
+    reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
 }
 
 CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 {
     while (true)
     {
-        Optional<ActiveResolveAttempts::ScheduledResolve> resolve = mActiveResolves.NextScheduledPeer();
+        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
 
         if (!resolve.HasValue())
         {
             break;
+        }
+        if (!resolve.Value().IsResolve())
+        {
+            continue;
         }
 
         System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
@@ -620,7 +664,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
         }
     }
 
-    return ScheduleResolveRetries();
+    return ScheduleRetries();
 }
 
 MinMdnsResolver gResolver;
@@ -639,6 +683,9 @@ Resolver & chip::Dnssd::Resolver::Instance()
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
+                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
     chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
 }
@@ -655,11 +702,6 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
-}
-
-bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
-{
-    return chip::Dnssd::Resolver::Instance().ResolveNodeIdFromInternalCache(peerId, type);
 }
 
 } // namespace Dnssd

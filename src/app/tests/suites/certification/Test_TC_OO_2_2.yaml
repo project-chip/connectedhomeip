@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.2. [TC-OO-3] Primary functionality with server as DUT
+name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -46,6 +46,24 @@ tests:
       response:
           value: 1
 
+    - label: "Send On Command"
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Send Off Command"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
     - label: "Send Off Command"
       command: "Off"
 
@@ -58,6 +76,14 @@ tests:
     - label: "Send Toggle Command"
       command: "Toggle"
 
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Check on/off attribute value is true after toggle command"
       command: "readAttribute"
       attribute: "OnOff"
@@ -67,22 +93,52 @@ tests:
     - label: "Send Toggle Command"
       command: "Toggle"
 
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Check on/off attribute value is false after toggle command"
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Send On Command"
-      command: "on"
+    - label: "User prompt Set OnOff attribute manually to on"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operate on device to set OnOff attribute manually to on"
 
     - label: "Check on/off attribute value is true after on command"
+      disabled: true
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "Send Off Command"
+    - label: "User prompt Set OnOff attribute manually to off"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Operate on device to set OnOff attribute manually to off"
+
+    - label: "Check on/off attribute value is false after off command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Reset Off Command"
       command: "Off"
 
     - label: "Check on/off attribute value is false after off command"

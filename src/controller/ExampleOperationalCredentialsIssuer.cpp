@@ -52,11 +52,14 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
 
     Crypto::P256SerializedKeypair serializedKey;
-    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
+    {
+        // Scope for keySize, because we use it as an in/out param.
+        uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-    serializedKey.SetLength(keySize);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+        serializedKey.SetLength(keySize);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -65,10 +68,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(serializedKey.Capacity());
-
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
+                          ReturnErrorOnFailure(
+                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
@@ -76,11 +78,14 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
-    keySize = static_cast<uint16_t>(serializedKey.Capacity());
+    {
+        // Scope for keySize, because we use it as an in/out param.
+        uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-    serializedKey.SetLength(keySize);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+        serializedKey.SetLength(keySize);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -90,10 +95,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(serializedKey.Capacity());
-
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
+                          ReturnErrorOnFailure(
+                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
@@ -107,6 +111,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 }
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
+                                                                                const CATValues & cats,
                                                                                 const Crypto::P256PublicKey & pubkey,
                                                                                 MutableByteSpan & rcac, MutableByteSpan & icac,
                                                                                 MutableByteSpan & noc)
@@ -114,13 +119,13 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     ChipDN noc_dn;
     // TODO: Is there a way to make this code less error-prone for consumers?
     // The consumer doesn't need to know the exact OID value.
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
-    // TODO: Add support for the CASE Authenticated Tags attributes
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
     ChipDN icac_dn;
-    icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId);
+    ReturnErrorOnFailure(icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId));
     ChipDN rcac_dn;
-    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
+    ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
 
     ChipLogProgress(Controller, "Generating NOC");
     X509CertRequestParams noc_request = { 1, mNow, mNow + mValidity, noc_dn, icac_dn };
@@ -219,7 +224,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
-    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(
+        GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcacSpan, icacSpan, nocSpan));
 
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
     onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, Optional<AesCcm128KeySpan>(),

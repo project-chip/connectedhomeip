@@ -25,6 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -590,7 +591,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     // If the device name is not specified, generate a CHIP-standard name based on the bottom digits of the Chip device id.
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {

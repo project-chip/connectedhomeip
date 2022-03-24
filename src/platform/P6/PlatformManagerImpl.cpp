@@ -28,7 +28,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/P6/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 namespace chip {
 namespace DeviceLayer {

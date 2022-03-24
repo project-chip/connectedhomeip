@@ -1,5 +1,6 @@
 {
     "cipd_package_files": [
+        "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/arm.json",
         "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json",
         "scripts/python.json"
     ],
@@ -7,5 +8,6 @@
         "gn_root": ".",
         "gn_targets": [":python_packages.install"]
     },
-    "required_submodules": ["third_party/pigweed/repo"]
+    "required_submodules": ["third_party/pigweed/repo"],
+    "gni_file": "build_overrides/pigweed_environment.gni"
 }

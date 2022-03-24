@@ -31,7 +31,7 @@ namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
                                                      Ble::BleLayer * bleLayer, SessionManager * sessionManager,
-                                                     FabricTable * fabrics, SessionIDAllocator * idAllocator)
+                                                     FabricTable * fabrics)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -42,7 +42,6 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mSessionManager  = sessionManager;
     mFabrics         = fabrics;
     mExchangeManager = exchangeManager;
-    mIDAllocator     = idAllocator;
 
     Cleanup();
     return CHIP_NO_ERROR;
@@ -68,7 +67,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
 #endif
 
-    ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
+    ReturnErrorOnFailure(mSessionIDAllocator.Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current fabric.
     ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
@@ -115,8 +114,8 @@ void CASEServer::Cleanup()
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    ChipLogProgress(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    mIDAllocator->Free(mSessionKeyId);
+    ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
+    mSessionIDAllocator.Free(mSessionKeyId);
     Cleanup();
 }
 

@@ -26,7 +26,7 @@ namespace NetworkCommissioning {
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 } // namespace
 
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -88,7 +88,7 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
-    CHIP_ERROR Init() override;
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     CHIP_ERROR Shutdown() override;
 
     // WirelessDriver

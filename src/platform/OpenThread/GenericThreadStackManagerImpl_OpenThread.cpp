@@ -127,6 +127,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     {
         ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
     }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
 }
 
 template <class ImplClass>
@@ -708,12 +710,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Leader Router ID: %u\n"
                     "Parent Avg RSSI:  %d\n"
                     "Parent Last RSSI: %d\n"
-                    "Partition ID:     %" PRIu32 "\n"
+                    "Partition ID:     %" PRIu32 "\n",
+                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Instant RSSI:     %d\n",
-                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId, extAddress->m8[0],
-                    extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4], extAddress->m8[5],
-                    extAddress->m8[6], extAddress->m8[7], instantRssi);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
 
 exit:
     Impl()->UnlockThreadStack();
@@ -746,7 +750,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
     otNeighborInfo neighborInfo[TELEM_NEIGHBOR_TABLE_SIZE];
     otNeighborInfoIterator iter;
     otNeighborInfoIterator iterCopy;
-    char printBuf[TELEM_PRINT_BUFFER_SIZE];
+    char printBuf[TELEM_PRINT_BUFFER_SIZE] = { 0 };
     uint16_t rloc16;
     uint16_t routerId;
     uint16_t leaderRouterId;
@@ -806,30 +810,37 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         iterCopy = iter;
     }
 
+    snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, "%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X",
+             leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
+             leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
+             leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
+             leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
+
     ChipLogProgress(DeviceLayer,
                     "Thread Topology:\n"
                     "RLOC16:                        %04X\n"
                     "Router ID:                     %u\n"
                     "Leader Router ID:              %u\n"
-                    "Leader Address:                %02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
+                    "Leader Address:                %s\n"
                     "Leader Weight:                 %d\n"
                     "Local Leader Weight:           %d\n"
                     "Network Data Len:              %d\n"
                     "Network Data Version:          %d\n"
-                    "Stable Network Data Version:   %d\n"
+                    "Stable Network Data Version:   %d\n",
+                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen, networkDataVersion,
+                    stableNetworkDataVersion);
+
+    memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Partition ID:                  %" PRIx32 "\n"
                     "Instant RSSI:                  %d\n"
                     "Neighbor Table Length:         %d\n"
                     "Child Table Length:            %d\n",
-                    rloc16, routerId, leaderRouterId, leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1],
-                    leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3], leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5],
-                    leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7], leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9],
-                    leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11], leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13],
-                    leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15], leaderWeight, leaderLocalWeight, networkDataLen,
-                    networkDataVersion, stableNetworkDataVersion, extAddress->m8[0], extAddress->m8[1], extAddress->m8[2],
-                    extAddress->m8[3], extAddress->m8[4], extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId,
-                    instantRssi, neighborTableSize, childTableSize);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize,
+                    childTableSize);
 
     // Handle each neighbor event seperatly.
     for (uint32_t i = 0; i < neighborTableSize; i++)
@@ -856,19 +867,22 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         "Age:               %3" PRIu32 "\n"
                         "LQI:               %1d\n"
                         "AvgRSSI:           %3d\n"
-                        "LastRSSI:          %3d\n"
+                        "LastRSSI:          %3d\n",
+                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
+                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
+                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
+                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi);
+
+        ChipLogProgress(DeviceLayer,
                         "LinkFrameCounter:  %10" PRIu32 "\n"
                         "MleFrameCounter:   %10" PRIu32 "\n"
                         "RxOnWhenIdle:      %c\n"
                         "FullFunction:      %c\n"
                         "FullNetworkData:   %c\n"
                         "IsChild:           %c%s\n",
-                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
-                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
-                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
-                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi, neighbor->mLinkFrameCounter,
-                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n', neighbor->mFullThreadDevice ? 'Y' : 'n',
-                        neighbor->mFullNetworkData ? 'Y' : 'n', neighbor->mIsChild ? 'Y' : 'n', printBuf);
+                        neighbor->mLinkFrameCounter, neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
+                        neighbor->mFullThreadDevice ? 'Y' : 'n', neighbor->mFullNetworkData ? 'Y' : 'n',
+                        neighbor->mIsChild ? 'Y' : 'n', printBuf);
     }
 
 exit:
@@ -1799,9 +1813,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerDiscerner discerner;
-        uint16_t discriminator;
+        // This is dead code to remove, so the placeholder value is OK.
+        // See ThreadStackManagerImpl.
+        uint16_t discriminator = 3840;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
@@ -1811,9 +1826,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerPskd pskd;
-        uint32_t pincode;
+        // This is dead code to remove, so the placeholder value is OK.d
+        // See ThreadStackManagerImpl.
+        uint32_t pincode = 20202021;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
         snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
 
         ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
@@ -1827,6 +1843,36 @@ exit:
     ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
 
     return error;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[chip::Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(datasetTLV));
+    ReturnOnFailure(dataset.Init(datasetTLV));
+    // The Thread network is not enabled, but has a different extended pan id.
+    ReturnOnFailure(dataset.GetExtendedPanId(extpanid));
+    // If we don't have a valid dataset, we are not attempting to connect the network.
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)),
+                                                         MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -1843,7 +1889,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
     switch (aError)
     {
     case OT_ERROR_NONE: {
-        ChipLogProgress(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+        ChipLogDetail(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
 
         if (aHostInfo)
         {

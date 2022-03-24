@@ -118,6 +118,18 @@ public:
     PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
+     * Should be called after initializing all layers of the Matter stack to
+     * run all needed post-startup actions.
+     */
+    void HandleServerStarted();
+
+    /**
+     * Should be called before shutting down the Matter stack or restarting the
+     * application to run all needed pre-shutdown actions.
+     */
+    void HandleServerShuttingDown();
+
+    /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
@@ -193,6 +205,15 @@ public:
     CHIP_ERROR GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
+    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
+
 private:
     bool mInitialized                   = false;
     PlatformManagerDelegate * mDelegate = nullptr;
@@ -204,6 +225,7 @@ private:
     friend class ConfigurationManagerImpl;
     friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
+    friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
@@ -226,14 +248,6 @@ private:
     friend class Internal::GenericConfigurationManagerImpl;
     friend class System::PlatformEventing;
 
-    /*
-     * PostEvent can be called safely on any thread without locking the stack.
-     * When called from a thread that is not doing the stack work item
-     * processing, the event might get dispatched (on the work item processing
-     * thread) before PostEvent returns.
-     */
-    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
-    void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(System::Clock::Timeout duration);
 
@@ -339,6 +353,16 @@ inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, in
 inline void PlatformManager::RemoveEventHandler(EventHandlerFunct handler, intptr_t arg)
 {
     static_cast<ImplClass *>(this)->_RemoveEventHandler(handler, arg);
+}
+
+inline void PlatformManager::HandleServerStarted()
+{
+    static_cast<ImplClass *>(this)->_HandleServerStarted();
+}
+
+inline void PlatformManager::HandleServerShuttingDown()
+{
+    static_cast<ImplClass *>(this)->_HandleServerShuttingDown();
 }
 
 inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)

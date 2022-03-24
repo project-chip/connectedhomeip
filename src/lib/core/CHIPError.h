@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -1232,16 +1232,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_ACCESS_TOKEN                        CHIP_CORE_ERROR(0x58)
 
 /**
- *  @def CHIP_ERROR_WRONG_CERT_SUBJECT
+ *  @def CHIP_ERROR_WRONG_CERT_DN
  *
  *  @brief
- *    A certificate subject is wrong.
+ *    A certificate subject/issuer distinguished name is wrong.
  *
  */
-#define CHIP_ERROR_WRONG_CERT_SUBJECT                          CHIP_CORE_ERROR(0x59)
-
-// deprecated alias
-#define CHIP_ERROR_WRONG_CERTIFICATE_SUBJECT CHIP_ERROR_WRONG_CERT_SUBJECT
+#define CHIP_ERROR_WRONG_CERT_DN                               CHIP_CORE_ERROR(0x59)
 
 /**
  *  @def CHIP_ERROR_INVALID_PROVISIONING_BUNDLE
@@ -1469,8 +1466,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TOO_MANY_CONNECTIONS                        CHIP_CORE_ERROR(0x72)
 
-// unused                                                      CHIP_CORE_ERROR(0x73)
-// unused                                                      CHIP_CORE_ERROR(0x74)
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation cancelled because a shut down was initiated
+ */
+#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+
+/**
+ * @def CHIP_ERROR_SHUT_DOWN
+ *
+ * @brief
+ *   The operation has been cancelled, generally by calling a cancel/abort request.
+ */
+#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
 
 /**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
@@ -1490,77 +1500,28 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_TAG_NOT_FOUND                           CHIP_CORE_ERROR(0x76)
 
-/**
- *  @def CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE
- *
- *  @brief
- *    A token pairing bundle is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE                  CHIP_CORE_ERROR(0x77)
+// unused CHIP_CORE_ERROR(0x77)
+
+// unused CHIP_CORE_ERROR(0x78)
+
+// unused CHIP_CORE_ERROR(0x79)
+
+// unused CHIP_CORE_ERROR(0x7a)
+
+// unused CHIP_CORE_ERROR(0x7b)
+
+// unused CHIP_CORE_ERROR(0x7c)
+
+// unused CHIP_CORE_ERROR(0x7d)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION
+ *  @def CHIP_ERROR_FABRIC_EXISTS
  *
  *  @brief
- *    A token pairing bundle is invalid.
+ *    The fabric with the given fabric id and root public key already exists.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION      CHIP_CORE_ERROR(0x78)
-
-/**
- *  @def CHIP_ERROR_NO_TAKE_AUTH_DELEGATE
- *
- *  @brief
- *    No TAKE authentication delegate is set.
- *
- */
-#define CHIP_ERROR_NO_TAKE_AUTH_DELEGATE                       CHIP_CORE_ERROR(0x79)
-
-/**
- *  @def CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED
- *
- *  @brief
- *    TAKE requires a reconfigure.
- *
- */
-#define CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED                   CHIP_CORE_ERROR(0x7a)
-
-/**
- *  @def CHIP_ERROR_TAKE_REAUTH_POSSIBLE
- *
- *  @brief
- *    TAKE can do a reauthentication.
- *
- */
-#define CHIP_ERROR_TAKE_REAUTH_POSSIBLE                        CHIP_CORE_ERROR(0x7b)
-
-/**
- *  @def CHIP_ERROR_INVALID_TAKE_PARAMETER
- *
- *  @brief
- *    Received an invalid TAKE parameter.
- *
- */
-#define CHIP_ERROR_INVALID_TAKE_PARAMETER                      CHIP_CORE_ERROR(0x7c)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION
- *
- *  @brief
- *    This configuration is not supported by TAKE.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION              CHIP_CORE_ERROR(0x7d)
-
-/**
- *  @def CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED
- *
- *  @brief
- *    The TAKE Token Identification failed.
- *
- */
-#define CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED            CHIP_CORE_ERROR(0x7e)
+#define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
 /**
  *  @def CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER
@@ -2402,6 +2363,14 @@ using CHIP_ERROR = ::chip::ChipError;
  *   has unexpected value.
  */
 #define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
+
+/**
+ * @def CHIP_ERROR_BUSY
+ *
+ * @brief
+ *   The Resource is busy and cannot process the request. Trying again might work.
+ */
+#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
 
 /**
  *  @}

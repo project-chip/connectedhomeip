@@ -32,14 +32,21 @@
     MatterFlowMeasurementPluginServerInitCallback();                                                                               \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
+    MatterGroupsPluginServerInitCallback();                                                                                        \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
+    MatterOccupancySensingPluginClientInitCallback();                                                                              \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \
     MatterPressureMeasurementPluginServerInitCallback();                                                                           \
     MatterPumpConfigurationAndControlPluginServerInitCallback();                                                                   \
+    MatterScenesPluginServerInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \

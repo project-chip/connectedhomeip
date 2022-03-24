@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
 
@@ -56,6 +57,29 @@ struct CATValues
         }
         return false;
     }
+
+    static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
+    typedef uint8_t Serialized[kSerializedLength];
+
+    CHIP_ERROR Serialize(Serialized & outSerialized) const
+    {
+        uint8_t * p = outSerialized;
+        for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
+        {
+            Encoding::LittleEndian::Write32(p, values[i]);
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Deserialize(const Serialized & inSerialized)
+    {
+        const uint8_t * p = inSerialized;
+        for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
+        {
+            values[i] = Encoding::LittleEndian::Read32(p);
+        }
+        return CHIP_NO_ERROR;
+    }
 };
 
 static constexpr CATValues kUndefinedCATs = { { kUndefinedCAT } };
@@ -68,6 +92,11 @@ constexpr NodeId NodeIdFromCASEAuthTag(CASEAuthTag aCAT)
 constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
 {
     return aNodeId & kMaskCASEAuthTag;
+}
+
+constexpr CASEAuthTag IsValidCASEAuthTag(CASEAuthTag aCAT)
+{
+    return (aCAT & kTagVersionMask) > 0;
 }
 
 } // namespace chip

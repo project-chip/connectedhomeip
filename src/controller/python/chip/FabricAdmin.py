@@ -152,7 +152,7 @@ class FabricAdmin:
 
         FabricAdmin.activeAdmins.add(self)
 
-    def NewController(self, nodeId: int = None, useTestCommissioner: bool = False):
+    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         ''' Vend a new controller on this fabric seeded with the right fabric details.
         '''
         if (not(self._isActive)):
@@ -166,7 +166,7 @@ class FabricAdmin:
         print(
             f"Allocating new controller with FabricId: {self._fabricId}({self._fabricIndex}), NodeId: {nodeId}")
         controller = ChipDeviceCtrl.ChipDeviceController(
-            self.closure, self._fabricId, self._fabricIndex, nodeId, useTestCommissioner)
+            self.closure, self._fabricId, self._fabricIndex, nodeId, paaTrustStorePath, useTestCommissioner)
         return controller
 
     def ShutdownAll():
