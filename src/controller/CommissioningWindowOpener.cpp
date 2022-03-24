@@ -245,7 +245,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
         err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
                                                                                            OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
-        messageIfError = "Could not read VID for opening commissioning window";
+        messageIfError = "Could not read PID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
         break;
     }

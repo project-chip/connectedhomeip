@@ -85,8 +85,12 @@ public:
      * @param[in] discriminator The long discriminator for the DNS-SD advertisement.
      * @param[in] setupPIN      The setup PIN to use, or NullOptional to use a randomly-generated one.
      * @param[in] callback      The function to be called on success or failure of opening of commissioning window.
-     * @param[out] payload      The setup payload, not including the VID/PID bits, that is generated based on the
-     *                          passed-in information.
+     * @param[out] payload      The setup payload, not including the VID/PID bits,
+     *                          even if those were asked for, that is generated
+     *                          based on the passed-in information.  The payload
+     *                          provided to the callback function, unlike this
+     *                          out parameter, will include the VID/PID bits if
+     *                          readVIDPIDAttributes is true.
      *
      * @param[in] readVIDPIDAttributes Should the API internally read VID and PID from the device while opening the
      *                                 commissioning window.  If this argument is `true`, the API will read VID and
