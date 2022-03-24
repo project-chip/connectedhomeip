@@ -638,6 +638,9 @@ IdleStateReason OTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
 
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
+    ChipLogError(SoftwareUpdate, "//is: RecordNewUpdateState newState %d, reason %d", to_underlying(newState),
+                 to_underlying(reason));
+
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
 

@@ -392,12 +392,8 @@ void GenericOTARequestorDriver::StopPeriodicQueryTimer()
 
 void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    ChipLogProgress(SoftwareUpdate, "Watchdog timer handler is invoked");
-
-    OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
-
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
-                 to_underlying(currentState));
+                 to_underlying(mRequestor->GetCurrentUpdateState()));
 
     // Something went wrong and OTA requestor is stuck in a non-idle state for too long.
     // Let's just cancel download, reset state, and re-start periodic query timer.
