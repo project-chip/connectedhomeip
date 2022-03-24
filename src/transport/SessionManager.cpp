@@ -209,6 +209,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
         else
         {
+            // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
+            // and the key is short-lived and always different for each PASE session.
             CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, kUndefinedNodeId);
         }
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
@@ -578,6 +580,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
     // Decrypt and verify the message before message counter verification or any further processing.
     CryptoContext::NonceStorage nonce;
+    // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
+    // and the key is short-lived and always different for each PASE session.
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
                               secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId()
                                                                                                   : kUndefinedNodeId);
