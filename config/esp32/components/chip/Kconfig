@@ -102,6 +102,12 @@ menu "CHIP Core"
             help
                 Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
 
+        config BUILD_CHIP_TESTS
+            bool "Build CHIP tests"
+            default "y"
+            help
+                Build CHIP test binaries.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -746,6 +752,20 @@ menu "CHIP Device Layer"
               and ReleaseNotesURL) to the ota_image_tool.py script.
               eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
 
+    endmenu
+
+    menu "External Platform"
+        config CHIP_ENABLE_EXTERNAL_PLATFORM
+            bool "Enable external platform layer"
+            default n
+            help
+                Use external platform layer to override the default ESP32 platform in Matter SDK.
+
+        config CHIP_EXTERNAL_PLATFORM_TARGET
+            string "The external platform target"
+            depends on CHIP_ENABLE_EXTERNAL_PLATFORM
+            help
+                The gn target of the external platform.
     endmenu
 
 endmenu

@@ -38,6 +38,7 @@
 
 /* Platform include headers */
 #if CHIP_HAVE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <system/SystemBuildConfig.h>
 #endif
 
