@@ -62,9 +62,11 @@ m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : 0x9FC00;
 
 MEMORY
 {
-  Flash640 (rx) : ORIGIN = m_app_start, LENGTH = m_app_size
-  RAM0 (rwx)    : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
-  RAM1 (rwx)    : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
+  Flash640 (rx)     : ORIGIN = m_app_start, LENGTH = m_app_size
+  
+  SCRATCH_RAM(rwx)  : ORIGIN = 0x4000000, LENGTH = 0x400   /* 1K bytes (alias SCRATCH_RAM) */
+  RAM0 (rwx)        : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
+  RAM1 (rwx)        : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
 }
 
 /* Define a symbol for the top of each memory region */
@@ -233,6 +235,13 @@ SECTIONS
         . = ALIGN(4);
         __interrupts_ram_end__ = .;     /* Define a global symbol at data end */
     } > RAM0
+    .scratch_area (NOLOAD): ALIGN(4)
+    {
+       __scratch_area_start__ = .;
+       . = ALIGN(4) ;
+       . += 0x400;
+       __scratch_area_top__ = .;
+    } > SCRATCH_RAM
 
     /* MAIN DATA SECTION */
     .uninit_RESERVED : ALIGN(4)
@@ -339,6 +348,8 @@ SECTIONS
     PROVIDE(Chip_LOWPOWER_ChipSoftwareReset = 0x03003fa1);
     PROVIDE(_pvHeapStart = _heap);
     PROVIDE(_pvHeapLimit = _pvHeapStart + (HEAP_SIZE));
+    PROVIDE(_scratch_buf_start = __scratch_area_start__);
+    PROVIDE(_scratch_buf_end = __scratch_area_top__);
 
     __StackLimit = _vStackTop - STACK_SIZE;
 }

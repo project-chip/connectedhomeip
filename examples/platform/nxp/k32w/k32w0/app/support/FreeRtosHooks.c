@@ -30,6 +30,7 @@
 #include "PWR_Interface.h"
 #include "TimersManager.h"
 #include "board.h"
+#include "PDM.h"
 
 /* Bluetooth Low Energy */
 #include "ble_config.h"
@@ -51,6 +52,10 @@
 #else
 #define APP_DBG_LOG(...)
 #endif
+
+#define PDM_MAX_WRITES_INFINITE 0xFF
+
+extern bool shouldReset;
 
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
@@ -218,6 +223,8 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
     OSA_InterruptEnable();
 }
 
+#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
+
 static void BOARD_ActionOnIdle(void)
 {
 #if ((defined gTcxo32k_ModeEn_c) && (gTcxo32k_ModeEn_c != 0))
@@ -230,7 +237,17 @@ static void BOARD_ActionOnIdle(void)
 
 void vApplicationIdleHook(void)
 {
+    PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+            OTA_TransactionResume();
+
+            if (shouldReset)
+            {
+                ResetMCU();
+            }
+#endif
+
+
     BOARD_ActionOnIdle();
 }
-
-#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
