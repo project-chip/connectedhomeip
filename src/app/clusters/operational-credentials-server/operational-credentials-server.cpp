@@ -629,6 +629,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index just allocated.
+    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     // Keep this after other possible failures, so it doesn't need to be rolled back in case of
     // subsequent failures. This should only typically fail if there is no space for the new entry.
     err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
@@ -646,11 +651,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
     err = gFabricBeingCommissioned.GetCompressedId(compressed_fabric_id);
     err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index just allocated.
-    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
