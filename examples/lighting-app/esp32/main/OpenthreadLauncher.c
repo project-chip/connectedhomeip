@@ -16,6 +16,7 @@
  */
 
 #include "OpenthreadConfig.h"
+#include "driver/uart.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_netif_types.h"
@@ -24,36 +25,35 @@
 #include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
-#include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "openthread/instance.h"
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
 
-static esp_netif_t *init_openthread_netif(const esp_openthread_platform_config_t *config)
+static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_t * config)
 {
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_OPENTHREAD();
-    esp_netif_t *netif = esp_netif_new(&cfg);
+    esp_netif_t * netif    = esp_netif_new(&cfg);
     assert(netif != NULL);
     ESP_ERROR_CHECK(esp_netif_attach(netif, esp_openthread_netif_glue_init(config)));
 
     return netif;
 }
 
-static void ot_task_worker(void *context)
+static void ot_task_worker(void * context)
 {
     esp_openthread_platform_config_t config = {
         .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
-        .host_config = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
-        .port_config = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
     };
-    esp_netif_t *openthread_netif;
+    esp_netif_t * openthread_netif;
 
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(&config));
     // The OpenThread log level directly matches ESP log level
-    (void)otLoggingSetLevel(OT_LOG_LEVEL_INFO);
+    (void) otLoggingSetLevel(OT_LOG_LEVEL_INFO);
     // Initialize the esp_netif bindings
     openthread_netif = init_openthread_netif(&config);
 
