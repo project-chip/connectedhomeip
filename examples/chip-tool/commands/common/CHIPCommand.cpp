@@ -133,7 +133,7 @@ void CHIPCommand::StartTracing()
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
-    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
     }

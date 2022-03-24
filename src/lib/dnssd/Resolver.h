@@ -71,12 +71,8 @@ struct ResolvedNodeData
         // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
-        if ((mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout)))
-        {
-            return true;
-        }
-        return false;
+        return (mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
     }
 
     PeerId mPeerId;
@@ -156,13 +152,8 @@ struct DiscoveredNodeData
         // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
-        if ((mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout)))
-
-        {
-            return true;
-        }
-        return false;
+        return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
     }
 
     void LogDetail() const
