@@ -176,7 +176,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 JniByteArray Ipv4ByteArray(env, jIpv4AddressObj);
 
-                if(Ipv4ByteArray.size() == kMaxIPv4AddrSize)
+                if (Ipv4ByteArray.size() == kMaxIPv4AddrSize)
                 {
                     memcpy(ifp->Ipv4AddressesBuffer[0], reinterpret_cast<const uint8_t *>(Ipv4ByteArray.data()), kMaxIPv4AddrSize);
                     ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
@@ -184,7 +184,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 }
                 else
                 {
-                    ChipLogError(DeviceLayer,"ipv4Address size (%d) not equal to kMaxIPv4AddrSize", Ipv4ByteArray.size());
+                    ChipLogError(DeviceLayer, "ipv4Address size (%d) not equal to kMaxIPv4AddrSize", Ipv4ByteArray.size());
                 }
             }
 
@@ -194,7 +194,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 JniByteArray Ipv6ByteArray(env, jIpv6AddressObj);
 
-                if(Ipv6ByteArray.size() == kMaxIPv6AddrSize) 
+                if (Ipv6ByteArray.size() == kMaxIPv6AddrSize)
                 {
                     memcpy(ifp->Ipv6AddressesBuffer[0], reinterpret_cast<const uint8_t *>(Ipv6ByteArray.data()), kMaxIPv6AddrSize);
                     ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
@@ -202,7 +202,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 }
                 else
                 {
-                    ChipLogError(DeviceLayer,"ipv6Address size (%d) not equal to kMaxIPv6AddrSize", Ipv6ByteArray.size());
+                    ChipLogError(DeviceLayer, "ipv6Address size (%d) not equal to kMaxIPv6AddrSize", Ipv6ByteArray.size());
                 }
             }
 
