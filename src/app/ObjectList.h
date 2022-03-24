@@ -18,12 +18,6 @@
 
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteEventPath.h>
-#include <app/util/basic-types.h>
-#include <assert.h>
-#include <lib/core/Optional.h>
-
 namespace chip {
 namespace app {
 
