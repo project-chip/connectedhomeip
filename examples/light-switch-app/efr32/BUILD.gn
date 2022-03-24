@@ -66,6 +66,10 @@ declare_args() {
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
+
+# Enables LCD on supported devices
+lcd_on = show_qr_code
+
 if (use_rs911x || use_wf200) {
   wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
   if (use_rs911x) {
@@ -163,7 +167,6 @@ efr32_executable("light_switch_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/light-switch-app/light-switch-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -218,9 +221,13 @@ efr32_executable("light_switch_app") {
     include_dirs += wf200_plat_incs
   }
 
-  if (show_qr_code) {
+  if (lcd_on) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
   }
 
   if (chip_enable_pw_rpc) {

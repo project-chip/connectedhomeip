@@ -51,14 +51,19 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Enables LCD Qr Code on supported devices
+  # Enables Qr Code on supported devices
   show_qr_code = true
 }
+
+# Enables LCD on supported devices
+lcd_on = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
+  lcd_on = false
 }
+
 if (use_rs911x || use_wf200) {
   wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
   if (use_rs911x) {
@@ -180,7 +185,6 @@ efr32_executable("window_app") {
   }
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/window-app/common:window-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -205,13 +209,17 @@ efr32_executable("window_app") {
     }
   }
 
-  if (show_qr_code) {
+  if (lcd_on) {
     sources += [
       "${examples_plat_dir}/display/lcd.c",
       "src/LcdPainter.cpp",
     ]
-
     defines += [ "DISPLAY_ENABLED" ]
+
+    if (show_qr_code) {
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+      defines += [ "QR_CODE_ENABLED" ]
+    }
   }
 
   if (enable_heap_monitoring) {

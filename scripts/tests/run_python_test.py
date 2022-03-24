@@ -31,6 +31,8 @@ import logging
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
+MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
+
 
 def EnqueueLogOutput(fp, tag, q):
     for line in iter(fp.readline, b''):
@@ -88,7 +90,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         DumpProgramOutputToQueue(
             log_cooking_threads, "\33[34mAPP \33[0m", app_process, log_queue)
 
-    script_command = ["/usr/bin/env", "python3", script,
+    script_command = ["/usr/bin/env", "python3", script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s'] + shlex.split(script_args)
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
