@@ -623,7 +623,7 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
         while (delegate)
         {
             ChipLogProgress(Discovery, "Fabric (%d) loaded from storage. Calling OnFabricRetrievedFromStorage",
-                fabric->GetFabricIndex());
+                            fabric->GetFabricIndex());
             delegate->OnFabricRetrievedFromStorage(fabric);
             delegate = delegate->mNext;
         }
