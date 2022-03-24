@@ -45,28 +45,29 @@ struct BrowseContext : public GenericContext
     Inet::IPAddressType mAddressType;
     DnssdService * mServices;
     size_t mServiceSize;
-    BrowseContext(const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx)
+    BrowseContext(const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle,
+                  Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx)
     {
         memset(mType, 0, sizeof(mType));
         strncpy(mType, type, strnlen(type, kDnssdTypeMaxSize));
-        mContextType = ContextType::Browse;
-        mAddressType = addrType;
-        mProtocol = protocol;
-        mBrowseCb = cb;
-        mCbContext = cbCtx;
-        mInterfaceId = ifId;
+        mContextType  = ContextType::Browse;
+        mAddressType  = addrType;
+        mProtocol     = protocol;
+        mBrowseCb     = cb;
+        mCbContext    = cbCtx;
+        mInterfaceId  = ifId;
         mSearchHandle = searchHandle;
-        mResult = nullptr;
-        mServices = nullptr;
-        mServiceSize = 0;
+        mResult       = nullptr;
+        mServices     = nullptr;
+        mServiceSize  = 0;
     }
     ~BrowseContext()
     {
-        if(mServices && mServiceSize > 0)
+        if (mServices && mServiceSize > 0)
         {
             for (size_t serviceIndex = 0; serviceIndex < mServiceSize; serviceIndex++)
             {
-                if(mServices[serviceIndex].mTextEntries)
+                if (mServices[serviceIndex].mTextEntries)
                 {
                     chip::Platform::MemoryFree(mServices[serviceIndex].mTextEntries);
                 }
@@ -96,7 +97,8 @@ struct ResolveContext : public GenericContext
         QuerySrv,
         QueryTxt,
     } mResolveState;
-    ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb, void * cbCtx)
+    ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb,
+                   void * cbCtx)
     {
         memset(mType, 0, sizeof(mType));
         memset(mInstanceName, 0, sizeof(mInstanceName));
@@ -104,17 +106,17 @@ struct ResolveContext : public GenericContext
         mType[kDnssdTypeMaxSize] = 0;
         strncpy(mInstanceName, service->mName, strnlen(service->mName, Common::kInstanceNameMaxLength));
         mInstanceName[Common::kInstanceNameMaxLength] = 0;
-        mContextType = ContextType::Resolve;
-        mProtocol = service->mProtocol;
-        mResolveCb = cb;
-        mCbContext = cbCtx;
-        mInterfaceId = ifId;
-        mSearchHandle = searchHandle;
-        mResolveState = ResolveState::QuerySrv;
-        mResult = nullptr;
-        mService = nullptr;
-        mExtraIPs = nullptr;
-        mExtraIPSize = 0;
+        mContextType                                  = ContextType::Resolve;
+        mProtocol                                     = service->mProtocol;
+        mResolveCb                                    = cb;
+        mCbContext                                    = cbCtx;
+        mInterfaceId                                  = ifId;
+        mSearchHandle                                 = searchHandle;
+        mResolveState                                 = ResolveState::QuerySrv;
+        mResult                                       = nullptr;
+        mService                                      = nullptr;
+        mExtraIPs                                     = nullptr;
+        mExtraIPSize                                  = 0;
     }
     ~ResolveContext()
     {
@@ -141,5 +143,5 @@ struct ResolveContext : public GenericContext
     }
 };
 
-}
+} // namespace Dnssd
 } // namespace chip
