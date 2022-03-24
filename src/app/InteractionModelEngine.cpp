@@ -624,7 +624,7 @@ void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPoo
 }
 
 template <typename T, size_t N>
-CHIP_ERROR InteractionModelEngine::PushFront(ObjectList<T> *& aObjectList, T & aCluster, ObjectPool<ObjectList<T>, N> & aObjectPool)
+CHIP_ERROR InteractionModelEngine::PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool)
 {
     ObjectList<T> * object = aObjectPool.CreateObject();
     if (object == nullptr)
