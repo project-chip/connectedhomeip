@@ -3594,9 +3594,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current hue", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
             }
 
             NextTest();
@@ -3661,9 +3664,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current saturation", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
             }
 
             NextTest();
@@ -3727,9 +3733,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current x", actualValue, 24939U));
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -3793,9 +3802,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current y", actualValue, 24701U));
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -3963,11 +3975,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("enhanced current hue", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
             NextTest();
         }];
 
@@ -4040,11 +4048,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop active", actualValue, 0));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopActive", "", "uint8"));
             NextTest();
         }];
 
@@ -4100,11 +4104,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop direction", actualValue, 0));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopDirection", "", "uint8"));
             NextTest();
         }];
 
@@ -4159,11 +4159,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop time", actualValue, 25U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopTime", "", "uint16"));
             NextTest();
         }];
 
@@ -4222,11 +4218,7 @@ private:
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("color loop start enhanced hue", actualValue, 8960U));
-                }
-
+                VerifyOrReturn(CheckConstraintType("colorLoopStartEnhancedHue", "", "uint16"));
                 NextTest();
             }];
 
@@ -4285,11 +4277,7 @@ private:
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("color loop stored enhanced hue", actualValue, 0U));
-                }
-
+                VerifyOrReturn(CheckConstraintType("colorLoopStoredEnhancedHue", "", "uint16"));
                 NextTest();
             }];
 
@@ -4352,9 +4340,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color capabilities", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorCapabilities", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", [value unsignedShortValue], 31U));
             }
 
             NextTest();
@@ -4420,9 +4411,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color temp physical min", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMin", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -4488,9 +4482,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color temp physical max", actualValue, 65279U));
+            VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMax", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -4567,11 +4564,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("couple color temp to level min-mireds", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("coupleColorTempToLevelMinMireds", "", "uint16"));
             NextTest();
         }];
 
@@ -4728,11 +4721,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("remaining time", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
             NextTest();
         }];
 
@@ -4810,9 +4799,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("drift compensation", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("driftCompensation", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("driftCompensation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("driftCompensation", [value unsignedCharValue], 4));
             }
 
             NextTest();
@@ -4886,11 +4878,8 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueAsString("compensation text", actualValue, @""));
-            }
-
+            VerifyOrReturn(CheckConstraintType("compensationText", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("compensationText", [value length], 254));
             NextTest();
         }];
 
@@ -4952,9 +4941,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("number of primaries", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("numberOfPrimaries", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPrimaries", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("numberOfPrimaries", [value unsignedCharValue], 6));
             }
 
             NextTest();
@@ -5018,9 +5010,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 1 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5084,9 +5079,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 1 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5168,9 +5166,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 2 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5234,9 +5235,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 2 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5318,9 +5322,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 3 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5384,9 +5391,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 3 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5468,9 +5478,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 4 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5534,9 +5547,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 4 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5618,9 +5634,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 5 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5684,9 +5703,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 5 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5768,9 +5790,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 6 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5834,9 +5859,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 6 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -13126,28 +13154,28 @@ public:
             err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET")) {
-                NextTest();
-                return;
-            }
-            err = TestColorLoopSetCommandSetAllAttributes_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE")) {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Read EnhancedCurrentHue attribute from DUT.\n");
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read EnhancedCurrentHue attribute from DUT.\n");
             if (ShouldSkip("A_ENHANCEDCURRENTHUE")) {
                 NextTest();
                 return;
             }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_10();
+            err = TestReadEnhancedCurrentHueAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Color Loop Set Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET")) {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandSetAllAttributes_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopActive attribute from DUT.\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopStoredEnhancedHue attribute from DUT.\n");
@@ -13394,8 +13422,31 @@ private:
 
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull EnhancedCurrentHueValue;
 
-    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_8()
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            {
+                EnhancedCurrentHueValue = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -13421,7 +13472,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -13435,29 +13486,6 @@ private:
             {
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("color loop active", actualValue, 1));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-    NSNumber * _Nonnull EnhancedCurrentHueValue;
-
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
-            {
-                EnhancedCurrentHueValue = value;
             }
 
             NextTest();
@@ -21384,6 +21412,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("vendorName", [value length], 32));
             NextTest();
         }];
 
@@ -21402,11 +21431,6 @@ private:
             NSLog(@"Reads the VendorID attribute Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("VendorID", actualValue, 0U));
-            }
 
             VerifyOrReturn(CheckConstraintType("vendorID", "", "vendor-id"));
             NextTest();
