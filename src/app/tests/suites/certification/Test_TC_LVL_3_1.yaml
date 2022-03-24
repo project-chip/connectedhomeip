@@ -32,19 +32,22 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 254
+          constraints:
+              type: uint8
 
     - label: "Reads the MinLevel attribute"
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Reads the MaxLevel attribute"
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 254
+          constraints:
+              type: uint8
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"
@@ -53,7 +56,7 @@ tests:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0
+                value: 65535
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -78,15 +81,49 @@ tests:
       arguments:
           values:
               - name: "level"
-                value: 128
+                value: 100
               - name: "transitionTime"
-                value: 1
+                value: 100
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait a second"
+    - label: "Wait 11000 second"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 11000
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 100
+
+    - label: "reads On Off Transition Time attribute from DUT"
+      command: "readAttribute"
+      attribute: "On Off Transition Time"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 128
+              - name: "transitionTime"
+                value: 65535
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -99,39 +136,6 @@ tests:
       attribute: "current level"
       response:
           value: 128
-
-    - label: "reads On Off Transition Time attribute from DUT"
-      command: "readAttribute"
-      attribute: "On Off Transition Time"
-      response:
-          value: 0
-
-    - label: "sends a Move to level command"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 65535
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 10ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "reads CurrentLevel attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 254
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

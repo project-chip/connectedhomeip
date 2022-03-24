@@ -207,7 +207,6 @@ private:
 
 {{/unless}}
 {{/if}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isReportableAttribute}}
 class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
@@ -254,7 +253,6 @@ private:
 };
 
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -272,7 +270,6 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
         {{! TODO: Various types (floats, structs) not supported here. }}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
         {{! No list support for writing yet.  Need to figure out how to
@@ -284,7 +281,6 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
-        {{/unless}}
         {{/chip_server_cluster_attributes}}
     };
 

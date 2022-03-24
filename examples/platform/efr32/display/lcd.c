@@ -23,7 +23,11 @@
 
 #include "dmd.h"
 #include "glib.h"
+
+#ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
+
 #include "sl_board_control.h"
 
 #define LCD_SIZE 128
@@ -32,10 +36,14 @@
 #define QR_CODE_BORDER_SIZE 0
 
 static GLIB_Context_t glibContext;
+#ifdef QR_CODE_ENABLED
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
+#endif // QR_CODE_ENABLED
 
+#ifdef QR_CODE_ENABLED
 static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
+#endif // QR_CODE_ENABLED
 
 void initLCD(void)
 {
@@ -92,6 +100,7 @@ int LCD_update(void)
     return DMD_updateDisplay();
 }
 
+#ifdef QR_CODE_ENABLED
 void LCDWriteQRCode(uint8_t * str)
 {
     if (!qrcodegen_encodeText((const char *) str, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
@@ -134,3 +143,4 @@ void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
         }
     }
 }
+#endif // QR_CODE_ENABLED

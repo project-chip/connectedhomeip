@@ -98,7 +98,7 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
 {
     ReturnErrorOnFailure(TearDownDiscoveryCommands());
 
-    if (mReady == false)
+    if (!mReady)
     {
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
         mReady = true;

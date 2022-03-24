@@ -26,13 +26,20 @@
 #include "MediaPlaybackManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
+#include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::Credentials;
+
+#define EXTENDED_DISCOVERY_TIMEOUT_SEC 20
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
 
@@ -129,4 +136,11 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
         JNIDACProvider * p = new JNIDACProvider(provider);
         chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
     }
+}
+
+JNI_METHOD(void, postInit)(JNIEnv *, jobject app)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+#endif
 }

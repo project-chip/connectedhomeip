@@ -40,18 +40,3 @@ tests:
       response:
           constraints:
               type: bool
-
-    - label:
-          "Write the default value to mandatory non-global attribute: StateValue"
-      command: "writeAttribute"
-      attribute: "StateValue"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: StateValue"
-      command: "readAttribute"
-      attribute: "StateValue"
-      response:
-          value: 0

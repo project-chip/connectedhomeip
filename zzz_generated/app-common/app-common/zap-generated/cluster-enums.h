@@ -133,6 +133,14 @@ enum class OnOffEffectIdentifier : uint8_t
 using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
 #endif
 
+// Enum for OnOffStartUpOnOff
+enum class OnOffStartUpOnOff : uint8_t
+{
+    kOff                 = 0x00,
+    kOn                  = 0x01,
+    kTogglePreviousOnOff = 0x02,
+};
+
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {

@@ -47,6 +47,8 @@ static_library("controller") {
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
+      "CommissioningWindowOpener.cpp",
+      "CommissioningWindowOpener.h",
       "DeviceDiscoveryDelegate.h",
       "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",

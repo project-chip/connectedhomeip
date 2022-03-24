@@ -37,8 +37,7 @@ namespace chip {
 
 namespace {
 
-constexpr size_t kAESCCMNonceLen = 13;
-constexpr size_t kMaxAADLen      = 128;
+constexpr size_t kMaxAADLen = 128;
 
 /* Session Establish Key Info */
 constexpr uint8_t SEKeysInfo[] = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 };
@@ -131,16 +130,13 @@ CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keyp
     return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
 }
 
-CHIP_ERROR CryptoContext::GetNonce(const PacketHeader & header, uint8_t * nonce, size_t len)
+CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId)
 {
+    Encoding::LittleEndian::BufferWriter bbuf(nonce.data(), nonce.size());
 
-    VerifyOrReturnError(len == kAESCCMNonceLen, CHIP_ERROR_INVALID_ARGUMENT);
-
-    Encoding::LittleEndian::BufferWriter bbuf(nonce, len);
-
-    bbuf.Put8(header.GetSecurityFlags());
-    bbuf.Put32(header.GetMessageCounter());
-    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put8(securityFlags);
+    bbuf.Put32(messageCounter);
+    bbuf.Put64(nodeId);
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -161,8 +157,8 @@ CHIP_ERROR CryptoContext::GetAdditionalAuthData(const PacketHeader & header, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                  MessageAuthenticationCode & mac) const
+CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
+                                  PacketHeader & header, MessageAuthenticationCode & mac) const
 {
 
     const size_t taglen = header.MICTagLength();
@@ -174,11 +170,9 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t AAD[kMaxAADLen];
-    uint8_t nonce[kAESCCMNonceLen];
     uint16_t aadLen = sizeof(AAD);
     uint8_t tag[kMaxTagLen];
 
-    ReturnErrorOnFailure(GetNonce(header, nonce, sizeof(nonce)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
     if (mKeyContext)
@@ -187,7 +181,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan ciphertext(output, input_length);
         MutableByteSpan mic(tag, taglen);
 
-        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), ByteSpan(nonce), mic, ciphertext));
+        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), nonce, mic, ciphertext));
     }
     else
     {
@@ -202,8 +196,8 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
             usage = kI2RKey;
         }
 
-        ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, nonce,
-                                             sizeof(nonce), output, tag, taglen));
+        ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length,
+                                             nonce.data(), nonce.size(), output, tag, taglen));
     }
 
     mac.SetTag(&header, tag, taglen);
@@ -211,12 +205,11 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  const MessageAuthenticationCode & mac) const
+CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
+                                  const PacketHeader & header, const MessageAuthenticationCode & mac) const
 {
     const size_t taglen = header.MICTagLength();
     const uint8_t * tag = mac.GetTag();
-    uint8_t nonce[kAESCCMNonceLen];
     uint8_t AAD[kMaxAADLen];
     uint16_t aadLen = sizeof(AAD);
 
@@ -224,7 +217,6 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(GetNonce(header, nonce, sizeof(nonce)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
     if (nullptr != mKeyContext)
@@ -233,7 +225,7 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan plaintext(output, input_length);
         ByteSpan mic(tag, taglen);
 
-        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), ByteSpan(nonce), mic, plaintext);
+        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), nonce, mic, plaintext);
         ReturnErrorOnFailure(err);
     }
     else
@@ -250,7 +242,7 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         }
 
         ReturnErrorOnFailure(AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage],
-                                             Crypto::kAES_CCM128_Key_Length, nonce, sizeof(nonce), output));
+                                             Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output));
     }
     return CHIP_NO_ERROR;
 }

@@ -2122,6 +2122,53 @@ public:
     }
 };
 
+class SubscribeAttributeApplicationBasicApplication : public ModelCommand {
+public:
+    SubscribeAttributeApplicationBasicApplication()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "application");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeApplicationBasicApplication() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
+                                                                             endpoint:endpointId
+                                                                                queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeApplicationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                  params:params
+                                 subscriptionEstablished:NULL
+                                           reportHandler:^(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                               NSError * _Nullable error) {
+                                               NSLog(@"ApplicationBasic.Application response %@", [value description]);
+                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute Status
  */
@@ -2956,6 +3003,52 @@ public:
     }
 
 private:
+};
+
+class SubscribeAttributeApplicationLauncherCurrentApp : public ModelCommand {
+public:
+    SubscribeAttributeApplicationLauncherCurrentApp()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-app");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeApplicationLauncherCurrentApp() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentAppWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                   NSError * _Nullable error) {
+                                                   NSLog(@"ApplicationLauncher.CurrentApp response %@", [value description]);
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -10660,6 +10753,50 @@ public:
     }
 };
 
+class SubscribeAttributeChannelLineup : public ModelCommand {
+public:
+    SubscribeAttributeChannelLineup()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "lineup");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeChannelLineup() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeLineupWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                             params:params
+                            subscriptionEstablished:NULL
+                                      reportHandler:^(CHIPChannelClusterLineupInfo * _Nullable value, NSError * _Nullable error) {
+                                          NSLog(@"Channel.Lineup response %@", [value description]);
+                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute CurrentChannel
  */
@@ -10691,6 +10828,50 @@ public:
         }];
         return err;
     }
+};
+
+class SubscribeAttributeChannelCurrentChannel : public ModelCommand {
+public:
+    SubscribeAttributeChannelCurrentChannel()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-channel");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeChannelCurrentChannel() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentChannelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(
+                                                       CHIPChannelClusterChannelInfo * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"Channel.CurrentChannel response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -25387,6 +25568,55 @@ public:
     }
 };
 
+class SubscribeAttributeGeneralCommissioningBasicCommissioningInfo : public ModelCommand {
+public:
+    SubscribeAttributeGeneralCommissioningBasicCommissioningInfo()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "basic-commissioning-info");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeGeneralCommissioningBasicCommissioningInfo() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
+                                                                                     endpoint:endpointId
+                                                                                        queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeBasicCommissioningInfoWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:NULL
+                                                      reportHandler:^(
+                                                          CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value,
+                                                          NSError * _Nullable error) {
+                                                          NSLog(@"GeneralCommissioning.BasicCommissioningInfo response %@",
+                                                              [value description]);
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute RegulatoryConfig
  */
@@ -34034,6 +34264,50 @@ public:
     }
 };
 
+class SubscribeAttributeMediaPlaybackSampledPosition : public ModelCommand {
+public:
+    SubscribeAttributeMediaPlaybackSampledPosition()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "sampled-position");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeMediaPlaybackSampledPosition() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSampledPositionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                        NSError * _Nullable error) {
+                                                        NSLog(@"MediaPlayback.SampledPosition response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute PlaybackSpeed
  */
@@ -34947,6 +35221,40 @@ public:
         }];
         return err;
     }
+};
+
+class WriteModeSelectStartUpMode : public ModelCommand {
+public:
+    WriteModeSelectStartUpMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeStartUpModeWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      err = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+                                      SetCommandExitStatus(err);
+                                  }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
 };
 
 class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
@@ -54203,6 +54511,50 @@ public:
 private:
 };
 
+class SubscribeAttributeTestClusterStructAttr : public ModelCommand {
+public:
+    SubscribeAttributeTestClusterStructAttr()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "struct-attr");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeTestClusterStructAttr() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStructAttrWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                   NSError * _Nullable error) {
+                                                   NSLog(@"TestCluster.StructAttr response %@", [value description]);
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute RangeRestrictedInt8u
  */
@@ -58365,6 +58717,50 @@ public:
     }
 
 private:
+};
+
+class SubscribeAttributeTestClusterNullableStruct : public ModelCommand {
+public:
+    SubscribeAttributeTestClusterNullableStruct()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "nullable-struct");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeTestClusterNullableStruct() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008025) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeNullableStructWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                       NSError * _Nullable error) {
+                                                       NSLog(@"TestCluster.NullableStruct response %@", [value description]);
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -72750,6 +73146,8 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<SubscribeAttributeApplicationBasicApplicationName>(), //
         make_unique<ReadApplicationBasicProductID>(), //
         make_unique<SubscribeAttributeApplicationBasicProductID>(), //
+        make_unique<ReadApplicationBasicApplication>(), //
+        make_unique<SubscribeAttributeApplicationBasicApplication>(), //
         make_unique<ReadApplicationBasicStatus>(), //
         make_unique<SubscribeAttributeApplicationBasicStatus>(), //
         make_unique<ReadApplicationBasicApplicationVersion>(), //
@@ -72778,6 +73176,9 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ApplicationLauncherStopApp>(), //
         make_unique<ReadApplicationLauncherCatalogList>(), //
         make_unique<SubscribeAttributeApplicationLauncherCatalogList>(), //
+        make_unique<ReadApplicationLauncherCurrentApp>(), //
+        make_unique<WriteApplicationLauncherCurrentApp>(), //
+        make_unique<SubscribeAttributeApplicationLauncherCurrentApp>(), //
         make_unique<ReadApplicationLauncherGeneratedCommandList>(), //
         make_unique<SubscribeAttributeApplicationLauncherGeneratedCommandList>(), //
         make_unique<ReadApplicationLauncherAcceptedCommandList>(), //
@@ -73054,6 +73455,10 @@ void registerClusterChannel(Commands & commands)
         make_unique<ChannelSkipChannel>(), //
         make_unique<ReadChannelChannelList>(), //
         make_unique<SubscribeAttributeChannelChannelList>(), //
+        make_unique<ReadChannelLineup>(), //
+        make_unique<SubscribeAttributeChannelLineup>(), //
+        make_unique<ReadChannelCurrentChannel>(), //
+        make_unique<SubscribeAttributeChannelCurrentChannel>(), //
         make_unique<ReadChannelGeneratedCommandList>(), //
         make_unique<SubscribeAttributeChannelGeneratedCommandList>(), //
         make_unique<ReadChannelAcceptedCommandList>(), //
@@ -73522,6 +73927,8 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<ReadGeneralCommissioningBreadcrumb>(), //
         make_unique<WriteGeneralCommissioningBreadcrumb>(), //
         make_unique<SubscribeAttributeGeneralCommissioningBreadcrumb>(), //
+        make_unique<ReadGeneralCommissioningBasicCommissioningInfo>(), //
+        make_unique<SubscribeAttributeGeneralCommissioningBasicCommissioningInfo>(), //
         make_unique<ReadGeneralCommissioningRegulatoryConfig>(), //
         make_unique<SubscribeAttributeGeneralCommissioningRegulatoryConfig>(), //
         make_unique<ReadGeneralCommissioningLocationCapability>(), //
@@ -73842,6 +74249,8 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<SubscribeAttributeMediaPlaybackStartTime>(), //
         make_unique<ReadMediaPlaybackDuration>(), //
         make_unique<SubscribeAttributeMediaPlaybackDuration>(), //
+        make_unique<ReadMediaPlaybackSampledPosition>(), //
+        make_unique<SubscribeAttributeMediaPlaybackSampledPosition>(), //
         make_unique<ReadMediaPlaybackPlaybackSpeed>(), //
         make_unique<SubscribeAttributeMediaPlaybackPlaybackSpeed>(), //
         make_unique<ReadMediaPlaybackSeekRangeEnd>(), //
@@ -73875,6 +74284,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<ReadModeSelectCurrentMode>(), //
         make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
         make_unique<ReadModeSelectStartUpMode>(), //
+        make_unique<WriteModeSelectStartUpMode>(), //
         make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
         make_unique<ReadModeSelectOnMode>(), //
         make_unique<WriteModeSelectOnMode>(), //
@@ -74523,6 +74933,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterEnumAttr>(), //
         make_unique<WriteTestClusterEnumAttr>(), //
         make_unique<SubscribeAttributeTestClusterEnumAttr>(), //
+        make_unique<ReadTestClusterStructAttr>(), //
+        make_unique<WriteTestClusterStructAttr>(), //
+        make_unique<SubscribeAttributeTestClusterStructAttr>(), //
         make_unique<ReadTestClusterRangeRestrictedInt8u>(), //
         make_unique<WriteTestClusterRangeRestrictedInt8u>(), //
         make_unique<SubscribeAttributeTestClusterRangeRestrictedInt8u>(), //
@@ -74635,6 +75048,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableEnumAttr>(), //
         make_unique<WriteTestClusterNullableEnumAttr>(), //
         make_unique<SubscribeAttributeTestClusterNullableEnumAttr>(), //
+        make_unique<ReadTestClusterNullableStruct>(), //
+        make_unique<WriteTestClusterNullableStruct>(), //
+        make_unique<SubscribeAttributeTestClusterNullableStruct>(), //
         make_unique<ReadTestClusterNullableRangeRestrictedInt8u>(), //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(), //
         make_unique<SubscribeAttributeTestClusterNullableRangeRestrictedInt8u>(), //

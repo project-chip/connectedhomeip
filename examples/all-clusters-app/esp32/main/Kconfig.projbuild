@@ -51,8 +51,6 @@ menu "Demo"
       help
           Specifies the Rendezvous mode of the peripheral.
 
-      config RENDEZVOUS_MODE_BYPASS
-          bool "Bypass"
       config RENDEZVOUS_MODE_SOFTAP
           bool "Soft-AP"
       config RENDEZVOUS_MODE_BLE
@@ -87,7 +85,6 @@ menu "Demo"
     config RENDEZVOUS_MODE
        int
        range 0 8
-       default 0 if RENDEZVOUS_MODE_BYPASS
        default 1 if RENDEZVOUS_MODE_SOFTAP
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_ON_NETWORK
