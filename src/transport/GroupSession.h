@@ -18,35 +18,20 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/GroupId.h>
-#include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
 
 namespace chip {
 namespace Transport {
 
-class GroupSessionDeleter
-{
-public:
-    static void Release(IncomingGroupSession * entry) {}
-    static void Release(OutgoingGroupSession * entry) {}
-};
-
-class IncomingGroupSession : public Session,
-                             // The group session is ephemeral, its lifespan is controlled by whoever is using it. To prevent the
-                             // object being destroyed while there are still SessionHandle or SessionHolder pointing to it, we
-                             // enforce a reference counter check at its destruction in debug build.
-                             public ReferenceCounted<IncomingGroupSession, GroupSessionDeleter, 0>
+class IncomingGroupSession : public Session
 {
 public:
     IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession() override;
-
-    void Retain() override;
-    void Release() override;
+    ~IncomingGroupSession() override { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
@@ -88,21 +73,14 @@ private:
     const NodeId mSourceNodeId;
 };
 
-class OutgoingGroupSession : public Session,
-                             // The group session is ephemeral, its lifespan is controlled by whoever is using it. To prevent the
-                             // object being destroyed while there are still SessionHandle or SessionHolder pointing to it, we
-                             // enforce a reference counter check at its destruction in debug build.
-                             public ReferenceCounted<OutgoingGroupSession, GroupSessionDeleter, 0>
+class OutgoingGroupSession : public Session
 {
 public:
     OutgoingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~OutgoingGroupSession() override;
-
-    void Retain() override;
-    void Release() override;
+    ~OutgoingGroupSession() override { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
 #if CHIP_PROGRESS_LOGGING
