@@ -688,16 +688,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 
     NSLog(@"Subscribing...");
-    [attributeCacheContainer subscribeWithDeviceController:controller
-                                                  deviceId:kDeviceId
-                                                    params:nil
-                                               clientQueue:queue
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscription complete with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [subscribeExpectation fulfill];
-                                                }];
-    [self waitForExpectations:[NSArray arrayWithObject:subscribeExpectation] timeout:kTimeoutInSeconds];
+    __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
+    [device subscribeWithQueue:queue
+        minInterval:2
+        maxInterval:60
+        params:nil
+        cacheContainer:attributeCacheContainer
+        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Received report: %@, error: %@", value, error);
+            if (reportHandler) {
+                __auto_type handler = reportHandler;
+                reportHandler = nil;
+                handler(value, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"Subscription established");
+            [subscribeExpectation fulfill];
+        }];
+    [self waitForExpectations:@[ subscribeExpectation ] timeout:60];
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
@@ -712,11 +721,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
     [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
 
-    // Wait till reports arrive from accessory. It turned out accessory could generate very lengthy initial reports.
+    // Wait till reports arrive from accessory.
     NSLog(@"Waiting for reports from accessory...");
-    __auto_type idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
-    idleExpectation.inverted = YES;
-    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:60];
+    sleep(5);
 
     // Read cache
     NSLog(@"Reading from cache...");
@@ -749,6 +756,22 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }];
     [self waitForExpectations:[NSArray arrayWithObject:newSubscriptionEstablished] timeout:kTimeoutInSeconds];
 
+    __auto_type reportExpectation = [self expectationWithDescription:@"Report handler called"];
+    reportHandler = ^(NSArray * _Nullable value, NSError * _Nullable error) {
+        NSLog(@"Report received: %@, error: %@", value, error);
+        for (CHIPAttributeReport * report in value) {
+            if ([report.path.endpoint isEqualToNumber:@1] && [report.path.cluster isEqualToNumber:@6] &&
+                [report.path.attribute isEqualToNumber:@0]) {
+                NSLog(@"Report value for OnOff: %@", report.value);
+                XCTAssertNotNil(report.value);
+                XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                XCTAssertEqual([report.value boolValue], NO);
+                [reportExpectation fulfill];
+                break;
+            }
+        }
+    };
+
     NSLog(@"Invoking another command...");
     commandExpectation = [self expectationWithDescription:@"Command invoked"];
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
@@ -760,12 +783,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait till reports arrive from accessory.
     NSLog(@"Waiting for reports from accessory...");
-    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
-    idleExpectation.inverted = YES;
-    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:3];
+    [self waitForExpectations:@[ reportExpectation ] timeout:kTimeoutInSeconds];
 
     NSLog(@"Disconnect accessory to test cache...");
-    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
+    __auto_type idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
     idleExpectation.inverted = YES;
     [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:10];
 

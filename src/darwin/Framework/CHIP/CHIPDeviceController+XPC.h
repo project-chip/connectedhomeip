@@ -139,12 +139,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopReportsWithController:(id _Nullable)controller nodeId:(uint64_t)nodeId completion:(void (^)(void))completion;
 
 /**
- * Requests a specific node attribute subscription into a cache
+ * Requests subscription of all attributes.
  */
-- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
-                                       nodeId:(uint64_t)nodeId
-                                       params:(NSDictionary<NSString *, id> * _Nullable)params
-                                   completion:(void (^)(NSError * _Nullable error))completion;
+- (void)subscribeWithController:(id _Nullable)controller
+                         nodeId:(uint64_t)nodeId
+                    minInterval:(NSNumber *)minInterval
+                    maxInterval:(NSNumber *)maxInterval
+                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                    shouldCache:(BOOL)shouldCache
+                     completion:(void (^)(NSError * _Nullable error))completion;
 
 /**
  * Requests reading attribute cache
