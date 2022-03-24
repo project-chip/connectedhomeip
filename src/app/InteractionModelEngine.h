@@ -349,7 +349,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
  *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
  * AttributeReportIB to the AttributeReportIBs::Builder.
- *  When the endpoint / cluster / attribute / event data specified by aAttributePathParams does not exist, corresponding interaction
+ *  When the endpoint / cluster / attribute data specified by aPath does not exist, corresponding interaction
  * model error code will be put into the writer, and CHIP_NO_ERROR will be returned. If the data exists on the server, the data
  * (with tag kData) and the data version (with tag kDataVersion) will be put into the TLVWriter. TLVWriter error will be returned if
  * any error occurred during encoding these values. This function is implemented by CHIP as a part of cluster data storage &
