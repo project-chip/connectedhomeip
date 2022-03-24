@@ -2603,7 +2603,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
