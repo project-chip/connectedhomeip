@@ -215,11 +215,22 @@ private:
 class HSMDefaultP256KeypairBuilder : public P256KeypairBuilder
 {
 public:
+
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
+
+    virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key) override;
+
+    virtual P256Keypair * GetP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
     virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
 
     virtual void FreeP256KeyPair(P256Keypair* p256key) override;
+
+private:
+    /**
+     * Fabric index - HSM P256 key mapping
+     **/
+    struct FabricP256KeyMap_t FabricHSMP256KeyMap[CHIP_CONFIG_MAX_FABRICS];
 };
 
 #ifdef ENABLE_HSM_EC_KEY

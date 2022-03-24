@@ -772,6 +772,21 @@ P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(Fa
     return keypair;
 }
 
+CHIP_ERROR HSMDefaultP256KeypairBuilder::ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key)
+{
+    //TBD
+    (void)fabricIdx;
+    (void)p256key;
+    return CHIP_NO_ERROR;
+}
+
+P256Keypair * HSMDefaultP256KeypairBuilder::GetP256KeyPairForOperationalKey(FabricIndex fabricIdx)
+{
+    //TBD
+    (void)fabricIdx;
+    return NULL;
+}
+
 P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForEphemeralUsage()
 {
     P256KeypairHSM * keypair = nullptr;
