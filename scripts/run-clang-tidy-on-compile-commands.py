@@ -86,6 +86,15 @@ class ClangTidyEntry:
                 "Cannot tidy %s - not a clang compile command", self.file)
             return
 
+        if compiler in ['gcc', 'g++'] and sys.platform == 'darwin':
+          # Darwin gcc invocation will auto select a system root, howeve clang requires an explicit path since
+          # we are using the built-in pigweed clang-tidy.
+          #
+          # TODO: this should be actually inferred, however I am not clear how
+          sysroot = '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
+          self.clang_arguments.insert(0, '--sysroot='+sysroot)
+
+
     @property
     def full_path(self):
         return os.path.abspath(os.path.join(self.directory, self.file))
@@ -97,8 +106,11 @@ class ClangTidyEntry:
     def Check(self):
         logging.debug("Running tidy on %s from %s", self.file, self.directory)
         try:
+            cmd = ["clang-tidy", self.file, "--"] + self.clang_arguments
+            logging.debug("Executing: %r" % cmd)
+
             proc = subprocess.Popen(
-                ["clang-tidy", self.file, "--"] + self.clang_arguments,
+                cmd,
                 cwd=self.directory,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
