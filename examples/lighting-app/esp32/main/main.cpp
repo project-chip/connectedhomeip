@@ -93,7 +93,7 @@ static void InitServer(intptr_t context)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
-            (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
+        (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
         ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
         chip::app::DnssdServer::Instance().StartServer();
@@ -129,11 +129,13 @@ extern "C" void app_main()
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     openthread_launch_task();
-    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR) {
+    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
+    {
         ESP_LOGE(TAG, "Failed to initialize Thread stack");
         return;
     }
-    if (ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR) {
+    if (ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
+    {
         ESP_LOGE(TAG, "Failed to launch Thread task");
         return;
     }
