@@ -83,6 +83,9 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
     NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
 
+    CryptoContext::NonceStorage nonce;
+    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
@@ -91,7 +94,7 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
 
     // Test uninitialized channel
     NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, packetHeader, mac) ==
+                   channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac) ==
                        CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     const char * salt = "Test Salt";
@@ -101,13 +104,13 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
     // Test initialized channel, but invalid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(nullptr, 0, nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(nullptr, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(
+        inSuite, channel.Encrypt(plain_text, sizeof(plain_text), nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, packetHeader, mac) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac) == CHIP_NO_ERROR);
 }
 
 void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
@@ -122,6 +125,9 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
     NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
 
+    CryptoContext::NonceStorage nonce;
+    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+
     const char * salt = "Test Salt";
 
     P256Keypair keypair;
@@ -134,13 +140,13 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                    channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, packetHeader, mac) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, nonce, packetHeader, mac) == CHIP_NO_ERROR);
 
     CryptoContext channel2;
     uint8_t output[128];
     // Uninitialized channel
     NL_TEST_ASSERT(inSuite,
-                   channel2.Decrypt(encrypted, sizeof(plain_text), output, packetHeader, mac) ==
+                   channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac) ==
                        CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     NL_TEST_ASSERT(inSuite,
                    channel2.InitFromKeyPair(keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
@@ -148,13 +154,13 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                                             CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 
     // Channel initialized, but invalid arguments to decrypt
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(nullptr, 0, nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   channel2.Decrypt(encrypted, sizeof(encrypted), nullptr, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(nullptr, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(
+        inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(plain_text), output, packetHeader, mac) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(plain_text, output, sizeof(plain_text)) == 0);
 }
