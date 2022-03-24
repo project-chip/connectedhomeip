@@ -38,7 +38,7 @@ namespace app {
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
-    mCallback(apCallback)
+    mManagementCallback(apCallback)
 {
     mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
     mpExchangeCtx           = apExchangeContext;
@@ -81,9 +81,10 @@ void ReadHandler::Abort(bool aCalledFromDestructor)
 
 ReadHandler::~ReadHandler()
 {
-    if (mActiveSubscription && mpApplicationCallback)
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (mActiveSubscription && appCallback)
     {
-        mpApplicationCallback->OnSubscriptionTerminated(*this);
+        appCallback->OnSubscriptionTerminated(*this);
     }
 
     Abort(true);
@@ -115,7 +116,7 @@ void ReadHandler::Close()
     }
 
     MoveToState(HandlerState::AwaitingDestruction);
-    mCallback.OnDone(*this);
+    mManagementCallback.OnDone(*this);
 }
 
 CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
@@ -172,9 +173,10 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
 
                 mActiveSubscription = true;
 
-                if (mpApplicationCallback)
+                auto * appCallback = mManagementCallback.GetAppCallback();
+                if (appCallback)
                 {
-                    mpApplicationCallback->OnSubscriptionEstablished(*this);
+                    appCallback->OnSubscriptionEstablished(*this);
                 }
             }
             else
@@ -708,10 +710,10 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
     // This also provides the application an opportunity to modify the negotiated min/max intervals set above.
     //
-    if (mpApplicationCallback)
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (appCallback)
     {
-        if (mpApplicationCallback->OnSubscriptionRequested(*this, *mpExchangeCtx->GetSessionHandle()->AsSecureSession()) !=
-            CHIP_NO_ERROR)
+        if (appCallback->OnSubscriptionRequested(*this, *mpExchangeCtx->GetSessionHandle()->AsSecureSession()) != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_TRANSACTION_CANCELED;
         }

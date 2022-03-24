@@ -75,21 +75,6 @@ public:
     };
 
     /*
-     * A callback used to manage the lifetime of the ReadHandler object.
-     */
-    class ManagementCallback
-    {
-    public:
-        virtual ~ManagementCallback() = default;
-
-        /*
-         * Method that signals to a registered callback that this object
-         * has completed doing useful work and is now safe for release/destruction.
-         */
-        virtual void OnDone(ReadHandler & apReadHandlerObj) = 0;
-    };
-
-    /*
      * A callback used to interact with the application.
      */
     class ApplicationCallback
@@ -103,8 +88,8 @@ public:
          * subscription (specifically, the min/max negotiated intervals) or even outright rejecting the subscription for
          * application-specific reasons.
          *
-         * TODO: Need a new IM status code to convey application-rejected subscribes. Currently, an OUT_OF_RESOURCE error is sent
-         * back, which isn't appropriate
+         * TODO: Need a new IM status code to convey application-rejected subscribes. Currently, a Failure IM status code is sent
+         * back to the subscriber, which isn't sufficient.
          *
          * To reject the subscription, a CHIP_ERROR code that is not equivalent to CHIP_NO_ERROR should be returned.
          *
@@ -134,6 +119,28 @@ public:
     };
 
     /*
+     * A callback used to manage the lifetime of the ReadHandler object.
+     */
+    class ManagementCallback
+    {
+    public:
+        virtual ~ManagementCallback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(ReadHandler & apReadHandlerObj) = 0;
+
+        /*
+         * Retrieve the ApplicationCallback (if a valid one exists) from our management entity. This avoids
+         * storing multiple references to the application provided callback and having to subsequently manage lifetime
+         * issues w.r.t the ReadHandler itself.
+         */
+        virtual ApplicationCallback * GetAppCallback() = 0;
+    };
+
+    /*
      * Destructor - as part of destruction, it will abort the exchange context
      * if a valid one still exists.
      *
@@ -150,13 +157,11 @@ public:
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
 
-    ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
-    ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
-    EventNumber & GetEventMin() { return mEventMin; }
-    PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
+    const ClusterInfo * GetAttributeClusterInfolist() const { return mpAttributeClusterInfoList; }
+    const ClusterInfo * GetEventClusterInfolist() const { return mpEventClusterInfoList; }
+    const ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
 
-    void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval)
+    void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
         aMaxInterval = mMaxIntervalCeilingSeconds;
@@ -168,7 +173,7 @@ public:
      */
     CHIP_ERROR SetReportingIntervals(uint16_t aMinInterval, uint16_t aMaxInterval)
     {
-        VerifyOrReturnError(IsGeneratingReports(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aMinInterval <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
         mMinIntervalFloorSeconds   = aMinInterval;
@@ -177,8 +182,8 @@ public:
     }
 
 private:
-    void RegisterAppCallback(ApplicationCallback * apCallback) { mpApplicationCallback = apCallback; }
-    void DeregisterAppCallback() { mpApplicationCallback = nullptr; }
+    PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
+    EventNumber GetEventMin() const { return mEventMin; }
 
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
@@ -208,6 +213,7 @@ private:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
+    bool IsIdle() const { return mState == HandlerState::Idle; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
@@ -328,7 +334,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber      = 0;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    ManagementCallback & mCallback;
+    ManagementCallback & mManagementCallback;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions
@@ -361,8 +367,6 @@ private:
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
-
-    ApplicationCallback * mpApplicationCallback = nullptr;
 };
 } // namespace app
 } // namespace chip

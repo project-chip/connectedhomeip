@@ -732,7 +732,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
                                              size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths

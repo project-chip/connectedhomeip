@@ -340,7 +340,7 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
                                 size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**

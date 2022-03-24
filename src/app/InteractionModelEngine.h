@@ -248,6 +248,8 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
      * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is

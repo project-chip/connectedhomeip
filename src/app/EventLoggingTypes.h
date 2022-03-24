@@ -151,10 +151,10 @@ struct EventLoadOutContext
     EventNumber mStartingEventNumber = 0;
     Timestamp mPreviousTime;
     Timestamp mCurrentTime;
-    EventNumber mCurrentEventNumber      = 0;
-    size_t mEventCount                   = 0;
-    ClusterInfo * mpInterestedEventPaths = nullptr;
-    bool mFirst                          = true;
+    EventNumber mCurrentEventNumber            = 0;
+    size_t mEventCount                         = 0;
+    const ClusterInfo * mpInterestedEventPaths = nullptr;
+    bool mFirst                                = true;
     Access::SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app
