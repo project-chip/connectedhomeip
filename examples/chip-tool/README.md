@@ -109,12 +109,13 @@ In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
 
 Trust store will be automatically created using the default TestAttestation PAA.
 To use a different set of PAAs, pass the path using the optional parameter
---paa-trust-store-path while running the built executable.
-Trusted PAAs are available at credentials/development/paa-root-certs/.
+--paa-trust-store-path while running the built executable. Trusted PAAs are
+available at credentials/development/paa-root-certs/.
 
-The command below will select a set of trusted PAAs to be used during Attestation
-Verification. It will also discover devices with long discriminator 3840 and try to
-pair with the first one it discovers using the provided setup code.
+The command below will select a set of trusted PAAs to be used during
+Attestation Verification. It will also discover devices with long discriminator
+3840 and try to pair with the first one it discovers using the provided setup
+code.
 
     $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840 --paa-trust-store-path path/to/PAAs
 
