@@ -393,8 +393,6 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    void ReleaseFabricIndex(FabricIndex fabricIndex);
-
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
