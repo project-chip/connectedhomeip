@@ -106,6 +106,10 @@ class ClangTidyEntry:
         self.tidy_arguments.append("--export-fixes")
         self.tidy_arguments.append(f)
 
+    def SetChecks(self, checks: str):
+        self.tidy_arguments.append("--checks")
+        self.tidy_arguments.append(checks)
+
     def Check(self):
         logging.debug("Running tidy on %s from %s", self.file, self.directory)
         try:
@@ -261,6 +265,10 @@ class ClangTidyRunner:
                 )
             )
 
+    def SetChecks(self, checks: str):
+        for e in self.entries:
+            e.SetChecks(checks)
+
     def FilterEntries(self, f):
         for e in self.entries:
             if not f(e):
@@ -346,7 +354,13 @@ __LOG_LEVELS__ = {
     "--export-fixes",
     default=None,
     type=click.Path(),
-    help="Where to export fixes to apply. TODO(fix apply not yet implemented).",
+    help="Where to export fixes to apply.",
+)
+@click.option(
+    "--checks",
+    default=None,
+    type=str,
+    help="Checks to run (passed in to clang-tidy). If not set the .clang-tidy file is used.",
 )
 @click.pass_context
 def main(
@@ -357,6 +371,7 @@ def main(
     log_level,
     no_log_timestamps,
     export_fixes,
+    checks,
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     if no_log_timestamps:
@@ -393,6 +408,9 @@ def main(
 
     if export_fixes:
         runner.ExportFixesTo(export_fixes)
+
+    if checks:
+        runner.SetChecks(checks)
 
     for e in context.obj.entries:
         logging.info("Will tidy %s", e.full_path)
