@@ -85,7 +85,7 @@ menu "CHIP Core"
 
         config USE_MINIMAL_MDNS
             bool "Use the minimal mDNS implementation shipped in the CHIP library"
-            default y
+            default n
             help
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
