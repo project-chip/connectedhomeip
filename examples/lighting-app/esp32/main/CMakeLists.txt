@@ -15,11 +15,6 @@
 #    limitations under the License.
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
-if (NOT CONFIG_IDF_TARGET_ESP32H2)
-set (exclude_srcs_list "${CMAKE_CURRENT_LIST_DIR}/OpenthreadLauncher.c")
-else ()
-set (exclude_srcs_list )
-endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lighting-app"
@@ -65,7 +60,6 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
-                      EXCLUDE_SRCS "${exclude_srcs_list}"
                       PRIV_REQUIRES chip QRCode bt led_strip app_update openthread)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)

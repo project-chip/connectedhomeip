@@ -38,9 +38,6 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <OpenthreadLauncher.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -128,7 +125,6 @@ extern "C" void app_main()
         return;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    openthread_launch_task();
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize Thread stack");

@@ -33,8 +33,9 @@
 #define ESP_CONFIG_H
 
 #include "sdkconfig.h"
-// For ESP32H2, we use idf v5.0, its "mbedtls/config.h" was replaced by "mbedtls/build_info.h"
-#if CONFIG_IDF_TARGET_ESP32H2
+#include "esp_idf_version.h"
+// For ESP32H2, we use idf v5.0. Its "mbedtls/config.h" was replaced by "mbedtls/build_info.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "mbedtls/build_info.h"
 #else
 #include "mbedtls/config.h"

@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "sdkconfig.h"
-#if CONFIG_IDF_TARGET_ESP32H2
 #include "esp_openthread_types.h"
+
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                                                      \
     {                                                                                                                              \
         .radio_mode = RADIO_MODE_NATIVE,                                                                                           \
@@ -34,4 +33,3 @@
     {                                                                                                                              \
         .storage_partition_name = "ot_storage", .netif_queue_size = 10, .task_queue_size = 10,                                     \
     }
-#endif
