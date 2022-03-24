@@ -194,7 +194,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 JniByteArray Ipv6ByteArray(env, jIpv6AddressObj);
 
-                if(Ipv6ByteArray.size() == kMaxIPv6AddrSize) 
+                if(Ipv6ByteArray.size() == kMaxIPv6AddrSize)
                 {
                     memcpy(ifp->Ipv6AddressesBuffer[0], reinterpret_cast<const uint8_t *>(Ipv6ByteArray.data()), kMaxIPv6AddrSize);
                     ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
