@@ -36,7 +36,6 @@ tests:
               type: int16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
-      disabled: true
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -46,7 +45,6 @@ tests:
               maxValue: 32766
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
-      disabled: true
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
