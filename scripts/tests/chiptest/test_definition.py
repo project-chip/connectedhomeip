@@ -24,6 +24,7 @@ from enum import Enum, auto
 from random import randrange
 
 TEST_NODE_ID = '0x12344321'
+DEVELOPMENT_PAA_LIST = './credentials/development/paa-root-certs'
 
 
 class App:
@@ -240,11 +241,13 @@ class TestDefinition:
             app.start(str(randrange(1, 4096)))
 
             runner.RunSubprocess(
-                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
+                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
                 name='PAIR', dependencies=[apps_register])
 
             runner.RunSubprocess(
-                tool_cmd + ['tests', self.run_name],
+                tool_cmd + ['tests', self.run_name] +
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
                 name='TEST', dependencies=[apps_register])
 
         except Exception:

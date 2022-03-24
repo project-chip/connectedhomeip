@@ -40,6 +40,14 @@ public:
     CHIP_ERROR ClearUpdateToken() override;
     CHIP_ERROR LoadUpdateToken(MutableByteSpan & updateToken) override;
 
+    CHIP_ERROR StoreCurrentUpdateState(OTAUpdateStateEnum currentUpdateState) override;
+    CHIP_ERROR LoadCurrentUpdateState(OTAUpdateStateEnum & currentUpdateState) override;
+    CHIP_ERROR ClearCurrentUpdateState() override;
+
+    CHIP_ERROR StoreTargetVersion(uint32_t targetVersion) override;
+    CHIP_ERROR LoadTargetVersion(uint32_t & targetVersion) override;
+    CHIP_ERROR ClearTargetVersion() override;
+
 private:
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
