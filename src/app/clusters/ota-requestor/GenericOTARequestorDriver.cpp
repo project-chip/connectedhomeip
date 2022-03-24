@@ -342,8 +342,8 @@ void GenericOTARequestorDriver::SendQueryImage()
     UpdateCancelled();
 
     // Default provider timer only runs when there is no ongoing query/update; must stop it now.
-    // TriggerImmediateQueryInternal() will cause the state to change from kIdle
-    StartSelectedTimer(SelectedTimer::kWatchdogTimer);
+    // TriggerImmediateQueryInternal() will cause the state to change from kIdle, which will start
+    // the Watchdog timer.  (Clean this up with Issue#16151)
 
     mProviderRetryCount++;
 
@@ -396,29 +396,14 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
 
     OTAUpdateStateEnum currentState = mRequestor->GetCurrentUpdateState();
 
-    switch (currentState)
-    {
-    case OTAUpdateStateEnum::kIdle:
-    case OTAUpdateStateEnum::kUnknown:
-        // Watchdog timer should not expire in Idle state and periodic timer should already be scheduled.
-        // Scheduling periodic timer here just in case.
-        StartPeriodicQueryTimer();
-        break;
-    case OTAUpdateStateEnum::kDownloading:
-    case OTAUpdateStateEnum::kApplying:
-    case OTAUpdateStateEnum::kDelayedOnApply:
-        UpdateDiscontinued();
-        mRequestor->CancelImageUpdate();
-        StartPeriodicQueryTimer();
-        break;
-    case OTAUpdateStateEnum::kQuerying:
-    case OTAUpdateStateEnum::kDelayedOnQuery:
-    case OTAUpdateStateEnum::kRollingBack:
-    case OTAUpdateStateEnum::kDelayedOnUserConsent:
-        mRequestor->Reset();
-        StartPeriodicQueryTimer();
-        break;
-    }
+    ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
+                 to_underlying(currentState));
+
+    // Something went wrong and OTA requestor is stuck in a non-idle state for too long.
+    // Let's just cancel download, reset state, and re-start periodic query timer.
+    UpdateDiscontinued();
+    mRequestor->CancelImageUpdate();
+    StartPeriodicQueryTimer();
 }
 
 void GenericOTARequestorDriver::StartWatchdogTimer()
