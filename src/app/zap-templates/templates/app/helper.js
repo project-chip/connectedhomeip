@@ -120,6 +120,7 @@ var endpointClusterWithInit = [
   'Scenes',
   'Time Format Localization',
   'Thermostat',
+  'Mode Select',
 ];
 var endpointClusterWithAttributeChanged = [
   'Bridged Device Basic',
@@ -129,7 +130,12 @@ var endpointClusterWithAttributeChanged = [
   'Window Covering',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
+  'IAS Zone',
+  'Door Lock',
+  'Thermostat User Interface Configuration',
+  'Time Format Localization',
+  'Localization Configuration',
+  'Mode Select',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
