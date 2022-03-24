@@ -119,7 +119,9 @@ inline CHIP_ERROR BLEManager::Init()
 
 inline CHIP_ERROR BLEManager::Shutdown()
 {
+#if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(GetBleLayer()->Shutdown());
+#endif
     return static_cast<ImplClass *>(this)->_Shutdown();
 }
 

@@ -70,11 +70,22 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
+                mRequestor->Reset();
                 return;
             }
 
             mRequestor->NotifyUpdateApplied();
         });
+    }
+    else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))
+    {
+        // Not running a new image for the first time but also not in the idle state may indicate there is a problem
+        mRequestor->Reset();
+    }
+    else
+    {
+        // Start the first periodic query timer
+        StartDefaultProviderTimer();
     }
 }
 

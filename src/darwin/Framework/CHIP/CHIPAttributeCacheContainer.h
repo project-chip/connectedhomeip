@@ -26,21 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAttributeCacheContainer : NSObject
 
 /**
- * Subscribes to all attributes to update attribute cache.
- *
- * @param deviceController   device controller to retrieve connected device from
- * @param deviceId  device identifier of the device to cache attributes of
- * @param params  subscription parameters
- * @param clientQueue  client queue to dispatch the completion handler through
- * @param completion  completion handler
- */
-- (void)subscribeWithDeviceController:(CHIPDeviceController *)deviceController
-                             deviceId:(uint64_t)deviceId
-                               params:(CHIPSubscribeParams * _Nullable)params
-                          clientQueue:(dispatch_queue_t)clientQueue
-                           completion:(void (^)(NSError * _Nullable error))completion;
-
-/**
  * Reads an attribute with specific attribute path
  *
  * @param endpointId  endpoint ID of the attribute

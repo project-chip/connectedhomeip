@@ -36,11 +36,11 @@
 #include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTAUtil.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
-#include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #endif
 
 #include <dk_buttons_and_leds.h>
@@ -77,7 +77,6 @@ bool sHaveBLEConnections  = false;
 #if CONFIG_CHIP_OTA_REQUESTOR
 DefaultOTARequestorStorage sRequestorStorage;
 GenericOTARequestorDriver sOTARequestorDriver;
-OTAImageProcessorImpl sOTAImageProcessor;
 chip::BDXDownloader sBDXDownloader;
 chip::OTARequestor sOTARequestor;
 #endif
@@ -183,9 +182,9 @@ CHIP_ERROR AppTask::Init()
 void AppTask::InitOTARequestor()
 {
 #if CONFIG_CHIP_OTA_REQUESTOR
-    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
-    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
-    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
+    OTAImageProcessorNrf::Get().SetOTADownloader(&sBDXDownloader);
+    sBDXDownloader.SetImageProcessorDelegate(&OTAImageProcessorNrf::Get());
+    sOTARequestorDriver.Init(&sOTARequestor, &OTAImageProcessorNrf::Get());
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     sOTARequestor.Init(Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
@@ -376,11 +375,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
-
-    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-    }
 
     if (!ConnectivityMgr().IsThreadProvisioned())
     {

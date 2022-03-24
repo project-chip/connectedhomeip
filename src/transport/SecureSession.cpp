@@ -20,6 +20,11 @@
 namespace chip {
 namespace Transport {
 
+ScopedNodeId SecureSession::GetPeer() const
+{
+    return ScopedNodeId(mPeerNodeId, GetFabricIndex());
+}
+
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
 {
     Access::SubjectDescriptor subjectDescriptor;

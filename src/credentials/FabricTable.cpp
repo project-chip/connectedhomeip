@@ -509,15 +509,6 @@ FabricTable::~FabricTable()
     }
 }
 
-void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
-{
-    FabricInfo * fabric = FindFabricWithIndex(fabricIndex);
-    if (fabric != nullptr)
-    {
-        fabric->Reset();
-    }
-}
-
 FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
@@ -618,15 +609,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
     if (!fabric->IsInitialized())
     {
         ReturnErrorOnFailure(fabric->LoadFromStorage(mStorage));
-    }
 
-    FabricTableDelegate * delegate = mDelegate;
-    while (delegate)
-    {
-        ChipLogProgress(Discovery, "Fabric (%d) loaded from storage. Calling OnFabricRetrievedFromStorage",
-                        fabric->GetFabricIndex());
-        delegate->OnFabricRetrievedFromStorage(fabric);
-        delegate = delegate->mNext;
+        FabricTableDelegate * delegate = mDelegate;
+        while (delegate)
+        {
+            ChipLogProgress(Discovery, "Fabric (%d) loaded from storage", fabric->GetFabricIndex());
+            delegate->OnFabricRetrievedFromStorage(fabric);
+            delegate = delegate->mNext;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -750,7 +740,9 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     }
     ReturnErrorOnFailure(err);
 
-    ReleaseFabricIndex(index);
+    // Since fabricIsInitialized was true, fabric is not null.
+    fabric->Reset();
+
     if (mDelegate != nullptr)
     {
         if (mFabricCount == 0)
