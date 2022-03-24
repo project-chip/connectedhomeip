@@ -130,7 +130,7 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     // Gets called when a software fault that has taken place on the Node.
     void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault) override
     {
-        ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+        ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
         {

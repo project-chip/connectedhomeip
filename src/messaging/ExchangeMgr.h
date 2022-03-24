@@ -187,7 +187,7 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    FabricIndex GetFabricIndex() { return mFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
 

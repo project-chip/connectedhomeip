@@ -48,7 +48,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession()
+    ~IncomingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG
@@ -65,6 +65,8 @@ public:
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -92,7 +94,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;
@@ -113,7 +115,7 @@ public:
     {
         SetFabricIndex(fabricIndex);
     }
-    ~OutgoingGroupSession()
+    ~OutgoingGroupSession() override
     {
         NotifySessionReleased();
 #ifndef NDEBUG
@@ -130,6 +132,8 @@ public:
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "outgoing group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -153,7 +157,7 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;

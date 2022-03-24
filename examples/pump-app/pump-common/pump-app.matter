@@ -28,11 +28,11 @@ server cluster AccessControl = 31 {
   }
 
   struct AccessControlEntry {
-    fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
     nullable INT64U subjects[] = 3;
     nullable Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   struct Target {
@@ -42,24 +42,24 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<254> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -369,16 +369,16 @@ server cluster GroupKeyManagement = 63 {
   }
 
   struct GroupKeyMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     INT16U groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct GroupInfoMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional CHAR_STRING<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
   }
 
   struct GroupKeySetStruct {
@@ -890,6 +890,12 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
@@ -902,7 +908,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
@@ -939,18 +945,18 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
     nullable OCTET_STRING icac = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;

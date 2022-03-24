@@ -110,19 +110,23 @@ class Efr32Builder(GnBuilder):
                  runner,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4161A,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 enable_ota_requestor: bool = False,
+                 ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
-        self.board = board
-        self.enable_rpcs = enable_rpcs
+        self.extra_gn_options = ['efr32_board="%s"' % board.GnArgName()]
+
+        if enable_rpcs:
+            self.extra_gn_options.append('import("//with_pw_rpc.gni")')
+
+        if enable_ota_requestor:
+            self.extra_gn_options.append('chip_enable_ota_requestor=true')
 
     def GnBuildArgs(self):
-        args = ['efr32_board="%s"' % self.board.GnArgName()]
-        if self.enable_rpcs:
-            args.append('import("//with_pw_rpc.gni")')
-        return args
+        return self.extra_gn_options
 
     def build_outputs(self):
         items = {}

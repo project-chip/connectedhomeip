@@ -75,9 +75,11 @@ void OTAConfig::Init()
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
+    // Periodic query timeout must be set prior to requestor being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(chip::CharSpan("test.txt"));
+    gImageProcessor.SetOTAImageFile("test.txt");
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects

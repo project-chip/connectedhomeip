@@ -29,9 +29,9 @@
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/support/PersistedCounter.h>
@@ -98,9 +98,9 @@ public:
     CircularEventBuffer * GetNextCircularEventBuffer() { return mpNext; }
 
     void SetRequiredSpaceforEvicted(size_t aRequiredSpace) { mRequiredSpaceForEvicted = aRequiredSpace; }
-    size_t GetRequiredSpaceforEvicted() { return mRequiredSpaceForEvicted; }
+    size_t GetRequiredSpaceforEvicted() const { return mRequiredSpaceForEvicted; }
 
-    virtual ~CircularEventBuffer() = default;
+    ~CircularEventBuffer() override = default;
 
 private:
     CircularEventBuffer * mpPrev = nullptr; ///< A pointer CircularEventBuffer storing events less important events
@@ -320,7 +320,7 @@ public:
      * specified by read/subscribe request.
      *
      * @param[in] aWriter     The writer to use for event storage
-     * @param[in] apClusterInfolist the interested cluster info list with event path inside
+     * @param[in] apEventPathList the interested EventPathParams list
      *
      * @param[in,out] aEventMin On input, the Event number is the one we're fetching.  On
      *                         completion, the event number of the next one we plan to fetch.
@@ -340,8 +340,9 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ObjectList<EventPathParams> * apEventPathList,
+                                EventNumber & aEventMin, size_t & aEventCount,
+                                const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**
      * @brief
@@ -349,7 +350,7 @@ public:
      *
      * @return EventNumber most recently vended event Number for that event priority
      */
-    EventNumber GetLastEventNumber() { return mLastEventNumber; }
+    EventNumber GetLastEventNumber() const { return mLastEventNumber; }
 
     /**
      * @brief
@@ -360,7 +361,7 @@ public:
     /**
      *  Logger would save last logged event number and initial written event bytes number into schedule event number array
      */
-    void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
+    void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const;
 
 private:
     /**

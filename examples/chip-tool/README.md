@@ -120,6 +120,71 @@ The endpoint id must be between 1 and 240.
 
 The client will send a single command packet and then exit.
 
+## Configuring the server side for Group Commands
+
+1. Commission and pair device with nodeId 1234
+
+2. Add Group to device
+
+    ```
+    $ chip-tool groups add-group 0x4141 Light 1234 1
+    ```
+
+3. Add group Keyset to device
+
+    ```
+    $ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+    "groupKeySecurityPolicy": 0, "epochKey0":
+    "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+    "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, }' 1234 0
+    ```
+
+4. Bind Key to group
+    ```
+    $ chip-tool groupkeymanagement write group-key-map
+    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
+    ```
+
+## Configuring the client for Group Commands
+
+Prior to sending a Group command, both the end device and the Client (Chip-tool)
+must be configured appropriately.
+
+To configure the client please use the groupsettings option
+
+    $ chip-tool groupsettings
+
+A group with a valid encryption key needs to be set. The groupid and the
+encryption key must match the one configured on the end device.
+
+To add a group
+
+    $ chip-tool groupsettings add-group TestName 0x1010
+
+To add a keyset
+
+    $ chip-tool groupsettings add-keyset 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+
+Take note that the epoch key must be in hex form with the 'hex:' prefix
+
+Finally to bind the keyset to the group
+
+    $ chip-tool groupsettings bind-keyset 0x1010 0xAAAA
+
+## Using the Client to Send Group (Multicast) Matter Commands
+
+To use the Client to send Matter commands, run the built executable and pass it
+the target cluster name, the target command name, the Group Id in Node Id form
+(0xffffffffffffXXXX) and an unused endpoint Id. Take note that Only commands and
+attributes write can be send with Group Id.
+
+E.G. sending to group Id 0x0025
+
+    $ chip-tool onoff on 0xffffffffffff0025 1
+
+The client will send a single multicast command packet and then exit.
+
 ### How to get the list of supported clusters
 
 To get the list of supported clusters, run the built executable without any

@@ -31,7 +31,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
 
@@ -136,7 +136,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
                         char name[IFNAMSIZ];
-                        if (if_indextoname(addressMessage->ifa_index, name) == NULL)
+                        if (if_indextoname(addressMessage->ifa_index, name) == nullptr)
                         {
                             ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
                                          addressMessage->ifa_index);
@@ -178,11 +178,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
-    sigaction(SIGHUP, &action, NULL);
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGUSR1, &action, NULL);
-    sigaction(SIGUSR2, &action, NULL);
-    sigaction(SIGTSTP, &action, NULL);
+    sigaction(SIGHUP, &action, nullptr);
+    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGUSR1, &action, nullptr);
+    sigaction(SIGUSR2, &action, nullptr);
+    sigaction(SIGTSTP, &action, nullptr);
 
 #if CHIP_WITH_GIO
     GError * error = nullptr;

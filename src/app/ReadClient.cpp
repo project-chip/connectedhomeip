@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
+#include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 
@@ -553,8 +554,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
     Close(CHIP_ERROR_TIMEOUT);
 }
 
@@ -769,6 +770,11 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     MoveToState(ClientState::SubscriptionActive);
 
+    if (mReadPrepareParams.mResubscribePolicy != nullptr)
+    {
+        mNumRetries = 0;
+    }
+
     RefreshLivenessCheckTimer();
 
     return CHIP_NO_ERROR;
@@ -883,7 +889,7 @@ bool ReadClient::ResubscribeIfNeeded()
     uint32_t intervalMsec  = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
-        ChipLogProgress(DataManagement, "mResubscribePolicy is null");
+        ChipLogDetail(DataManagement, "mResubscribePolicy is null");
         return false;
     }
     mReadPrepareParams.mResubscribePolicy(mNumRetries, intervalMsec, shouldResubscribe);
@@ -896,15 +902,14 @@ bool ReadClient::ResubscribeIfNeeded()
         System::Clock::Milliseconds32(intervalMsec), OnResubscribeTimerCallback, this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    else
-    {
-        ChipLogProgress(DataManagement,
-                        "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
-                        mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
-    }
+
+    ChipLogProgress(DataManagement,
+                    "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
+                    mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
+
     return true;
 }
 

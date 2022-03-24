@@ -28,11 +28,11 @@ server cluster AccessControl = 31 {
   }
 
   struct AccessControlEntry {
-    fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
     nullable INT64U subjects[] = 3;
     nullable Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   struct Target {
@@ -42,24 +42,24 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<254> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -271,11 +271,11 @@ server cluster BinaryInputBasic = 15 {
 
 server cluster Binding = 30 {
   struct TargetStruct {
-    FABRIC_IDX fabricIndex = 0;
     optional NODE_ID node = 1;
     optional GROUP_ID group = 2;
     optional ENDPOINT_NO endpoint = 3;
     optional CLUSTER_ID cluster = 4;
+    FABRIC_IDX fabricIndex = 254;
   }
 
   attribute TargetStruct binding[] = 0;
@@ -334,243 +334,6 @@ client cluster Channel = 1284 {
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
   command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
-}
-
-server cluster ColorControl = 768 {
-  enum ColorLoopAction : ENUM8 {
-    kDeactivate = 0;
-    kActivateFromColorLoopStartEnhancedHue = 1;
-    kActivateFromEnhancedCurrentHue = 2;
-  }
-
-  enum ColorLoopDirection : ENUM8 {
-    kDecrementHue = 0;
-    kIncrementHue = 1;
-  }
-
-  enum ColorMode : ENUM8 {
-    kCurrentHueAndCurrentSaturation = 0;
-    kCurrentXAndCurrentY = 1;
-    kColorTemperature = 2;
-  }
-
-  enum HueDirection : ENUM8 {
-    kShortestDistance = 0;
-    kLongestDistance = 1;
-    kUp = 2;
-    kDown = 3;
-  }
-
-  enum HueMoveMode : ENUM8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum HueStepMode : ENUM8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationMoveMode : ENUM8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationStepMode : ENUM8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  bitmap ColorCapabilities : BITMAP16 {
-    kHueSaturationSupported = 0x1;
-    kEnhancedHueSupported = 0x2;
-    kColorLoopSupported = 0x4;
-    kXYAttributesSupported = 0x8;
-    kColorTemperatureSupported = 0x10;
-  }
-
-  bitmap ColorLoopUpdateFlags : BITMAP8 {
-    kUpdateAction = 0x1;
-    kUpdateDirection = 0x2;
-    kUpdateTime = 0x4;
-    kUpdateStartHue = 0x8;
-  }
-
-  readonly attribute int8u currentHue = 0;
-  readonly attribute int8u currentSaturation = 1;
-  readonly attribute int16u remainingTime = 2;
-  readonly attribute int16u currentX = 3;
-  readonly attribute int16u currentY = 4;
-  readonly attribute enum8 driftCompensation = 5;
-  readonly attribute char_string<254> compensationText = 6;
-  readonly attribute int16u colorTemperature = 7;
-  readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 colorControlOptions = 15;
-  readonly attribute int8u numberOfPrimaries = 16;
-  readonly attribute int16u primary1X = 17;
-  readonly attribute int16u primary1Y = 18;
-  readonly attribute int8u primary1Intensity = 19;
-  readonly attribute int16u primary2X = 21;
-  readonly attribute int16u primary2Y = 22;
-  readonly attribute int8u primary2Intensity = 23;
-  readonly attribute int16u primary3X = 25;
-  readonly attribute int16u primary3Y = 26;
-  readonly attribute int8u primary3Intensity = 27;
-  readonly attribute int16u primary4X = 32;
-  readonly attribute int16u primary4Y = 33;
-  readonly attribute int8u primary4Intensity = 34;
-  readonly attribute int16u primary5X = 36;
-  readonly attribute int16u primary5Y = 37;
-  readonly attribute int8u primary5Intensity = 38;
-  readonly attribute int16u primary6X = 40;
-  readonly attribute int16u primary6Y = 41;
-  readonly attribute int8u primary6Intensity = 42;
-  attribute int16u whitePointX = 48;
-  attribute int16u whitePointY = 49;
-  attribute int16u colorPointRX = 50;
-  attribute int16u colorPointRY = 51;
-  attribute int8u colorPointRIntensity = 52;
-  attribute int16u colorPointGX = 54;
-  attribute int16u colorPointGY = 55;
-  attribute int8u colorPointGIntensity = 56;
-  attribute int16u colorPointBX = 58;
-  attribute int16u colorPointBY = 59;
-  attribute int8u colorPointBIntensity = 60;
-  readonly attribute int16u enhancedCurrentHue = 16384;
-  readonly attribute enum8 enhancedColorMode = 16385;
-  readonly attribute int8u colorLoopActive = 16386;
-  readonly attribute int8u colorLoopDirection = 16387;
-  readonly attribute int16u colorLoopTime = 16388;
-  readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMin = 16395;
-  readonly attribute int16u colorTempPhysicalMax = 16396;
-  readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute int16u startUpColorTemperatureMireds = 16400;
-  readonly global attribute int16u clusterRevision = 65533;
-
-  request struct MoveColorRequest {
-    INT16S rateX = 0;
-    INT16S rateY = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode = 0;
-    INT16U rate = 1;
-    INT16U colorTemperatureMinimum = 2;
-    INT16U colorTemperatureMaximum = 3;
-    BITMAP8 optionsMask = 4;
-    BITMAP8 optionsOverride = 5;
-  }
-
-  request struct MoveHueRequest {
-    HueMoveMode moveMode = 0;
-    INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode = 0;
-    INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveToColorRequest {
-    INT16U colorX = 0;
-    INT16U colorY = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToColorTemperatureRequest {
-    INT16U colorTemperature = 0;
-    INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveToHueRequest {
-    INT8U hue = 0;
-    HueDirection direction = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToHueAndSaturationRequest {
-    INT8U hue = 0;
-    INT8U saturation = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToSaturationRequest {
-    INT8U saturation = 0;
-    INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepColorRequest {
-    INT16S stepX = 0;
-    INT16S stepY = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct StepColorTemperatureRequest {
-    HueStepMode stepMode = 0;
-    INT16U stepSize = 1;
-    INT16U transitionTime = 2;
-    INT16U colorTemperatureMinimum = 3;
-    INT16U colorTemperatureMaximum = 4;
-    BITMAP8 optionsMask = 5;
-    BITMAP8 optionsOverride = 6;
-  }
-
-  request struct StepHueRequest {
-    HueStepMode stepMode = 0;
-    INT8U stepSize = 1;
-    INT8U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct StepSaturationRequest {
-    SaturationStepMode stepMode = 0;
-    INT8U stepSize = 1;
-    INT8U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct StopMoveStepRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
-  }
-
-  command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  command StepColor(StepColorRequest): DefaultSuccess = 9;
-  command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
-  command StepHue(StepHueRequest): DefaultSuccess = 2;
-  command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
 }
 
 client cluster ContentLauncher = 1290 {
@@ -723,486 +486,6 @@ server cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
-server cluster DoorLock = 257 {
-  enum DlAlarmCode : ENUM8 {
-    kLockJammed = 0;
-    kLockFactoryReset = 1;
-    kLockRadioPowerCycled = 3;
-    kWrongCodeEntryLimit = 4;
-    kFrontEsceutcheonRemoved = 5;
-    kDoorForcedOpen = 6;
-    kDoorAjar = 7;
-    kForcedUser = 8;
-  }
-
-  enum DlCredentialRule : ENUM8 {
-    kSingle = 0;
-    kDouble = 1;
-    kTri = 2;
-  }
-
-  enum DlCredentialType : ENUM8 {
-    kProgrammingPIN = 0;
-    kPin = 1;
-    kRfid = 2;
-    kFingerprint = 3;
-    kFingerVein = 4;
-    kFace = 5;
-  }
-
-  enum DlDataOperationType : ENUM8 {
-    kAdd = 0;
-    kClear = 1;
-    kModify = 2;
-  }
-
-  enum DlDoorState : ENUM8 {
-    kDoorOpen = 0;
-    kDoorClosed = 1;
-    kDoorJammed = 2;
-    kDoorForcedOpen = 3;
-    kDoorUnspecifiedError = 4;
-    kDoorAjar = 5;
-  }
-
-  enum DlLockDataType : ENUM8 {
-    kUnspecified = 0;
-    kProgrammingCode = 1;
-    kUserIndex = 2;
-    kWeekDaySchedule = 3;
-    kYearDaySchedule = 4;
-    kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
-    kFingerprint = 8;
-  }
-
-  enum DlLockOperationType : ENUM8 {
-    kLock = 0;
-    kUnlock = 1;
-    kNonAccessUserEvent = 2;
-    kForcedUserEvent = 3;
-  }
-
-  enum DlLockState : ENUM8 {
-    kNotFullyLocked = 0;
-    kLocked = 1;
-    kUnlocked = 2;
-  }
-
-  enum DlLockType : ENUM8 {
-    kDeadBolt = 0;
-    kMagnetic = 1;
-    kOther = 2;
-    kMortise = 3;
-    kRim = 4;
-    kLatchBolt = 5;
-    kCylindricalLock = 6;
-    kTubularLock = 7;
-    kInterconnectedLock = 8;
-    kDeadLatch = 9;
-    kDoorFurniture = 10;
-  }
-
-  enum DlOperatingMode : ENUM8 {
-    kNormal = 0;
-    kVacation = 1;
-    kPrivacy = 2;
-    kNoRemoteLockUnlock = 3;
-    kPassage = 4;
-  }
-
-  enum DlOperationError : ENUM8 {
-    kUnspecified = 0;
-    kInvalidCredential = 1;
-    kDisabledUserDenied = 2;
-    kRestricted = 3;
-    kInsufficientBattery = 4;
-  }
-
-  enum DlOperationSource : ENUM8 {
-    kUnspecified = 0;
-    kManual = 1;
-    kProprietaryRemote = 2;
-    kKeypad = 3;
-    kAuto = 4;
-    kButton = 5;
-    kSchedule = 6;
-    kRemote = 7;
-    kRfid = 8;
-    kBiometric = 9;
-  }
-
-  enum DlStatus : ENUM8 {
-    kSuccess = 0;
-    kFailure = 1;
-    kDuplicate = 2;
-    kOccupied = 3;
-    kInvalidField = 133;
-    kNotFound = 139;
-  }
-
-  enum DlUserStatus : ENUM8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-  }
-
-  enum DlUserType : ENUM8 {
-    kUnrestrictedUser = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kProgrammingUser = 3;
-    kNonAccessUser = 4;
-    kForcedUser = 5;
-    kDisposableUser = 6;
-    kExpiringUser = 7;
-    kScheduleRestrictedUser = 8;
-    kRemoteOnlyUser = 9;
-  }
-
-  enum DoorLockOperationEventCode : ENUM8 {
-    kUnknownOrMfgSpecific = 0;
-    kLock = 1;
-    kUnlock = 2;
-    kLockInvalidPinOrId = 3;
-    kLockInvalidSchedule = 4;
-    kUnlockInvalidPinOrId = 5;
-    kUnlockInvalidSchedule = 6;
-    kOneTouchLock = 7;
-    kKeyLock = 8;
-    kKeyUnlock = 9;
-    kAutoLock = 10;
-    kScheduleLock = 11;
-    kScheduleUnlock = 12;
-    kManualLock = 13;
-    kManualUnlock = 14;
-  }
-
-  enum DoorLockProgrammingEventCode : ENUM8 {
-    kUnknownOrMfgSpecific = 0;
-    kMasterCodeChanged = 1;
-    kPinAdded = 2;
-    kPinDeleted = 3;
-    kPinChanged = 4;
-    kIdAdded = 5;
-    kIdDeleted = 6;
-  }
-
-  enum DoorLockSetPinOrIdStatus : ENUM8 {
-    kSuccess = 0;
-    kGeneralFailure = 1;
-    kMemoryFull = 2;
-    kDuplicateCodeError = 3;
-  }
-
-  enum DoorLockUserStatus : ENUM8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-    kNotSupported = 255;
-  }
-
-  enum DoorLockUserType : ENUM8 {
-    kUnrestricted = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kMasterUser = 3;
-    kNonAccessUser = 4;
-    kNotSupported = 255;
-  }
-
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
-  bitmap DlCredentialRulesSupport : BITMAP8 {
-    kSingle = 0x1;
-    kDual = 0x2;
-    kTri = 0x4;
-  }
-
-  bitmap DlDaysMaskMap : BITMAP8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-  }
-
-  bitmap DlDefaultConfigurationRegister : BITMAP16 {
-    kEnableLocalProgrammingEnabled = 0x1;
-    kKeypadInterfaceDefaultAccessEnabled = 0x2;
-    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
-    kSoundEnabled = 0x20;
-    kAutoRelockTimeSet = 0x40;
-    kLEDSettingsSet = 0x80;
-  }
-
-  bitmap DlKeypadOperationEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidPIN = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-    kNonAccessUserOpEvent = 0x80;
-  }
-
-  bitmap DlKeypadProgrammingEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-  }
-
-  bitmap DlLocalProgrammingFeatures : BITMAP8 {
-    kAddUsersCredentialsSchedulesLocally = 0x1;
-    kModifyUsersCredentialsSchedulesLocally = 0x2;
-    kClearUsersCredentialsSchedulesLocally = 0x4;
-    kAdjustLockSettingsLocally = 0x8;
-  }
-
-  bitmap DlManualOperationEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kThumbturnLock = 0x2;
-    kThumbturnUnlock = 0x4;
-    kOneTouchLock = 0x8;
-    kKeyLock = 0x10;
-    kKeyUnlock = 0x20;
-    kAutoLock = 0x40;
-    kScheduleLock = 0x80;
-    kScheduleUnlock = 0x100;
-    kManualLock = 0x200;
-    kManualUnlock = 0x400;
-  }
-
-  bitmap DlRFIDOperationEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidRFID = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidRFID = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRFIDProgrammingEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlRemoteOperationEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidCode = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRemoteProgrammingEventMask : BITMAP16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlSupportedOperatingModes : BITMAP16 {
-    kNormal = 0x1;
-    kVacation = 0x2;
-    kPrivacy = 0x4;
-    kNoRemoteLockUnlock = 0x8;
-    kPassage = 0x10;
-  }
-
-  bitmap DoorLockDayOfWeek : BITMAP8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-  }
-
-  bitmap DoorLockFeature : BITMAP32 {
-    kPINCredentials = 0x1;
-    kRFIDCredentials = 0x2;
-    kFingerCredentials = 0x4;
-    kLogging = 0x8;
-    kAccessSchedules = 0x10;
-    kDoorPositionSensor = 0x20;
-    kFaceCredentials = 0x40;
-    kCredentialsOTA = 0x80;
-    kUsersManagement = 0x100;
-    kNotifications = 0x200;
-  }
-
-  struct DlCredential {
-    DlCredentialType credentialType = 0;
-    INT16U credentialIndex = 1;
-  }
-
-  critical event DoorLockAlarm = 0 {
-    DlAlarmCode alarmCode = 0;
-  }
-
-  critical event DoorStateChange = 1 {
-    DlDoorState doorState = 0;
-  }
-
-  critical event LockOperation = 2 {
-    DlLockOperationType lockOperationType = 0;
-    DlOperationSource operationSource = 1;
-    nullable INT16U userIndex = 2;
-    nullable fabric_idx fabricIndex = 3;
-    nullable NODE_ID sourceNode = 4;
-    optional nullable DlCredential credentials[] = 5;
-  }
-
-  critical event LockOperationError = 3 {
-    DlLockOperationType lockOperationType = 0;
-    DlOperationSource operationSource = 1;
-    DlOperationError operationError = 2;
-    nullable INT16U userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable NODE_ID sourceNode = 5;
-    optional nullable DlCredential credentials[] = 6;
-  }
-
-  info event LockUserChange = 4 {
-    DlLockDataType lockDataType = 0;
-    DlDataOperationType dataOperationType = 1;
-    DlOperationSource operationSource = 2;
-    nullable INT16U userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable NODE_ID sourceNode = 5;
-    nullable INT16U dataIndex = 6;
-  }
-
-  readonly attribute nullable DlLockState lockState = 0;
-  readonly attribute DlLockType lockType = 1;
-  readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute nullable DlDoorState doorState = 3;
-  attribute int32u doorOpenEvents = 4;
-  attribute int32u doorClosedEvents = 5;
-  attribute int16u openPeriod = 6;
-  readonly attribute int16u numberOfTotalUsersSupported = 17;
-  readonly attribute int16u numberOfPINUsersSupported = 18;
-  readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
-  readonly attribute int8u maxPINCodeLength = 23;
-  readonly attribute int8u minPINCodeLength = 24;
-  readonly attribute bitmap8 credentialRulesSupport = 27;
-  attribute char_string<3> language = 33;
-  attribute int32u autoRelockTime = 35;
-  attribute int8u soundVolume = 36;
-  attribute DlOperatingMode operatingMode = 37;
-  readonly attribute bitmap16 supportedOperatingModes = 38;
-  readonly attribute bitmap16 defaultConfigurationRegister = 39;
-  attribute boolean enableOneTouchLocking = 41;
-  attribute boolean enableInsideStatusLED = 42;
-  attribute boolean enablePrivacyModeButton = 43;
-  attribute int8u wrongCodeEntryLimit = 48;
-  attribute int8u userCodeTemporaryDisableTime = 49;
-  attribute boolean requirePINforRemoteOperation = 51;
-  readonly global attribute int16u clusterRevision = 65533;
-
-  request struct ClearCredentialRequest {
-    nullable DlCredential credential = 0;
-  }
-
-  request struct ClearUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct GetCredentialStatusRequest {
-    DlCredential credential = 0;
-  }
-
-  request struct GetUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct LockDoorRequest {
-    optional OCTET_STRING pinCode = 0;
-  }
-
-  request struct SetCredentialRequest {
-    DlDataOperationType operationType = 0;
-    DlCredential credential = 1;
-    LONG_OCTET_STRING credentialData = 2;
-    nullable INT16U userIndex = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-  }
-
-  request struct SetUserRequest {
-    DlDataOperationType operationType = 0;
-    INT16U userIndex = 1;
-    nullable CHAR_STRING userName = 2;
-    nullable INT32U userUniqueId = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-    nullable DlCredentialRule credentialRule = 6;
-  }
-
-  request struct UnlockDoorRequest {
-    optional OCTET_STRING pinCode = 0;
-  }
-
-  response struct GetCredentialStatusResponse {
-    boolean credentialExists = 0;
-    nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
-  }
-
-  response struct GetUserResponse {
-    INT16U userIndex = 0;
-    nullable CHAR_STRING userName = 1;
-    nullable INT32U userUniqueId = 2;
-    nullable DlUserStatus userStatus = 3;
-    nullable DlUserType userType = 4;
-    nullable DlCredentialRule credentialRule = 5;
-    nullable DlCredential credentials[] = 6;
-    nullable fabric_idx creatorFabricIndex = 7;
-    nullable fabric_idx lastModifiedFabricIndex = 8;
-    nullable INT16U nextUserIndex = 9;
-  }
-
-  response struct SetCredentialResponse {
-    DlStatus status = 0;
-    nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
-  }
-
-  timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
-  command GetUser(GetUserRequest): GetUserResponse = 27;
-  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  timed command SetUser(SetUserRequest): DefaultSuccess = 26;
-  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
-}
-
 server cluster EthernetNetworkDiagnostics = 55 {
   enum PHYRateType : ENUM8 {
     k10m = 0;
@@ -1232,13 +515,6 @@ server cluster EthernetNetworkDiagnostics = 55 {
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
-server cluster FlowMeasurement = 1028 {
-  readonly attribute nullable int16u measuredValue = 0;
-  readonly attribute nullable int16u minMeasuredValue = 1;
-  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1399,16 +675,16 @@ server cluster GroupKeyManagement = 63 {
   }
 
   struct GroupKeyMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     INT16U groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct GroupInfoMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional CHAR_STRING<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute GroupKeyMapStruct groupKeyMap[] = 0;
@@ -2144,13 +1420,6 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
 }
 
-server cluster OccupancySensing = 1030 {
-  readonly attribute bitmap8 occupancy = 0;
-  readonly attribute enum8 occupancySensorType = 1;
-  readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
 client cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : enum8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -2167,6 +1436,12 @@ client cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
@@ -2179,7 +1454,7 @@ client cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2204,6 +1479,12 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
@@ -2216,7 +1497,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2240,18 +1521,18 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
     nullable OCTET_STRING icac = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -2332,24 +1613,6 @@ server cluster OperationalCredentials = 62 {
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-}
-
-server cluster PressureMeasurement = 1027 {
-  bitmap PressureFeature : BITMAP32 {
-    kExt = 0x1;
-  }
-
-  readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
-server cluster RelativeHumidityMeasurement = 1029 {
-  readonly attribute int16u measuredValue = 0;
-  readonly attribute int16u minMeasuredValue = 1;
-  readonly attribute int16u maxMeasuredValue = 2;
-  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Scenes = 5 {
@@ -2536,13 +1799,6 @@ client cluster TargetNavigator = 1285 {
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
-server cluster TemperatureMeasurement = 1026 {
-  readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
 server cluster TestCluster = 1295 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
@@ -2600,7 +1856,7 @@ server cluster TestCluster = 1295 {
   }
 
   info event TestFabricScopedEvent = 2 {
-    fabric_idx arg1 = 1;
+    fabric_idx arg1 = 254;
   }
 
   attribute boolean boolean = 0;
@@ -2631,82 +1887,6 @@ server cluster TestCluster = 1295 {
 
   command Test(): DefaultSuccess = 0;
   command TestNotHandled(): DefaultSuccess = 1;
-}
-
-server cluster Thermostat = 513 {
-  enum SetpointAdjustMode : ENUM8 {
-    kHeatSetpoint = 0;
-    kCoolSetpoint = 1;
-    kHeatAndCoolSetpoints = 2;
-  }
-
-  enum ThermostatControlSequence : ENUM8 {
-    kCoolingOnly = 0;
-    kCoolingWithReheat = 1;
-    kHeatingOnly = 2;
-    kHeatingWithReheat = 3;
-    kCoolingAndHeating = 4;
-    kCoolingAndHeatingWithReheat = 5;
-  }
-
-  enum ThermostatRunningMode : ENUM8 {
-    kOff = 0;
-    kCool = 3;
-    kHeat = 4;
-  }
-
-  enum ThermostatSystemMode : ENUM8 {
-    kOff = 0;
-    kAuto = 1;
-    kCool = 3;
-    kHeat = 4;
-    kEmergencyHeating = 5;
-    kPrecooling = 6;
-    kFanOnly = 7;
-  }
-
-  bitmap DayOfWeek : BITMAP8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-    kAwayOrVacation = 0x80;
-  }
-
-  bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointFieldPresent = 0x1;
-    kCoolSetpointFieldPresent = 0x2;
-  }
-
-  bitmap ThermostatFeature : BITMAP32 {
-    kHeating = 0x1;
-    kCooling = 0x2;
-    kOccupancy = 0x4;
-    kSchedule = 0x8;
-    kSetback = 0x10;
-    kAutomode = 0x20;
-  }
-
-  readonly attribute int16s localTemperature = 0;
-  attribute int16s occupiedCoolingSetpoint = 17;
-  attribute int16s occupiedHeatingSetpoint = 18;
-  attribute ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute enum8 systemMode = 28;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
-  readonly global attribute bitmap32 featureMap = 65532;
-  readonly global attribute int16u clusterRevision = 65533;
-
-  response struct GetWeeklyScheduleResponse {
-    ENUM8 numberOfTransitionsForSequence = 0;
-    DayOfWeek dayOfWeekForSequence = 1;
-    ModeForSequence modeForSequence = 2;
-    INT8U payload[] = 3;
-  }
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
@@ -2974,74 +2154,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-server cluster WindowCovering = 258 {
-  bitmap WcConfigStatus : BITMAP8 {
-    kOperational = 0x1;
-    kOnline = 0x2;
-    kOpenAndUpCommandsReversed = 0x4;
-    kLiftPositionAware = 0x8;
-    kTiltPositionAware = 0x10;
-    kLiftEncoderControlled = 0x20;
-    kTiltEncoderControlled = 0x40;
-  }
-
-  bitmap WcFeature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
-  }
-
-  bitmap WcMode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLEDFeedback = 0x8;
-  }
-
-  bitmap WcOperationalStatus : BITMAP8 {
-    kGlobal = 0x3;
-    kLift = 0xC;
-    kTilt = 0x30;
-  }
-
-  bitmap WcSafetyStatus : BITMAP16 {
-    kRemoteLockout = 0x1;
-    kTamperDetection = 0x2;
-    kFailedCommunication = 0x4;
-    kPositionFailure = 0x8;
-    kThermalProtection = 0x10;
-    kObstacleDetected = 0x20;
-    kPower = 0x40;
-    kStopInput = 0x80;
-    kMotorJammed = 0x100;
-    kHardwareFailure = 0x200;
-    kManualOperation = 0x400;
-    kProtection = 0x800;
-  }
-
-  readonly attribute enum8 type = 0;
-  readonly attribute nullable int16u currentPositionLift = 3;
-  readonly attribute nullable int16u currentPositionTilt = 4;
-  readonly attribute bitmap8 configStatus = 7;
-  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
-  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
-  readonly attribute bitmap8 operationalStatus = 10;
-  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
-  readonly attribute enum8 endProductType = 13;
-  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
-  readonly attribute int16u installedOpenLimitLift = 16;
-  readonly attribute int16u installedClosedLimitLift = 17;
-  readonly attribute int16u installedOpenLimitTilt = 18;
-  readonly attribute int16u installedClosedLimitTilt = 19;
-  attribute bitmap8 mode = 23;
-  readonly attribute bitmap16 safetyStatus = 26;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
 
 endpoint 0 {
   server  cluster AccessControl;
@@ -3059,7 +2171,6 @@ endpoint 0 {
   server  cluster NetworkCommissioning;
   server  cluster OtaSoftwareUpdateProvider;
   server  cluster OperationalCredentials;
-  server  cluster RelativeHumidityMeasurement;
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
   server  cluster TimeFormatLocalization;
@@ -3077,13 +2188,10 @@ endpoint 1 {
   server  cluster BinaryInputBasic;
   server  cluster Binding;
   binding cluster Channel;
-  server  cluster ColorControl;
   binding cluster ContentLauncher;
   binding cluster Descriptor;
   server  cluster Descriptor;
-  server  cluster DoorLock;
   server  cluster FixedLabel;
-  server  cluster FlowMeasurement;
   server  cluster Groups;
   server  cluster IasZone;
   server  cluster Identify;
@@ -3094,21 +2202,15 @@ endpoint 1 {
   binding cluster MediaPlayback;
   binding cluster OnOff;
   server  cluster OnOff;
-  server  cluster PressureMeasurement;
-  server  cluster RelativeHumidityMeasurement;
   server  cluster Scenes;
   server  cluster Switch;
   binding cluster TargetNavigator;
-  server  cluster TemperatureMeasurement;
   server  cluster TestCluster;
-  server  cluster Thermostat;
   server  cluster WakeOnLan;
-  server  cluster WindowCovering;
 }
 
 endpoint 2 {
   server  cluster Descriptor;
-  server  cluster OccupancySensing;
   server  cluster OnOff;
 }
 

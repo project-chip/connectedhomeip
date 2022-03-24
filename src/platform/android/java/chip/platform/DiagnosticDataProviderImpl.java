@@ -19,9 +19,12 @@ package chip.platform;
 
 import android.content.Context;
 import android.util.Log;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
@@ -64,6 +67,22 @@ public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
               name.startsWith("wlan")
                   ? NetworkInterface.INTERFACE_TYPE_WI_FI
                   : NetworkInterface.INTERFACE_TYPE_ETHERNET;
+
+          Enumeration<InetAddress> inetAddress = nif.getInetAddresses();
+          while (inetAddress.hasMoreElements()) {
+            InetAddress ip = inetAddress.nextElement();
+
+            if (ip instanceof Inet4Address) {
+              if (anInterface.ipv4Address == null) {
+                anInterface.ipv4Address = ip.getAddress();
+              }
+            } else if (ip instanceof InetAddress) {
+              if (anInterface.ipv6Address == null) {
+                anInterface.ipv6Address = ip.getAddress();
+              }
+            }
+          }
+
           destInterfaces.add(anInterface);
         }
       }

@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 from dataclasses import dataclass
 from inspect import Attribute
+import inspect
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -53,6 +55,67 @@ def TestFail(message):
 def FailIfNot(cond, message):
     if not cond:
         TestFail(message)
+
+
+_configurable_tests = set()
+_configurable_test_sets = set()
+_enabled_tests = []
+_disabled_tests = []
+
+
+def SetTestSet(enabled_tests, disabled_tests):
+    global _enabled_tests, _disabled_tests
+    _enabled_tests = enabled_tests[:]
+    _disabled_tests = disabled_tests[:]
+
+
+def TestIsEnabled(test_name: str):
+    enabled_len = -1
+    disabled_len = -1
+    if 'all' in _enabled_tests:
+        enabled_len = 0
+    if 'all' in _disabled_tests:
+        disabled_len = 0
+
+    for test_item in _enabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > enabled_len):
+            enabled_len = len(test_item)
+
+    for test_item in _disabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > disabled_len):
+            disabled_len = len(test_item)
+
+    return enabled_len > disabled_len
+
+
+def test_set(cls):
+    _configurable_test_sets.add(cls.__qualname__)
+    return cls
+
+
+def test_case(func):
+    test_name = func.__qualname__
+    _configurable_tests.add(test_name)
+
+    def CheckEnableBeforeRun(*args, **kwargs):
+        if TestIsEnabled(test_name=test_name):
+            return func(*args, **kwargs)
+        elif inspect.iscoroutinefunction(func):
+            # noop, so users can use await as usual
+            return asyncio.sleep(0)
+    return CheckEnableBeforeRun
+
+
+def configurable_tests():
+    res = [v for v in _configurable_test_sets]
+    res.sort()
+    return res
+
+
+def configurable_test_cases():
+    res = [v for v in _configurable_tests]
+    res.sort()
+    return res
 
 
 class TestTimeout(threading.Thread):
@@ -104,13 +167,15 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, testCommissioner: bool = False):
+    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
-        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
+        self.devCtrl = self.fabricAdmin.NewController(
+            nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
         self.logger = logger
+        self.paaTrustStorePath = paaTrustStorePath
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -136,6 +201,39 @@ class BaseTestHelper:
         self.logger.info(f"Found device at {res}")
         return res
 
+    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        if self.devCtrl.EstablishPASESessionIP(
+                ip.encode("utf-8"), setuppin, nodeid) is not None:
+            self.logger.info(
+                "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+            return False
+        self.logger.info(
+            "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        return True
+
+    def TestCommissionOnly(self, nodeid: int):
+        self.logger.info(
+            "Commissioning device with id {}".format(nodeid))
+        if not self.devCtrl.Commission(nodeid):
+            self.logger.info(
+                "Failed to commission device with id {}".format(str(nodeid)))
+            return False
+        self.logger.info(
+            "Successfully commissioned device with id {}".format(str(nodeid)))
+        return True
+
+    def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Conducting key exchange with device {}".format(discriminator))
+        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(discriminator))
+            return False
+        self.logger.info("Device finished key exchange.")
+        return True
+
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))
         if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
@@ -157,7 +255,8 @@ class BaseTestHelper:
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
-        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        devCtrl2 = fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
         if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
@@ -184,8 +283,10 @@ class BaseTestHelper:
             fabricId=1, fabricIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
-        self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
-        self.devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        self.devCtrl = self.fabricAdmin.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
+        self.devCtrl2 = fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
         data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
@@ -480,8 +581,8 @@ class BaseTestHelper:
             "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 0,
-            "SoftwareVersionString": "prerelease",
+            "SoftwareVersion": 1,
+            "SoftwareVersionString": "1.0",
         }
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():

@@ -117,8 +117,8 @@ public:
     using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
     using EndPoint = typename EndPointImpl::EndPoint;
 
-    EndPointManagerImplPool()  = default;
-    ~EndPointManagerImplPool() = default;
+    EndPointManagerImplPool()           = default;
+    ~EndPointManagerImplPool() override = default;
 
     EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
     void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }

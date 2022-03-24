@@ -32,7 +32,7 @@ class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBas
 {
 public:
     SessionHolder() {}
-    ~SessionHolder();
+    ~SessionHolder() override;
 
     SessionHolder(const SessionHolder &);
     SessionHolder(SessionHolder && that);

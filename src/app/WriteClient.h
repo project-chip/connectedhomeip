@@ -196,10 +196,8 @@ public:
                                           attributePath.mClusterId, attributePath.mAttributeId, aDataVersion),
                 value);
         }
-        else
-        {
-            return EncodeAttribute(attributePath, value.Value());
-        }
+
+        return EncodeAttribute(attributePath, value.Value());
     }
 
     /**
@@ -234,7 +232,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~WriteClient() { Abort(); }
+    ~WriteClient() override { Abort(); }
 
 private:
     friend class TestWriteInteraction;

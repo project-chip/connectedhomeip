@@ -69,12 +69,6 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
     }
-    else
-    {
-        // If rendezvous is bypassed, enable SoftAP so that the device can still
-        // be communicated with via its SoftAP as needed.
-        ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-    }
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.

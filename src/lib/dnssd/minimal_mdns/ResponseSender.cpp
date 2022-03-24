@@ -72,6 +72,19 @@ CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder
     return CHIP_ERROR_NO_MEMORY;
 }
 
+CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryResponder)
+{
+    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    {
+        if (mResponder[i] == queryResponder)
+        {
+            mResponder[i] = nullptr;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
 {
     mSendState.Reset(messageId, query, querySource);

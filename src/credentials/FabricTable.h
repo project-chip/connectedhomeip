@@ -128,7 +128,7 @@ public:
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId);
+                                     MutableByteSpan & destinationId) const;
 
     CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
                                   size_t ipkListEntries);
@@ -194,6 +194,10 @@ public:
     CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     friend class FabricTable;
+
+    // Test-only, build a fabric using given root cert and NOC
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                   ByteSpan nodePrivateKey);
 
 private:
     static constexpr size_t MetadataTLVMaxSize()
@@ -371,8 +375,6 @@ public:
      * If the call is successful, the assigned fabric index is returned as output parameter.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
-
-    void ReleaseFabricIndex(FabricIndex fabricIndex);
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);

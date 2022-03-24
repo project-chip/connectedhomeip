@@ -67,8 +67,6 @@ public:
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    CHIP_ERROR AddTestCommissioning();
-
     /**
      * @brief Call this function to rejoin existing groups found in the GroupDataProvider
      */
@@ -122,11 +120,9 @@ private:
                 {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                else
-                {
-                    // When size is zero, let's give a non-nullptr to the KVS backend
-                    buffer = &emptyPlaceholder;
-                }
+
+                // When size is zero, let's give a non-nullptr to the KVS backend
+                buffer = &emptyPlaceholder;
             }
 
             size_t bytesRead = 0;

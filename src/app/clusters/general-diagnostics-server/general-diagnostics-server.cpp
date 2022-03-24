@@ -189,7 +189,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
     }
@@ -197,7 +197,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Gets called when the device has been rebooted.
     void OnDeviceRebooted(chip::DeviceLayer::BootReasonType bootReason) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
 
@@ -217,7 +217,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous,
                                   GeneralFaults<kMaxHardwareFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {
@@ -243,7 +243,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Get called when the Node detects a radio fault has been raised.
     void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnRadioFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {
@@ -269,7 +269,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     // Get called when the Node detects a network fault has been raised.
     void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkFaultsDetected");
 
         for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
         {

@@ -526,10 +526,8 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
     {
         return mChipVal == other.mChipVal;
     }
-    else
-    {
-        return mString.data_equal(other.mString);
-    }
+
+    return mString.data_equal(other.mString);
 }
 
 ChipDN::ChipDN() {}
@@ -574,6 +572,19 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
     rdn[rdnCount].mAttrOID               = oid;
     rdn[rdnCount].mChipVal               = val;
     rdn[rdnCount].mAttrIsPrintableString = false;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
+{
+    for (auto & cat : cats.values)
+    {
+        if (cat != kUndefinedCAT)
+        {
+            ReturnErrorOnFailure(AddAttribute(chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag, cat));
+        }
+    }
 
     return CHIP_NO_ERROR;
 }

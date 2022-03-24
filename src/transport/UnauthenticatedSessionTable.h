@@ -56,7 +56,7 @@ public:
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
-    ~UnauthenticatedSession() { NotifySessionReleased(); }
+    ~UnauthenticatedSession() override { NotifySessionReleased(); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -73,6 +73,8 @@ public:
 
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -101,10 +103,8 @@ public:
         {
             return kUndefinedNodeId;
         }
-        else
-        {
-            return mEphemeralInitiatorNodeId;
-        }
+
+        return mEphemeralInitiatorNodeId;
     }
 
     SessionRole GetSessionRole() const { return mSessionRole; }
@@ -158,10 +158,8 @@ public:
         {
             return MakeOptional<SessionHandle>(*result);
         }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+
+        return Optional<SessionHandle>::Missing();
     }
 
     CHECK_RETURN_VALUE Optional<SessionHandle> FindInitiator(NodeId ephemeralInitiatorNodeID)
@@ -171,10 +169,8 @@ public:
         {
             return MakeOptional<SessionHandle>(*result);
         }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+
+        return Optional<SessionHandle>::Missing();
     }
 
     CHECK_RETURN_VALUE Optional<SessionHandle> AllocInitiator(NodeId ephemeralInitiatorNodeID, const PeerAddress & peerAddress,
@@ -187,10 +183,8 @@ public:
             result->SetPeerAddress(peerAddress);
             return MakeOptional<SessionHandle>(*result);
         }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+
+        return Optional<SessionHandle>::Missing();
     }
 
 private:

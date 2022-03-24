@@ -429,8 +429,8 @@ CHIP_ERROR LogEntryChangedEvent(const AccessControl::Entry & entry, const Access
         adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor.subject));
     }
 
-    AccessControlCluster::Events::AccessControlEntryChanged::Type event{ subjectDescriptor.fabricIndex, adminNodeID,
-                                                                         adminPasscodeID, changeType, latestValue };
+    AccessControlCluster::Events::AccessControlEntryChanged::Type event{ adminNodeID, adminPasscodeID, changeType, latestValue,
+                                                                         subjectDescriptor.fabricIndex };
 
     err = LogEvent(event, 0, eventNumber);
     if (CHIP_NO_ERROR != err)

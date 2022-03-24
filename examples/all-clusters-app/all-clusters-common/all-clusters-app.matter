@@ -28,11 +28,11 @@ server cluster AccessControl = 31 {
   }
 
   struct AccessControlEntry {
-    fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
     nullable INT64U subjects[] = 3;
     nullable Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   struct Target {
@@ -42,24 +42,24 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<254> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -230,11 +230,11 @@ server cluster BinaryInputBasic = 15 {
 
 server cluster Binding = 30 {
   struct TargetStruct {
-    FABRIC_IDX fabricIndex = 0;
     optional NODE_ID node = 1;
     optional GROUP_ID group = 2;
     optional ENDPOINT_NO endpoint = 3;
     optional CLUSTER_ID cluster = 4;
+    FABRIC_IDX fabricIndex = 254;
   }
 
   attribute TargetStruct binding[] = 0;
@@ -963,6 +963,12 @@ server cluster DoorLock = 257 {
     kForcedDoorOpenUnderDoorLockedCondition = 0x40;
   }
 
+  bitmap DlCredentialRuleMask : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
   bitmap DlCredentialRulesSupport : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1154,13 +1160,13 @@ server cluster DoorLock = 257 {
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
-  readonly attribute bitmap8 credentialRulesSupport = 27;
+  readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
   attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
   attribute int8u soundVolume = 36;
   attribute DlOperatingMode operatingMode = 37;
-  readonly attribute bitmap16 supportedOperatingModes = 38;
-  readonly attribute bitmap16 defaultConfigurationRegister = 39;
+  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
+  readonly attribute DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
   attribute boolean enableOneTouchLocking = 41;
   attribute boolean enableInsideStatusLED = 42;
   attribute boolean enablePrivacyModeButton = 43;
@@ -1462,16 +1468,16 @@ server cluster GroupKeyManagement = 63 {
   }
 
   struct GroupKeyMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     INT16U groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct GroupInfoMapStruct {
-    fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional CHAR_STRING<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
   }
 
   struct GroupKeySetStruct {
@@ -1965,17 +1971,26 @@ server cluster MediaPlayback = 1286 {
 }
 
 server cluster ModeSelect = 80 {
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+  }
+
   struct ModeOptionStruct {
     CHAR_STRING<32> label = 0;
     INT8U mode = 1;
     INT32U semanticTag = 2;
   }
 
-  readonly attribute int8u currentMode = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  attribute int8u onMode = 2;
-  readonly attribute int8u startUpMode = 3;
-  readonly attribute char_string<32> description = 4;
+  readonly attribute char_string<32> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct ChangeToModeRequest {
@@ -2256,6 +2271,12 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
@@ -2268,7 +2289,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2312,18 +2333,18 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
     nullable OCTET_STRING icac = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -2881,7 +2902,6 @@ server cluster TestCluster = 1295 {
   }
 
   struct TestFabricScoped {
-    fabric_idx fabricIndex = 0;
     INT8U fabricSensitiveInt8u = 1;
     optional INT8U optionalFabricSensitiveInt8u = 2;
     nullable INT8U nullableFabricSensitiveInt8u = 3;
@@ -2889,6 +2909,7 @@ server cluster TestCluster = 1295 {
     CHAR_STRING fabricSensitiveCharString = 5;
     SimpleStruct fabricSensitiveStruct = 6;
     INT8U fabricSensitiveInt8uList[] = 7;
+    fabric_idx fabricIndex = 254;
   }
 
   struct NestedStructList {
@@ -2917,7 +2938,7 @@ server cluster TestCluster = 1295 {
   }
 
   info event TestFabricScopedEvent = 2 {
-    fabric_idx arg1 = 1;
+    fabric_idx arg1 = 254;
   }
 
   attribute boolean boolean = 0;

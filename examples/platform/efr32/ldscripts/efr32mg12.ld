@@ -284,6 +284,6 @@ SECTIONS
 
 
   /* Check if FLASH usage exceeds FLASH size */
-  ASSERT( LENGTH(FLASH) >= (__etext + SIZEOF(.data)), "FLASH memory overflowed !")
+  ASSERT( LENGTH(FLASH) >= (__etext), "FLASH memory overflowed !")
   ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")
 }
