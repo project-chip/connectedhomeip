@@ -207,7 +207,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     else
     {
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
-        StartPeriodicQueryTimer();
+        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
     }
 }
 
@@ -404,8 +404,6 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
         // Scheduling periodic timer here just in case.
         StartPeriodicQueryTimer();
         break;
-    case OTAUpdateStateEnum::kQuerying:
-    case OTAUpdateStateEnum::kDelayedOnQuery:
     case OTAUpdateStateEnum::kDownloading:
     case OTAUpdateStateEnum::kApplying:
     case OTAUpdateStateEnum::kDelayedOnApply:
@@ -413,6 +411,8 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
         mRequestor->CancelImageUpdate();
         StartPeriodicQueryTimer();
         break;
+    case OTAUpdateStateEnum::kQuerying:
+    case OTAUpdateStateEnum::kDelayedOnQuery:
     case OTAUpdateStateEnum::kRollingBack:
     case OTAUpdateStateEnum::kDelayedOnUserConsent:
         mRequestor->Reset();
