@@ -86,7 +86,7 @@ bool DnssdServer::HaveOperationalCredentials()
 
 void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int32_t secs)
 {
-    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId16 "s", secs);
+    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId32 "s", secs);
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
 }
 
@@ -237,7 +237,7 @@ CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId16 "s", extendedDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId32 "s", extendedDiscoveryTimeoutSecs);
 
     mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds32(extendedDiscoveryTimeoutSecs);
 
