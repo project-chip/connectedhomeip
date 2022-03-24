@@ -113,7 +113,8 @@ class ClangTidyEntry:
     def Check(self):
         logging.debug("Running tidy on %s from %s", self.file, self.directory)
         try:
-            cmd = ["clang-tidy", self.file] + self.tidy_arguments + ["--"] + self.clang_arguments
+            cmd = ["clang-tidy", self.file] + \
+                self.tidy_arguments + ["--"] + self.clang_arguments
             logging.debug("Executing: %r" % cmd)
 
             proc = subprocess.Popen(
@@ -213,7 +214,7 @@ class ClangTidyRunner:
 
             # When running over several files, fixes may be applied to the same
             # file over and over again, like 'append override' can result in the
-            # same override being appended multiple times. 
+            # same override being appended multiple times.
             already_seen = set()
             for name in glob.iglob(
                 os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")
@@ -226,12 +227,12 @@ class ClangTidyRunner:
                 # Allow all diagnostics for distinct paths to be applied
                 # at once but never again for future paths
                 for d in diagnostics:
-                  if d['DiagnosticMessage']['FilePath'] not in already_seen:
-                    all_diagnostics.append(d)
+                    if d['DiagnosticMessage']['FilePath'] not in already_seen:
+                        all_diagnostics.append(d)
 
                 # in the future assume these files were already processed
                 for d in diagnostics:
-                  already_seen.add(d['DiagnosticMessage']['FilePath'])
+                    already_seen.add(d['DiagnosticMessage']['FilePath'])
 
             if all_diagnostics:
                 with open(self.fixes_file, "w") as out:
