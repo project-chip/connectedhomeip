@@ -319,7 +319,9 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
 
-    mPathCount = 0;
+    mAttributePathCount     = 0;
+    mEventPathCount         = 0;
+    mDataVersionFilterCount = 0;
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
@@ -384,9 +386,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
 
-    size_t attributePathCount = 0;
-    TLV::Utilities::Count(reader, attributePathCount, false);
-    mPathCount += attributePathCount;
+    TLV::Utilities::Count(reader, mAttributePathCount, false);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
@@ -459,6 +459,9 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
+
+    TLV::Utilities::Count(reader, mDataVersionFilterCount, false);
+
     aDataVersionFilterListParser.GetReader(&reader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -492,9 +495,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     TLV::TLVReader reader;
     aEventPathsParser.GetReader(&reader);
 
-    size_t eventPathCount = 0;
-    TLV::Utilities::Count(reader, eventPathCount, false);
-    mPathCount += eventPathCount;
+    TLV::Utilities::Count(reader, mEventPathCount, false);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {

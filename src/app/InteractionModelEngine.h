@@ -223,7 +223,10 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool() { return mReadHandlers; }
+    auto & GetReadHandlerPool()
+    {
+        return mReadHandlers;
+    }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -231,7 +234,10 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
+    void SetHandlerCapacity(int32_t sz)
+    {
+        mReadHandlerCapacityOverride = sz;
+    }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -334,17 +340,21 @@ private:
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
                           (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric +
                            kReservedPathInfoForReadRequests),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+#endif
 
     ObjectPool<ObjectList<AttributePathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mAttributePathPool;
     ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= CHIP_CONFIG_MAX_FABRICS * (kMinSupportedSubscriptionPerFabric + 1),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+#endif
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
 
     ReadClient * mpActiveReadClientList = nullptr;
