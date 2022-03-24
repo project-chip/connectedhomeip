@@ -1779,7 +1779,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  *        When this is not set, CHIP_CONFIG_MAX_FABRICS is used to determine
  *        and statically allocate pointers needed to track active
- *        operational responder lits.
+ *        operational responder lists.
  */
 #ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 #define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0

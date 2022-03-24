@@ -88,6 +88,18 @@ CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryRespon
     return CHIP_ERROR_NOT_FOUND;
 }
 
+bool ResponseSender::HasQueryResponders() const
+{
+    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
+    {
+        if (*it != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
 {
     mSendState.Reset(messageId, query, querySource);
