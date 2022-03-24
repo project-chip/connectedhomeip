@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include <inet/UDPEndPointImpl_OpenThread.h>
+#include <inet/UDPEndPointImplOpenThread.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
