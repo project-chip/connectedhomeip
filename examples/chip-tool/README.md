@@ -107,8 +107,8 @@ In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
 
 #### Trust Store
 
-Trust store will be automatically created using the default Test Attestation PAA.
-To use a different set of PAAs, pass the path using the optional parameter
+Trust store will be automatically created using the default Test Attestation
+PAA. To use a different set of PAAs, pass the path using the optional parameter
 --paa-trust-store-path while running the built executable. Trusted PAAs are
 available at credentials/development/paa-root-certs/.
 
