@@ -9,7 +9,7 @@ Run clang-tidy in parallel on compile databases.
 Example run:
 
 # This prepares the build. NOTE this is `build` not `gen` because the build
-# steps generates required header files (this can be simplified if needed
+# step generates required header files (this can be simplified if needed
 # to invoke ninja to compile only generated files if needed)
 
 ./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
