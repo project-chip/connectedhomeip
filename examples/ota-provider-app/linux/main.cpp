@@ -58,16 +58,16 @@ OTAProviderExample gOtaProvider;
 chip::ota::DefaultUserConsentProvider gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
-static OTAApplyUpdateAction gOptionUpdateAction                       = OTAApplyUpdateAction::kProceed;
-static uint32_t gDelayedQueryActionTimeSec                            = 0;
-static uint32_t gDelayedApplyActionTimeSec                            = 0;
-static const char * gOtaFilepath                                      = nullptr;
-static const char * gOtaImageListFilepath                             = nullptr;
-static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
-static bool gUserConsentNeeded                                        = false;
-static uint32_t gIgnoreQueryImageCount                                = 0;
-static uint32_t gIgnoreApplyUpdateCount                               = 0;
+static OTAQueryStatus gQueryImageStatus              = OTAQueryStatus::kUpdateAvailable;
+static OTAApplyUpdateAction gOptionUpdateAction      = OTAApplyUpdateAction::kProceed;
+static uint32_t gDelayedQueryActionTimeSec           = 0;
+static uint32_t gDelayedApplyActionTimeSec           = 0;
+static const char * gOtaFilepath                     = nullptr;
+static const char * gOtaImageListFilepath            = nullptr;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
+static bool gUserConsentNeeded                       = false;
+static uint32_t gIgnoreQueryImageCount               = 0;
+static uint32_t gIgnoreApplyUpdateCount              = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -172,15 +172,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         else if (strcmp(aValue, "updateAvailable") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+            gQueryImageStatus = OTAQueryStatus::kUpdateAvailable;
         }
         else if (strcmp(aValue, "busy") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithBusy;
+            gQueryImageStatus = OTAQueryStatus::kBusy;
         }
         else if (strcmp(aValue, "updateNotAvailable") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
+            gQueryImageStatus = OTAQueryStatus::kNotAvailable;
         }
         else
         {
@@ -330,9 +330,9 @@ void ApplicationInit()
         gOtaProvider.SetOTAFilePath(gOtaFilepath);
     }
 
-    gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
+    gOtaProvider.SetQueryImageStatus(gQueryImageStatus);
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
     gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
     gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
@@ -356,6 +356,12 @@ void ApplicationInit()
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
         ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
         gOtaProvider.SetOTACandidates(candidates);
+    }
+
+    if ((gOtaFilepath == nullptr) && (gOtaImageListFilepath == nullptr))
+    {
+        ChipLogError(SoftwareUpdate, "Either an OTA file or image list file must be specified");
+        chipDie();
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
