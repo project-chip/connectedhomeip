@@ -134,10 +134,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         }
 
         std::ifstream otaFile(mFileDesignator, std::ifstream::in);
-        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        if (!otaFile.good())
+        {
+            ChipLogError(BDX, "%s: file read failed", __FUNCTION__);
+            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            return;
+        }
+
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
-        VerifyOrReturn(otaFile.good() || otaFile.eof(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
 
         blockData.Data   = blockBuf->Start();
         blockData.Length = static_cast<size_t>(otaFile.gcount());
@@ -146,8 +151,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
         otaFile.close();
 
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
-                       ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+        if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
+        {
+            ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err));
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+        }
         break;
     }
     case TransferSession::OutputEventType::kAckReceived:
@@ -180,12 +188,14 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
-    if (mExchangeCtx != nullptr)
+
+    // mExchangeCtx->Close() will crash if ExchangeMgr is nullptr. So check for nullptr before calling Close().
+    if (mExchangeCtx && mExchangeCtx->GetExchangeMgr())
     {
         mExchangeCtx->Close();
         mExchangeCtx = nullptr;
     }
+    mTransfer.Reset();
 
     mInitialized  = false;
     mNumBytesSent = 0;
