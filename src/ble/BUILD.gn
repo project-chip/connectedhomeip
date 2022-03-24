@@ -51,6 +51,7 @@ source_set("ble_config_header") {
 
   public_deps = [
     ":ble_buildconfig",
+    "${chip_root}/src/platform:platform_buildconfig",
     "${chip_root}/src/system:system_config_header",
   ]
 }
