@@ -1,0 +1,417 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <app/util/privilege-storage.h>
+
+// Prevent changing generated format
+// clang-format off
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (*cluster*, attribute, privilege) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, *attribute*, privilege) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, attribute, *privilege*) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    kMatterAccessPrivilegeOperate, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    kMatterAccessPrivilegeManage, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    kMatterAccessPrivilegeAdminister, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (*cluster*, attribute, privilege) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, *attribute*, privilege) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, attribute, *privilege*) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
+    {{/first}}
+    {{#chip_server_cluster_attributes}}
+        {{#access entity="attribute"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "write")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    kMatterAccessPrivilegeManage, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    kMatterAccessPrivilegeAdminister, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/chip_server_cluster_attributes}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (*cluster*, command, privilege) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
+    {{/first}}
+    {{#all_incoming_commands_for_cluster name "server"}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/all_incoming_commands_for_cluster}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, *command*, privilege) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
+    {{/first}}
+    {{#all_incoming_commands_for_cluster name "server"}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/all_incoming_commands_for_cluster}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, command, *privilege*) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
+    {{/first}}
+    {{#all_incoming_commands_for_cluster name "server"}}
+        {{#access entity="command"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "invoke")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    ERROR: access has disallowed role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{else if (isStrEqual role "operate")}}
+    /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    kMatterAccessPrivilegeManage, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    kMatterAccessPrivilegeAdminister, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/all_incoming_commands_for_cluster}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (*cluster*, event, privilege) for read event
+#define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, *event*, privilege) for read event
+#define GENERATED_ACCESS_READ_EVENT__EVENT { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+    {{#first}}
+// Parallel array data (cluster, event, *privilege*) for read event
+#define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
+    {{/first}}
+    {{#zcl_events}}
+        {{#access entity="event"}}
+            {{#if hasOperation}}
+                {{#if (isStrEqual operation "read")}}
+                    {{#if hasRole}}
+                        {{#if (isStrEqual role "view")}}
+    /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "operate")}}
+    kMatterAccessPrivilegeOperate, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "manage")}}
+    kMatterAccessPrivilegeManage, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else if (isStrEqual role "administer")}}
+    kMatterAccessPrivilegeAdminister, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+                        {{else}}
+    ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                        {{/if}}
+                    {{else}}
+    ERROR: access has operation but no role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/access}}
+    {{/zcl_events}}
+    {{#last}}
+}
+    {{/last}}
+{{/chip_server_clusters}}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// clang-format on

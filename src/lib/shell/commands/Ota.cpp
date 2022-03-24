@@ -59,7 +59,7 @@ CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
 static void HandleState(intptr_t context)
 {
     app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state;
-    CHIP_ERROR err = GetRequestorInstance()->GetState(0, state);
+    CHIP_ERROR err = GetRequestorInstance()->GetUpdateStateAttribute(0, state);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -108,7 +108,7 @@ static void HandleState(intptr_t context)
 static void HandleProgress(intptr_t context)
 {
     chip::app::DataModel::Nullable<uint8_t> progress;
-    CHIP_ERROR err = GetRequestorInstance()->GetUpdateProgress(0, progress);
+    CHIP_ERROR err = GetRequestorInstance()->GetUpdateStateProgressAttribute(0, progress);
 
     if (err == CHIP_NO_ERROR)
     {
