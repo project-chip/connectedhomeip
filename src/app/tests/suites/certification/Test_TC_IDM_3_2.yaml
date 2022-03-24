@@ -27,8 +27,8 @@ tests:
           Specific Attribute. On receipt of this message, DUT should send a
           write response action with the modified attribute value to the TH."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool levelcontrol write on-level 2 1 1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          levelcontrol write on-level 2 1 1"
       disabled: true
 
     - label:
@@ -36,8 +36,8 @@ tests:
           receipt of this message, DUT should send a Write Response action with
           the attribute value to the DUT."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool any write-by-id 0x0008 0x0010 1 1 0xffff"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any write-by-id 0x0008 0x0010 1 1 0xffff"
       disabled: true
 
     - label:
@@ -45,8 +45,8 @@ tests:
           attribute of data type bool. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool basic write local-config-disabled 1 1 0"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          basic write local-config-disabled 1 1 0"
       disabled: true
 
     - label:
@@ -54,8 +54,8 @@ tests:
           attribute of data type string. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool basic write node-label 1 1 0"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          basic write node-label 1 1 0"
       disabled: true
 
     - label:
@@ -63,8 +63,8 @@ tests:
           attribute of data type unsigned integer. DUT responds with the Write
           Response action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool any write-by-id 0x0008 0x0010 1 1 1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any write-by-id 0x0008 0x0010 1 1 1"
       disabled: true
 
     - label:
@@ -108,8 +108,8 @@ tests:
           attribute of data type enum. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool any write-by-id 0x0204 0 1 1 1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any write-by-id 0x0204 0 1 1 1"
       disabled: true
 
     - label:
@@ -117,8 +117,8 @@ tests:
           attribute of data type bitmap. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool colorcontrol write-by-id 0x000f 1 1 1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          colorcontrol write-by-id 0x000f 1 1 1"
       disabled: true
 
     - label:
@@ -150,8 +150,8 @@ tests:
           "TH sends the Write Request Message to the DUT to read an unsupported
           attribute DUT responds with the Write Response action"
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool any read-by-id 0x03 -900 1 1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any read-by-id 0x03 -900 1 1"
       disabled: true
 
     - label:
@@ -186,10 +186,9 @@ tests:
           write response action with the modified attribute value to the TH.
           Repeat the above steps 3 times."
       verification:
-          "In case of chip tool, here is an example command to use
-          ./chip-tool basic write node-label TE8 1 1 ./chip-tool basic
-          write node-label TE7 1 1 ./chip-tool basic write node-label TE6 1
-          1"
+          "In case of chip tool, here is an example command to use ./chip-tool
+          basic write node-label TE8 1 1 ./chip-tool basic write node-label TE7
+          1 1 ./chip-tool basic write node-label TE6 1 1"
       disabled: true
 
     - label:

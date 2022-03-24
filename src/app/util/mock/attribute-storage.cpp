@@ -37,7 +37,6 @@
 #include <app/util/mock/Constants.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
