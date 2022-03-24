@@ -84,6 +84,11 @@ public:
      *                          PAKE passcode verifier to be used for this commissioning.
      * @param[in] discriminator The long discriminator for the DNS-SD advertisement.
      * @param[in] setupPIN      The setup PIN to use, or NullOptional to use a randomly-generated one.
+     * @param[in] salt          The salt to use, or NullOptional to use a
+     *                          randomly-generated one.  If provided, must be at
+     *                          least kSpake2p_Min_PBKDF_Salt_Length bytes and
+     *                          at most kSpake2p_Max_PBKDF_Salt_Length bytes in
+     *                          length.
      * @param[in] callback      The function to be called on success or failure of opening of commissioning window.
      * @param[out] payload      The setup payload, not including the VID/PID bits,
      *                          even if those were asked for, that is generated
@@ -98,7 +103,7 @@ public:
      *                                 callback.
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, System::Clock::Seconds16 timeout, uint32_t iteration,
-                                       uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                       uint16_t discriminator, Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
                                        Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
                                        bool readVIDPIDAttributes = false);
 
@@ -124,10 +129,6 @@ private:
     static void OnDeviceConnectedCallback(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureCallback(void * context, PeerId peerId, CHIP_ERROR error);
 
-    // TODO: Salt should be provided as an input or it should be randomly generated when
-    // the PIN is randomly generated.
-    static ByteSpan GetSPAKE2Salt();
-
     DeviceController * const mController = nullptr;
     Step mNextStep                       = Step::kAcceptCommissioningStart;
 
@@ -136,9 +137,12 @@ private:
     SetupPayload mSetupPayload;
     NodeId mNodeId                                       = kUndefinedNodeId;
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
-    uint32_t mCommissioningWindowIteration               = 0;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
     Spake2pVerifier mVerifier; // Used for non-basic commissioning.
+    // Parameters needed for non-basic commissioning.
+    uint32_t mPBKDFIterations = 0;
+    uint8_t mPBKDFSaltBuffer[kSpake2p_Max_PBKDF_Salt_Length];
+    ByteSpan mPBKDFSalt;
 
     Callback::Callback<OnDeviceConnected> mDeviceConnected;
     Callback::Callback<OnDeviceConnectionFailure> mDeviceConnectionFailure;
@@ -160,7 +164,7 @@ public:
     // callback.
     static CHIP_ERROR OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, System::Clock::Seconds16 timeout,
                                               uint32_t iteration, uint16_t discriminator, Optional<uint32_t> setupPIN,
-                                              SetupPayload & payload, bool readVIDPIDAttributes = false);
+                                              Optional<ByteSpan> salt, SetupPayload & payload, bool readVIDPIDAttributes = false);
 
 private:
     AutoCommissioningWindowOpener(DeviceController * controller);

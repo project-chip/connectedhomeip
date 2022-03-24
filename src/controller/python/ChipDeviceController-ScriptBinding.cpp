@@ -426,7 +426,8 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
     {
         SetupPayload payload;
         return Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
-                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, payload)
+                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, NullOptional,
+                   payload)
             .AsInteger();
     }
 

@@ -55,10 +55,18 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, Seconds16 timeout, uint32_t iteration,
                                                               uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                                              Optional<ByteSpan> salt,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= iteration && iteration <= kSpake2p_Max_PBKDF_Iterations,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(
+        !salt.HasValue() ||
+            (salt.Value().size() >= kSpake2p_Max_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
+        CHIP_ERROR_INVALID_ARGUMENT);
 
     mSetupPayload = SetupPayload();
 
@@ -72,6 +80,19 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
     }
 
+    if (salt.HasValue())
+    {
+        memcpy(mPBKDFSaltBuffer, salt.Value().data(), salt.Value().size());
+        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, salt.Value().size());
+    }
+    else
+    {
+        // What size should we use?
+        constexpr size_t saltLength = (kSpake2p_Min_PBKDF_Salt_Length + kSpake2p_Max_PBKDF_Salt_Length) / 2;
+        ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFSaltBuffer, saltLength));
+        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, saltLength);
+    }
+
     mSetupPayload.version               = 0;
     mSetupPayload.discriminator         = discriminator;
     mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
@@ -80,11 +101,11 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
     mBasicCommissioningWindowCallback = nullptr;
     mNodeId                           = deviceId;
     mCommissioningWindowTimeout       = timeout;
-    mCommissioningWindowIteration     = iteration;
+    mPBKDFIterations                  = iteration;
 
     bool randomSetupPIN = !setupPIN.HasValue();
-    ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(mVerifier, mCommissioningWindowIteration, GetSPAKE2Salt(),
-                                                           randomSetupPIN, mSetupPayload.setUpPINCode));
+    ReturnErrorOnFailure(
+        PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
 
     payload = mSetupPayload;
 
@@ -119,8 +140,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
         request.PAKEVerifier         = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator;
-        request.iterations           = mCommissioningWindowIteration;
-        request.salt                 = GetSPAKE2Salt();
+        request.iterations           = mPBKDFIterations;
+        request.salt                 = mPBKDFSalt;
 
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
                                                    OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
@@ -277,15 +298,6 @@ void CommissioningWindowOpener::OnDeviceConnectionFailureCallback(void * context
     OnOpenCommissioningWindowFailure(context, error);
 }
 
-namespace {
-constexpr char kSpake2pKeyExchangeSalt[] = "SPAKE2P Key Salt";
-} // anonymous namespace
-
-ByteSpan CommissioningWindowOpener::GetSPAKE2Salt()
-{
-    return ByteSpan(Uint8::from_const_char(kSpake2pKeyExchangeSalt), sizeof(kSpake2pKeyExchangeSalt) - 1);
-}
-
 AutoCommissioningWindowOpener::AutoCommissioningWindowOpener(DeviceController * controller) :
     CommissioningWindowOpener(controller), mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
     mOnOpenBasicCommissioningWindowCallback(OnOpenBasicCommissioningWindowResponse, this)
@@ -313,8 +325,8 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
 
 CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, Seconds16 timeout,
                                                                   uint32_t iteration, uint16_t discriminator,
-                                                                  Optional<uint32_t> setupPIN, SetupPayload & payload,
-                                                                  bool readVIDPIDAttributes)
+                                                                  Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                                                  SetupPayload & payload, bool readVIDPIDAttributes)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AutoCommissioningWindowOpener(controller);
@@ -324,7 +336,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenCommissioningWindow(
-        deviceId, timeout, iteration, discriminator, setupPIN, &opener->mOnOpenCommissioningWindowCallback, payload,
+        deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
         readVIDPIDAttributes);
     if (err != CHIP_NO_ERROR)
     {
