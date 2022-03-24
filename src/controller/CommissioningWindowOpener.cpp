@@ -87,10 +87,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
     }
     else
     {
-        // What size should we use?
-        constexpr size_t saltLength = (kSpake2p_Min_PBKDF_Salt_Length + kSpake2p_Max_PBKDF_Salt_Length) / 2;
-        ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFSaltBuffer, saltLength));
-        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, saltLength);
+        ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFSaltBuffer, sizeof(mPBKDFSaltBuffer)));
+        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer);
     }
 
     mSetupPayload.version               = 0;
