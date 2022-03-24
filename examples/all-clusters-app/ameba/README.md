@@ -65,7 +65,6 @@ There are two commissioning modes supported by Ameba platform:
 
 1. In "connectedhomeip/config/ameba/args.gni"
 
-    - set `chip_bypass_rendezvous = false`
     - Set `chip_config_network_layer_ble = true`
 
 2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
@@ -82,7 +81,6 @@ There are two commissioning modes supported by Ameba platform:
 
 1. In "connectedhomeip/config/ameba/args.gni"
 
-    - set `chip_bypass_rendezvous = false`
     - Set `chip_config_network_layer_ble = false`
 
 2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"

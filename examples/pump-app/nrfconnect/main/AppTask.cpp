@@ -371,11 +371,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-    }
-
     if (!ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();

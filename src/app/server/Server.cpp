@@ -57,17 +57,6 @@ using chip::Transport::UdpListenParameters;
 
 namespace {
 
-constexpr bool isRendezvousBypassed()
-{
-#if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
-    return true;
-#elif defined(CONFIG_RENDEZVOUS_MODE)
-    return static_cast<RendezvousInformationFlag>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlag::kNone;
-#else
-    return false;
-#endif
-}
-
 void StopEventLoop(intptr_t arg)
 {
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -222,12 +211,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 #endif
 
-    if (isRendezvousBypassed())
-    {
-        ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
-        SuccessOrExit(err = AddTestCommissioning());
-    }
-    else if (GetFabricTable().FabricCount() != 0)
+    if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
@@ -391,34 +375,5 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-CHIP_ERROR Server::AddTestCommissioning()
-{
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    PASESession * testSession = nullptr;
-    PASESessionSerializable serializedTestSession;
-    SessionHolder session;
-
-    mTestPairing.ToSerializable(serializedTestSession);
-
-    testSession = chip::Platform::New<PASESession>();
-    testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() },
-                                             chip::kTestControllerNodeId, testSession, CryptoContext::SessionRole::kResponder,
-                                             kMinValidFabricIndex));
-
-exit:
-    if (testSession)
-    {
-        testSession->Clear();
-        chip::Platform::Delete(testSession);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        mFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
-    }
-    return err;
-}
 
 } // namespace chip
