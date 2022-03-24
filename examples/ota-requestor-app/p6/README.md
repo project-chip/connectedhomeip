@@ -54,11 +54,11 @@ will then join the network.
 
 *   Build the P6 OTA Requestor application from the chip root dir:
 
-          $ ./examples/ota-requestor-app/examples/ota_base_build.sh
+          $ ./examples/ota-requestor-app/p6/ota_base_build.sh
 
 *   Build the P6 OTA Update application from the chip root dir:
 
-          $ ./examples/ota-requestor-app/examples/ota_update_build.sh
+          $ ./examples/ota-requestor-app/p6/ota_update_build.sh
 
 *   On a RPi4: Build the Linux OTA Provider application from the chip root dir:
 

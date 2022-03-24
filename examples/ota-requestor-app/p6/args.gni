@@ -18,10 +18,6 @@ import("${chip_root}/src/platform/P6/args.gni")
 
 declare_args() {
   chip_enable_ota_requestor = true
-
-  # Disable lock tracking, since our FreeRTOS configuration does not set
-  # INCLUDE_xSemaphoreGetMutexHolder
-  chip_stack_lock_tracking = "none"
 }
 
 p6_target_project =
