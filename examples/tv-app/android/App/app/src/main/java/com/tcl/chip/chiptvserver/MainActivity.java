@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import chip.setuppayload.DiscoveryCapability;
@@ -41,6 +42,24 @@ public class MainActivity extends AppCompatActivity {
                 MatterServant.get().toggleOnOff();
               }
             });
+
+    SeekBar sb = findViewById(R.id.seekBar);
+    sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        MatterServant.get().updateLevel(i);
+      }
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+
+      }
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+
+      }
+    });
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
