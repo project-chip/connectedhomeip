@@ -44,7 +44,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfFindClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id);
-    VerifyOrReturn(ep != 0xFFFF && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
+    VerifyOrReturn(ep != emberEndpointNotFound && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
     VerifyOrReturn(gOnOffManagerTable[ep] == nullptr,
