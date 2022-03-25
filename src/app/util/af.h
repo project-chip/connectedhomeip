@@ -79,6 +79,8 @@
 /** @name Attribute Storage */
 // @{
 
+#define emberEndpointNotFound (0xFFFF)
+
 /**
  * @brief locate attribute metadata
  *
