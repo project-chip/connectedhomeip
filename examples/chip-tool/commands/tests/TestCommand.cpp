@@ -53,7 +53,7 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
 
-    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
+    LogErrorOnFailure(command->ContinueOnChipMainThread(error));
 }
 
 void TestCommand::Exit(std::string message)
