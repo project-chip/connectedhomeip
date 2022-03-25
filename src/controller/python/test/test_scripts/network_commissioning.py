@@ -142,6 +142,9 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        if res.networkIndex != 0:
+            raise AssertionError(
+                f"Unexpected result: {res.networkIndex} (should be 0)")
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
@@ -240,6 +243,9 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        if res.networkIndex != 0:
+            raise AssertionError(
+                f"Unexpected result: {res.networkIndex} (should be 0)")
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)

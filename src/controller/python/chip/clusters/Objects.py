@@ -9706,11 +9706,13 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
-            debugText: 'str' = ""
+            debugText: 'typing.Optional[str]' = None
+            networkIndex: 'typing.Optional[uint]' = None
 
         @dataclass
         class ConnectNetwork(ClusterCommand):

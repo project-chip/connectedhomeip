@@ -11073,9 +11073,20 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSucce
         response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+        if (data.debugText.HasValue()) {
+            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            response.debugText = nil;
+        }
+    }
+    {
+        if (data.networkIndex.HasValue()) {
+            response.networkIndex = [NSNumber numberWithUnsignedChar:data.networkIndex.Value()];
+        } else {
+            response.networkIndex = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
