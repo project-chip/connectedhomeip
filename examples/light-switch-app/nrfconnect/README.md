@@ -631,11 +631,11 @@ To perform the unicast binding process, complete the following steps:
 
     In this command:
 
-    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
-      is an ACL for the communication with the CHIP Tool.
-    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
-      is an ACL for binding (cluster no. 6 is the On/Off cluster and the cluster
-      no. 8 is the Level Control cluster).
+    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
+        is an ACL for the communication with the CHIP Tool.
+    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+        is an ACL for binding (cluster no. 6 is the On/Off cluster and the
+        cluster no. 8 is the Level Control cluster).
 
     This command adds permissions on the lighting application device that allows
     it to receive commands from the light switch device.
@@ -646,10 +646,10 @@ To perform the unicast binding process, complete the following steps:
 
     In this command:
 
-    - `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 6}` is a
-      binding for the On/Off cluster.
-    - `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 8}` is a
-      binding for the Level Control cluster.
+    -   `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 6}` is a
+        binding for the On/Off cluster.
+    -   `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 8}` is a
+        binding for the Level Control cluster.
 
 > **Note:** When a light switch device reboots, the binding table is restored
 > from flash memory and the device tries to bind a known device that is
@@ -682,11 +682,11 @@ To perform the unicast binding process, complete the following steps:
 
     In this command:
 
-    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
-      is an ACL for the communication with the CHIP Tool.
-    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
-      is an ACL for binding (cluster `no. 6` is the On/Off cluster and the
-      cluster `no. 8` is the Level Control cluster).
+    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
+        is an ACL for the communication with the CHIP Tool.
+    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+        is an ACL for binding (cluster `no. 6` is the On/Off cluster and the
+        cluster `no. 8` is the Level Control cluster).
 
     This allows the lighting application device to receive commands from the
     light switch device.
