@@ -231,8 +231,8 @@ public:
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
-    virtual Status RemoveNetwork(ByteSpan networkId)                 = 0;
-    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index) = 0;
+    virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) = 0;
+    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan outDebugText)            = 0;
 
     /**
      * @brief Initializes a network join. callback->OnResult must be called, on both success and error. Callback can be
@@ -261,7 +261,8 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) = 0;
+    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan outDebugText,
+                                      uint8_t * outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a WiFi network scan. callback->OnFinished must be called, on both success and error. Callback can
@@ -294,7 +295,7 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset) = 0;
+    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a Thread network scan. callback->OnFinished must be called, on both success and error. Callback can
