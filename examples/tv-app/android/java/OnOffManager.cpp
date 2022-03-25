@@ -47,13 +47,17 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
     VerifyOrReturn(ep != 0xFFFF && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
-    VerifyOrReturn(gOnOffManagerTable[ep] == nullptr, ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d already has a manager", endpoint));
+    VerifyOrReturn(gOnOffManagerTable[ep] == nullptr,
+                   ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d already has a manager", endpoint));
     OnOffManager * mgr = new OnOffManager();
-    CHIP_ERROR err = mgr->InitializeWithObjects(manager);
-    if(err != CHIP_NO_ERROR) {
+    CHIP_ERROR err     = mgr->InitializeWithObjects(manager);
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(Zcl, "TV Android App::OnOff::NewManager: failed to initialize manager for endpoint %d", endpoint);
         delete mgr;
-    } else {
+    }
+    else
+    {
         gOnOffManagerTable[ep] = mgr;
     }
 }
@@ -61,7 +65,8 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);
-    return ((ep == emberEndpointNotFound || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gOnOffManagerTable[ep]);
+    return ((ep == emberEndpointNotFound || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
+                                                                                                         : gOnOffManagerTable[ep]);
 }
 
 void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
