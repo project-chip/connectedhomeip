@@ -69,7 +69,7 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     bool IsCommissionableDeviceTypeEnabled() override { return false; }
-    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     bool IsCommissionableDeviceNameEnabled() override { return false; }
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

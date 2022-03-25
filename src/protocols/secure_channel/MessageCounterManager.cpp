@@ -95,7 +95,7 @@ CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext *
     {
         return HandleMsgCounterSyncReq(exchangeContext, std::move(msgBuf));
     }
-    else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
     {
         return HandleMsgCounterSyncResp(exchangeContext, std::move(msgBuf));
     }

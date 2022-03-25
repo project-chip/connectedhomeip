@@ -231,6 +231,15 @@ public:
     CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
 
     /**
+     * @brief Add CASE Authenticated Tags (CATs) attributes to the DN.
+     *
+     * @param cats    Array of CAT values.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR AddCATs(const chip::CATValues & cats);
+
+    /**
      * @brief Add string attribute to the DN.
      *
      * @param oid     String OID for DN attribute.

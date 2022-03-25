@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -175,6 +175,24 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
         // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
         // printed for debug will be invalid, but if the onboarding payload had been given
         // properly to the commissioner later, PASE will succeed.
+    }
+
+    if (options.discriminator.HasValue())
+    {
+        options.payload.discriminator = options.discriminator.Value();
+    }
+    else
+    {
+        uint16_t defaultTestDiscriminator = 0;
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
+
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure discriminator. ***",
+                     static_cast<unsigned>(defaultTestDiscriminator));
+        options.payload.discriminator = defaultTestDiscriminator;
     }
 
     // Default to minimum PBKDF iterations
@@ -398,8 +416,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
-                                                                        rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
+                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;

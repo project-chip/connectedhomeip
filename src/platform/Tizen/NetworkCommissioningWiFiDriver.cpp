@@ -38,7 +38,7 @@ constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 } // namespace
 
-CHIP_ERROR TizenWiFiDriver::Init()
+CHIP_ERROR TizenWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;

@@ -181,6 +181,21 @@ public:
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
                 app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
+            else if (name == "OccupiedCoolingSetpoint")
+            {
+                ESP_LOGI(TAG, "OccupiedCoolingSetpoint changed to : %d", n);
+                app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(n * 100));
+            }
+            else if (name == "OccupiedHeatingSetpoint")
+            {
+                ESP_LOGI(TAG, "OccupiedHeatingSetpoint changed to : %d", n);
+                app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(n * 100));
+            }
+            else if (name == "SystemMode")
+            {
+                ESP_LOGI(TAG, "SystemMode changed to : %d", n);
+                app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, n);
+            }
             value = buffer;
         }
         else if (IsBooleanAttribute())

@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-
+import pprint
 import chip.clusters as Clusters
 import chip.exceptions
 import logging
@@ -23,6 +23,8 @@ from chip.clusters.Attribute import AttributePath, AttributeReadResult, Attribut
 import chip.interaction_model
 import asyncio
 import time
+
+import base
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -44,19 +46,18 @@ def _IgnoreAttributeDecodeFailure(path):
 
 
 def VerifyDecodeSuccess(values):
-    print(f"{values}")
+    pprint.pprint(values)
     for endpoint in values:
         for cluster in values[endpoint]:
             for attribute in values[endpoint][cluster]:
                 v = values[endpoint][cluster][attribute]
-                print(f"EP{endpoint}/{cluster}/{attribute} = {v}")
                 if (isinstance(v, ValueDecodeFailure)):
                     if _IgnoreAttributeDecodeFailure((endpoint, cluster, attribute)):
                         print(
-                            f"Ignoring attribute decode failure for path {endpoint}/{cluster}/{attribute}")
+                            f"Ignoring attribute decode failure for path {endpoint}/{attribute}")
                     else:
                         raise AssertionError(
-                            f"Cannot decode value for path {endpoint}/{cluster}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
+                            f"Cannot decode value for path {endpoint}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
 
     for endpoint in values:
         for cluster in values[endpoint]:
@@ -71,8 +72,10 @@ def _AssumeEventsDecodeSuccess(values):
     print(f"Dump the events: {values} ")
 
 
+@base.test_set
 class ClusterObjectTests:
     @classmethod
+    @base.test_case
     def TestAPI(cls):
         if Clusters.OnOff.id != 6:
             raise ValueError()
@@ -86,7 +89,8 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
-    async def RoundTripTest(cls, devCtrl):
+    @base.test_case
+    async def TestCommandRoundTrip(cls, devCtrl):
         req = Clusters.OnOff.Commands.On()
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if res is not None:
@@ -95,7 +99,8 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
-    async def RoundTripTestWithBadEndpoint(cls, devCtrl):
+    @base.test_case
+    async def TestCommandRoundTripWithBadEndpoint(cls, devCtrl):
         req = Clusters.OnOff.Commands.On()
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
@@ -105,7 +110,8 @@ class ClusterObjectTests:
             return
 
     @classmethod
-    async def SendCommandWithResponse(cls, devCtrl):
+    @base.test_case
+    async def TestCommandWithResponse(cls, devCtrl):
         req = Clusters.TestCluster.Commands.TestAddArguments(arg1=2, arg2=3)
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if not isinstance(res, Clusters.TestCluster.Commands.TestAddArgumentsResponse):
@@ -116,7 +122,8 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
-    async def SendWriteRequest(cls, devCtrl):
+    @base.test_case
+    async def TestWriteRequest(cls, devCtrl):
         logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -154,6 +161,7 @@ class ClusterObjectTests:
             raise AssertionError("Write returned unexpected result.")
 
     @classmethod
+    @base.test_case
     async def TestSubscribeAttribute(cls, devCtrl):
         logger.info("Test Subscription")
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
@@ -179,6 +187,7 @@ class ClusterObjectTests:
         sub.Shutdown()
 
     @classmethod
+    @base.test_case
     async def TestReadAttributeRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
@@ -284,6 +293,7 @@ class ClusterObjectTests:
             raise AssertionError("Got no events back")
 
     @classmethod
+    @base.test_case
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
@@ -323,6 +333,7 @@ class ClusterObjectTests:
         # TODO: Add more wildcard test for IM events.
 
     @classmethod
+    @base.test_case
     async def TestTimedRequest(cls, devCtrl):
         logger.info("1: Send Timed Command Request")
         req = Clusters.TestCluster.Commands.TimedInvokeRequest()
@@ -336,29 +347,8 @@ class ClusterObjectTests:
                                      ],
                                      timedRequestTimeoutMs=1000)
 
-        logger.info("3: Send Timed Command Request -- Timeout")
-        try:
-            req = Clusters.TestCluster.Commands.TimedInvokeRequest()
-            # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
-            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=10)
-            raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
-            pass
-
-        logger.info("4: Send Timed Write Request -- Timeout")
-        try:
-            await devCtrl.WriteAttribute(nodeid=NODE_ID,
-                                         attributes=[
-                                             (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                                 True)),
-                                         ],
-                                         timedRequestTimeoutMs=10)
-            raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
-            pass
-
         logger.info(
-            "5: Sending TestCluster-TimedInvokeRequest without timedRequestTimeoutMs should be rejected")
+            "3: Sending TestCluster-TimedInvokeRequest without timedRequestTimeoutMs should be rejected")
         try:
             req = Clusters.TestCluster.Commands.TimedInvokeRequest()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
@@ -367,7 +357,7 @@ class ClusterObjectTests:
             pass
 
         logger.info(
-            "6: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
+            "4: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
         try:
             await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                          attributes=[
@@ -379,6 +369,31 @@ class ClusterObjectTests:
             pass
 
     @classmethod
+    @base.test_case
+    async def TestTimedRequestTimeout(cls, devCtrl):
+        logger.info("1: Send Timed Command Request -- Timeout")
+        try:
+            req = Clusters.TestCluster.Commands.TimedInvokeRequest()
+            # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=1)
+            raise AssertionError("Timeout expected!")
+        except chip.exceptions.ChipStackException:
+            pass
+
+        logger.info("2: Send Timed Write Request -- Timeout")
+        try:
+            await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                         attributes=[
+                                             (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
+                                                 True)),
+                                         ],
+                                         timedRequestTimeoutMs=1)
+            raise AssertionError("Timeout expected!")
+        except chip.exceptions.ChipStackException:
+            pass
+
+    @classmethod
+    @base.test_case
     async def TestReadWriteAttributeRequestsWithVersion(cls, devCtrl):
         logger.info("TestReadWriteAttributeRequestsWithVersion")
         req = [
@@ -457,16 +472,17 @@ class ClusterObjectTests:
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
-            await cls.RoundTripTest(devCtrl)
-            await cls.RoundTripTestWithBadEndpoint(devCtrl)
-            await cls.SendCommandWithResponse(devCtrl)
+            await cls.TestCommandRoundTrip(devCtrl)
+            await cls.TestCommandRoundTripWithBadEndpoint(devCtrl)
+            await cls.TestCommandWithResponse(devCtrl)
             await cls.TestReadEventRequests(devCtrl, 1)
             await cls.TestReadWriteAttributeRequestsWithVersion(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
             # Note: Write will change some attribute values, always put it after read tests
-            await cls.SendWriteRequest(devCtrl)
+            await cls.TestWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
+            await cls.TestTimedRequestTimeout(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

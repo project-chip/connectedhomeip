@@ -38,11 +38,9 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
             }
             return;
         }
-        else
-        {
-            // This is a response to another attribute write. Report the final result of last attribute write.
-            callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
-        }
+
+        // This is a response to another attribute write. Report the final result of last attribute write.
+        callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
     }
 
     // This is the first report for a new attribute.  We assume it will never be a list item operation.

@@ -65,10 +65,16 @@ timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-lo
 
 echo "Exiting, logs are in tmp/ota/"
 
-killall -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
-
 if cmp "$OTA_DOWNLOAD_PATH" "$FIRMWARE_BIN"; then
-    echo Test passed && exit 0
+    TEST_RESULT="Test passed"
+    RETURN_VALUE=0
 else
-    echo Test failed && exit 1
+    TEST_RESULT="Test failed"
+    RETURN_VALUE=1
 fi
+
+killall -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
+rm -f "$FIRMWARE_OTA" "$FIRMWARE_BIN" "$OTA_DOWNLOAD_PATH"
+
+echo "$TEST_RESULT"
+exit "$RETURN_VALUE"

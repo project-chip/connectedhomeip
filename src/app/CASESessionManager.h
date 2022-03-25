@@ -61,10 +61,10 @@ public:
         mConfig = params;
     }
 
-    virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+    virtual ~CASESessionManager() {}
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
-    void Shutdown() { mDNSResolver.Shutdown(); }
+    void Shutdown() {}
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -75,7 +75,7 @@ public:
     CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId);
+    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
 
     void ReleaseSession(PeerId peerId);
 
@@ -94,11 +94,10 @@ public:
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
 private:
-    OperationalDeviceProxy * FindSession(const SessionHandle & session);
-    void ReleaseSession(OperationalDeviceProxy * device);
+    OperationalDeviceProxy * FindSession(const SessionHandle & session) const;
+    void ReleaseSession(OperationalDeviceProxy * device) const;
 
     CASESessionManagerConfig mConfig;
-    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace chip

@@ -157,7 +157,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     }
 
     nodeData.LogNodeIdResolved();
-    nodeData.PrioritizeAddresses();
     proxy->OnOperationalNodeResolved(nodeData);
     proxy->Release();
 }
@@ -446,7 +445,7 @@ void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type
     }
     else
     {
-        ChipLogProgress(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
     }
 }
 
@@ -627,6 +626,10 @@ Resolver & chip::Dnssd::Resolver::Instance()
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
+                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+
     mDelegate->Retain();
 
     DnssdService service;

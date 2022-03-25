@@ -71,8 +71,6 @@
 #include <ble/BleLayer.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
-#include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -160,8 +158,6 @@ struct CommissionerInitParams : public ControllerInitParams
     CommissioningDelegate * defaultCommissioner = nullptr;
 };
 
-typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
-
 /**
  * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
@@ -174,14 +170,7 @@ class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public Abstr
 {
 public:
     DeviceController();
-    virtual ~DeviceController() {}
-
-    enum class CommissioningWindowOption : uint8_t
-    {
-        kOriginalSetupCode = 0,
-        kTokenWithRandomPIN,
-        kTokenWithProvidedPIN,
-    };
+    ~DeviceController() override {}
 
     CHIP_ERROR Init(ControllerInitParams params);
 
@@ -213,7 +202,8 @@ public:
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        return mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection,
+                                                                      onFailure);
     }
 
     /**
@@ -240,62 +230,6 @@ public:
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
                                    Spake2pVerifier & outVerifier);
-
-    /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
-     *   after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] deviceId        The device Id.
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-     *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload).
-     * @param[in,out] payload     The generated setup payload.
-     *                            - The payload is generated only if the user didn't ask for using the original setup code.
-     *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
-     *                              this payload
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                       CommissioningWindowOption option, SetupPayload & payload)
-    {
-        mSuggestedSetUpPINCode = payload.setUpPINCode;
-        ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
-        payload = mSetupPayload;
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
-     *   after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] deviceId        The device Id.
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-     *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload).
-     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
-     *
-     * @param[in] readVIDPIDAttributes Should the API internally read VID and PID from the device while opening the
-     *                                 commissioning window. VID and PID is only needed for enchanced commissioning mode.
-     *                                 If this argument is `true`, and enhanced commissioning mode is used, the API will
-     *                                 read VID and PID from the device.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                                   CommissioningWindowOption option,
-                                                   Callback::Callback<OnOpenCommissioningWindow> * callback,
-                                                   bool readVIDPIDAttributes = false);
 
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 
@@ -352,14 +286,6 @@ protected:
 
     State mState;
 
-    CASESessionManager * mCASESessionManager = nullptr;
-
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
-#endif
-    CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
-    OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
-
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
@@ -379,8 +305,6 @@ protected:
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
-    SessionIDAllocator mIDAllocator;
-
     uint16_t mVendorId;
 
     /// Fetches the session to use for the current device. Allows overriding
@@ -394,31 +318,6 @@ protected:
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
-    static void OnPIDReadResponse(void * context, uint16_t value);
-    static void OnVIDReadResponse(void * context, VendorId value);
-    static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
-
-    CHIP_ERROR OpenCommissioningWindowInternal();
-
-    PeerId GetPeerIdWithCommissioningWindowOpen()
-    {
-        return mFabricInfo ? mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen) : PeerId();
-    }
-
-    // TODO - Support opening commissioning window simultaneously on multiple devices
-    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
-    SetupPayload mSetupPayload;
-    NodeId mDeviceWithCommissioningWindowOpen;
-    uint32_t mSuggestedSetUpPINCode = 0;
-
-    uint16_t mCommissioningWindowTimeout;
-    uint32_t mCommissioningWindowIteration;
-
-    CommissioningWindowOption mCommissioningWindowOption;
-
-    static void OnOpenPairingWindowSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
-    static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
@@ -438,7 +337,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() {}
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -698,7 +597,8 @@ public:
 private:
     DevicePairingDelegate * mPairingDelegate;
 
-    CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
+    DeviceProxy * mDeviceBeingCommissioned               = nullptr;
+    CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
@@ -716,8 +616,6 @@ private:
     DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
     uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
-    void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
@@ -751,7 +649,7 @@ private:
        the operational credential provisioning process.
        The function does not hold a reference to the device object.
        */
-    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(DeviceProxy * device);
 
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, CHIP_ERROR error);

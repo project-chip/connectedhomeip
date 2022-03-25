@@ -32,11 +32,11 @@
         },
         {
             "name": "encode_value",
-            "path": "partials/encode_value.zapt"
+            "path": "../../../src/darwin/Framework/CHIP/templates/partials/encode_value.zapt"
         },
         {
             "name": "decode_value",
-            "path": "partials/decode_value.zapt"
+            "path": "../../../src/darwin/Framework/CHIP/templates/partials/decode_value.zapt"
         },
         {
             "name": "test_value",

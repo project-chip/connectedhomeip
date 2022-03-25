@@ -28,7 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/android/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
 

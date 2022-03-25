@@ -133,6 +133,14 @@ enum class OnOffEffectIdentifier : uint8_t
 using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
 #endif
 
+// Enum for OnOffStartUpOnOff
+enum class OnOffStartUpOnOff : uint8_t
+{
+    kOff                 = 0x00,
+    kOn                  = 0x01,
+    kTogglePreviousOnOff = 0x02,
+};
+
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {
@@ -941,6 +949,12 @@ namespace BooleanState {
 } // namespace BooleanState
 
 namespace ModeSelect {
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+};
 } // namespace ModeSelect
 
 namespace ShadeConfiguration {
@@ -1186,6 +1200,14 @@ enum class DlAlarmMask : uint16_t
     kWrongCodeEntryLimit                    = 0x10,
     kFrontEscutcheonRemovedFromMain         = 0x20,
     kForcedDoorOpenUnderDoorLockedCondition = 0x40,
+};
+
+// Bitmap for DlCredentialRuleMask
+enum class DlCredentialRuleMask : uint8_t
+{
+    kSingle = 0x1,
+    kDual   = 0x2,
+    kTri    = 0x4,
 };
 
 // Bitmap for DlCredentialRulesSupport

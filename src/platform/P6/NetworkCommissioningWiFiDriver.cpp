@@ -39,7 +39,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 cy_wcm_scan_result_t scan_result_list[kWiFiMaxNetworks];
 uint8_t NumAP; // no of network scanned
 
-CHIP_ERROR P6WiFiDriver::Init()
+CHIP_ERROR P6WiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;

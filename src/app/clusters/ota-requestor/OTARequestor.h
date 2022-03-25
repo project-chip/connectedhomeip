@@ -40,6 +40,9 @@ public:
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
+    void Reset(void) override;
+    void Shutdown(void) override;
+
     EmberAfStatus HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
@@ -63,14 +66,18 @@ public:
     // Initiate the session to send NotifyUpdateApplied command
     void NotifyUpdateApplied() override;
 
-    // Get image update progress in percents unit
-    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
+    // Get the value of the UpdateStateProgress attribute (in percentage) of the OTA Software Update Requestor Cluster on the given
+    // endpoint
+    CHIP_ERROR GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
 
-    // Get requestor state
-    CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) override;
+    // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
+    CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override;
 
     // Get the current state of the OTA update
     OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
+
+    // Get the target version of the OTA update
+    uint32_t GetTargetVersion() override { return mTargetVersion; }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -100,43 +107,10 @@ public:
     //////////// OTARequestor public APIs ///////////////
 
     /**
-     * Called to perform some initialization including:
-     *   - Set server instance used to get access to the system resources necessary to open CASE sessions and drive
-     *     BDX transfers
-     *   - Set the OTA requestor driver instance used to communicate download progress and errors
-     *   - Set the BDX downloader instance used for initiating BDX downloads
+     * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to
+     * InitState.
      */
-    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader)
-    {
-        mServer             = &server;
-        mCASESessionManager = server.GetCASESessionManager();
-        mStorage            = &storage;
-        mOtaRequestorDriver = &driver;
-        mBdxDownloader      = &downloader;
-
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
-
-        storage.LoadDefaultProviders(mDefaultOtaProviderList);
-
-        ProviderLocationType providerLocation;
-        if (storage.LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
-        {
-            mProviderLocation.SetValue(providerLocation);
-        }
-
-        MutableByteSpan updateToken(mUpdateTokenBuffer);
-        if (storage.LoadUpdateToken(updateToken) == CHIP_NO_ERROR)
-        {
-            mUpdateToken = updateToken;
-        }
-
-
-        // Schedule the initializations that needs to be performed in the CHIP context
-        DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
-
-        return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
-                                                                    reinterpret_cast<intptr_t>(this));
-    }
+    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -287,6 +261,11 @@ private:
     void StoreCurrentUpdateInfo();
 
     /**
+     * Load current update information to KVS
+     */
+    void LoadCurrentUpdateInfo();
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -333,7 +312,10 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
+    // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
+    // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
+    // in the OTARequestorDriver on reboot.
+    Optional<ProviderLocationType> mProviderLocation;
 };
 
 } // namespace chip

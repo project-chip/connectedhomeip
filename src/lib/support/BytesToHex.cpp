@@ -34,10 +34,8 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
     {
         return static_cast<char>((x - 10) + (uppercase ? 'A' : 'a'));
     }
-    else
-    {
-        return static_cast<char>(x + '0');
-    }
+
+    return static_cast<char>(x + '0');
 }
 
 CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * val, BitFlags<HexFlags> flags)
@@ -104,7 +102,7 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (src_size > ((SIZE_MAX - 1) / 2u))
+    if (src_size > ((SIZE_MAX - 1) / 2u))
     {
         // Output would overflow a size_t, let's bail out to avoid computation wraparounds below.
         // This condition will hit with slightly less than the very max, but is unlikely to

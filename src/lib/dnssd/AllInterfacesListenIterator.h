@@ -29,7 +29,7 @@ namespace Dnssd {
 template <typename T>
 bool IsCurrentInterfaceUsable(T & iterator)
 {
-    if (!iterator.IsUp() || !iterator.SupportsMulticast())
+    if (!iterator.IsUp())
     {
         return false; // not a usable interface
     }

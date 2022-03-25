@@ -34,7 +34,7 @@ constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 } // namespace
 
-CHIP_ERROR WiFiDriverImpl::Init()
+CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
@@ -265,8 +265,6 @@ exit:
 
 void WiFiDriverImpl::DisconnectNetwork(ByteSpan networkId)
 {
-    Status status = Status::kSuccess;
-
     VerifyOrReturn(mWiFiInterface != nullptr, ChipLogError(DeviceLayer, "Wifi network not available"));
     VerifyOrReturn(NetworkMatch(mStagingNetwork, networkId), ChipLogError(DeviceLayer, "Network not found"));
     ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver disconnect network: SSID: %.*s", static_cast<int>(networkId.size()),

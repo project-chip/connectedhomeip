@@ -374,7 +374,10 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
+#if CONFIG_NETWORK_LAYER_BLE
+                                                                nullptr,
+#endif
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
@@ -656,14 +659,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
     ctx.EnableAsyncDispatch();
-
-    ctx.SetBobNodeId(kPlaceholderNodeId);
-    ctx.SetAliceNodeId(kPlaceholderNodeId);
-    ctx.SetBobKeyId(0);
-    ctx.SetAliceKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);
@@ -687,8 +685,8 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     gCommissionerStorageDelegate.Cleanup();
     gDeviceStorageDelegate.Cleanup();
-    gCommissionerFabrics.Reset();
-    gDeviceFabrics.Reset();
+    gCommissionerFabrics.DeleteAllFabrics();
+    gDeviceFabrics.DeleteAllFabrics();
     static_cast<TestContext *>(inContext)->Shutdown();
     return SUCCESS;
 }

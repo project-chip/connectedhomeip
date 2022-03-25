@@ -222,8 +222,7 @@ public:
         T * element = static_cast<T *>(Allocate());
         if (element != nullptr)
             return new (element) T(std::forward<Args>(args)...);
-        else
-            return nullptr;
+        return nullptr;
     }
 
     void ReleaseObject(T * element)

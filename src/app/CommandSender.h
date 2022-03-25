@@ -59,7 +59,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~CommandSender() { Abort(); }
+    ~CommandSender() override { Abort(); }
 
     /**
      * Gets the inner exchange context object, without ownership.

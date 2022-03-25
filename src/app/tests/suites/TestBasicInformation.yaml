@@ -76,8 +76,8 @@ tests:
                   16,
                   17,
                   18,
-                  0xFFF8, # ServerGeneratedCommandList
-                  0xFFF9, # ClientGeneratedCommandList
+                  0xFFF8, # GeneratedCommandList
+                  0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
                   0xFFFD, # ClusterRevision
               ]

@@ -48,13 +48,13 @@ tests:
     - label: "TH reads the CommandList attribute from the DUT"
       verification:
           "./chip-tool modeselect read client-generated-command-list 1 1
-          [1645776597.295794][4635:4640] CHIP:TOO: ClientGeneratedCommandList: 1
+          [1645776597.295794][4635:4640] CHIP:TOO: AcceptedCommandList: 1
           entries [1645776597.295853][4635:4640] CHIP:TOO: [1]: 0"
       disabled: true
 
     - label: "TH reads the EventList attribute from the DUT"
       verification:
           "./chip-tool modeselect read server-generated-command-list 1 1
-          [1645776667.509100][4643:4648] CHIP:TOO: ServerGeneratedCommandList: 0
+          [1645776667.509100][4643:4648] CHIP:TOO: GeneratedCommandList: 0
           entries"
       disabled: true

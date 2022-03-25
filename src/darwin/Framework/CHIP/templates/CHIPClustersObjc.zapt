@@ -43,6 +43,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
 {{/if}}
 {{#if isReportableAttribute}}
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(CHIPSubscribeParams * _Nullable)params
 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -56,7 +60,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
-typedef NS_ENUM(NSInteger, {{objCEnumName ../name label}}) {
+typedef NS_ENUM({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
    {{#zcl_enum_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
    {{/zcl_enum_items}}
@@ -64,7 +68,7 @@ typedef NS_ENUM(NSInteger, {{objCEnumName ../name label}}) {
 
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
-typedef NS_OPTIONS(NSUInteger, {{objCEnumName ../name label}}) {
+typedef NS_OPTIONS({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
    {{#zcl_bitmap_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
    {{/zcl_bitmap_items}}

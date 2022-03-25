@@ -184,20 +184,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4161a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
 
+# Generating efr32-brd4161a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4161a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-with-ota-requestor
+
 # Generating efr32-brd4161a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
 # Generating efr32-brd4161a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
+# Generating efr32-brd4161a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4161a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-with-ota-requestor
+
 # Generating efr32-brd4161a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-switch
+
+# Generating efr32-brd4161a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-switch-with-ota-requestor
 
 # Generating efr32-brd4161a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
 
+# Generating efr32-brd4161a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4161a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
+
+# Generating efr32-brd4161a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4163a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-light
@@ -205,20 +226,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4163a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-light-rpc
 
+# Generating efr32-brd4163a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4163a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-with-ota-requestor
+
 # Generating efr32-brd4163a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-lock
 
 # Generating efr32-brd4163a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
 
+# Generating efr32-brd4163a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4163a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-with-ota-requestor
+
 # Generating efr32-brd4163a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-switch
+
+# Generating efr32-brd4163a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-switch-with-ota-requestor
 
 # Generating efr32-brd4163a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
 
+# Generating efr32-brd4163a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4163a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-window-covering
+
+# Generating efr32-brd4163a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4164a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-light
@@ -226,20 +268,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4164a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-light-rpc
 
+# Generating efr32-brd4164a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4164a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-with-ota-requestor
+
 # Generating efr32-brd4164a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-lock
 
 # Generating efr32-brd4164a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
 
+# Generating efr32-brd4164a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4164a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-with-ota-requestor
+
 # Generating efr32-brd4164a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-switch
+
+# Generating efr32-brd4164a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-switch-with-ota-requestor
 
 # Generating efr32-brd4164a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
 
+# Generating efr32-brd4164a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4164a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-window-covering
+
+# Generating efr32-brd4164a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4166a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-light
@@ -247,20 +310,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4166a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-light-rpc
 
+# Generating efr32-brd4166a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4166a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-with-ota-requestor
+
 # Generating efr32-brd4166a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-lock
 
 # Generating efr32-brd4166a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
 
+# Generating efr32-brd4166a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4166a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-with-ota-requestor
+
 # Generating efr32-brd4166a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-switch
+
+# Generating efr32-brd4166a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-switch-with-ota-requestor
 
 # Generating efr32-brd4166a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
 
+# Generating efr32-brd4166a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4166a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-window-covering
+
+# Generating efr32-brd4166a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4170a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-light
@@ -268,20 +352,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4170a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-light-rpc
 
+# Generating efr32-brd4170a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4170a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-with-ota-requestor
+
 # Generating efr32-brd4170a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-lock
 
 # Generating efr32-brd4170a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
 
+# Generating efr32-brd4170a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4170a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-with-ota-requestor
+
 # Generating efr32-brd4170a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-switch
+
+# Generating efr32-brd4170a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-switch-with-ota-requestor
 
 # Generating efr32-brd4170a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
 
+# Generating efr32-brd4170a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4170a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-window-covering
+
+# Generating efr32-brd4170a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4186a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-light
@@ -289,20 +394,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4186a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-light-rpc
 
+# Generating efr32-brd4186a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4186a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-with-ota-requestor
+
 # Generating efr32-brd4186a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-lock
 
 # Generating efr32-brd4186a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
 
+# Generating efr32-brd4186a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4186a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-with-ota-requestor
+
 # Generating efr32-brd4186a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-switch
+
+# Generating efr32-brd4186a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-switch-with-ota-requestor
 
 # Generating efr32-brd4186a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
 
+# Generating efr32-brd4186a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4186a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-window-covering
+
+# Generating efr32-brd4186a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4187a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-light
@@ -310,20 +436,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4187a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-light-rpc
 
+# Generating efr32-brd4187a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4187a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-with-ota-requestor
+
 # Generating efr32-brd4187a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-lock
 
 # Generating efr32-brd4187a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
 
+# Generating efr32-brd4187a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4187a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-with-ota-requestor
+
 # Generating efr32-brd4187a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-switch
+
+# Generating efr32-brd4187a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-switch-with-ota-requestor
 
 # Generating efr32-brd4187a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
 
+# Generating efr32-brd4187a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4187a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-window-covering
+
+# Generating efr32-brd4187a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4304a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-light
@@ -331,20 +478,41 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4304a-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-light-rpc
 
+# Generating efr32-brd4304a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4304a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-with-ota-requestor
+
 # Generating efr32-brd4304a-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-lock
 
 # Generating efr32-brd4304a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
 
+# Generating efr32-brd4304a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4304a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-with-ota-requestor
+
 # Generating efr32-brd4304a-switch
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-switch
+
+# Generating efr32-brd4304a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-switch-with-ota-requestor
 
 # Generating efr32-brd4304a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
 
+# Generating efr32-brd4304a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-unit-test-with-ota-requestor
+
 # Generating efr32-brd4304a-window-covering
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-window-covering
+
+# Generating efr32-brd4304a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-window-covering-with-ota-requestor
 
 # Generating esp32-c3devkit-all-clusters
 mkdir -p {out}/esp32-c3devkit-all-clusters
@@ -775,6 +943,8 @@ ninja -C {out}/android-arm-chip-tv-casting-app
 # Prepare Native libs android-arm-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
 
+cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
+
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
@@ -782,6 +952,8 @@ cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -859,6 +1031,8 @@ ninja -C {out}/android-arm64-chip-tv-casting-app
 # Prepare Native libs android-arm64-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
 
+cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
@@ -866,6 +1040,8 @@ cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -955,20 +1131,41 @@ ninja -C {out}/efr32-brd4161a-light
 # Building efr32-brd4161a-light-rpc
 ninja -C {out}/efr32-brd4161a-light-rpc
 
+# Building efr32-brd4161a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4161a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-light-with-ota-requestor
+
 # Building efr32-brd4161a-lock
 ninja -C {out}/efr32-brd4161a-lock
 
 # Building efr32-brd4161a-lock-rpc
 ninja -C {out}/efr32-brd4161a-lock-rpc
 
+# Building efr32-brd4161a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4161a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-lock-with-ota-requestor
+
 # Building efr32-brd4161a-switch
 ninja -C {out}/efr32-brd4161a-switch
+
+# Building efr32-brd4161a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-switch-with-ota-requestor
 
 # Building efr32-brd4161a-unit-test
 ninja -C {out}/efr32-brd4161a-unit-test
 
+# Building efr32-brd4161a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-unit-test-with-ota-requestor
+
 # Building efr32-brd4161a-window-covering
 ninja -C {out}/efr32-brd4161a-window-covering
+
+# Building efr32-brd4161a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4161a-window-covering-with-ota-requestor
 
 # Building efr32-brd4163a-light
 ninja -C {out}/efr32-brd4163a-light
@@ -976,20 +1173,41 @@ ninja -C {out}/efr32-brd4163a-light
 # Building efr32-brd4163a-light-rpc
 ninja -C {out}/efr32-brd4163a-light-rpc
 
+# Building efr32-brd4163a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4163a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-light-with-ota-requestor
+
 # Building efr32-brd4163a-lock
 ninja -C {out}/efr32-brd4163a-lock
 
 # Building efr32-brd4163a-lock-rpc
 ninja -C {out}/efr32-brd4163a-lock-rpc
 
+# Building efr32-brd4163a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4163a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-lock-with-ota-requestor
+
 # Building efr32-brd4163a-switch
 ninja -C {out}/efr32-brd4163a-switch
+
+# Building efr32-brd4163a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-switch-with-ota-requestor
 
 # Building efr32-brd4163a-unit-test
 ninja -C {out}/efr32-brd4163a-unit-test
 
+# Building efr32-brd4163a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-unit-test-with-ota-requestor
+
 # Building efr32-brd4163a-window-covering
 ninja -C {out}/efr32-brd4163a-window-covering
+
+# Building efr32-brd4163a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4163a-window-covering-with-ota-requestor
 
 # Building efr32-brd4164a-light
 ninja -C {out}/efr32-brd4164a-light
@@ -997,20 +1215,41 @@ ninja -C {out}/efr32-brd4164a-light
 # Building efr32-brd4164a-light-rpc
 ninja -C {out}/efr32-brd4164a-light-rpc
 
+# Building efr32-brd4164a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4164a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-light-with-ota-requestor
+
 # Building efr32-brd4164a-lock
 ninja -C {out}/efr32-brd4164a-lock
 
 # Building efr32-brd4164a-lock-rpc
 ninja -C {out}/efr32-brd4164a-lock-rpc
 
+# Building efr32-brd4164a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4164a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-lock-with-ota-requestor
+
 # Building efr32-brd4164a-switch
 ninja -C {out}/efr32-brd4164a-switch
+
+# Building efr32-brd4164a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-switch-with-ota-requestor
 
 # Building efr32-brd4164a-unit-test
 ninja -C {out}/efr32-brd4164a-unit-test
 
+# Building efr32-brd4164a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-unit-test-with-ota-requestor
+
 # Building efr32-brd4164a-window-covering
 ninja -C {out}/efr32-brd4164a-window-covering
+
+# Building efr32-brd4164a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4164a-window-covering-with-ota-requestor
 
 # Building efr32-brd4166a-light
 ninja -C {out}/efr32-brd4166a-light
@@ -1018,20 +1257,41 @@ ninja -C {out}/efr32-brd4166a-light
 # Building efr32-brd4166a-light-rpc
 ninja -C {out}/efr32-brd4166a-light-rpc
 
+# Building efr32-brd4166a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4166a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-light-with-ota-requestor
+
 # Building efr32-brd4166a-lock
 ninja -C {out}/efr32-brd4166a-lock
 
 # Building efr32-brd4166a-lock-rpc
 ninja -C {out}/efr32-brd4166a-lock-rpc
 
+# Building efr32-brd4166a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4166a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-lock-with-ota-requestor
+
 # Building efr32-brd4166a-switch
 ninja -C {out}/efr32-brd4166a-switch
+
+# Building efr32-brd4166a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-switch-with-ota-requestor
 
 # Building efr32-brd4166a-unit-test
 ninja -C {out}/efr32-brd4166a-unit-test
 
+# Building efr32-brd4166a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-unit-test-with-ota-requestor
+
 # Building efr32-brd4166a-window-covering
 ninja -C {out}/efr32-brd4166a-window-covering
+
+# Building efr32-brd4166a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4166a-window-covering-with-ota-requestor
 
 # Building efr32-brd4170a-light
 ninja -C {out}/efr32-brd4170a-light
@@ -1039,20 +1299,41 @@ ninja -C {out}/efr32-brd4170a-light
 # Building efr32-brd4170a-light-rpc
 ninja -C {out}/efr32-brd4170a-light-rpc
 
+# Building efr32-brd4170a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4170a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-light-with-ota-requestor
+
 # Building efr32-brd4170a-lock
 ninja -C {out}/efr32-brd4170a-lock
 
 # Building efr32-brd4170a-lock-rpc
 ninja -C {out}/efr32-brd4170a-lock-rpc
 
+# Building efr32-brd4170a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4170a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-lock-with-ota-requestor
+
 # Building efr32-brd4170a-switch
 ninja -C {out}/efr32-brd4170a-switch
+
+# Building efr32-brd4170a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-switch-with-ota-requestor
 
 # Building efr32-brd4170a-unit-test
 ninja -C {out}/efr32-brd4170a-unit-test
 
+# Building efr32-brd4170a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-unit-test-with-ota-requestor
+
 # Building efr32-brd4170a-window-covering
 ninja -C {out}/efr32-brd4170a-window-covering
+
+# Building efr32-brd4170a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4170a-window-covering-with-ota-requestor
 
 # Building efr32-brd4186a-light
 ninja -C {out}/efr32-brd4186a-light
@@ -1060,20 +1341,41 @@ ninja -C {out}/efr32-brd4186a-light
 # Building efr32-brd4186a-light-rpc
 ninja -C {out}/efr32-brd4186a-light-rpc
 
+# Building efr32-brd4186a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4186a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-light-with-ota-requestor
+
 # Building efr32-brd4186a-lock
 ninja -C {out}/efr32-brd4186a-lock
 
 # Building efr32-brd4186a-lock-rpc
 ninja -C {out}/efr32-brd4186a-lock-rpc
 
+# Building efr32-brd4186a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4186a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-lock-with-ota-requestor
+
 # Building efr32-brd4186a-switch
 ninja -C {out}/efr32-brd4186a-switch
+
+# Building efr32-brd4186a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-switch-with-ota-requestor
 
 # Building efr32-brd4186a-unit-test
 ninja -C {out}/efr32-brd4186a-unit-test
 
+# Building efr32-brd4186a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-unit-test-with-ota-requestor
+
 # Building efr32-brd4186a-window-covering
 ninja -C {out}/efr32-brd4186a-window-covering
+
+# Building efr32-brd4186a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4186a-window-covering-with-ota-requestor
 
 # Building efr32-brd4187a-light
 ninja -C {out}/efr32-brd4187a-light
@@ -1081,20 +1383,41 @@ ninja -C {out}/efr32-brd4187a-light
 # Building efr32-brd4187a-light-rpc
 ninja -C {out}/efr32-brd4187a-light-rpc
 
+# Building efr32-brd4187a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4187a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-light-with-ota-requestor
+
 # Building efr32-brd4187a-lock
 ninja -C {out}/efr32-brd4187a-lock
 
 # Building efr32-brd4187a-lock-rpc
 ninja -C {out}/efr32-brd4187a-lock-rpc
 
+# Building efr32-brd4187a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4187a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-lock-with-ota-requestor
+
 # Building efr32-brd4187a-switch
 ninja -C {out}/efr32-brd4187a-switch
+
+# Building efr32-brd4187a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-switch-with-ota-requestor
 
 # Building efr32-brd4187a-unit-test
 ninja -C {out}/efr32-brd4187a-unit-test
 
+# Building efr32-brd4187a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-unit-test-with-ota-requestor
+
 # Building efr32-brd4187a-window-covering
 ninja -C {out}/efr32-brd4187a-window-covering
+
+# Building efr32-brd4187a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4187a-window-covering-with-ota-requestor
 
 # Building efr32-brd4304a-light
 ninja -C {out}/efr32-brd4304a-light
@@ -1102,20 +1425,41 @@ ninja -C {out}/efr32-brd4304a-light
 # Building efr32-brd4304a-light-rpc
 ninja -C {out}/efr32-brd4304a-light-rpc
 
+# Building efr32-brd4304a-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-light-rpc-with-ota-requestor
+
+# Building efr32-brd4304a-light-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-light-with-ota-requestor
+
 # Building efr32-brd4304a-lock
 ninja -C {out}/efr32-brd4304a-lock
 
 # Building efr32-brd4304a-lock-rpc
 ninja -C {out}/efr32-brd4304a-lock-rpc
 
+# Building efr32-brd4304a-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4304a-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-lock-with-ota-requestor
+
 # Building efr32-brd4304a-switch
 ninja -C {out}/efr32-brd4304a-switch
+
+# Building efr32-brd4304a-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-switch-with-ota-requestor
 
 # Building efr32-brd4304a-unit-test
 ninja -C {out}/efr32-brd4304a-unit-test
 
+# Building efr32-brd4304a-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-unit-test-with-ota-requestor
+
 # Building efr32-brd4304a-window-covering
 ninja -C {out}/efr32-brd4304a-window-covering
+
+# Building efr32-brd4304a-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4304a-window-covering-with-ota-requestor
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 

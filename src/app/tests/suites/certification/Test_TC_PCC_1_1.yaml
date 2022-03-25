@@ -58,7 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 3
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -76,24 +76,21 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ClientGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
-      attribute: "ClientGeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ServerGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
-      attribute: "ServerGeneratedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
 
     - label: "read the optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -107,7 +104,6 @@ tests:
               type: map32
 
     - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:
@@ -116,8 +112,9 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: map32

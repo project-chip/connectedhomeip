@@ -22,14 +22,24 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 
 #if defined(PW_RPC_ENABLED)
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+namespace {
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
+} // namespace
+#endif
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
                                        uint16_t size, uint8_t * value)
@@ -60,7 +70,12 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+}
 
 int main(int argc, char * argv[])
 {

@@ -49,6 +49,11 @@ public:
     CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+
+private:
+    DiagnosticDataProviderImpl();
+
+    const uint8_t mBootReason;
 };
 
 } // namespace DeviceLayer

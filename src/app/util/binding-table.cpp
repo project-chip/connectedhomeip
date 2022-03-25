@@ -64,23 +64,21 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         mBindingTable[newIndex].type = EMBER_UNUSED_BINDING;
         return error;
     }
+
+    if (mTail == kNextNullIndex)
+    {
+        mTail = newIndex;
+        mHead = newIndex;
+    }
     else
     {
-        if (mTail == kNextNullIndex)
-        {
-            mTail = newIndex;
-            mHead = newIndex;
-        }
-        else
-        {
-            mNextIndex[mTail]    = newIndex;
-            mNextIndex[newIndex] = kNextNullIndex;
-            mTail                = newIndex;
-        }
-
-        mSize++;
-        return CHIP_NO_ERROR;
+        mNextIndex[mTail]    = newIndex;
+        mNextIndex[newIndex] = kNextNullIndex;
+        mTail                = newIndex;
     }
+
+    mSize++;
+    return CHIP_NO_ERROR;
 }
 
 const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)

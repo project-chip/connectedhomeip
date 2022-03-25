@@ -27,10 +27,13 @@
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
+#include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
+#include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
+#include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -98,7 +101,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    ~ReadHandler();
+    ~ReadHandler() override;
 
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
@@ -126,16 +129,16 @@ public:
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
-    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
+    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
-    ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
-    ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
+    ObjectList<AttributePathParams> * GetAttributePathList() { return mpAttributePathList; }
+    ObjectList<EventPathParams> * GetEventPathList() { return mpEventPathList; }
+    ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
     EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
@@ -145,23 +148,23 @@ public:
     bool CheckEventClean(EventManagement & aEventManager);
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() { return mIsChunkedReport; }
-    bool IsPriming() { return mIsPrimingReports; }
+    bool IsChunkedReport() const { return mIsChunkedReport; }
+    bool IsPriming() const { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
     void SetDirty()
     {
         mDirty = true;
         // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
         // we've sent up till now are no longer valid and need to be invalidated.
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
-    bool IsDirty() { return mDirty; }
+    bool IsDirty() const { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
@@ -175,7 +178,7 @@ public:
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
-    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:
@@ -240,10 +243,10 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                      = HandlerState::Idle;
-    ClusterInfo * mpAttributeClusterInfoList = nullptr;
-    ClusterInfo * mpEventClusterInfoList     = nullptr;
-    ClusterInfo * mpDataVersionFilterList    = nullptr;
+    HandlerState mState                                     = HandlerState::Idle;
+    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
+    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
+    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

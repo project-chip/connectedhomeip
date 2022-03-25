@@ -281,9 +281,9 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVer
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint32_t & deviceType)
 {
-    deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+    deviceType = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
     return CHIP_NO_ERROR;
 }
 
@@ -723,10 +723,6 @@ exit:
 template <class ConfigClass>
 bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
 {
-#if CHIP_BYPASS_RENDEZVOUS
-    return true;
-#else // CHIP_BYPASS_RENDEZVOUS
-
     return
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         ConnectivityMgr().IsWiFiStationProvisioned() &&
@@ -735,7 +731,6 @@ bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
         ConnectivityMgr().IsThreadProvisioned() &&
 #endif
         true;
-#endif // CHIP_BYPASS_RENDEZVOUS
 }
 
 template <class ConfigClass>
@@ -864,12 +859,12 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
     }
 
     {
-        uint16_t deviceType;
+        uint32_t deviceType;
         if (GetDeviceTypeId(deviceType) != CHIP_NO_ERROR)
         {
             deviceType = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu16 " (0x%" PRIX16 ")", deviceType, deviceType);
+        ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu32 " (0x%" PRIX32 ")", deviceType, deviceType);
     }
 }
 

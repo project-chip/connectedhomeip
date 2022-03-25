@@ -29,15 +29,74 @@
 
 #include <drivers/hwinfo.h>
 
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#include <dfu/mcuboot.h>
+#endif
+
 #include <malloc.h>
 
 namespace chip {
 namespace DeviceLayer {
 
+namespace {
+
+uint8_t DetermineBootReason()
+{
+#ifdef CONFIG_HWINFO
+    uint32_t reason;
+
+    if (hwinfo_get_reset_cause(&reason) != 0)
+    {
+        return BootReasonType::Unspecified;
+    }
+
+    // Bits returned by hwinfo_get_reset_cause() are accumulated between subsequent resets, so
+    // the reset cause must be cleared after reading in order to make sure it always contains
+    // information about the most recent boot only.
+    (void) hwinfo_clear_reset_cause();
+
+    // If no reset cause is provided, it indicates a power-on-reset.
+    if (reason == 0 || reason & (RESET_POR | RESET_PIN))
+    {
+        return BootReasonType::PowerOnReboot;
+    }
+
+    if (reason & RESET_WATCHDOG)
+    {
+        return BootReasonType::HardwareWatchdogReset;
+    }
+
+    if (reason & RESET_BROWNOUT)
+    {
+        return BootReasonType::BrownOutReset;
+    }
+
+    if (reason & RESET_SOFTWARE)
+    {
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+        if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+        {
+            return BootReasonType::SoftwareUpdateCompleted;
+        }
+#endif
+        return BootReasonType::SoftwareReset;
+    }
+#endif
+
+    return BootReasonType::Unspecified;
+}
+
+} // namespace
+
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
     static DiagnosticDataProviderImpl sInstance;
     return sInstance;
+}
+
+inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
+{
+    ChipLogDetail(DeviceLayer, "Boot reason: %" PRIu16, static_cast<uint16_t>(mBootReason));
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
@@ -124,45 +183,15 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
 {
 #if CONFIG_HWINFO
-    uint32_t reason = 0;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (hwinfo_get_reset_cause(&reason) != 0)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    if (reason & (RESET_POR | RESET_PIN))
-    {
-        bootReason = BootReasonType::PowerOnReboot;
-    }
-    else if (reason & RESET_WATCHDOG)
-    {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
-    }
-    else if (reason & RESET_BROWNOUT)
-    {
-        bootReason = BootReasonType::BrownOutReset;
-    }
-    else if (reason & (RESET_SOFTWARE | RESET_CPU_LOCKUP | RESET_DEBUG))
-    {
-        bootReason = BootReasonType::SoftwareReset;
-    }
-    else
-    {
-        bootReason = BootReasonType::Unspecified;
-    }
-
-    return err;
+    bootReason = mBootReason;
+    return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     NetworkInterface * head = NULL;
 
     for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
@@ -215,7 +244,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         // Assuming IPv6-only support
         Inet::InterfaceAddressIterator interfaceAddressIterator;
         uint8_t ipv6AddressesCount = 0;
-        while (interfaceAddressIterator.HasCurrent())
+        while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
         {
             if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
             {
@@ -223,8 +252,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
                 {
                     memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
-                    ifp->Ipv6AddressSpans[ipv6AddressesCount] =
-                        ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
                     ipv6AddressesCount++;
                 }
             }
@@ -237,9 +265,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     *netifpp = head;
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)

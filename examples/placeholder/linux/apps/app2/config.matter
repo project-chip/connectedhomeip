@@ -9,15 +9,21 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    INT16U catalogVendorId = 0;
+    CHAR_STRING applicationId = 1;
+  }
+
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -30,15 +36,21 @@ server cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    INT16U catalogVendorId = 0;
+    CHAR_STRING applicationId = 1;
+  }
+
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -253,8 +265,8 @@ client cluster ContentLauncher = 1290 {
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -355,8 +367,8 @@ server cluster ContentLauncher = 1290 {
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -417,8 +429,8 @@ client cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -464,8 +476,8 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -790,8 +802,8 @@ client cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -908,8 +920,8 @@ server cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -995,6 +1007,64 @@ server cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   command Stop(StopRequest): DefaultSuccess = 3;
   command StopWithOnOff(): DefaultSuccess = 7;
+}
+
+client cluster ModeSelect = 80 {
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+  }
+
+  struct ModeOptionStruct {
+    CHAR_STRING<32> label = 0;
+    INT8U mode = 1;
+    INT32U semanticTag = 2;
+  }
+
+  readonly attribute char_string<32> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+}
+
+server cluster ModeSelect = 80 {
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+  }
+
+  struct ModeOptionStruct {
+    CHAR_STRING<32> label = 0;
+    INT8U mode = 1;
+    INT32U semanticTag = 2;
+  }
+
+  readonly attribute char_string<32> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -1122,6 +1192,63 @@ server cluster NetworkCommissioning = 49 {
   command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
 }
 
+client cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : enum8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : enum8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute boolean globalSceneControl = 16384;
+  attribute int16u onTime = 16385;
+  attribute int16u offWaitTime = 16386;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  command Off(): DefaultSuccess = 0;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command On(): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+  command Toggle(): DefaultSuccess = 2;
+}
+
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : enum8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -1138,6 +1265,12 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
@@ -1150,7 +1283,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1188,12 +1321,12 @@ client cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute FabricDescriptor fabrics[] = 1;
@@ -1270,12 +1403,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute FabricDescriptor fabrics[] = 1;
@@ -1465,6 +1598,28 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+client cluster RelativeHumidityMeasurement = 1029 {
+  readonly attribute int16u measuredValue = 0;
+  readonly attribute int16u minMeasuredValue = 1;
+  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+}
+
+server cluster RelativeHumidityMeasurement = 1029 {
+  readonly attribute int16u measuredValue = 0;
+  readonly attribute int16u minMeasuredValue = 1;
+  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+}
+
 server cluster Scenes = 5 {
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
@@ -1569,6 +1724,88 @@ server cluster Scenes = 5 {
   command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
 }
 
+client cluster Switch = 59 {
+  info event SwitchLatched = 0 {
+    INT8U newPosition = 0;
+  }
+
+  info event InitialPress = 1 {
+    INT8U newPosition = 0;
+  }
+
+  info event LongPress = 2 {
+    INT8U newPosition = 0;
+  }
+
+  info event ShortRelease = 3 {
+    INT8U previousPosition = 0;
+  }
+
+  info event LongRelease = 4 {
+    INT8U previousPosition = 0;
+  }
+
+  info event MultiPressOngoing = 5 {
+    INT8U newPosition = 0;
+    INT8U currentNumberOfPressesCounted = 1;
+  }
+
+  info event MultiPressComplete = 6 {
+    INT8U newPosition = 0;
+    INT8U totalNumberOfPressesCounted = 1;
+  }
+
+  readonly attribute int8u numberOfPositions = 0;
+  readonly attribute int8u currentPosition = 1;
+  readonly attribute int8u multiPressMax = 2;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+server cluster Switch = 59 {
+  info event SwitchLatched = 0 {
+    INT8U newPosition = 0;
+  }
+
+  info event InitialPress = 1 {
+    INT8U newPosition = 0;
+  }
+
+  info event LongPress = 2 {
+    INT8U newPosition = 0;
+  }
+
+  info event ShortRelease = 3 {
+    INT8U previousPosition = 0;
+  }
+
+  info event LongRelease = 4 {
+    INT8U previousPosition = 0;
+  }
+
+  info event MultiPressOngoing = 5 {
+    INT8U newPosition = 0;
+    INT8U currentNumberOfPressesCounted = 1;
+  }
+
+  info event MultiPressComplete = 6 {
+    INT8U newPosition = 0;
+    INT8U totalNumberOfPressesCounted = 1;
+  }
+
+  readonly attribute int8u numberOfPositions = 0;
+  readonly attribute int8u currentPosition = 1;
+  readonly attribute int8u multiPressMax = 2;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 client cluster TargetNavigator = 1285 {
   enum StatusEnum : ENUM8 {
     kSuccess = 0;
@@ -1583,8 +1820,8 @@ client cluster TargetNavigator = 1285 {
 
   readonly attribute TargetInfo targetList[] = 0;
   readonly attribute int8u currentTarget = 1;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1615,8 +1852,8 @@ server cluster TargetNavigator = 1285 {
 
   readonly attribute TargetInfo targetList[] = 0;
   readonly attribute int8u currentTarget = 1;
-  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
-  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1720,6 +1957,28 @@ server cluster Thermostat = 513 {
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
   readonly attribute int8u numberOfDailyTransitions = 34;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+client cluster ThermostatUserInterfaceConfiguration = 516 {
+  attribute enum8 temperatureDisplayMode = 0;
+  attribute enum8 keypadLockout = 1;
+  attribute enum8 scheduleProgrammingVisibility = 2;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+server cluster ThermostatUserInterfaceConfiguration = 516 {
+  attribute enum8 temperatureDisplayMode = 0;
+  attribute enum8 keypadLockout = 1;
+  attribute enum8 scheduleProgrammingVisibility = 2;
+  readonly global attribute command_id generatedCommandList[] = 65528;
+  readonly global attribute command_id acceptedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -1832,16 +2091,25 @@ endpoint 0 {
   server  cluster GeneralDiagnostics;
   binding cluster KeypadInput;
   server  cluster KeypadInput;
+  binding cluster ModeSelect;
+  server  cluster ModeSelect;
   server  cluster NetworkCommissioning;
+  binding cluster OnOff;
   server  cluster OnOff;
   binding cluster OperationalCredentials;
   server  cluster OperationalCredentials;
   server  cluster PumpConfigurationAndControl;
+  binding cluster RelativeHumidityMeasurement;
+  server  cluster RelativeHumidityMeasurement;
+  binding cluster Switch;
+  server  cluster Switch;
   binding cluster TargetNavigator;
   server  cluster TargetNavigator;
   binding cluster TemperatureMeasurement;
   server  cluster TemperatureMeasurement;
   server  cluster Thermostat;
+  binding cluster ThermostatUserInterfaceConfiguration;
+  server  cluster ThermostatUserInterfaceConfiguration;
   server  cluster WindowCovering;
 }
 
@@ -1851,6 +2119,7 @@ endpoint 1 {
   server  cluster Groups;
   server  cluster Identify;
   server  cluster LevelControl;
+  binding cluster OnOff;
   server  cluster OnOff;
   server  cluster Scenes;
 }

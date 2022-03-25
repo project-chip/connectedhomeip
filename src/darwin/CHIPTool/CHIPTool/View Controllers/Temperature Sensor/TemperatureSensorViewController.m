@@ -18,12 +18,15 @@
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
+static TemperatureSensorViewController * _Nullable sCurrentController = nil;
+
 @implementation TemperatureSensorViewController
 
 // MARK: UIViewController methods
 
 - (void)viewDidLoad
 {
+    sCurrentController = self;
     [super viewDidLoad];
     [self setupUI];
 
@@ -31,6 +34,23 @@
     [self.view addGestureRecognizer:tap];
 
     [self readCurrentTemperature];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    sCurrentController = nil;
+    [super viewWillDisappear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    sCurrentController = self;
+    [super viewDidAppear:animated];
+}
+
++ (nullable TemperatureSensorViewController *)currentController
+{
+    return sCurrentController;
 }
 
 - (IBAction)sendReportingSetup:(id)sender
@@ -203,6 +223,7 @@
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
                                    minInterval:minIntervalSeconds
                                    maxInterval:maxIntervalSeconds
+                                        params:nil
                                  reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
                                      if (error) {
                                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
@@ -216,7 +237,10 @@
                                              if (report.error != nil) {
                                                  NSLog(@"Error reading temperature: %@", report.error);
                                              } else {
-                                                 [self updateTempInUI:((NSNumber *) report.value).shortValue];
+                                                 __auto_type controller = [TemperatureSensorViewController currentController];
+                                                 if (controller != nil) {
+                                                     [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                                                 }
                                              }
                                          }
                                      }

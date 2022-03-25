@@ -291,7 +291,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Remove the fabric from the fabrics' linked list
-    CHIP_ERROR Unregister(PersistentStorageDelegate * storage)
+    CHIP_ERROR Unregister(PersistentStorageDelegate * storage) const
     {
         FabricList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
@@ -334,7 +334,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Check the fabric is registered in the fabrics' linked list
-    CHIP_ERROR Validate(PersistentStorageDelegate * storage)
+    CHIP_ERROR Validate(PersistentStorageDelegate * storage) const
     {
         FabricList fabric_list;
         ReturnErrorOnFailure(fabric_list.Load(storage));
@@ -929,13 +929,11 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
         group.SetName(info.name);
         return group.Save(mStorage);
     }
-    else
-    {
-        // New group_id
-        group.group_id = info.group_id;
-        group.SetName(info.name);
-        return SetGroupInfoAt(fabric_index, fabric.group_count, group);
-    }
+
+    // New group_id
+    group.group_id = info.group_id;
+    group.SetName(info.name);
+    return SetGroupInfoAt(fabric_index, fabric.group_count, group);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info)
@@ -985,7 +983,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         // Update existing entry
         return group.Save(mStorage);
     }
-    else if (index < fabric.group_count)
+    if (index < fabric.group_count)
     {
         // Replace existing entry with a new group
         GroupData old_group;
@@ -1631,16 +1629,14 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
         // Update existing keyset info, keep next
         return keyset.Save(mStorage);
     }
-    else
-    {
-        // New keyset, insert first
-        keyset.next = fabric.first_keyset;
-        ReturnErrorOnFailure(keyset.Save(mStorage));
-        // Update fabric
-        fabric.keyset_count++;
-        fabric.first_keyset = in_keyset.keyset_id;
-        return fabric.Save(mStorage);
-    }
+
+    // New keyset, insert first
+    keyset.next = fabric.first_keyset;
+    ReturnErrorOnFailure(keyset.Save(mStorage));
+    // Update fabric
+    fabric.keyset_count++;
+    fabric.first_keyset = in_keyset.keyset_id;
+    return fabric.Save(mStorage);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint16_t target_id, KeySet & out_keyset)

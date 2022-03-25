@@ -85,7 +85,7 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData);
+    bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     Dnssd::DiscoveryFilter currentFilter;
 
     DeviceCommissioner * mCommissioner = nullptr;

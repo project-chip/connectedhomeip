@@ -29,7 +29,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import struct
-from collections import Mapping, Sequence, OrderedDict
+from collections import OrderedDict
+from collections.abc import Mapping, Sequence
 from enum import Enum
 
 TLV_TYPE_SIGNED_INTEGER = 0x00

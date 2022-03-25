@@ -71,6 +71,9 @@ struct BdxOtaSenderCallbacks
 class BdxOtaSender : public chip::bdx::Responder
 {
 public:
+    // Initializes BDX transfer-related metadata. Should always be called first.
+    CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
+
     void SetCallbacks(BdxOtaSenderCallbacks callbacks);
 
     /**
@@ -96,6 +99,12 @@ private:
     void Reset();
 
     uint32_t mNumBytesSent = 0;
+
+    bool mInitialized = false;
+
+    chip::Optional<chip::FabricIndex> mFabricIndex;
+
+    chip::Optional<chip::NodeId> mNodeId;
 
     chip::Callback::Callback<OnBdxBlockQuery> * mOnBlockQueryCallback             = nullptr;
     chip::Callback::Callback<OnBdxTransferComplete> * mOnTransferCompleteCallback = nullptr;

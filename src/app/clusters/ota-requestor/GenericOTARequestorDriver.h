@@ -56,6 +56,7 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
+    void HandleIdleStateExit() override;
     void HandleIdleState(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
@@ -68,12 +69,16 @@ public:
     void ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void SendQueryImage() override;
-    bool GetNextProviderLocation(ProviderLocationType & providerLocation) override;
+    bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) override;
 
 protected:
-    void StartDefaultProviderTimer();
-    void StopDefaultProviderTimer();
-    void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
+    void StartPeriodicQueryTimer();
+    void StopPeriodicQueryTimer();
+    void PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState);
+    void StartWatchdogTimer();
+    void StopWatchdogTimer();
+    void WatchdogTimerHandler(System::Layer * systemLayer, void * appState);
+    void StartSelectedTimer(SelectedTimer timer);
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
@@ -82,6 +87,10 @@ protected:
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelaySec                   = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
+    uint32_t mWatchdogTimeInterval = (6 * 60 * 60); // Timeout (in seconds) for checking if Requestor has reverted back to idle mode
+    // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
+    static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
+    uint8_t mProviderRetryCount; // Track retry count for the current provider
 };
 
 } // namespace DeviceLayer

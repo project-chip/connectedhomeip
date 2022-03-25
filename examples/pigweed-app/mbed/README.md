@@ -225,7 +225,7 @@ parameters as arguments:
 
 Example:
 
-    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    chip-console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
 
 To send the echo message type the following command, where you define the
 message content:

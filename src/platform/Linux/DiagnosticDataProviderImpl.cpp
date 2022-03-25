@@ -281,7 +281,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         struct dirent * entry;
 
         /* proc available, iterate through tasks... */
-        while ((entry = readdir(proc_dir)) != NULL)
+        while ((entry = readdir(proc_dir)) != nullptr)
         {
             if (entry->d_name[0] == '.')
                 continue;

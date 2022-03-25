@@ -81,6 +81,9 @@ public:
     void SetListener(NodeListener * listener) { mListener = listener; }
     NodeListener * GetListener() { return mListener; }
 
+    /// Convenience method that is more readable than 'IsInList'
+    inline bool IsActive() const { return IntrusiveListNodeBase::IsInList(); }
+
 protected:
     NodeListener * mListener = nullptr;
 };
@@ -168,6 +171,14 @@ class NodeLookupHandle;
 class Resolver
 {
 public:
+    /// Enumeration defining how to handle cancel callbacks during operation
+    /// cancellation.
+    enum class FailureCallback
+    {
+        Call, // Call the failure callback
+        Skip  // do not call the failure callback (generally silent operation)
+    };
+
     virtual ~Resolver();
 
     /// Expected to be called at least once before the resolver is ever
@@ -192,6 +203,21 @@ public:
     ///     and maintains lookup data internally while the operation is still
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
+
+    /// Stops an active lookup request.
+    ///
+    /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
+    /// the `cancel_method` argument.
+    ///
+    /// Note that there is no default cancel_method on purpose, so that the caller has to make
+    /// a clear decision if the callback should or should not be invoked.
+    virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
+
+    /// Shut down any active resolves
+    ///
+    /// Will immediately fail any scheduled resolve calls and will refuse to register
+    /// any new lookups until re-initialized.
+    virtual void Shutdown() = 0;
 
     /// Expected to be provided by the implementation.
     static Resolver & Instance();

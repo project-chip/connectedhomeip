@@ -18,9 +18,9 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
+#include <app/ObjectList.h>
 #include <app/util/mock/Constants.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -41,46 +41,46 @@ using P = app::ConcreteAttributePath;
 
 void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
+    app::ObjectList<app::AttributePathParams> clusInfo;
 
     app::ConcreteAttributePath path;
     P paths[] = {
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -88,18 +88,18 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(2) },
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(3) },
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
@@ -117,9 +117,9 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
-    clusInfo.mClusterId   = Test::MockClusterId(3);
-    clusInfo.mAttributeId = Test::MockAttributeId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo;
+    clusInfo.mValue.mClusterId   = Test::MockClusterId(3);
+    clusInfo.mValue.mAttributeId = Test::MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -140,9 +140,9 @@ void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId  = Test::kMockEndpoint3;
-    clusInfo.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
+    app::ObjectList<app::AttributePathParams> clusInfo;
+    clusInfo.mValue.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -166,9 +166,9 @@ void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId  = Test::kMockEndpoint3;
-    clusInfo.mAttributeId = app::Clusters::Globals::Attributes::AttributeList::Id;
+    app::ObjectList<app::AttributePathParams> clusInfo;
+    clusInfo.mValue.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::AttributeList::Id;
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -192,9 +192,9 @@ void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void
 
 void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId = Test::kMockEndpoint2;
-    clusInfo.mClusterId  = Test::MockClusterId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo;
+    clusInfo.mValue.mEndpointId = Test::kMockEndpoint2;
+    clusInfo.mValue.mClusterId  = Test::MockClusterId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -203,8 +203,8 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
     };
 
@@ -222,10 +222,10 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 
 void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 {
-    app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId  = Test::kMockEndpoint2;
-    clusInfo.mClusterId   = Test::MockClusterId(3);
-    clusInfo.mAttributeId = Test::MockAttributeId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo;
+    clusInfo.mValue.mEndpointId  = Test::kMockEndpoint2;
+    clusInfo.mValue.mClusterId   = Test::MockClusterId(3);
+    clusInfo.mValue.mAttributeId = Test::MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -247,24 +247,24 @@ void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
 {
 
-    app::ClusterInfo clusInfo1;
+    app::ObjectList<app::AttributePathParams> clusInfo1;
 
-    app::ClusterInfo clusInfo2;
-    clusInfo2.mClusterId   = Test::MockClusterId(3);
-    clusInfo2.mAttributeId = Test::MockAttributeId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo2;
+    clusInfo2.mValue.mClusterId   = Test::MockClusterId(3);
+    clusInfo2.mValue.mAttributeId = Test::MockAttributeId(3);
 
-    app::ClusterInfo clusInfo3;
-    clusInfo3.mEndpointId  = Test::kMockEndpoint3;
-    clusInfo3.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
+    app::ObjectList<app::AttributePathParams> clusInfo3;
+    clusInfo3.mValue.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo3.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
-    app::ClusterInfo clusInfo4;
-    clusInfo4.mEndpointId = Test::kMockEndpoint2;
-    clusInfo4.mClusterId  = Test::MockClusterId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo4;
+    clusInfo4.mValue.mEndpointId = Test::kMockEndpoint2;
+    clusInfo4.mValue.mClusterId  = Test::MockClusterId(3);
 
-    app::ClusterInfo clusInfo5;
-    clusInfo5.mEndpointId  = Test::kMockEndpoint2;
-    clusInfo5.mClusterId   = Test::MockClusterId(3);
-    clusInfo5.mAttributeId = Test::MockAttributeId(3);
+    app::ObjectList<app::AttributePathParams> clusInfo5;
+    clusInfo5.mValue.mEndpointId  = Test::kMockEndpoint2;
+    clusInfo5.mValue.mClusterId   = Test::MockClusterId(3);
+    clusInfo5.mValue.mAttributeId = Test::MockAttributeId(3);
 
     clusInfo1.mpNext = &clusInfo2;
     clusInfo2.mpNext = &clusInfo3;
@@ -275,40 +275,40 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
     P paths[] = {
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
         { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
@@ -316,18 +316,18 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(2) },
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(3) },
         { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
         { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
@@ -339,8 +339,8 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ServerGeneratedCommandList::Id },
-        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClientGeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::GeneratedCommandList::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AcceptedCommandList::Id },
         { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
         { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };

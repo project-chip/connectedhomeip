@@ -31,71 +31,64 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-ssize_t ReadLine(char * buffer, size_t max)
+// max > 1
+size_t ReadLine(char * buffer, size_t max)
 {
-    ssize_t read = 0;
-    bool done    = false;
-    char * inptr = buffer;
+    size_t line_sz = 0;
 
-    // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < static_cast<int>(max)) && !done)
+    // Read in characters until we get a line ending or EOT.
+    for (bool done = false; !done;)
     {
-        if (read == 0)
+        // Stop reading if we've run out of space in the buffer (still need to null-terminate).
+        if (line_sz >= max - 1u)
         {
-            read = streamer_read(streamer_get(), inptr, 1);
+            buffer[max - 1] = '\0';
+            break;
         }
 
-        // Process any characters we just read in.
-        while (read > 0)
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
         {
-            switch (*inptr)
-            {
-            case '\r':
-            case '\n':
-                streamer_printf(streamer_get(), "\r\n");
-                *inptr = 0; // null terminate
-                done   = true;
-                break;
-            case 0x04:
-                // Delete EOT character.
-                inptr -= 1;
-                // Stop the read loop if the input is still empty.
-                if (inptr == buffer - 1)
-                {
-                    done = true;
-                }
-                break;
-            case 0x7F:
-                // delete backspace character + 1 more
-                inptr -= 2;
-                if (inptr >= buffer - 1)
-                {
-                    streamer_printf(streamer_get(), "\b \b");
-                }
-                else
-                {
-                    inptr = buffer - 1;
-                }
-                break;
-            default:
-                if (isprint(static_cast<int>(*inptr)) || *inptr == '\t')
-                {
-                    streamer_printf(streamer_get(), "%c", *inptr);
-                }
-                else
-                {
-                    inptr--;
-                }
-                break;
-            }
+            continue;
+        }
 
-            inptr++;
-            read--;
+        // Process character we just read.
+        switch (buffer[line_sz])
+        {
+        case '\r':
+        case '\n':
+            streamer_printf(streamer_get(), "\r\n");
+            buffer[line_sz] = '\0';
+            line_sz++;
+            done = true;
+            break;
+        case 0x04:
+            // Do not accept EOT character (i.e. don't increment line_sz).
+            // Stop the read loop if the input is still empty.
+            if (line_sz == 0u)
+            {
+                done = true;
+            }
+            break;
+        case 0x7F:
+            // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
+            if (line_sz >= 1u)
+            {
+                streamer_printf(streamer_get(), "\b \b");
+                line_sz--;
+            }
+            break;
+        default:
+            if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
+            {
+                streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+                line_sz++;
+            }
+            break;
         }
     }
 
     // Return the length of the buffer including the terminating null byte.
-    return inptr - buffer;
+    return line_sz;
 }
 
 bool IsSeparator(char ch)
@@ -198,7 +191,7 @@ void Engine::RunMainLoop()
     while (true)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
-        if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0)
+        if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0u)
         {
             // Stop loop in case of empty read (Ctrl-D).
             break;

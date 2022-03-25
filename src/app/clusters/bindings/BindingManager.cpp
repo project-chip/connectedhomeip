@@ -185,18 +185,10 @@ void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, Fabric
     mInitParams.mCASESessionManager->ReleaseSessionsForFabric(compressedFabricId);
 }
 
-CHIP_ERROR BindingManager::NotifyBindingAdded(const EmberBindingTableEntry & binding)
-{
-    if (mBindingAddedHandler)
-    {
-        mBindingAddedHandler(binding);
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
@@ -208,7 +200,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(iter->nodeId);
                 OperationalDeviceProxy * peerDevice = mInitParams.mCASESessionManager->FindExistingSession(peer);
-                if (peerDevice != nullptr && peerDevice->IsConnected() && mBoundDeviceChangedHandler)
+                if (peerDevice != nullptr && peerDevice->IsConnected())
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(*iter, peerDevice, context);
@@ -216,10 +208,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 else
                 {
                     mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), context);
-                    if (peerDevice == nullptr || !peerDevice->IsConnecting())
-                    {
-                        ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
-                    }
+                    ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
                 }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)

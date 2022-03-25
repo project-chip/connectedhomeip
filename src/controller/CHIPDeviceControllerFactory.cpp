@@ -24,8 +24,10 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -53,8 +55,11 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
+    // Save our initialization state that we can't recover later from a
+    // created-but-shut-down system state.
     mListenPort               = params.listenPort;
     mFabricIndependentStorage = params.fabricIndependentStorage;
+    mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -72,9 +77,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
+        params.listenPort               = mListenPort;
+        params.fabricIndependentStorage = mFabricIndependentStorage;
+        params.enableServerInteractions = mEnableServerInteractions;
     }
-
-    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -126,12 +132,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
@@ -172,8 +178,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
         // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
         //
-        ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable));
+        ReturnErrorOnFailure(
+            stateParams.caseServer->ListenForSessionEstablishment(stateParams.exchangeMgr, stateParams.transportMgr,
+#if CONFIG_NETWORK_LAYER_BLE
+                                                                  nullptr,
+#endif
+                                                                  stateParams.sessionMgr, stateParams.fabricTable));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
@@ -200,6 +210,31 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         //
         chip::app::DnssdServer::Instance().StartServer();
     }
+
+    stateParams.sessionIDAllocator    = Platform::New<SessionIDAllocator>();
+    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
+    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+
+    DeviceProxyInitParams deviceInitParams = {
+        .sessionManager = stateParams.sessionMgr,
+        .exchangeMgr    = stateParams.exchangeMgr,
+        .idAllocator    = stateParams.sessionIDAllocator,
+        .fabricTable    = stateParams.fabricTable,
+        .clientPool     = stateParams.caseClientPool,
+        .mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+    };
+
+    CASESessionManagerConfig sessionManagerConfig = {
+        .sessionInitParams = deviceInitParams,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = NoSuchThingWeWouldNeedToAddIt,
+#endif
+        .devicePool = stateParams.operationalDevicePool,
+    };
+
+    // TODO: Need to be able to create a CASESessionManagerConfig here!
+    stateParams.caseSessionManager = Platform::New<CASESessionManager>(sessionManagerConfig);
+    ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -287,6 +322,33 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASEServer = nullptr;
     }
 
+    if (mCASESessionManager != nullptr)
+    {
+        mCASESessionManager->Shutdown();
+        Platform::Delete(mCASESessionManager);
+        mCASESessionManager = nullptr;
+    }
+
+    // mSessionIDAllocator, mCASEClientPool, and mDevicePool must be deallocated
+    // after mCASESessionManager, which uses them.
+    if (mSessionIDAllocator != nullptr)
+    {
+        Platform::Delete(mSessionIDAllocator);
+        mSessionIDAllocator = nullptr;
+    }
+
+    if (mOperationalDevicePool != nullptr)
+    {
+        Platform::Delete(mOperationalDevicePool);
+        mOperationalDevicePool = nullptr;
+    }
+
+    if (mCASEClientPool != nullptr)
+    {
+        Platform::Delete(mCASEClientPool);
+        mCASEClientPool = nullptr;
+    }
+
     Dnssd::Resolver::Instance().Shutdown();
 
     // Shut down the interaction model
@@ -324,7 +386,11 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     }
 
     mSystemLayer        = nullptr;
+    mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mMessageCounterManager != nullptr)
     {

@@ -127,7 +127,7 @@ public:
 void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                        const app::StatusIB & aStatus)
 {
-    if (aPath.mAttributeId == Globals::Attributes::ServerGeneratedCommandList::Id)
+    if (aPath.mAttributeId == Globals::Attributes::GeneratedCommandList::Id)
     {
         app::DataModel::DecodableList<CommandId> v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
@@ -141,7 +141,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
     }
-    else if (aPath.mAttributeId == Globals::Attributes::ClientGeneratedCommandList::Id)
+    else if (aPath.mAttributeId == Globals::Attributes::AcceptedCommandList::Id)
     {
         app::DataModel::DecodableList<CommandId> v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
@@ -288,8 +288,8 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 
         //
         // Always returns the same number of attributes read (5 + revision +
-        // AttributeList + ClientGeneratedCommandList +
-        // ServerGeneratedCommandList = 9).
+        // AttributeList + AcceptedCommandList +
+        // GeneratedCommandList = 9).
         //
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
         readCallback.mAttributeCount = 0;
@@ -465,7 +465,7 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not included in
+        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not included in
         // testClusterAttrsOnEndpoint4.
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
 
@@ -491,7 +491,7 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
+        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not include in
         // testClusterAttrsOnEndpoint4.
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
 

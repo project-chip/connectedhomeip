@@ -24,14 +24,14 @@ limitations under the License.
 
   <struct name="TestFabricScoped">
     <cluster code="0x050F"/>
-    <item name="fabricIndex" type="fabric_idx"/>
-    <item name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
-    <item name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
-    <item name="nullableFabricSensitiveInt8u" type="INT8U" isNullable="true" isFabricSensitive="true"/>
-    <item name="nullableOptionalFabricSensitiveInt8u" type="INT8U" optional="true" isNullable="true" isFabricSensitive="true"/>
-    <item name="fabricSensitiveCharString" type="CHAR_STRING" isFabricSensitive="true"/>
-    <item name="fabricSensitiveStruct" type="SimpleStruct" isFabricSensitive="true"/>
-    <item name="fabricSensitiveInt8uList" type="INT8U" array="true" isFabricSensitive="true"/>
+    <item fieldId="1" name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
+    <item fieldId="2" name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
+    <item fieldId="3" name="nullableFabricSensitiveInt8u" type="INT8U" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="nullableOptionalFabricSensitiveInt8u" type="INT8U" optional="true" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="5" name="fabricSensitiveCharString" type="CHAR_STRING" isFabricSensitive="true"/>
+    <item fieldId="6" name="fabricSensitiveStruct" type="SimpleStruct" isFabricSensitive="true"/>
+    <item fieldId="7" name="fabricSensitiveInt8uList" type="INT8U" array="true" isFabricSensitive="true"/>
+    <item fieldId="0xFE" name="fabricIndex" type="fabric_idx"/>
   </struct>
 
   <enum name="SimpleEnum" type="ENUM8">
@@ -577,7 +577,7 @@ limitations under the License.
 
     <event code="0x0002" name="TestFabricScopedEvent" priority="info" side="server">
       <description>Example test event</description>
-      <field id="1" name="arg1" type="fabric_idx"/>
+      <field id="0xFE" name="arg1" type="fabric_idx"/>
     </event>
 
   </cluster>

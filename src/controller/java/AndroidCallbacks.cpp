@@ -24,6 +24,7 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/jsontlv/TlvJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <type_traits>
@@ -214,8 +215,10 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
 
     TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
+    TLV::TLVReader readerForJson;
     readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
+    readerForJson.Init(*apData);
 
     jobject value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, just skip it.
@@ -238,14 +241,20 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     size = writer.GetLengthWritten();
     chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
+    // Convert TLV to JSON
+    Json::Value json;
+    err = TlvToJson(readerForJson, json);
+    UtfString jsonString(env, JsonToString(json).c_str());
+
     // Create AttributeState object
     jclass attributeStateCls;
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/AttributeState", attributeStateCls);
     VerifyOrReturn(attributeStateCls != nullptr, ChipLogError(Controller, "Could not find AttributeState class"));
     chip::JniClass attributeStateJniCls(attributeStateCls);
-    jmethodID attributeStateCtor = env->GetMethodID(attributeStateCls, "<init>", "(Ljava/lang/Object;[B)V");
+    jmethodID attributeStateCtor = env->GetMethodID(attributeStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(attributeStateCtor != nullptr, ChipLogError(Controller, "Could not find AttributeState constructor"));
-    jobject attributeStateObj = env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue());
+    jobject attributeStateObj =
+        env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(attributeStateObj != nullptr, ChipLogError(Controller, "Could not create AttributeState object"));
 
     // Add AttributeState to NodeState

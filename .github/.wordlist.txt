@@ -95,6 +95,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
@@ -156,6 +157,7 @@ BTP
 btvirt
 buildwithmatter
 burndown
+ButtonIsr
 BytesMain
 bz
 bzip
@@ -175,6 +177,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDEEDC
 CDVersionNumber
 ced
 cfg
@@ -300,6 +303,7 @@ cxx
 CY
 CYW
 DAC
+dadbdcdddedf
 DAP
 DAPLINK
 DataFrame
@@ -340,6 +344,7 @@ detokenizer
 dev
 devcontainer
 devCtrl
+DevelopmentCerts
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -358,6 +363,7 @@ DevKitC
 DevKitM
 devtype
 df
+dfe
 dfu
 DgDxsfHx
 dhclient
@@ -438,6 +444,8 @@ entrypoint
 enum
 Enums
 env
+epochKey
+epochStartTime
 eq
 errorValue
 esd
@@ -474,6 +482,7 @@ FC
 FDDE
 fddead
 fde
+fdx
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -542,6 +551,9 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupKeySecurityPolicy
+groupKeySetID
+groupsettings
 gtk
 GUA
 Gv
@@ -601,6 +613,7 @@ Infineon
 ini
 init
 inlined
+InputLoop
 installDebug
 instantiation
 integrations
@@ -645,11 +658,14 @@ kAdminister
 kBusy
 kCase
 Kconfig
+kDacPublicKey
 KeypadInput
+keyset
 kGroup
 kInvalidCommandId
 KitProg
 kManage
+kNewButton
 kNodeIdNotSpecified
 knownissues
 kOperate
@@ -897,6 +913,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -1076,6 +1093,8 @@ sdl
 SED
 SEGGER
 semver
+SendButton
+SendNewInputEvent
 sendto
 SERIALDEVICE
 SerialNumber
@@ -1096,6 +1115,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
@@ -1184,6 +1204,7 @@ TestEmptyString
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead
+TestName
 TESTPASSWD
 TestPICS
 TESTSSID
@@ -1242,7 +1263,7 @@ TXD
 txt
 uargument
 UART
-udc
+UDC
 udcport
 udhcpc
 UDP
@@ -1269,6 +1290,7 @@ ureverse
 URI
 urlrequest
 usbmodem
+usbserial
 USBtoUART
 uscif
 UserConsentNeeded
@@ -1302,6 +1324,7 @@ vous
 VPN
 VSC
 VSCode
+WaitNewInputEvent
 WakeOnLan
 WantedBy
 webpage
@@ -1326,6 +1349,7 @@ WS
 WSL
 WSTK
 xa
+xAAAA
 xab
 xaver
 xb
@@ -1358,6 +1382,8 @@ xfffff
 xFFFFFFFD
 xffffffffe
 xfffffffff
+xffffffffffff
+xffffffffffffXXXX
 xtensa
 xwayland
 XXXX
@@ -1401,3 +1427,15 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+ClusterObjectTests
+TestTimedRequestTimeout
+datamodel
+appliable
+commissionee
+configs
+NAMESERVER
+UTF
+localedef
+nameserver
+nmcli
+tsan

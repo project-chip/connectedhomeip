@@ -1141,7 +1141,7 @@ HelpOptions::HelpOptions(const char * appName, const char * appUsage, const char
 /**
  * Print a short description of the command's usage followed by instructions on how to get more help.
  */
-void HelpOptions::PrintBriefUsage(FILE * s)
+void HelpOptions::PrintBriefUsage(FILE * s) const
 {
     PutStringWithNewLine(s, AppUsage);
     fprintf(s, "Try `%s --help' for more information.\n", AppName);
@@ -1150,7 +1150,7 @@ void HelpOptions::PrintBriefUsage(FILE * s)
 /**
  * Print the full usage information, including information on all available options.
  */
-void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s)
+void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s) const
 {
     PutStringWithBlankLine(s, AppUsage);
     if (AppDesc != nullptr)
@@ -1160,7 +1160,7 @@ void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s)
     PrintOptionHelp(optSets, s);
 }
 
-void HelpOptions::PrintVersion(FILE * s)
+void HelpOptions::PrintVersion(FILE * s) const
 {
     fprintf(s, "%s ", AppName);
     PutStringWithNewLine(s, (AppVersion != nullptr) ? AppVersion : "(unknown version)");

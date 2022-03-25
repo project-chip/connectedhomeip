@@ -45,13 +45,13 @@ public:
     void SetSecuredPort(uint16_t port) { mSecuredPort = port; }
 
     /// Gets the secure Matter port
-    uint16_t GetSecuredPort() { return mSecuredPort; }
+    uint16_t GetSecuredPort() const { return mSecuredPort; }
 
     /// Sets the unsecure Matter port
     void SetUnsecuredPort(uint16_t port) { mUnsecuredPort = port; }
 
     /// Gets the unsecure Matter port
-    uint16_t GetUnsecuredPort() { return mUnsecuredPort; }
+    uint16_t GetUnsecuredPort() const { return mUnsecuredPort; }
 
     /// Sets the interface id used for advertising
     void SetInterfaceId(Inet::InterfaceId interfaceId) { mInterfaceId = interfaceId; }
@@ -63,7 +63,7 @@ public:
     void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
 
     /// Gets the factory-new state commissionable node discovery timeout
-    int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
+    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
 
     //
     // Override the referenced fabric table from the default that is present

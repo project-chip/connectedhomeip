@@ -116,6 +116,7 @@ const char ModuleNames[] = "-\0\0" // None
                            "TST"   // Test
                            "ODP"   // OperationalDeviceProxy
                            "ATM"   // Automation
+                           "CSM"   // CASESessionManager
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)

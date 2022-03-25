@@ -137,6 +137,10 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           not great from a type-safety perspective, of course. }}
       reportHandler,
       ^(Cancelable * success, Cancelable * failure) {
+          if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+              // We don't support disabling auto-resubscribe.
+              return CHIP_ERROR_INVALID_ARGUMENT;
+          }
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);

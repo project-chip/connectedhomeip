@@ -100,6 +100,10 @@ chip_configure_data_model(app
     GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()
+
 if(BUILD_WITH_DFU STREQUAL "BLE")
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
@@ -235,7 +239,8 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1")
+                       "-DPW_RPC_TRACING_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc

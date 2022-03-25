@@ -94,7 +94,7 @@ public:
         return nullptr;
     }
 
-    BLEEndPoint * Find(BLE_CONNECTION_OBJECT c)
+    BLEEndPoint * Find(BLE_CONNECTION_OBJECT c) const
     {
         if (c == BLE_CONNECTION_UNINITIALIZED)
         {

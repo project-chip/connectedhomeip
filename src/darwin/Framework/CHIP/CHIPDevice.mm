@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
+#import "CHIPAttributeCacheContainer_Internal.h"
 #import "CHIPAttributeTLVValueDecoder_Internal.h"
 #import "CHIPCallbackBridgeBase_internal.h"
+#import "CHIPCluster.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
+#include "app/ConcreteAttributePath.h"
+#include "app/ConcreteCommandPath.h"
 #include "lib/core/CHIPError.h"
+#include "lib/core/DataModelTypes.h"
 
+#include <app/AttributeCache.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/InteractionModelEngine.h>
@@ -38,28 +44,25 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 
+NSString * const kCHIPAttributePathKey = @"attributePath";
+NSString * const kCHIPCommandPathKey = @"commandPath";
+NSString * const kCHIPDataKey = @"data";
+NSString * const kCHIPErrorKey = @"error";
 NSString * const kCHIPTypeKey = @"type";
 NSString * const kCHIPValueKey = @"value";
-NSString * const kCHIPTagKey = @"tag";
-NSString * const kCHIPSignedIntegerValueTypeKey = @"SignedInteger";
-NSString * const kCHIPUnsignedIntegerValueTypeKey = @"UnsignedInteger";
-NSString * const kCHIPBooleanValueTypeKey = @"Boolean";
-NSString * const kCHIPUTF8StringValueTypeKey = @"UTF8String";
-NSString * const kCHIPOctetStringValueTypeKey = @"OctetString";
-NSString * const kCHIPFloatValueTypeKey = @"Float";
-NSString * const kCHIPDoubleValueTypeKey = @"Double";
-NSString * const kCHIPNullValueTypeKey = @"Null";
-NSString * const kCHIPStructureValueTypeKey = @"Structure";
-NSString * const kCHIPArrayValueTypeKey = @"Array";
-NSString * const kCHIPListValueTypeKey = @"List";
-NSString * const kCHIPEndpointIdKey = @"endpointId";
-NSString * const kCHIPClusterIdKey = @"clusterId";
-NSString * const kCHIPAttributeIdKey = @"attributeId";
-NSString * const kCHIPCommandIdKey = @"commandId";
-NSString * const kCHIPDataKey = @"data";
-NSString * const kCHIPStatusKey = @"status";
+NSString * const kCHIPContextTagKey = @"contextTag";
+NSString * const kCHIPSignedIntegerValueType = @"SignedInteger";
+NSString * const kCHIPUnsignedIntegerValueType = @"UnsignedInteger";
+NSString * const kCHIPBooleanValueType = @"Boolean";
+NSString * const kCHIPUTF8StringValueType = @"UTF8String";
+NSString * const kCHIPOctetStringValueType = @"OctetString";
+NSString * const kCHIPFloatValueType = @"Float";
+NSString * const kCHIPDoubleValueType = @"Double";
+NSString * const kCHIPNullValueType = @"Null";
+NSString * const kCHIPStructureValueType = @"Structure";
+NSString * const kCHIPArrayValueType = @"Array";
 
-class NSObjectAttributeCallbackBridge;
+class NSObjectDataValueCallbackBridge;
 
 @interface CHIPDevice ()
 
@@ -67,10 +70,6 @@ class NSObjectAttributeCallbackBridge;
 @property (readonly) chip::DeviceProxy * cppDevice;
 @property (nonatomic, readwrite) NSMutableDictionary * reportHandlerBridges;
 
-@end
-
-@interface CHIPAttributePath ()
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path;
 @end
 
 @interface CHIPAttributeReport ()
@@ -124,11 +123,11 @@ static void PurgeReadClientContainers(uint64_t deviceId, dispatch_queue_t queue,
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
         for (CHIPReadClientContainer * container in listToDelete) {
             if (container.readClientPtr) {
-                delete container.readClientPtr;
+                Platform::Delete(container.readClientPtr);
                 container.readClientPtr = nullptr;
             }
             if (container.pathParams) {
-                delete container.pathParams;
+                Platform::Delete(container.pathParams);
                 container.pathParams = nullptr;
             }
         }
@@ -157,15 +156,43 @@ static void PurgeCompletedReadClientContainers(uint64_t deviceId)
     [readClientContainersLock unlock];
 }
 
+#ifdef DEBUG
+// This function is for unit testing only. This function closes all read clients.
+static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
+{
+    InitializeReadClientContainers();
+
+    NSMutableArray<CHIPReadClientContainer *> * listToFail;
+    NSNumber * key = [NSNumber numberWithUnsignedLongLong:deviceId];
+    [readClientContainersLock lock];
+    listToFail = readClientContainers[key];
+    [readClientContainers removeObjectForKey:key];
+    [readClientContainersLock unlock];
+
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        for (CHIPReadClientContainer * container in listToFail) {
+            // Send auto resubscribe request again by read clients, which must fail.
+            chip::app::ReadPrepareParams readParams;
+            if (container.readClientPtr) {
+                container.readClientPtr->SendAutoResubscribeRequest(std::move(readParams));
+            }
+        }
+        if (completion) {
+            dispatch_async(queue, completion);
+        }
+    });
+}
+#endif
+
 @implementation CHIPReadClientContainer
 - (void)onDone
 {
     if (_readClientPtr) {
-        delete _readClientPtr;
+        Platform::Delete(_readClientPtr);
         _readClientPtr = nullptr;
     }
     if (_pathParams) {
-        delete _pathParams;
+        Platform::Delete(_pathParams);
         _pathParams = nullptr;
     }
     PurgeCompletedReadClientContainers(_deviceId);
@@ -174,11 +201,11 @@ static void PurgeCompletedReadClientContainers(uint64_t deviceId)
 - (void)dealloc
 {
     if (_readClientPtr) {
-        delete _readClientPtr;
+        Platform::Delete(_readClientPtr);
         _readClientPtr = nullptr;
     }
     if (_pathParams) {
-        delete _pathParams;
+        Platform::Delete(_pathParams);
         _pathParams = nullptr;
     }
 }
@@ -211,7 +238,7 @@ typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable er
 
 namespace {
 
-class SubscriptionCallback final : public ReadClient::Callback {
+class SubscriptionCallback final : public AttributeCache::Callback {
 public:
     SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
@@ -222,10 +249,21 @@ public:
     {
     }
 
+    SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, void (^onDoneHandler)(void))
+        : mQueue(queue)
+        , mReportCallback(reportCallback)
+        , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
+        , mBufferedReadAdapter(*this)
+        , mOnDoneHandler(onDoneHandler)
+    {
+    }
+
     BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
+    void AdoptAttributeCache(std::unique_ptr<AttributeCache> aAttributeCache) { mAttributeCache = std::move(aAttributeCache); }
 
 private:
     void OnReportBegin() override;
@@ -237,6 +275,8 @@ private:
     void OnError(CHIP_ERROR aError) override;
 
     void OnDone() override;
+
+    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
 
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
 
@@ -266,7 +306,9 @@ private:
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
     std::unique_ptr<ReadClient> mReadClient;
+    std::unique_ptr<AttributeCache> mAttributeCache;
     bool mHaveQueuedDeletion = false;
+    void (^mOnDoneHandler)(void) = nil;
 };
 
 } // anonymous namespace
@@ -274,6 +316,8 @@ private:
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
@@ -284,18 +328,46 @@ private:
         });
         return;
     }
-    AttributePathParams attributePath; // Wildcard endpoint, cluster, attribute.
-    ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mMinIntervalFloorSeconds = minInterval;
-    params.mMaxIntervalCeilingSeconds = maxInterval;
-    params.mpAttributePathParamsList = &attributePath;
-    params.mAttributePathParamsListSize = 1;
 
-    auto callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
-    auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-        callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    // Wildcard endpoint, cluster, attribute.
+    auto attributePath = std::make_unique<AttributePathParams>();
+    ReadPrepareParams readParams(device->GetSecureSession().Value());
+    readParams.mMinIntervalFloorSeconds = minInterval;
+    readParams.mMaxIntervalCeilingSeconds = maxInterval;
+    readParams.mpAttributePathParamsList = attributePath.get();
+    readParams.mAttributePathParamsListSize = 1;
+    readParams.mKeepSubscriptions
+        = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
 
-    CHIP_ERROR err = readClient->SendRequest(params);
+    std::unique_ptr<SubscriptionCallback> callback;
+    std::unique_ptr<ReadClient> readClient;
+    std::unique_ptr<AttributeCache> attributeCache;
+    if (attributeCacheContainer) {
+        __weak CHIPAttributeCacheContainer * weakPtr = attributeCacheContainer;
+        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler, ^{
+            CHIPAttributeCacheContainer * container = weakPtr;
+            if (container) {
+                container.cppAttributeCache = nullptr;
+            }
+        });
+        attributeCache = std::make_unique<AttributeCache>(*callback.get());
+        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+            attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    } else {
+        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
+        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+            callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    }
+
+    CHIP_ERROR err;
+    if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+        err = readClient->SendRequest(readParams);
+    } else {
+        // SendAutoResubscribeRequest cleans up the params, even on failure.
+        attributePath.release();
+        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+    }
+
     if (err != CHIP_NO_ERROR) {
         dispatch_async(queue, ^{
             reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
@@ -304,6 +376,11 @@ private:
         return;
     }
 
+    if (attributeCacheContainer) {
+        attributeCacheContainer.cppAttributeCache = attributeCache.get();
+        // AttributeCache will be deleted when OnDone is called or an error is encountered as well.
+        callback->AdoptAttributeCache(std::move(attributeCache));
+    }
     // Callback and ReadClient will be deleted when OnDone is called or an error is
     // encountered.
     callback->AdoptReadClient(std::move(readClient));
@@ -322,7 +399,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPSignedIntegerValueTypeKey, kCHIPTypeKey,
+        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPSignedIntegerValueType, kCHIPTypeKey,
                              [NSNumber numberWithLongLong:val], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
@@ -332,7 +409,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV unsigned integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPUnsignedIntegerValueTypeKey, kCHIPTypeKey,
+        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPUnsignedIntegerValueType, kCHIPTypeKey,
                              [NSNumber numberWithUnsignedLongLong:val], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_Boolean: {
@@ -343,27 +420,34 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary
-            dictionaryWithObjectsAndKeys:kCHIPBooleanValueTypeKey, kCHIPTypeKey, [NSNumber numberWithBool:val], kCHIPValueKey, nil];
+            dictionaryWithObjectsAndKeys:kCHIPBooleanValueType, kCHIPTypeKey, [NSNumber numberWithBool:val], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_FloatingPointNumber: {
+        // Try float first
+        float floatValue;
+        CHIP_ERROR err = data->Get(floatValue);
+        if (err == CHIP_NO_ERROR) {
+            return @ { kCHIPTypeKey : kCHIPFloatValueType, kCHIPValueKey : [NSNumber numberWithFloat:floatValue] };
+        }
         double val;
-        CHIP_ERROR err = data->Get(val);
+        err = data->Get(val);
         if (err != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Error(%s): TLV floating point decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPDoubleValueTypeKey, kCHIPTypeKey, [NSNumber numberWithDouble:val],
-                             kCHIPValueKey, nil];
+        return [NSDictionary
+            dictionaryWithObjectsAndKeys:kCHIPDoubleValueType, kCHIPTypeKey, [NSNumber numberWithDouble:val], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_UTF8String: {
+        uint32_t len = data->GetLength();
         const uint8_t * ptr;
         CHIP_ERROR err = data->GetDataPtr(ptr);
         if (err != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPUTF8StringValueTypeKey, kCHIPTypeKey,
-                             [NSString stringWithUTF8String:(const char *) ptr], kCHIPValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPUTF8StringValueType, kCHIPTypeKey,
+                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_ByteString: {
         uint32_t len = data->GetLength();
@@ -373,25 +457,21 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPOctetStringValueTypeKey, kCHIPTypeKey,
+        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPOctetStringValueType, kCHIPTypeKey,
                              [NSData dataWithBytes:ptr length:len], kCHIPValueKey, nil];
     }
     case chip::TLV::kTLVType_Null: {
-        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPNullValueTypeKey, kCHIPTypeKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:kCHIPNullValueType, kCHIPTypeKey, nil];
     }
     case chip::TLV::kTLVType_Structure:
-    case chip::TLV::kTLVType_Array:
-    case chip::TLV::kTLVType_List: {
+    case chip::TLV::kTLVType_Array: {
         NSString * typeName;
         switch (dataTLVType) {
         case chip::TLV::kTLVType_Structure:
-            typeName = kCHIPStructureValueTypeKey;
+            typeName = kCHIPStructureValueType;
             break;
         case chip::TLV::kTLVType_Array:
-            typeName = kCHIPArrayValueTypeKey;
-            break;
-        case chip::TLV::kTLVType_List:
-            typeName = kCHIPListValueTypeKey;
+            typeName = kCHIPArrayValueType;
             break;
         default:
             typeName = @"Unsupported";
@@ -411,8 +491,12 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
                 CHIP_LOG_ERROR("Error when decoding TLV container");
                 return nil;
             }
-            [array addObject:[NSDictionary dictionaryWithObjectsAndKeys:value, kCHIPValueKey,
-                                           [NSNumber numberWithUnsignedLongLong:(unsigned long long) tag.mVal], kCHIPTagKey, nil]];
+            NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
+            [arrayElement setObject:value forKey:kCHIPDataKey];
+            if (dataTLVType == chip::TLV::kTLVType_Structure) {
+                [arrayElement setObject:[NSNumber numberWithUnsignedLong:TagNumFromTag(tag)] forKey:kCHIPContextTagKey];
+            }
+            [array addObject:arrayElement];
         }
         if (err != CHIP_END_OF_TLV) {
             CHIP_LOG_ERROR("Error(%s): TLV container decoding failed", chip::ErrorStr(err));
@@ -443,59 +527,59 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
         CHIP_LOG_ERROR("Error: Object to encode is corrupt");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if ([typeName isEqualToString:kCHIPSignedIntegerValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPSignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt signed integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value intValue]);
+        return writer.Put(tag, [value longLongValue]);
     }
-    if ([typeName isEqualToString:kCHIPUnsignedIntegerValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPUnsignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt unsigned integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value unsignedIntValue]);
+        return writer.Put(tag, [value unsignedLongLongValue]);
     }
-    if ([typeName isEqualToString:kCHIPBooleanValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPBooleanValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt boolean type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.Put(tag, [value unsignedIntValue] ? true : false);
+        return writer.Put(tag, static_cast<bool>([value boolValue]));
     }
-    if ([typeName isEqualToString:kCHIPFloatValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPFloatValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt float type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value floatValue]);
     }
-    if ([typeName isEqualToString:kCHIPDoubleValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPDoubleValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt double type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value doubleValue]);
     }
-    if ([typeName isEqualToString:kCHIPNullValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPNullValueType]) {
         return writer.PutNull(tag);
     }
-    if ([typeName isEqualToString:kCHIPUTF8StringValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPUTF8StringValueType]) {
         if (![value isKindOfClass:[NSString class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt UTF8 string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.PutString(tag, [value cStringUsingEncoding:NSUTF8StringEncoding]);
     }
-    if ([typeName isEqualToString:kCHIPOctetStringValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPOctetStringValueType]) {
         if (![value isKindOfClass:[NSData class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt octet string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, chip::ByteSpan(static_cast<const uint8_t *>([value bytes]), [value length]));
     }
-    if ([typeName isEqualToString:kCHIPStructureValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPStructureValueType]) {
         if (![value isKindOfClass:[NSArray class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt structure type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -507,8 +591,8 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 CHIP_LOG_ERROR("Error: Structure element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            NSNumber * elementTag = element[kCHIPTagKey];
-            id elementValue = element[kCHIPValueKey];
+            NSNumber * elementTag = element[kCHIPContextTagKey];
+            id elementValue = element[kCHIPDataKey];
             if (!elementTag || !elementValue) {
                 CHIP_LOG_ERROR("Error: Structure element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -518,7 +602,7 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
-    if ([typeName isEqualToString:kCHIPArrayValueTypeKey]) {
+    if ([typeName isEqualToString:kCHIPArrayValueType]) {
         if (![value isKindOfClass:[NSArray class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt array type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -530,7 +614,7 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 CHIP_LOG_ERROR("Error: Array element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            id elementValue = element[kCHIPValueKey];
+            id elementValue = element[kCHIPDataKey];
             if (!elementValue) {
                 CHIP_LOG_ERROR("Error: Array element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -540,36 +624,12 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
-    if ([typeName isEqualToString:kCHIPListValueTypeKey]) {
-        if (![value isKindOfClass:[NSArray class]]) {
-            CHIP_LOG_ERROR("Error: Object to encode has corrupt list type: %@", [value class]);
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_List, outer));
-        for (id element in value) {
-            if (![element isKindOfClass:[NSDictionary class]]) {
-                CHIP_LOG_ERROR("Error: List element to encode has corrupt type: %@", [element class]);
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-            NSNumber * elementTag = element[kCHIPTagKey];
-            id elementValue = element[kCHIPValueKey];
-            if (!elementValue) {
-                CHIP_LOG_ERROR("Error: Array element to encode has corrupt value: %@", element);
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-            ReturnErrorOnFailure(EncodeTLVFromObject(elementValue, writer,
-                elementTag ? chip::TLV::ContextTag((uint8_t)[elementTag unsignedCharValue]) : chip::TLV::AnonymousTag()));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
     CHIP_LOG_ERROR("Error: Unsupported type to encode: %@", typeName);
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-// Callback type to pass attribute value as an NSObject
-typedef void (*NSObjectAttributeCallback)(void * context, id value);
+// Callback type to pass data value as an NSObject
+typedef void (*NSObjectDataValueCallback)(void * context, id value);
 typedef void (*CHIPErrorCallback)(void * context, CHIP_ERROR error);
 
 // Rename to be generic for decode and encode
@@ -608,12 +668,12 @@ private:
     id _Nullable decodedObj;
 };
 
-// Callback bridge for NSObjectAttributeCallback
-class NSObjectAttributeCallbackBridge : public CHIPCallbackBridge<NSObjectAttributeCallback> {
+// Callback bridge for NSObjectDataValueCallback
+class NSObjectDataValueCallbackBridge : public CHIPCallbackBridge<NSObjectDataValueCallback> {
 public:
-    NSObjectAttributeCallbackBridge(
+    NSObjectDataValueCallbackBridge(
         dispatch_queue_t queue, CHIPDeviceResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
-        : CHIPCallbackBridge<NSObjectAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
+        : CHIPCallbackBridge<NSObjectDataValueCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
 
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
 };
@@ -683,15 +743,7 @@ private:
         }
     }
 
-    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
-    {
-        VerifyOrDie(
-            aReadPrepareParams.mAttributePathParamsListSize == 1 && aReadPrepareParams.mpAttributePathParamsList != nullptr);
-        chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
-
-        VerifyOrDie(aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr);
-        chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
-    }
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override {}
 
     ClusterId mClusterId;
     AttributeId mAttributeId;
@@ -703,15 +755,16 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                        attributeId:(NSNumber *)attributeId
+                             params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
-    new NSObjectAttributeCallbackBridge(
+    new NSObjectDataValueCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectAttributeCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<CHIPErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -719,43 +772,45 @@ private:
             auto resultArray = [[NSMutableArray alloc] init];
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](
-                                   const app::ConcreteAttributePath & attribPath, const NSObjectData & aData) {
-                [resultArray
-                    addObject:[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:attribPath.mEndpointId],
-                                                    kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:attribPath.mClusterId],
-                                                    kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:attribPath.mAttributeId],
-                                                    kCHIPAttributeIdKey, aData.GetDecodedObject(), kCHIPDataKey,
-                                                    [NSNumber numberWithUnsignedInt:0], kCHIPStatusKey, nil]];
-                if ([resultSuccess count] == 0) {
-                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                }
-            };
+            auto onSuccessCb
+                = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath, const NSObjectData & aData) {
+                      [resultArray addObject:@ {
+                          kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:attribPath],
+                          kCHIPDataKey : aData.GetDecodedObject()
+                      }];
+                      if ([resultSuccess count] == 0) {
+                          [resultSuccess addObject:[NSNumber numberWithBool:YES]];
+                      }
+                  };
 
             auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
                 if (attribPath) {
-                    [resultArray addObject:[[NSDictionary alloc]
-                                               initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:attribPath->mEndpointId],
-                                               kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:attribPath->mClusterId],
-                                               kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:attribPath->mAttributeId],
-                                               kCHIPAttributeIdKey, [NSNumber numberWithUnsignedInteger:aError.AsInteger()],
-                                               kCHIPStatusKey, nil]];
+                    [resultArray addObject:@ {
+                        kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:*attribPath],
+                        kCHIPErrorKey : [CHIPError errorForCHIPErrorCode:aError]
+                    }];
                 } else if ([resultFailure count] == 0) {
-                    [resultFailure addObject:[NSNumber numberWithUnsignedInteger:aError.AsInteger()]];
+                    [resultFailure addObject:[CHIPError errorForCHIPErrorCode:aError]];
                 }
             };
 
-            auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
-            auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
-            auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
-
-            app::AttributePathParams attributePath(chipEndpointId, chipClusterId, chipAttributeId);
+            app::AttributePathParams attributePath;
+            if (endpointId) {
+                attributePath.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            }
+            if (clusterId) {
+                attributePath.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+            }
+            if (attributeId) {
+                attributePath.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+            }
             app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
             CHIP_ERROR err = CHIP_NO_ERROR;
 
             chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
+            readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<NSObjectData> * callback) {
@@ -763,12 +818,9 @@ private:
                     // Failure
                     if (failureCb) {
                         if ([resultFailure count] > 0) {
-                            failureCb(
-                                context, CHIP_ERROR(static_cast<CHIP_ERROR::StorageType>([resultFailure[0] unsignedIntegerValue])));
+                            failureCb(context, [CHIPError errorToCHIPErrorCode:resultFailure[0]]);
                         } else if ([resultArray count] > 0) {
-                            failureCb(context,
-                                CHIP_ERROR(
-                                    static_cast<CHIP_ERROR::StorageType>([resultArray[0][kCHIPStatusKey] unsignedIntegerValue])));
+                            failureCb(context, [CHIPError errorToCHIPErrorCode:resultArray[0][kCHIPErrorKey]]);
                         } else {
                             failureCb(context, CHIP_ERROR_READ_FAILED);
                         }
@@ -783,7 +835,7 @@ private:
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-                chipClusterId, chipAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
+                attributePath.mClusterId, attributePath.mAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
@@ -807,16 +859,17 @@ private:
         });
 }
 
-- (void)writeAttributeWithEndpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(CHIPDeviceResponseHandler)completion
 {
-    new NSObjectAttributeCallbackBridge(
+    new NSObjectDataValueCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectAttributeCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<CHIPErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -824,60 +877,52 @@ private:
             auto resultArray = [[NSMutableArray alloc] init];
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteAttributePath & commandPath) {
-                [resultArray
-                    addObject:[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:commandPath.mEndpointId],
-                                                    kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:commandPath.mClusterId],
-                                                    kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:commandPath.mAttributeId],
-                                                    kCHIPAttributeIdKey, [NSNumber numberWithUnsignedInt:0], kCHIPStatusKey, nil]];
+            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath) {
+                [resultArray addObject:@ { kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:attribPath] }];
                 if ([resultSuccess count] == 0) {
                     [resultSuccess addObject:[NSNumber numberWithBool:YES]];
                 }
             };
 
-            auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * commandPath, CHIP_ERROR aError) {
-                if (commandPath) {
-                    [resultArray addObject:[[NSDictionary alloc]
-                                               initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:commandPath->mEndpointId],
-                                               kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:commandPath->mClusterId],
-                                               kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:commandPath->mAttributeId],
-                                               kCHIPAttributeIdKey, [NSNumber numberWithUnsignedInteger:aError.AsInteger()],
-                                               kCHIPStatusKey, nil]];
+            auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
+                if (attribPath) {
+                    [resultArray addObject:@ {
+                        kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:*attribPath],
+                        kCHIPErrorKey : [CHIPError errorForCHIPErrorCode:aError],
+                    }];
                 } else {
                     if ([resultFailure count] == 0) {
-                        [resultFailure addObject:[NSNumber numberWithUnsignedInteger:aError.AsInteger()]];
+                        [resultFailure addObject:[CHIPError errorForCHIPErrorCode:aError]];
                     }
                 }
             };
 
-            auto onDoneCb = [context, successCb, failureCb, resultArray, resultSuccess, resultFailure](
-                                app::WriteClient * pWriteClient) {
-                if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
-                    // Failure
-                    if (failureCb) {
-                        if ([resultFailure count] > 0) {
-                            failureCb(
-                                context, CHIP_ERROR(static_cast<CHIP_ERROR::StorageType>([resultFailure[0] unsignedIntegerValue])));
-                        } else if ([resultArray count] > 0) {
-                            failureCb(context,
-                                CHIP_ERROR(
-                                    static_cast<CHIP_ERROR::StorageType>([resultArray[0][kCHIPStatusKey] unsignedIntegerValue])));
-                        } else {
-                            failureCb(context, CHIP_ERROR_WRITE_FAILED);
-                        }
-                    }
-                } else {
-                    // Success
-                    if (successCb) {
-                        successCb(context, resultArray);
-                    }
-                }
-            };
+            auto onDoneCb
+                = [context, successCb, failureCb, resultArray, resultSuccess, resultFailure](app::WriteClient * pWriteClient) {
+                      if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
+                          // Failure
+                          if (failureCb) {
+                              if ([resultFailure count] > 0) {
+                                  failureCb(context, [CHIPError errorToCHIPErrorCode:resultFailure[0]]);
+                              } else if ([resultArray count] > 0) {
+                                  failureCb(context, [CHIPError errorToCHIPErrorCode:resultArray[0][kCHIPErrorKey]]);
+                              } else {
+                                  failureCb(context, CHIP_ERROR_WRITE_FAILED);
+                              }
+                          }
+                      } else {
+                          // Success
+                          if (successCb) {
+                              successCb(context, resultArray);
+                          }
+                      }
+                  };
 
             return chip::Controller::WriteAttribute<NSObjectData>([self internalDevice]->GetSecureSession().Value(),
-                static_cast<chip::EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId),
-                static_cast<chip::AttributeId>(attributeId), NSObjectData(value), onSuccessCb, onFailureCb, NullOptional, onDoneCb,
-                NullOptional);
+                static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
+                static_cast<chip::AttributeId>([attributeId unsignedLongValue]), NSObjectData(value), onSuccessCb, onFailureCb,
+                (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]), onDoneCb, NullOptional);
         });
 }
 
@@ -946,16 +991,17 @@ exit:
     }
 }
 
-- (void)invokeCommandWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                       commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
-    new NSObjectAttributeCallbackBridge(
+    new NSObjectDataValueCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectAttributeCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<CHIPErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -966,18 +1012,12 @@ exit:
             auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteCommandPath & commandPath,
                                    const app::StatusIB & status, const NSObjectData & responseData) {
                 if (responseData.GetDecodedObject()) {
-                    [resultArray addObject:[[NSDictionary alloc]
-                                               initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:commandPath.mEndpointId],
-                                               kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:commandPath.mClusterId],
-                                               kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:commandPath.mCommandId],
-                                               kCHIPCommandIdKey, [NSNumber numberWithUnsignedInt:0], kCHIPStatusKey,
-                                               responseData.GetDecodedObject(), kCHIPDataKey, nil]];
+                    [resultArray addObject:@ {
+                        kCHIPCommandPathKey : [[CHIPCommandPath alloc] initWithPath:commandPath],
+                        kCHIPDataKey : responseData.GetDecodedObject()
+                    }];
                 } else {
-                    [resultArray addObject:[[NSDictionary alloc]
-                                               initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:commandPath.mEndpointId],
-                                               kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:commandPath.mClusterId],
-                                               kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:commandPath.mCommandId],
-                                               kCHIPCommandIdKey, [NSNumber numberWithUnsignedInt:0], kCHIPStatusKey, nil]];
+                    [resultArray addObject:@ { kCHIPCommandPathKey : [[CHIPCommandPath alloc] initWithPath:commandPath] }];
                 }
                 if ([resultSuccess count] == 0) {
                     [resultSuccess addObject:[NSNumber numberWithBool:YES]];
@@ -986,12 +1026,13 @@ exit:
 
             auto onFailureCb = [resultFailure](CHIP_ERROR aError) {
                 if ([resultFailure count] == 0) {
-                    [resultFailure addObject:[NSNumber numberWithUnsignedInteger:aError.AsInteger()]];
+                    [resultFailure addObject:[CHIPError errorForCHIPErrorCode:aError]];
                 }
             };
 
-            app::CommandPathParams commandPath = { (chip::EndpointId) endpointId, 0, (chip::ClusterId) clusterId,
-                (chip::CommandId) commandId, (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([endpointId unsignedShortValue]), 0,
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
+                static_cast<chip::CommandId>([commandId unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
 
             auto decoder = chip::Platform::MakeUnique<NSObjectCommandCallback>(
                 commandPath.mClusterId, commandPath.mCommandId, onSuccessCb, onFailureCb);
@@ -1004,8 +1045,7 @@ exit:
                     // Failure
                     if (failureCb) {
                         if ([resultFailure count] > 0) {
-                            failureCb(
-                                context, CHIP_ERROR(static_cast<CHIP_ERROR::StorageType>([resultFailure[0] unsignedIntegerValue])));
+                            failureCb(context, [CHIPError errorToCHIPErrorCode:resultFailure[0]]);
                         } else {
                             failureCb(context, CHIP_ERROR_WRITE_FAILED);
                         }
@@ -1026,7 +1066,8 @@ exit:
                 = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), [self internalDevice]->GetExchangeManager(), false);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, NSObjectData(commandFields), chip::NullOptional));
+            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, NSObjectData(commandFields),
+                (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
             ReturnErrorOnFailure(commandSender->SendCommandRequest([self internalDevice]->GetSecureSession().Value()));
 
             decoder.release();
@@ -1035,14 +1076,14 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(CHIPSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
-                           reportHandler:(void (^)(NSDictionary<NSString *, id> * _Nullable value,
-                                             NSError * _Nullable error))reportHandler
+                           reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
 {
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
@@ -1050,12 +1091,10 @@ exit:
             id valueObject = data.GetDecodedObject();
             app::ConcreteAttributePath pathCopy = attribPath;
             dispatch_async(clientQueue, ^{
-                reportHandler(@ {
-                    kCHIPEndpointIdKey : [NSNumber numberWithUnsignedShort:pathCopy.mEndpointId],
-                    kCHIPClusterIdKey : [NSNumber numberWithUnsignedInt:pathCopy.mClusterId],
-                    kCHIPAttributeIdKey : [NSNumber numberWithUnsignedInt:pathCopy.mAttributeId],
-                    kCHIPValueKey : valueObject
-                },
+                reportHandler(
+                    @[
+                        @ { kCHIPAttributePathKey : [[CHIPAttributePath alloc] initWithPath:pathCopy], kCHIPDataKey : valueObject }
+                    ],
                     nil);
             });
         };
@@ -1086,13 +1125,18 @@ exit:
             }
         };
 
-        auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
-        auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
-        auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
-
         CHIPReadClientContainer * container = [[CHIPReadClientContainer alloc] init];
         container.deviceId = self.cppDevice->GetDeviceId();
-        container.pathParams = new app::AttributePathParams(chipEndpointId, chipClusterId, chipAttributeId);
+        container.pathParams = Platform::New<app::AttributePathParams>();
+        if (endpointId) {
+            container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+        }
+        if (clusterId) {
+            container.pathParams->mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+        }
+        if (attributeId) {
+            container.pathParams->mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+        }
 
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1100,6 +1144,11 @@ exit:
         chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
         readParams.mpAttributePathParamsList = container.pathParams;
         readParams.mAttributePathParamsListSize = 1;
+        readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
+        readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
+        readParams.mIsFabricFiltered = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
+        readParams.mKeepSubscriptions
+            = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
 
         auto onDone = [container](BufferedReadAttributeCallback<NSObjectData> * callback) {
             chip::Platform::Delete(callback);
@@ -1107,9 +1156,9 @@ exit:
         };
 
         auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-            chipClusterId, chipAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
+            container.pathParams->mClusterId, container.pathParams->mAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
 
-        auto readClient = new app::ReadClient(engine, [self internalDevice]->GetExchangeManager(),
+        auto readClient = Platform::New<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
             callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
         err = readClient->SendAutoResubscribeRequest(std::move(readParams));
@@ -1120,7 +1169,7 @@ exit:
                     reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
                 });
             }
-            delete readClient;
+            Platform::Delete(readClient);
             return;
         }
 
@@ -1137,6 +1186,15 @@ exit:
     CHIP_LOG_DEBUG("Unexpected call to deregister report handlers");
     PurgeReadClientContainers(self.cppDevice->GetDeviceId(), clientQueue, completion);
 }
+
+#ifdef DEBUG
+// This method is for unit testing only
+- (void)failSubscribers:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
+{
+    CHIP_LOG_DEBUG("Causing failure in subscribers on purpose");
+    CauseReadClientFailure(self.cppDevice->GetDeviceId(), clientQueue, completion);
+}
+#endif
 
 // The following method is for unit testing purpose only
 + (id)CHIPEncodeAndDecodeNSObject:(id)object
@@ -1189,6 +1247,35 @@ exit:
         _attribute = @(path.mAttributeId);
     }
     return self;
+}
+
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId attributeId:(NSNumber *)attributeId
+{
+    ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
+        static_cast<chip::AttributeId>([attributeId unsignedLongValue]));
+
+    return [[CHIPAttributePath alloc] initWithPath:path];
+}
+@end
+
+@implementation CHIPCommandPath
+- (instancetype)initWithPath:(const ConcreteCommandPath &)path
+{
+    if (self = [super init]) {
+        _endpoint = @(path.mEndpointId);
+        _cluster = @(path.mClusterId);
+        _command = @(path.mCommandId);
+    }
+    return self;
+}
+
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId
+{
+    ConcreteCommandPath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterId unsignedLongValue]), static_cast<chip::CommandId>([commandId unsignedLongValue]));
+
+    return [[CHIPCommandPath alloc] initWithPath:path];
 }
 @end
 
@@ -1260,9 +1347,34 @@ void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError e
 
 void SubscriptionCallback::OnDone()
 {
+    if (mOnDoneHandler) {
+        mOnDoneHandler();
+        mOnDoneHandler = nil;
+    }
     if (!mHaveQueuedDeletion) {
         delete this;
         return; // Make sure we touch nothing else.
+    }
+}
+
+void SubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams)
+{
+    VerifyOrDie((aReadPrepareParams.mAttributePathParamsListSize == 0 && aReadPrepareParams.mpAttributePathParamsList == nullptr)
+        || (aReadPrepareParams.mAttributePathParamsListSize == 1 && aReadPrepareParams.mpAttributePathParamsList != nullptr));
+    if (aReadPrepareParams.mpAttributePathParamsList) {
+        delete aReadPrepareParams.mpAttributePathParamsList;
+    }
+
+    VerifyOrDie((aReadPrepareParams.mDataVersionFilterListSize == 0 && aReadPrepareParams.mpDataVersionFilterList == nullptr)
+        || (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr));
+    if (aReadPrepareParams.mpDataVersionFilterList != nullptr) {
+        delete aReadPrepareParams.mpDataVersionFilterList;
+    }
+
+    VerifyOrDie((aReadPrepareParams.mEventPathParamsListSize == 0 && aReadPrepareParams.mpEventPathParamsList == nullptr)
+        || (aReadPrepareParams.mEventPathParamsListSize == 1 && aReadPrepareParams.mpEventPathParamsList != nullptr));
+    if (aReadPrepareParams.mpEventPathParamsList) {
+        delete aReadPrepareParams.mpEventPathParamsList;
     }
 }
 
@@ -1270,8 +1382,6 @@ void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
         dispatch_async(mQueue, mSubscriptionEstablishedHandler);
-        // Don't need it anymore.
-        mSubscriptionEstablishedHandler = nil;
     }
 }
 
@@ -1294,8 +1404,13 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
     __block ReportCallback callback = mReportCallback;
     __block auto * myself = this;
     mReportCallback = nil;
+    __auto_type onDoneHandler = mOnDoneHandler;
+    mOnDoneHandler = nil;
     dispatch_async(mQueue, ^{
         callback(nil, err);
+        if (onDoneHandler) {
+            onDoneHandler();
+        }
 
         // Deletion of our ReadClient (and hence of ourselves, since the
         // ReadClient has a pointer to us) needs to happen on the Matter work

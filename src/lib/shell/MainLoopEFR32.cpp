@@ -34,58 +34,52 @@ namespace {
 
 constexpr const char kShellPrompt[] = "matterCli > ";
 
+// max > 1
 void ReadLine(char * buffer, size_t max)
 {
-    ssize_t read = 0;
-    bool done    = false;
-    char * inptr = buffer;
+    size_t line_sz = 0;
 
-    // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < static_cast<int>(max)) && !done)
+    // Read in characters until we get a line ending or EOT.
+    for (bool done = false; !done;)
     {
-        chip::WaitForShellActivity();
-        if (read == 0)
+        // Stop reading if we've run out of space in the buffer (still need to null-terminate).
+        if (line_sz >= max - 1u)
         {
-            read = streamer_read(streamer_get(), inptr, 1);
+            buffer[max - 1] = '\0';
+            break;
         }
 
-        // Process any characters we just read in.
-        while (read > 0)
+        chip::WaitForShellActivity();
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
         {
-            switch (*inptr)
-            {
-            case '\r':
-            case '\n':
-                streamer_printf(streamer_get(), "\r\n");
-                *inptr = 0; // null terminate
-                done   = true;
-                break;
-            case 0x7F:
-                // delete backspace character + 1 more
-                inptr -= 2;
-                if (inptr >= buffer - 1)
-                {
-                    streamer_printf(streamer_get(), "\b \b");
-                }
-                else
-                {
-                    inptr = buffer - 1;
-                }
-                break;
-            default:
-                if (isprint(static_cast<int>(*inptr)) || *inptr == '\t')
-                {
-                    streamer_printf(streamer_get(), "%c", *inptr);
-                }
-                else
-                {
-                    inptr--;
-                }
-                break;
-            }
+            continue;
+        }
 
-            inptr++;
-            read--;
+        // Process character we just read.
+        switch (buffer[line_sz])
+        {
+        case '\r':
+        case '\n':
+            streamer_printf(streamer_get(), "\r\n");
+            buffer[line_sz] = '\0';
+            line_sz++;
+            done = true;
+            break;
+        case 0x7F:
+            // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
+            if (line_sz >= 1u)
+            {
+                streamer_printf(streamer_get(), "\b \b");
+                line_sz--;
+            }
+            break;
+        default:
+            if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
+            {
+                streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+                line_sz++;
+            }
+            break;
         }
     }
 }

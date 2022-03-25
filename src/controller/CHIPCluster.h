@@ -56,7 +56,6 @@ public:
     virtual ~ClusterBase() {}
 
     CHIP_ERROR Associate(DeviceProxy * device, EndpointId endpoint);
-    CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
     // Temporary function to set command timeout before we move over to InvokeCommand
@@ -141,21 +140,54 @@ public:
             }
         };
 
-        if (mGroupId.HasValue())
-        {
-            VerifyOrReturnError(mDevice->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-            Transport::OutgoingGroupSession groupSession(mGroupId.Value(), mDevice->GetSecureSession().Value()->GetFabricIndex(),
-                                                         mDevice->GetDeviceId());
-            return chip::Controller::WriteAttribute<AttrType>(SessionHandle(groupSession), mEndpoint, clusterId, attributeId,
-                                                              requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
-                                                              aDataVersion);
-        }
-        else
-        {
-            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
-                                                              attributeId, requestData, onSuccessCb, onFailureCb,
-                                                              aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
-        }
+        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                          requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
+                                                          aDataVersion);
+    }
+
+    template <typename AttrType>
+    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, NodeId sourceNodeId, const AttrType & requestData,
+                              void * context, ClusterId clusterId, AttributeId attributeId, WriteResponseSuccessCallback successCb,
+                              WriteResponseFailureCallback failureCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                              WriteResponseDoneCallback doneCb = nullptr, const Optional<DataVersion> & aDataVersion = NullOptional)
+    {
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & aPath) {
+            if (successCb != nullptr)
+            {
+                successCb(context);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, aError);
+            }
+        };
+
+        auto onDoneCb = [context, doneCb](app::WriteClient * pWriteClient) {
+            if (doneCb != nullptr)
+            {
+                doneCb(context);
+            }
+        };
+
+        Transport::OutgoingGroupSession groupSession(groupId, fabricIndex, sourceNodeId);
+        return chip::Controller::WriteAttribute<AttrType>(SessionHandle(groupSession), 0 /*Unused for Group*/, clusterId,
+                                                          attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs,
+                                                          onDoneCb, aDataVersion);
+    }
+
+    template <typename AttributeInfo>
+    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, NodeId sourceNodeId,
+                              const typename AttributeInfo::Type & requestData, void * context,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+                              WriteResponseDoneCallback doneCb = nullptr, const Optional<DataVersion> & aDataVersion = NullOptional,
+                              const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional)
+    {
+        return WriteAttribute(groupId, fabricIndex, sourceNodeId, requestData, context, AttributeInfo::GetClusterId(),
+                              AttributeInfo::GetAttributeId(), successCb, failureCb, aTimedWriteTimeoutMs, doneCb, aDataVersion);
     }
 
     template <typename AttributeInfo>
@@ -347,7 +379,6 @@ protected:
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
-    Optional<GroupId> mGroupId;
     Optional<System::Clock::Timeout> mTimeout;
 };
 

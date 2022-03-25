@@ -21,20 +21,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPAttributeCacheContainer : NSObject
+@class CHIPSubscribeParams;
 
-/**
- * Subscribes to all attributes to update attribute cache.
- *
- * @param deviceController   device controller to retrieve connected device from
- * @param deviceId  device identifier of the device to cache attributes of
- * @param clientQueue  client queue to dispatch the completion handler through
- * @param completion  completion handler
- */
-- (void)subscribeWithDeviceController:(CHIPDeviceController *)deviceController
-                             deviceId:(uint64_t)deviceId
-                          clientQueue:(dispatch_queue_t)clientQueue
-                           completion:(void (^)(NSError * _Nullable error))completion;
+@interface CHIPAttributeCacheContainer : NSObject
 
 /**
  * Reads an attribute with specific attribute path
@@ -47,9 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
  *                   "values" received by the block will have the same format of object as the one received by completion block
  *                   of CHIPDevice readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion method.
  */
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
                                         NSError * _Nullable error))completion;

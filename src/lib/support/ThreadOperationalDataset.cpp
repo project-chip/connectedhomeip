@@ -498,8 +498,7 @@ const ThreadTLV * OperationalDataset::Locate(uint8_t aType) const
     {
         if (tlv->GetType() == aType)
             break;
-        else
-            tlv = tlv->GetNext();
+        tlv = tlv->GetNext();
     }
 
     assert(tlv < reinterpret_cast<const ThreadTLV *>(&mData[sizeof(mData)]));

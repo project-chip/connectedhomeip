@@ -28,41 +28,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue #10816 Disabled as values needs to be stored for comparison
     - label: "Reads Occupancy attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "occupancy"
       PICS: A_OCCUPANCY
       response:
           value: 0
-
-    - label: "Reads Occupancy attribute from DUT"
-      command: "readAttribute"
-      attribute: "occupancy"
-      PICS: A_OCCUPANCY
-      response:
-          constraints:
-              type: map8
+          saveAs: OccupancyValue
 
     #Issue #10815 Disabled as UI prompts required for user action
     - label: "Operate on DUT to change the occupancy status"
       disabled: true
       PICS: MANUAL_OCCUPANCY_CHANGE
 
-    #Issue #10816 Disabled as values needs to be compared with the value read in step 2
     - label: "Reads back Occupancy attribute from DUT after few seconds"
-      disabled: true
-      command: "readAttribute"
-      attribute: "occupancy"
-      PICS: A_OCCUPANCY
-      response:
-          value: 0
-
-    - label: "Reads Occupancy attribute from DUT"
       command: "readAttribute"
       attribute: "occupancy"
       PICS: A_OCCUPANCY
       response:
           constraints:
-              type: map8
+              notvalue: OccupancyValue

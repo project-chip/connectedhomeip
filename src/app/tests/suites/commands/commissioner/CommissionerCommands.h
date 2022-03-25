@@ -25,12 +25,12 @@ class CommissionerCommands : public chip::Controller::DevicePairingDelegate
 {
 public:
     CommissionerCommands(){};
-    virtual ~CommissionerCommands(){};
+    ~CommissionerCommands() override{};
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)             = 0;
     virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner() = 0;
 
-    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload);
+    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload, CHIP_ERROR expectedStatus = CHIP_NO_ERROR);
     CHIP_ERROR PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload);
     CHIP_ERROR Unpair(chip::NodeId nodeId);
 
@@ -39,4 +39,7 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+
+private:
+    CHIP_ERROR mExpectedStatus = CHIP_NO_ERROR;
 };

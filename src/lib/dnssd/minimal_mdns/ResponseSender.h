@@ -93,6 +93,7 @@ public:
     ResponseSender(ServerBase * server) : mServer(server) {}
 
     CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
+    CHIP_ERROR RemoveQueryResponder(QueryResponderBase * queryResponder);
 
     /// Send back the response to a particular query
     CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource);

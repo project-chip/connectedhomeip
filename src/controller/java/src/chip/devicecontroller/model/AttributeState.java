@@ -17,14 +17,26 @@
  */
 package chip.devicecontroller.model;
 
-/** Represents the reported value of an attribute in object form AND TLV. */
+import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/** Represents the reported value of an attribute in object form, TLV and JSON. */
 public final class AttributeState {
+  private static final String TAG = "AttributeState";
+
   private Object valueObject;
   private byte[] tlv;
+  private JSONObject json;
 
-  public AttributeState(Object valueObject, byte[] tlv) {
+  public AttributeState(Object valueObject, byte[] tlv, String jsonString) {
     this.valueObject = valueObject;
     this.tlv = tlv;
+    try {
+      this.json = new JSONObject(jsonString);
+    } catch (JSONException ex) {
+      Log.e(TAG, "Error parsing JSON string", ex);
+    }
   }
 
   public Object getValue() {
@@ -36,5 +48,9 @@ public final class AttributeState {
    */
   public byte[] getTlv() {
     return tlv;
+  }
+
+  public JSONObject getJson() {
+    return json;
   }
 }

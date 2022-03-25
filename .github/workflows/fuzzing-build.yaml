@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.56
+            image: connectedhomeip/chip-build:0.5.58
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -124,7 +124,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-all-clusters-no-ble-asan-libfuzzer \
+                        --target darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "

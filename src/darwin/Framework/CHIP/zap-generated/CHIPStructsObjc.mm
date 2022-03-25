@@ -105,8 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _node = nil;
 
         _group = nil;
@@ -114,6 +112,8 @@ NS_ASSUME_NONNULL_BEGIN
         _endpoint = nil;
 
         _cluster = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -139,8 +139,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _privilege = @(0);
 
         _authMode = @(0);
@@ -148,6 +146,8 @@ NS_ASSUME_NONNULL_BEGIN
         _subjects = nil;
 
         _targets = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -158,9 +158,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _data = [NSData data];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -504,8 +504,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _rootPublicKey = [NSData data];
 
         _vendorId = @(0);
@@ -515,6 +513,8 @@ NS_ASSUME_NONNULL_BEGIN
         _nodeId = @(0);
 
         _label = @"";
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -525,11 +525,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _noc = [NSData data];
 
         _icac = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -540,13 +540,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _groupId = @(0);
 
         _endpoints = [NSArray array];
 
         _groupName = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -557,11 +557,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _groupId = @(0);
 
         _groupKeySetID = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -925,8 +925,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _fabricSensitiveInt8u = @(0);
 
         _optionalFabricSensitiveInt8u = nil;
@@ -940,6 +938,8 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
 
         _fabricSensitiveInt8uList = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }

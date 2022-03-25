@@ -24,6 +24,7 @@
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <lib/support/Variant.h>
 #include <list>

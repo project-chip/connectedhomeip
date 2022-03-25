@@ -27,6 +27,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <trace/trace.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -84,9 +85,8 @@ CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(mpBaseDriver->Init());
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
@@ -239,9 +239,37 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
+void Instance::OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError,
+                                        Optional<ByteSpan> aNetworkId, Optional<int32_t> aConnectStatus)
+{
+    if (aNetworkId.HasValue() && aNetworkId.Value().size() > kMaxNetworkIDLen)
+    {
+        ChipLogError(DeviceLayer, "Invalid network id received when calling OnNetworkingStatusChange");
+        return;
+    }
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(aCommissioningError));
+    if (aNetworkId.HasValue())
+    {
+        memcpy(mLastNetworkID, aNetworkId.Value().data(), aNetworkId.Value().size());
+        mLastNetworkIDLen = static_cast<uint8_t>(aNetworkId.Value().size());
+    }
+    else
+    {
+        mLastNetworkIDLen = 0;
+    }
+    if (aConnectStatus.HasValue())
+    {
+        mLastConnectErrorValue.SetNonNull(aConnectStatus.Value());
+    }
+    else
+    {
+        mLastConnectErrorValue.SetNull();
+    }
+}
+
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-
+    MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
         mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
@@ -260,6 +288,7 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
 
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials));
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -267,6 +296,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset));
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -274,6 +304,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID));
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -281,6 +312,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
@@ -296,6 +328,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
+    MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex));
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -321,7 +354,15 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
-    mLastConnectErrorValue.SetNonNull(interfaceStatus);
+
+    if (commissioningError == Status::kSuccess)
+    {
+        mLastConnectErrorValue.SetNull();
+    }
+    else
+    {
+        mLastConnectErrorValue.SetNonNull(interfaceStatus);
+    }
 
     if (commissioningError == Status::kSuccess)
     {
@@ -447,27 +488,34 @@ exit:
     }
 }
 
-void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     Instance * this_ = reinterpret_cast<Instance *>(arg);
-    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-    this_->OnCommissioningComplete(event->CommissioningComplete.Status);
+
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        this_->OnCommissioningComplete();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        this_->OnFailSafeTimerExpired();
+    }
 }
 
-void Instance::OnCommissioningComplete(CHIP_ERROR err)
+void Instance::OnCommissioningComplete()
 {
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
-        mpWirelessDriver->CommitConfiguration();
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
-        mpWirelessDriver->RevertConfiguration();
-    }
+    ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
+    mpWirelessDriver->CommitConfiguration();
+}
+
+void Instance::OnFailSafeTimerExpired()
+{
+    VerifyOrReturn(mpWirelessDriver != nullptr);
+
+    ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
+    mpWirelessDriver->RevertConfiguration();
 }
 
 bool NullNetworkDriver::GetEnabled()

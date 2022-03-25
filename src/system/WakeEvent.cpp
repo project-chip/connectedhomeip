@@ -91,7 +91,7 @@ void WakeEvent::Close(LayerSockets & systemLayer)
     mWriteFD = -1;
 }
 
-void WakeEvent::Confirm()
+void WakeEvent::Confirm() const
 {
     uint8_t buffer[128];
     ssize_t res;
@@ -107,7 +107,7 @@ void WakeEvent::Confirm()
     } while (res == sizeof(buffer));
 }
 
-CHIP_ERROR WakeEvent::Notify()
+CHIP_ERROR WakeEvent::Notify() const
 {
     char byte = 1;
 
@@ -143,7 +143,7 @@ void WakeEvent::Close(LayerSockets & systemLayer)
     mReadFD = -1;
 }
 
-void WakeEvent::Confirm()
+void WakeEvent::Confirm() const
 {
     uint64_t value;
 
@@ -153,7 +153,7 @@ void WakeEvent::Confirm()
     }
 }
 
-CHIP_ERROR WakeEvent::Notify()
+CHIP_ERROR WakeEvent::Notify() const
 {
     uint64_t value = 1;
 

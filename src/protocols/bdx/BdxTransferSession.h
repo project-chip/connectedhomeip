@@ -349,7 +349,7 @@ private:
     CHIP_ERROR VerifyProposedMode(const BitFlags<TransferControlFlags> & proposed);
 
     void PrepareStatusReport(StatusCode code);
-    bool IsTransferLengthDefinite();
+    bool IsTransferLengthDefinite() const;
 
     OutputEventType mPendingOutput = OutputEventType::kNone;
     TransferState mState           = TransferState::kUnitialized;

@@ -294,8 +294,8 @@ void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
               0x34, 0x05, // Tag (05) Null
             0x18, // End of container (attribute path)
             0x35, 0x02, // Tag 02 (attribute data)
-              0x24, 0x00, 0x01, // Tag 0, UINT8 Value 1 (fabric index)
               0x30, 0x01, 0x00, // Tag 1, OCTET_STRING length 0 (data)
+              0x24, 0xFE, 0x01, // Tag 0xFE, UINT8 Value 1 (fabric index)
             0x18,
           0x18,
         0x18,

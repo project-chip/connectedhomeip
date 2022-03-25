@@ -271,6 +271,11 @@ combination with JLinkRTTClient as follows:
         -  'switch groups onoff off'    : Sends On group command to bound group
         -  'switch groups onoff toggle' : Sends On group command to bound group
 
+    **_Binding Cluster_**
+
+        - 'switch binding unicast  <fabric index> <node id> <endpoint>' : Creates a unicast binding
+        - 'switch binding group <fabric index> <group id>'              : Creates a group binding
+
 *   You can provision and control the Chip device using the python controller,
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     standalone, Android or iOS app
@@ -280,7 +285,7 @@ combination with JLinkRTTClient as follows:
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
+    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null }{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
 
     chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
     ```
@@ -302,6 +307,13 @@ combination with JLinkRTTClient as follows:
 
     ```
     chip-tool binding write binding '[{"fabricIndex": 1, "group": 257},{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6} ]' 1 1
+    ```
+
+    To acquire the chip-tool node id, read the acl table right after
+    commissioning
+
+    ```
+    ./connectedhomeip/out/chip-tool/chip-tool accesscontrol read acl <nodeid> 0
     ```
 
 ### Notes
@@ -335,7 +347,7 @@ via 2002::2
 
 -   To use the chip-rpc console after it has been installed run:
 
-    `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
@@ -370,3 +382,27 @@ tracking code inside the `trackAlloc` and `trackFree` function
 For the description of Software Update process with EFR32 example applications
 see
 [EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options :
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
