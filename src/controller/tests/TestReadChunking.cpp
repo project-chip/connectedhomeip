@@ -679,7 +679,7 @@ struct Instruction
 void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
-    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() { return callback->mOnSubscriptionEstablished; });
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
     NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
     NL_TEST_ASSERT(gSuite, callback->mOnSubscriptionEstablished);
     callback->mActionOn.clear();
@@ -688,7 +688,7 @@ void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
 void DriveIOUntilEndOfReport(TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
-    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() { return callback->mOnReportEnd; });
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
     NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
     callback->mActionOn.clear();
 }
@@ -803,7 +803,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
                     &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
-                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                                     WriteAttrOp(AttrOnEp5<Attr3>, 2) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
                                  .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
@@ -869,7 +869,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
             DoTest(&readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
-                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                                    WriteAttrOp(AttrOnEp5<Attr3>, 3) },
                                 .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.
