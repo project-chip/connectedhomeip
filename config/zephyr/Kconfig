@@ -175,6 +175,21 @@ config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	  precisely operation time in case of device reboot and maximizing flash memory
 	  lifetime.
 
+config CHIP_MALLOC_SYS_HEAP
+	bool "Use custom malloc implementation based on sys_heap"
+	imply SYS_HEAP_RUNTIME_STATS
+	help
+	  Replace the default allocator functions, such as malloc and free, with
+	  custom ones based on Zephyr's sys_heap.
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+	int "Size of the heap used by the custom malloc implementation"
+	default 16384 # 16kB
+	depends on CHIP_MALLOC_SYS_HEAP
+	help
+	  When the custom malloc implementation based on Zephyr's sys_heap is used,
+	  this value controls how much of the device RAM is reserved for the heap.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y

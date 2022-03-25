@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nrfconnect/args.gni")
 
 assert(chip_device_platform == "nrfconnect")
 
@@ -75,6 +76,13 @@ static_library("nrfconnect") {
       "OTAImageContentHeader.h",
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_malloc_sys_heap) {
+    sources += [
+      "../Zephyr/SysHeapMalloc.cpp",
+      "../Zephyr/SysHeapMalloc.h",
     ]
   }
 }
