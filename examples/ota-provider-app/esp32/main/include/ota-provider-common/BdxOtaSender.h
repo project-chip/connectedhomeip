@@ -120,6 +120,8 @@ private:
     chip::Callback::Callback<OnBdxTransferComplete> * mOnTransferCompleteCallback = nullptr;
     chip::Callback::Callback<OnBdxTransferFailed> * mOnTransferFailedCallback     = nullptr;
 
+    // Maximum file designator length
+    static constexpr uint8_t kMaxFDLen = 30;
     // Null-terminated string representing file designator
-    char mFileDesignator[30];
+    char mFileDesignator[kMaxFDLen];
 };
