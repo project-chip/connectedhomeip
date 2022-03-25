@@ -79,7 +79,8 @@ void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
 
 jboolean LevelManager::SetLevel(jint endpoint, jint value)
 {
-    EmberAfStatus status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value));
+    EmberAfStatus status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(static_cast<chip::EndpointId>(endpoint),
+                                                                                      static_cast<uint8_t>(value));
     return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
