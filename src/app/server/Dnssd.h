@@ -60,10 +60,10 @@ public:
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
     /// Sets the factory-new state commissionable node discovery timeout
-    void SetDiscoveryTimeoutSecs(int32_t secs) { mDiscoveryTimeoutSecs = secs; }
+    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
 
     /// Gets the factory-new state commissionable node discovery timeout
-    int32_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
+    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
 
     //
     // Override the referenced fabric table from the default that is present
@@ -165,7 +165,7 @@ private:
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();
-    int32_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
+    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
     System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
 
     /// return true if expirationMs is valid (not cleared and not in the future)
