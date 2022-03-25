@@ -44,22 +44,19 @@ public class MainActivity extends AppCompatActivity {
             });
 
     SeekBar sb = findViewById(R.id.seekBar);
-    sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        MatterServant.get().updateLevel(i);
-      }
+    sb.setOnSeekBarChangeListener(
+        new SeekBar.OnSeekBarChangeListener() {
+          @Override
+          public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            MatterServant.get().updateLevel(i);
+          }
 
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
+          @Override
+          public void onStartTrackingTouch(SeekBar seekBar) {}
 
-      }
-
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-
-      }
-    });
+          @Override
+          public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
