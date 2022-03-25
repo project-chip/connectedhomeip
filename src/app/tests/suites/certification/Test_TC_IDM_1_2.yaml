@@ -269,5 +269,5 @@ tests:
           [1646261193889] [5094:213098] CHIP: [DMG]         InteractionModelRevision = 1
           [1646261193889] [5094:213098] CHIP: [DMG] }
           [1646261193889] [5094:213098] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9DataVersion: 759594214
-          [1646261193889] [5094:213098] CHIP: [TOO]   ClientGeneratedCommandList: 0 entries
+          [1646261193889] [5094:213098] CHIP: [TOO]   AcceptedCommandList: 0 entries
       disabled: true
