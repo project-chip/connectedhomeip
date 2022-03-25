@@ -153,32 +153,32 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
-    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
-    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
