@@ -138,7 +138,7 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
-    const DeviceControllerSystemState * GetSystemState() { return mSystemState; }
+    const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
 
     class ControllerFabricDelegate final : public FabricTableDelegate
     {
