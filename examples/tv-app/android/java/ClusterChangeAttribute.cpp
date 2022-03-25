@@ -37,7 +37,8 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 
         OnOffManager().PostOnOffChanged(attributePath.mEndpointId, onoff);
     }
-    else if(attributePath.mClusterId == LevelControl::Id && attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
+    else if (attributePath.mClusterId == LevelControl::Id &&
+             attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
         uint8_t level = *value;
 
