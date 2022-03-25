@@ -19,14 +19,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-#include "OTAUtil.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
-#endif
-
 struct k_timer;
 class AppEvent;
 class LEDWidget;
@@ -51,7 +43,6 @@ private:
 
     CHIP_ERROR Init();
     void DispatchEvent(AppEvent * aEvent);
-    void InitOTARequestor();
 
     // statics needed to interact with zephyr C API
     static void CancelTimer(void);
@@ -72,11 +63,4 @@ private:
     bool mIsThreadProvisioned{ false };
     bool mIsThreadEnabled{ false };
     bool mHaveBLEConnections{ false };
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-    chip::DefaultOTARequestorStorage mOTARequestorStorage;
-    chip::DeviceLayer::GenericOTARequestorDriver mOTARequestorDriver;
-    chip::BDXDownloader mBDXDownloader;
-    chip::OTARequestor mOTARequestor;
-#endif
 };

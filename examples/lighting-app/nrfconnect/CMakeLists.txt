@@ -100,6 +100,10 @@ chip_configure_data_model(app
     GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()
+
 if(BUILD_WITH_DFU STREQUAL "BLE")
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()

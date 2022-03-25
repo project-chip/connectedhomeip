@@ -41,10 +41,6 @@
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #endif
 
 #include <dk_buttons_and_leds.h>
@@ -84,13 +80,6 @@ LEDWidget sUnusedLED;
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-DefaultOTARequestorStorage sRequestorStorage;
-GenericOTARequestorDriver sOTARequestorDriver;
-chip::BDXDownloader sBDXDownloader;
-chip::OTARequestor sOTARequestor;
-#endif
 
 } // namespace
 
@@ -178,9 +167,11 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    InitOTARequestor();
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -196,18 +187,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
-}
-
-void AppTask::InitOTARequestor()
-{
-#if CONFIG_CHIP_OTA_REQUESTOR
-    OTAImageProcessorNrf::Get().SetOTADownloader(&sBDXDownloader);
-    sBDXDownloader.SetImageProcessorDelegate(&OTAImageProcessorNrf::Get());
-    sOTARequestorDriver.Init(&sOTARequestor, &OTAImageProcessorNrf::Get());
-    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sOTARequestor.Init(Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
-    chip::SetRequestorInstance(&sOTARequestor);
-#endif
 }
 
 CHIP_ERROR AppTask::StartApp()
