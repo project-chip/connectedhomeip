@@ -415,6 +415,26 @@ public:
     virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
+     * Indicates the start a a series of list operations, this function will be called before first Write to the list.
+     *
+     * @param [in] aPath indicates the path of the modified list.
+     */
+    virtual void OnListWriteBegin(const ConcreteAttributePath & aPath) {}
+
+    /**
+     * Indicates the end of a series of list operations, this function will be called after last Write to the list or the
+     * transaction is aborted with a possiblily incomplete list.
+     *
+     * @param [in] aPath indicates the path of the modified list
+     * @param [in] aErr indicates the status.
+     *
+     * 1) CHIP_NO_ERROR All entries are delivered successfully.
+     * 2) CHIP_ERROR_MESSAGE_INCOMPLETE When the write transaction is aborted (timeout, one or more entries failed to pass some
+     * checks.)
+     */
+    virtual void OnListWriteEnd(const ConcreteAttributePath & aPath, CHIP_ERROR aErr) {}
+
+    /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.
      */
     void SetNext(AttributeAccessInterface * aNext) { mNext = aNext; }

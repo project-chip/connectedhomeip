@@ -366,6 +366,26 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
+ *  Checks the preconditions required before writing an attribute, including:
+ *   1) The attribute must exist in the attribute catagory and it is read only.
+ *   2) The client must have required privilege for writing this attribute.
+ *   3) The cluster data version provided by client must match the cluster data version on the server side when present.
+ *
+ *  @param[in]    aSubjectDescriptor    The subject descriptor for the write.
+ *  @param[in]    aPath                 The concrete path of the data being written.
+ *  @param[in]    apWriteHandler        The write handler for the write transaction.
+ *
+ * @retval  The corresponding interaction model status code for checking result.
+ */
+Protocols::InteractionModel::Status CheckPreconditionsForWrite(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                                               const ConcreteAttributePath & aPath, WriteHandler * apWriteHandler);
+
+/**
+ *  Get the registered attribute access override. nullptr when attribute access override is not found.
+ */
+AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
+
+/**
  * TODO: Document.
  */
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,

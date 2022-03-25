@@ -141,6 +141,9 @@ private:
      */
     void Close();
 
+    void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
+    void DeliverListWriteEnd(const ConcreteAttributePath & aPath, CHIP_ERROR aError);
+
 private: // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -154,6 +157,7 @@ private:
     bool mSuppressResponse = false;
     bool mHasMoreChunks    = false;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
+    bool mLastAttributeIsList                     = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app

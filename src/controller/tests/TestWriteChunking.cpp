@@ -37,8 +37,12 @@
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
 
+#include <memory>
+#include <utility>
+
 using TestContext = chip::Test::AppContext;
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -67,6 +71,7 @@ public:
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestConflictWrite(nlTestSuite * apSuite, void * apContext);
     static void TestNonConflictWrite(nlTestSuite * apSuite, void * apContext);
+    static void TestTransactionalList(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -124,6 +129,25 @@ public:
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
+
+    void OnListWriteBegin(const app::ConcreteAttributePath & aPath) override
+    {
+        if (mOnListWriteBegin)
+        {
+            mOnListWriteBegin(aPath);
+        }
+    }
+
+    void OnListWriteEnd(const app::ConcreteAttributePath & aPath, CHIP_ERROR aError) override
+    {
+        if (mOnListWriteEnd)
+        {
+            mOnListWriteEnd(aPath, aError);
+        }
+    }
+
+    std::function<void(const app::ConcreteAttributePath & path)> mOnListWriteBegin;
+    std::function<void(const app::ConcreteAttributePath & path, CHIP_ERROR error)> mOnListWriteEnd;
 } testServer;
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
@@ -454,6 +478,141 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     emberAfClearDynamicEndpoint(0);
 }
 
+namespace TestTransactionalListInstructions {
+
+using PathStatus = std::pair<app::ConcreteAttributePath, CHIP_ERROR>;
+struct Instructions
+{
+    // The paths used in write request
+    std::vector<ConcreteAttributePath> paths;
+    // operations on OnListWriteBegin and OnListWriteEnd on the server side
+    std::function<void(std::unique_ptr<WriteClient> & writeClient, const app::ConcreteAttributePath & path)> onListWriteBegin;
+    // The expected status when OnListWriteEnd is called. In the same order as paths
+    std::vector<CHIP_ERROR> expectedStatus;
+};
+
+void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    TestWriteCallback writeCallback;
+    std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
+        &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    NL_TEST_ASSERT(apSuite, instructions.paths.size() == instructions.expectedStatus.size());
+
+    ConcreteAttributePath onGoingPath = ConcreteAttributePath();
+    std::vector<PathStatus> status;
+
+    testServer.mOnListWriteBegin = [&](const ConcreteAttributePath & aPath) {
+        NL_TEST_ASSERT(apSuite, onGoingPath == ConcreteAttributePath());
+        onGoingPath = aPath;
+        ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+                        aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
+        if (instructions.onListWriteBegin)
+        {
+            instructions.onListWriteBegin(writeClient, aPath);
+        }
+    };
+    testServer.mOnListWriteEnd = [&](const ConcreteAttributePath & aPath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, onGoingPath == aPath);
+        status.push_back(PathStatus(aPath, aError));
+        onGoingPath = ConcreteAttributePath();
+        ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+                        aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
+    };
+
+    ByteSpan list[kTestListLength];
+
+    for (const auto & p : instructions.paths)
+    {
+        err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                           DataModel::List<ByteSpan>(list, kTestListLength));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    err = writeClient->SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(10),
+                                    [&]() { return ctx.GetExchangeManager().GetNumActiveExchanges() == 0; });
+
+    NL_TEST_ASSERT(apSuite, onGoingPath == app::ConcreteAttributePath());
+    NL_TEST_ASSERT(apSuite, status.size() == instructions.expectedStatus.size());
+
+    for (size_t i = 0; i < status.size(); i++)
+    {
+        NL_TEST_ASSERT(apSuite, status[i] == PathStatus(instructions.paths[i], instructions.expectedStatus[i]));
+    }
+
+    testServer.mOnListWriteBegin = nullptr;
+    testServer.mOnListWriteEnd   = nullptr;
+}
+
+} // namespace TestTransactionalListInstructions
+
+void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace TestTransactionalListInstructions;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    // Test 1: we should receive transaction notifications
+    ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .expectedStatus = { CHIP_NO_ERROR },
+            });
+
+    ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths            = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .onListWriteBegin = [&](std::unique_ptr<WriteClient> & writeClient,
+                                        const app::ConcreteAttributePath & aPath) { writeClient = nullptr; },
+                .expectedStatus   = { CHIP_ERROR_MESSAGE_INCOMPLETE },
+            });
+
+    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .expectedStatus = { CHIP_NO_ERROR, CHIP_NO_ERROR },
+            });
+
+    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications with the status of each list");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .onListWriteBegin =
+                    [&](std::unique_ptr<WriteClient> & writeClient, const app::ConcreteAttributePath & aPath) {
+                        if (aPath.mAttributeId == kTestListAttribute2)
+                        {
+                            writeClient = nullptr;
+                        }
+                    },
+                .expectedStatus = { CHIP_NO_ERROR, CHIP_ERROR_MESSAGE_INCOMPLETE },
+            });
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -461,6 +620,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestBadChunking", TestWriteChunking::TestBadChunking),
     NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
     NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
+    NL_TEST_DEF("TestTransactionalList", TestWriteChunking::TestTransactionalList),
     NL_TEST_SENTINEL()
 };
 
