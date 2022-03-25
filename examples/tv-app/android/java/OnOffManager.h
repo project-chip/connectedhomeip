@@ -19,13 +19,16 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <jni.h>
 
+/**
+ * @brief class to manage and bridge the on/off cluster status to the java layer
+ */
 class OnOffManager
 {
 public:
     static void NewManager(jint endpoint, jobject manager);
     static jboolean SetOnOff(jint endpoint, bool value);
     static void PostOnOffChanged(chip::EndpointId endpoint, bool value);
-    void InitializeWithObjects(jobject managerObject);
+    CHIP_ERROR InitializeWithObjects(jobject managerObject);
     void HandleOnOffChanged(bool value);
 
 private:

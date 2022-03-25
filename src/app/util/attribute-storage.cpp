@@ -826,7 +826,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 
     if (emberAfFindCluster(endpoint, clusterId, mask) == nullptr)
     {
-        return 0xFFFF;
+        return emberEndpointNotFound;
     }
 
     for (i = 0; i < emberAfEndpointCount(); i++)

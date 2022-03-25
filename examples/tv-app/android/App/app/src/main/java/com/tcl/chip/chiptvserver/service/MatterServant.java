@@ -43,7 +43,7 @@ public class MatterServant {
 
   private ChipAppServer chipAppServer;
   private TvApp mTvApp;
-  private boolean mOnOff = true;
+  private boolean mIsOn = true;
 
   private MatterServant() {}
 
@@ -114,7 +114,7 @@ public class MatterServant {
   }
 
   public void toggleOnOff() {
-    mTvApp.SetOnOff(1, mOnOff);
-    mOnOff = !mOnOff;
+    mTvApp.SetOnOff(1, mIsOn);
+    mIsOn = !mIsOn;
   }
 }

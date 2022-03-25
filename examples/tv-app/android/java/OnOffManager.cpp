@@ -47,15 +47,21 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
     VerifyOrReturn(ep != 0xFFFF && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
+    VerifyOrReturn(gOnOffManagerTable[ep] == nullptr, ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d already has a manager", endpoint));
     OnOffManager * mgr = new OnOffManager();
-    mgr->InitializeWithObjects(manager);
-    gOnOffManagerTable[ep] = mgr;
+    CHIP_ERROR err = mgr->InitializeWithObjects(manager);
+    if(err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "TV Android App::OnOff::NewManager: failed to initialize manager for endpoint %d", endpoint);
+        delete mgr;
+    } else {
+        gOnOffManagerTable[ep] = mgr;
+    }
 }
 
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gOnOffManagerTable[ep]);
+    return ((ep == emberEndpointNotFound || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gOnOffManagerTable[ep]);
 }
 
 void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
@@ -73,23 +79,26 @@ jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
     return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
-void OnOffManager::InitializeWithObjects(jobject managerObject)
+CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for OnOffManager"));
+    VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mOnOffManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef OnOffManager"));
+    VerifyOrReturnLogError(mOnOffManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     jclass OnOffManagerClass = env->GetObjectClass(managerObject);
-    VerifyOrReturn(OnOffManagerClass != nullptr, ChipLogError(Zcl, "Failed to get OnOffManager Java class"));
+    VerifyOrReturnLogError(OnOffManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mHandleOnOffChangedMethod = env->GetMethodID(OnOffManagerClass, "HandleOnOffChanged", "(Z)V");
     if (mHandleOnOffChangedMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access OnOffManager 'HandleOnOffChanged' method");
         env->ExceptionClear();
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void OnOffManager::HandleOnOffChanged(bool value)
