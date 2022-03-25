@@ -128,6 +128,6 @@ public class MatterServant {
   }
 
   public void updateLevel(int value) {
-    mTvApp.setCurrentLevel(mLevelEndpoint,value);
+    mTvApp.setCurrentLevel(mLevelEndpoint, value);
   }
 }
