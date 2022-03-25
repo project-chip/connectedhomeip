@@ -21,20 +21,21 @@ config:
 
 tests:
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event hardware-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event radio-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event network-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event network-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification: "./chip-tool generaldiagnostics read-event boot-reason 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
       disabled: true

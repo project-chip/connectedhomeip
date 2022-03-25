@@ -57,7 +57,7 @@ if (chip_device_platform != "none") {
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
     # Linux platform has already transitioned.
     chip_use_transitional_commissionable_data_provider =
-        chip_device_platform != "linux"
+        chip_device_platform != "linux" && chip_device_platform != "android"
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
