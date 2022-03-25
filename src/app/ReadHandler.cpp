@@ -751,11 +751,11 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
     mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
 }
 
-void ReadHandler::SetDirty(const ClusterInfo & apAttributeChanged)
+void ReadHandler::SetDirty(const AttributePathParams & apAttributeChanged)
 {
     ConcreteAttributePath path;
 

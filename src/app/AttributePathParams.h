@@ -89,6 +89,7 @@ struct AttributePathParams
 
 struct AttributePathParamsWithTimestamp : public AttributePathParams
 {
+    AttributePathParamsWithTimestamp() {}
     AttributePathParamsWithTimestamp(const AttributePathParams aPath) : AttributePathParams(aPath) {}
     AttributePathParamsWithTimestamp(const AttributePathParams aPath, uint64_t aTickTouched) :
         AttributePathParams(aPath), mTickTouched(aTickTouched)

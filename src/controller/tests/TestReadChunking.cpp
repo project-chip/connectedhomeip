@@ -207,7 +207,7 @@ public:
 
     void SetDirty(AttributeId attr)
     {
-        app::ClusterInfo path;
+        app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId5;
         path.mClusterId   = TestCluster::Id;
         path.mAttributeId = attr;
@@ -637,23 +637,21 @@ constexpr AttributeIdWithEndpointId AttrOnEp1 = AttributeIdWithEndpointId(kTestE
 template <AttributeId id>
 constexpr AttributeIdWithEndpointId AttrOnEp5 = AttributeIdWithEndpointId(kTestEndpointId5, id);
 
-template <AttributeIdWithEndpointId attr, uint8_t val>
-void WriteAttr()
+auto WriteAttrOp(AttributeIdWithEndpointId attr, uint8_t val)
 {
-    static_assert(attr.first == kTestEndpointId5, "Only TestCluster on endpoint 5 is mutable.");
-    gMutableAttrAccess.SetVal(attr.second, val);
+    return [=]() { gMutableAttrAccess.SetVal(static_cast<uint8_t>(attr.second), val); };
 }
 
-template <AttributeIdWithEndpointId attr>
-void TouchAttr()
+auto TouchAttrOp(AttributeIdWithEndpointId attr)
 {
-    static_assert(attr.first == kTestEndpointId, "Only TestCluster on endpoint 1 can be accessed by TouchAttr.");
-    app::ClusterInfo path;
-    path.mEndpointId  = attr.first;
-    path.mClusterId   = TestCluster::Id;
-    path.mAttributeId = attr.second;
-    gIterationCount++;
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    return [=]() {
+        app::AttributePathParams path;
+        path.mEndpointId  = attr.first;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = attr.second;
+        gIterationCount++;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    };
 }
 
 enum AttrIds
@@ -789,46 +787,49 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
                 // The report engine should NOT include it in initial report to reduce traffic.
                 // We are expected to miss attributes on kTestEndpointId during initial reports.
                 ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
-                readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttr<AttrOnEp1<Attr1>>;
+                readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttrOp(AttrOnEp1<Attr1>);
                 DriveIOUntilSubscriptionEstablished(&readCallback);
                 CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
 
                 ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
-                DoTest(&readCallback, { .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+                DoTest(&readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
             }
 
             // CASE 2 -- Set dirty during chunked report, the attribute is already dirty.
             {
                 ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
-                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 3>;
-                DoTest(&readCallback,
-                       { .chunksize      = 2,
-                         .preworks       = { WriteAttr<AttrOnEp5<Attr1>, 2>, WriteAttr<AttrOnEp5<Attr2>, 2>,
-                                       WriteAttr<AttrOnEp5<Attr3>, 2> },
-                         .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
-                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 3);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 2,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
+                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
 
             // CASE 3 -- Set dirty during chunked report, the attribute is not dirty, and it may catch / missed the current report.
             {
                 ChipLogProgress(DataManagement,
                                 "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
-                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 4>;
-                DoTest(&readCallback,
-                       { .chunksize      = 1,
-                         .preworks       = { WriteAttr<AttrOnEp5<Attr1>, 4>, WriteAttr<AttrOnEp5<Attr2>, 4> },
-                         .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
-                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 1,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 4), WriteAttrOp(AttrOnEp5<Attr2>, 4) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
 
                 ChipLogProgress(DataManagement,
                                 "Case 3-2: Set dirty during chunked report by wildcard path -- new dirty attribute.");
                 app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
-                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr1>, 5>;
-                DoTest(&readCallback,
-                       { .chunksize      = 1,
-                         .preworks       = { WriteAttr<AttrOnEp5<Attr2>, 5>, WriteAttr<AttrOnEp5<Attr3>, 5> },
-                         .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
-                         .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr1>, 5);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 1,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr2>, 5), WriteAttrOp(AttrOnEp5<Attr3>, 5) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
         }
     }
@@ -864,11 +865,12 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
             // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
             // In this case, we won't reset the path iterator.
             ChipLogProgress(DataManagement, "Case 1-1: Test set dirty during reports generated by concrete paths.");
-            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttr<AttrOnEp5<Attr3>, 4>;
+            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
             DoTest(&readCallback,
-                   { .chunksize = 1,
-                     .preworks = { WriteAttr<AttrOnEp5<Attr1>, 3>, WriteAttr<AttrOnEp5<Attr2>, 3>, WriteAttr<AttrOnEp5<Attr3>, 3> },
-                     .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
+                   Instruction{ .chunksize      = 1,
+                                .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
+                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.
             ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
