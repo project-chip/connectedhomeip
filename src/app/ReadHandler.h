@@ -163,7 +163,7 @@ public:
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
     const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
-    
+
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
@@ -222,7 +222,7 @@ private:
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
-    
+
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
     // with snapshotted last event number. if current priority  is in the end, no valid
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
