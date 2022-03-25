@@ -75,12 +75,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t 
         }
         else
         {
-            err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
     }
     else
     {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     return err;
 }
@@ -88,8 +88,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-    uint32_t nvm3Key;
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
+    uint32_t nvm3Key;
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
@@ -105,6 +108,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     uint32_t nvm3Key;
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key, /* isSlotNeeded */ true);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
@@ -123,6 +129,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     uint32_t nvm3Key;
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);

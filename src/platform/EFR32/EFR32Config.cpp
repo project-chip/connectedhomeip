@@ -51,6 +51,7 @@ void nvm3_lockEnd(void)
     VerifyOrDie(nvm3_Sem != NULL);
     xSemaphoreGive(nvm3_Sem);
 }
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
