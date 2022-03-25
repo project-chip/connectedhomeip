@@ -39,7 +39,7 @@ public:
         chip::CommandId CommandId;
         chip::ClusterId ClusterId;
         uint8_t Value;
-        bool IsGroup{false};
+        bool IsGroup{ false };
     };
 
 private:
