@@ -27,10 +27,13 @@
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
+#include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
+#include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
+#include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -134,9 +137,9 @@ public:
     void ResetPathIterator();
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
-    ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
-    ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
+    ObjectList<AttributePathParams> * GetAttributePathList() { return mpAttributePathList; }
+    ObjectList<EventPathParams> * GetEventPathList() { return mpEventPathList; }
+    ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
     EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
@@ -160,7 +163,7 @@ public:
     /**
      * Marked the attribute as dirty, and reset the internal path iterator when required.
      */
-    void SetDirty(const ClusterInfo & apAttributeChanged);
+    void SetDirty(const AttributePathParams & apAttributeChanged);
     bool IsDirty() const { return (mDirtyTick > mPreviousReportsBeginTick) || mOverrideDirty; }
     void ClearDirty() { mOverrideDirty = false; }
 
@@ -242,10 +245,10 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                      = HandlerState::Idle;
-    ClusterInfo * mpAttributeClusterInfoList = nullptr;
-    ClusterInfo * mpEventClusterInfoList     = nullptr;
-    ClusterInfo * mpDataVersionFilterList    = nullptr;
+    HandlerState mState                                     = HandlerState::Idle;
+    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
+    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
+    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

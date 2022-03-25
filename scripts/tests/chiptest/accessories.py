@@ -15,7 +15,6 @@
 
 import sys
 import threading
-from xmlrpc.client import ServerProxy
 from xmlrpc.server import SimpleXMLRPCServer
 
 IP = '127.0.0.1'
@@ -98,9 +97,6 @@ class AppsRegister:
             return accessory.waitForOperationalAdvertisement()
         return False
 
-    def ping(self):
-        return True
-
     def __startXMLRPCServer(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
 
@@ -114,20 +110,9 @@ class AppsRegister:
         self.server.register_function(
             self.waitForOperationalAdvertisement,
             'waitForOperationalAdvertisement')
-        self.server.register_function(self.ping, 'ping')
 
-        self.server_thread = threading.Thread(target=self.__handle_request)
+        self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
-    def __handle_request(self):
-        self.__should_handle_requests = True
-        while self.__should_handle_requests:
-            self.server.handle_request()
-
     def __stopXMLRPCServer(self):
-        self.__should_handle_requests = False
-        # handle_request will wait until it receives a message,
-        # so let's send a ping to the server
-        client = ServerProxy('http://' + IP + ':' +
-                             str(PORT) + '/', allow_none=True)
-        client.ping()
+        self.server.shutdown()

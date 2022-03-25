@@ -51,6 +51,7 @@ class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
 {
 public:
     bool CanConsent() override;
+    void UpdateDownloaded() override;
 };
 
 OTARequestor gRequestorCore;
@@ -67,17 +68,20 @@ constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
 constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr uint16_t kOptionAutoApplyImage       = 'a';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
+bool gAutoApplyImage                           = false;
 
 OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
+    { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
     {},
 };
 
@@ -97,13 +101,30 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        subsequent commands, the value of granted will be used.\n"
                              "        granted: Authorize OTA requestor to download an OTA image\n"
                              "        denied: Forbid OTA requestor to download an OTA image\n"
-                             "        deferred: Defer obtaining user consent \n" };
+                             "        deferred: Defer obtaining user consent \n"
+                             "  -a/--autoApplyImage\n"
+                             "        If supplied, apply the image immediately after download.\n"
+                             "        Otherwise, the OTA update is complete after image download.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 bool CustomOTARequestorDriver::CanConsent()
 {
     return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+}
+
+void CustomOTARequestorDriver::UpdateDownloaded()
+{
+    if (gAutoApplyImage)
+    {
+        // Let the default driver take further action to apply the image
+        GenericOTARequestorDriver::UpdateDownloaded();
+    }
+    else
+    {
+        // Reset to put the state back to idle to allow the next OTA update to occur
+        gRequestorCore.Reset();
+    }
 }
 
 static void InitOTARequestor(void)
@@ -118,7 +139,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(CharSpan::fromCharString(gOtaDownloadPath));
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
@@ -170,6 +191,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
+    case kOptionAutoApplyImage:
+        gAutoApplyImage = true;
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -189,5 +213,21 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
     ChipLinuxAppMainLoop();
+
+    // If the event loop had been stopped due to an update being applied, boot into the new image
+    if (gRequestorCore.GetCurrentUpdateState() == OTARequestor::OTAUpdateStateEnum::kApplying)
+    {
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
+        {
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+            return -1;
+        }
+
+        argv[0] = kImageExecPath;
+        execv(argv[0], argv);
+
+        // If successfully executing the new iamge, execv should not return
+        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+    }
     return 0;
 }

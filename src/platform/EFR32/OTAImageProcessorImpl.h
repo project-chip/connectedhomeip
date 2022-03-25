@@ -40,7 +40,7 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
+    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -66,7 +66,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    CharSpan mImageFile;
+    const char * mImageFile = nullptr;
 };
 
 } // namespace chip

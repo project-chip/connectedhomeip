@@ -35,6 +35,7 @@ public:
     const char * KeyName() { return mKeyName; }
 
     // Fabric Table
+    const char * FabricIndexInfo() { return Format("g/fidx"); }
     const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
     const char * FabricICAC(FabricIndex fabric) { return Format("f/%x/i", fabric); }
     const char * FabricRCAC(FabricIndex fabric) { return Format("f/%x/r", fabric); }
@@ -79,6 +80,11 @@ public:
     static const char * OTADefaultProviders() { return "o/dp"; }
     static const char * OTACurrentProvider() { return "o/cp"; }
     static const char * OTAUpdateToken() { return "o/ut"; }
+    static const char * OTACurrentUpdateState() { return "o/us"; }
+    static const char * OTATargetVersion() { return "o/tv"; }
+
+    // [G]lobal [D]NS-related keys
+    static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }
 
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,

@@ -134,6 +134,40 @@ CHIP_ERROR DefaultOTARequestorStorage::LoadUpdateToken(MutableByteSpan & updateT
     return Load(DefaultStorageKeyAllocator::OTAUpdateToken(), updateToken);
 }
 
+CHIP_ERROR DefaultOTARequestorStorage::StoreCurrentUpdateState(OTAUpdateStateEnum currentUpdateState)
+{
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OTACurrentUpdateState(), &currentUpdateState,
+                                               sizeof(currentUpdateState));
+}
+
+CHIP_ERROR DefaultOTARequestorStorage::LoadCurrentUpdateState(OTAUpdateStateEnum & currentUpdateState)
+{
+    uint16_t size = static_cast<uint16_t>(sizeof(currentUpdateState));
+    return mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::OTACurrentUpdateState(), &currentUpdateState, size);
+}
+
+CHIP_ERROR DefaultOTARequestorStorage::ClearCurrentUpdateState()
+{
+    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OTACurrentUpdateState());
+}
+
+CHIP_ERROR DefaultOTARequestorStorage::StoreTargetVersion(uint32_t targetVersion)
+{
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OTATargetVersion(), &targetVersion,
+                                               sizeof(targetVersion));
+}
+
+CHIP_ERROR DefaultOTARequestorStorage::LoadTargetVersion(uint32_t & targetVersion)
+{
+    uint16_t size = static_cast<uint16_t>(sizeof(targetVersion));
+    return mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::OTATargetVersion(), &targetVersion, size);
+}
+
+CHIP_ERROR DefaultOTARequestorStorage::ClearTargetVersion()
+{
+    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OTATargetVersion());
+}
+
 CHIP_ERROR DefaultOTARequestorStorage::Load(const char * key, MutableByteSpan & buffer)
 {
     uint16_t size = static_cast<uint16_t>(buffer.size());

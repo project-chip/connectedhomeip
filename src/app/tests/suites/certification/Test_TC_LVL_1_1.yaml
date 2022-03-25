@@ -73,24 +73,21 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ClientGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
-      attribute: "ClientGeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ServerGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
-      attribute: "ServerGeneratedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
 
     - label: "read the optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -112,8 +109,8 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 3
+          constraints:
+              type: map32

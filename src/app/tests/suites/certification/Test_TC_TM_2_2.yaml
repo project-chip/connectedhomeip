@@ -28,14 +28,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled as values needs to be stored for comparison
-    - label: "Reads MeasuredValue attribute from DUT"
-      disabled: true
+    - label: "read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
-      attribute: "MeasuredValue"
-      PICS: A_TEMPERATURE
+      attribute: "MinMeasuredValue"
       response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: -27315
+              maxValue: 32766
+
+    - label: "read the mandatory attribute: MaxMeasuredValue"
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -27314
+              maxValue: 32767
 
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
@@ -49,15 +58,6 @@ tests:
     - label: "Operate on device to change the temperature significantly"
       disabled: true
       PICS: MANUAL_TEMPERATURE_CHANGE
-
-    #Disabled as values needs to be compared with the value read in step 2
-    - label: "Reads back MeasuredValue attribute from DUT after few seconds"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      PICS: A_TEMPERATURE
-      response:
-          value: 0
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"

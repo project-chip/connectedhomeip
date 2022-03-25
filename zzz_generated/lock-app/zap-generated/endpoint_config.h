@@ -558,14 +558,14 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 1
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 2
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                              \
-        {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1                                                                         \
-        } /* HourFormat */                                                                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* HourFormat */                                                       \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: On/Off (server) */ { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 } /* StartUpOnOff */          \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
@@ -840,9 +840,11 @@
             { 0x00004000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(1) },                           /* GlobalSceneControl */     \
             { 0x00004001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OnTime */                 \
             { 0x00004002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OffWaitTime */            \
-            { 0x00004003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },    /* StartUpOnOff */           \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(363) },                   /* FeatureMap */             \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                            /* ClusterRevision */        \
+            { 0x00004003, ZAP_TYPE(ENUM8), 1,                                                                                      \
+              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                           \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(1) },                                      /* StartUpOnOff */                             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(363) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
@@ -981,8 +983,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Access Control (server) */ \
@@ -992,8 +994,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Basic (server) */ \
@@ -1003,8 +1005,8 @@
       .clusterSize = 39, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayBasicServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
@@ -1014,8 +1016,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
@@ -1025,8 +1027,8 @@
       .clusterSize = 5, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
@@ -1036,8 +1038,8 @@
       .clusterSize = 38, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayLocalizationConfigurationServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
@@ -1047,8 +1049,8 @@
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayTimeFormatLocalizationServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Power Source Configuration (server) */ \
@@ -1058,8 +1060,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Power Source (server) */ \
@@ -1069,8 +1071,8 @@
       .clusterSize = 73, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
@@ -1080,8 +1082,8 @@
       .clusterSize = 16, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 2 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 6 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 2 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 6 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
@@ -1091,8 +1093,8 @@
       .clusterSize = 48, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 9 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 16 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 9 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 16 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
@@ -1102,8 +1104,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
@@ -1113,8 +1115,8 @@
       .clusterSize = 17, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
@@ -1124,8 +1126,8 @@
       .clusterSize = 30, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
@@ -1135,8 +1137,8 @@
       .clusterSize = 247, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 23 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 23 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
@@ -1146,8 +1148,8 @@
       .clusterSize = 58, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */ \
@@ -1157,8 +1159,8 @@
       .clusterSize = 57, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 27 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 27 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
@@ -1168,8 +1170,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
@@ -1179,8 +1181,8 @@
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 33 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 33 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -1190,8 +1192,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: User Label (server) */ \
@@ -1201,8 +1203,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
@@ -1212,8 +1214,8 @@
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Descriptor (server) */ \
@@ -1223,8 +1225,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Power Source (server) */ \
@@ -1234,8 +1236,8 @@
       .clusterSize = 133, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
 }
 

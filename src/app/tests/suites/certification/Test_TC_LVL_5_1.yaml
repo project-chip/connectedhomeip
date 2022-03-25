@@ -32,14 +32,14 @@ tests:
       cluster: "On/Off"
       command: "on"
 
-    - label: "Precondition: DUT level is set to 0x80"
+    - label: "Precondition: DUT level is set to its lowest point"
       command: "Step"
       arguments:
           values:
               - name: "stepMode"
                 value: 1
               - name: "stepSize"
-                value: 126
+                value: 100
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
@@ -47,50 +47,23 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 4000ms"
+    - label: "Wait 3000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 4000
+                value: 3000
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          saveAs: CurrentlevelValue
+          constraints:
+              type: uint8
 
-    - label: "Sends step down command to DUT"
-      command: "Step"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 1
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
-              - name: "optionMask"
-                value: 0
-              - name: "optionOverride"
-                value: 0
-
-    - label: "Wait 4000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 4000
-
-    - label: "Reads current level attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 64
-
-    - label: "Sends a Step up command"
+    - label: "Sends step up command to DUT"
       command: "Step"
       arguments:
           values:
@@ -99,7 +72,37 @@ tests:
               - name: "stepSize"
                 value: 64
               - name: "transitionTime"
-                value: 20
+                value: 2
+              - name: "optionMask"
+                value: 0
+              - name: "optionOverride"
+                value: 0
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Reads current level attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          constraints:
+              notValue: CurrentlevelValue
+
+    - label: "Sends a Step down command"
+      command: "Step"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 1
+              - name: "stepSize"
+                value: 64
+              - name: "transitionTime"
+                value: 2
               - name: "optionMask"
                 value: 0
               - name: "optionOverride"
@@ -117,7 +120,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: CurrentlevelValue
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

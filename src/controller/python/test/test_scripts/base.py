@@ -167,13 +167,15 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, testCommissioner: bool = False):
+    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
-        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
+        self.devCtrl = self.fabricAdmin.NewController(
+            nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
         self.logger = logger
+        self.paaTrustStorePath = paaTrustStorePath
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -198,6 +200,29 @@ class BaseTestHelper:
             return False
         self.logger.info(f"Found device at {res}")
         return res
+
+    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        if self.devCtrl.EstablishPASESessionIP(
+                ip.encode("utf-8"), setuppin, nodeid) is not None:
+            self.logger.info(
+                "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+            return False
+        self.logger.info(
+            "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
+        return True
+
+    def TestCommissionOnly(self, nodeid: int):
+        self.logger.info(
+            "Commissioning device with id {}".format(nodeid))
+        if not self.devCtrl.Commission(nodeid):
+            self.logger.info(
+                "Failed to commission device with id {}".format(str(nodeid)))
+            return False
+        self.logger.info(
+            "Successfully commissioned device with id {}".format(str(nodeid)))
+        return True
 
     def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
@@ -230,7 +255,8 @@ class BaseTestHelper:
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
-        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        devCtrl2 = fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
         if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
@@ -257,8 +283,10 @@ class BaseTestHelper:
             fabricId=1, fabricIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
-        self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
-        self.devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        self.devCtrl = self.fabricAdmin.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
+        self.devCtrl2 = fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
         data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
@@ -553,8 +581,8 @@ class BaseTestHelper:
             "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 0,
-            "SoftwareVersionString": "prerelease",
+            "SoftwareVersion": 1,
+            "SoftwareVersionString": "1.0",
         }
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():

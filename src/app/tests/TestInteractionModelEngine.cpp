@@ -43,14 +43,14 @@ namespace app {
 class TestInteractionModelEngine
 {
 public:
-    static void TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext);
-    static int GetClusterInfoListLength(ClusterInfo * apClusterInfoList);
+    static void TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext);
+    static int GetAttributePathListLength(ObjectList<AttributePathParams> * apattributePathParamsList);
 };
 
-int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apClusterInfoList)
+int TestInteractionModelEngine::GetAttributePathListLength(ObjectList<AttributePathParams> * apAttributePathParamsList)
 {
-    int length           = 0;
-    ClusterInfo * runner = apClusterInfoList;
+    int length                               = 0;
+    ObjectList<AttributePathParams> * runner = apAttributePathParamsList;
     while (runner != nullptr)
     {
         runner = runner->mpNext;
@@ -59,35 +59,41 @@ int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apCluster
     return length;
 }
 
-void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext)
+void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ClusterInfo * clusterInfoList = nullptr;
-    ClusterInfo clusterInfo1;
-    ClusterInfo clusterInfo2;
-    ClusterInfo clusterInfo3;
+    ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
+    AttributePathParams attributePathParams1;
+    AttributePathParams attributePathParams2;
+    AttributePathParams attributePathParams3;
 
-    clusterInfo1.mEndpointId = 1;
-    clusterInfo2.mEndpointId = 2;
-    clusterInfo3.mEndpointId = 3;
+    attributePathParams1.mEndpointId = 1;
+    attributePathParams2.mEndpointId = 2;
+    attributePathParams3.mEndpointId = 3;
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo1);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo1.mEndpointId == clusterInfoList->mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 1);
+    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    NL_TEST_ASSERT(apSuite,
+                   attributePathParamsList != nullptr &&
+                       attributePathParams1.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo2);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo2.mEndpointId == clusterInfoList->mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 2);
+    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    NL_TEST_ASSERT(apSuite,
+                   attributePathParamsList != nullptr &&
+                       attributePathParams2.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo3);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo3.mEndpointId == clusterInfoList->mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 3);
+    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    NL_TEST_ASSERT(apSuite,
+                   attributePathParamsList != nullptr &&
+                       attributePathParams3.mEndpointId == attributePathParamsList->mValue.mEndpointId);
+    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
 
-    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(clusterInfoList);
-    NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 0);
+    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 0);
 }
 } // namespace app
 } // namespace chip
@@ -97,7 +103,7 @@ namespace {
 // clang-format off
 const nlTest sTests[] =
         {
-                NL_TEST_DEF("TestClusterInfoPushRelease", chip::app::TestInteractionModelEngine::TestClusterInfoPushRelease),
+                NL_TEST_DEF("TestAttributePathParamsPushRelease", chip::app::TestInteractionModelEngine::TestAttributePathParamsPushRelease),
                 NL_TEST_SENTINEL()
         };
 // clang-format on

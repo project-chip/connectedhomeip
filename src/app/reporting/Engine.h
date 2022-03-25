@@ -89,7 +89,7 @@ public:
     /**
      * Application marks mutated change path and would be sent out in later report.
      */
-    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
+    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
 
     /**
      * @brief
@@ -148,7 +148,7 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
+    bool IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
@@ -177,7 +177,7 @@ private:
      *
      * Return whether one of our paths is now a superset of the provided path.
      */
-    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
+    bool MergeOverlappedAttributePath(AttributePathParams & aAttributePath);
 
     inline void BumpDirtyTick() { mDirtyTick++; }
 
@@ -209,7 +209,7 @@ private:
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+    ObjectPool<AttributePathParamsWithTimestamp, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
 
     /**
      * A ticker for recording when an attribute is makred as dirty. Acts as a monotonic timestamp for attributes.

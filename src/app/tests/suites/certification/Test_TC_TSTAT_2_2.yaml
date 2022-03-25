@@ -31,6 +31,7 @@ tests:
     - label:
           "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
           that the value is within range"
+      optional: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -44,6 +45,7 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           OccupiedCoolingSetpoint attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -53,6 +55,7 @@ tests:
     - label:
           "Reads it back again to confirm the successful write of
           OccupiedCoolingSetpoint attribute"
+      optional: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -84,6 +87,7 @@ tests:
     - label:
           "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -93,6 +97,7 @@ tests:
     - label:
           "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -315,6 +320,7 @@ tests:
     - label:
           "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
+      optional: true
       command: "readAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -328,6 +334,7 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MinCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -337,6 +344,7 @@ tests:
     - label:
           "Reads it back again to confirm the successful write of
           MinCoolSetpointLimit attribute"
+      optional: true
       command: "readAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -367,6 +375,7 @@ tests:
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -376,6 +385,7 @@ tests:
     - label:
           "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -385,6 +395,7 @@ tests:
     - label:
           "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
+      optional: true
       command: "readAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -398,6 +409,7 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MaxCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -407,6 +419,7 @@ tests:
     - label:
           "Reads it back again to confirm the successful write of
           MaxCoolSetpointLimit attribute"
+      optional: true
       command: "readAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -437,6 +450,7 @@ tests:
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -446,6 +460,7 @@ tests:
     - label:
           "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -491,6 +506,7 @@ tests:
     - label:
           "Writes (sets back) the limit of MinCoolSetpointLimit to
           MinCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -500,6 +516,7 @@ tests:
     - label:
           "Writes (sets back) the limit of MaxCoolSetpointLimit to
           MinCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
       PICS: A_MINCOOLSETPOINTLIMIT
@@ -509,6 +526,7 @@ tests:
     - label:
           "Writes (sets back) the limit of MinCoolSetpointLimit to
           MaxCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -518,6 +536,7 @@ tests:
     - label:
           "Writes (sets back) the limit of MaxCoolSetpointLimit to
           MaxCoolSetpointLimit attribute"
+      optional: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
       PICS: A_MAXCOOLSETPOINTLIMIT
@@ -612,6 +631,7 @@ tests:
           value: 30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -641,6 +661,7 @@ tests:
           value: -30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -670,6 +691,7 @@ tests:
           value: 30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
@@ -716,6 +738,7 @@ tests:
           value: -30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT

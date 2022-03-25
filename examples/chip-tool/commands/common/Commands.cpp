@@ -227,23 +227,23 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
 
         if (IsGlobalCommand(command->GetName()))
         {
-            if (strcmp(command->GetName(), "read") == 0 && readCommand == false)
+            if (strcmp(command->GetName(), "read") == 0 && !readCommand)
             {
                 readCommand = true;
             }
-            else if (strcmp(command->GetName(), "write") == 0 && writeCommand == false)
+            else if (strcmp(command->GetName(), "write") == 0 && !writeCommand)
             {
                 writeCommand = true;
             }
-            else if (strcmp(command->GetName(), "subscribe") == 0 && subscribeCommand == false)
+            else if (strcmp(command->GetName(), "subscribe") == 0 && !subscribeCommand)
             {
                 subscribeCommand = true;
             }
-            else if (strcmp(command->GetName(), "read-event") == 0 && readEventCommand == false)
+            else if (strcmp(command->GetName(), "read-event") == 0 && !readEventCommand)
             {
                 readEventCommand = true;
             }
-            else if (strcmp(command->GetName(), "subscribe-event") == 0 && subscribeEventCommand == false)
+            else if (strcmp(command->GetName(), "subscribe-event") == 0 && !subscribeEventCommand)
             {
                 subscribeEventCommand = true;
             }

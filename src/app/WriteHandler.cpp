@@ -163,8 +163,8 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
     Close();
 }
 

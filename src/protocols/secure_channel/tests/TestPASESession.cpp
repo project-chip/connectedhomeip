@@ -416,7 +416,9 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac);
+        CryptoContext::NonceStorage nonce;
+        CryptoContext::BuildNonce(nonce, header.GetSecurityFlags(), header.GetMessageCounter(), kUndefinedNodeId);
+        err = session1.Encrypt(plain_text, sizeof(plain_text), encrypted, nonce, header, mac);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
@@ -426,7 +428,9 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
                        testPairingSession2->DeriveSecureSession(session2, CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
-        NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
+        CryptoContext::NonceStorage nonce;
+        CryptoContext::BuildNonce(nonce, header.GetSecurityFlags(), header.GetMessageCounter(), kUndefinedNodeId);
+        NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, nonce, header, mac) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(plain_text, decrypted, sizeof(plain_text)) == 0);
     }
 

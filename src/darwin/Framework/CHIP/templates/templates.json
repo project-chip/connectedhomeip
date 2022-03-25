@@ -22,11 +22,11 @@
         },
         {
             "name": "encode_value",
-            "path": "../../../../../examples/chip-tool-darwin/templates/partials/encode_value.zapt"
+            "path": "partials/encode_value.zapt"
         },
         {
             "name": "decode_value",
-            "path": "../../../../../examples/chip-tool-darwin/templates/partials/decode_value.zapt"
+            "path": "partials/decode_value.zapt"
         },
         {
             "name": "init_struct_member",

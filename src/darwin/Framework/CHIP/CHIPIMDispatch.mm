@@ -52,7 +52,8 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TODO: Maybe consider making this configurable?
+// TODO: Maybe consider making this configurable?  See also
+// CHIPControllerAccessControl.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
 
 } // anonymous namespace
@@ -87,9 +88,9 @@ namespace app {
             switch (aPath.mAttributeId) {
             case AttributeList::Id:
                 FALLTHROUGH;
-            case ClientGeneratedCommandList::Id:
+            case AcceptedCommandList::Id:
                 FALLTHROUGH;
-            case ServerGeneratedCommandList::Id:
+            case GeneratedCommandList::Id:
                 FALLTHROUGH;
                 // When EventList is supported, include it here.
 #if 0

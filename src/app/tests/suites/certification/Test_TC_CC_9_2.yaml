@@ -89,6 +89,15 @@ tests:
       response:
           value: 160
 
+    - label: "Read EnhancedCurrentHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          saveAs: EnhancedCurrentHueValue
+          constraints:
+              type: uint16
+
     - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
@@ -115,15 +124,6 @@ tests:
       PICS: A_COLORLOOPACTIVE
       response:
           value: 1
-
-    - label: "Read EnhancedCurrentHue attribute from DUT."
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      PICS: A_ENHANCEDCURRENTHUE
-      response:
-          saveAs: EnhancedCurrentHueValue
-          constraints:
-              type: uint16
 
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"

@@ -387,7 +387,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
     mState = kSentSigma1;
 
-    ChipLogDetail(SecureChannel, "Sent Sigma1 msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -412,7 +412,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan destinationIdentifier;
     ByteSpan initiatorRandom;
 
-    ChipLogDetail(SecureChannel, "Received Sigma1 msg");
+    ChipLogProgress(SecureChannel, "Received Sigma1 msg");
 
     bool sessionResumptionRequested = false;
     ByteSpan resumptionId;
@@ -657,7 +657,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     mState = kSentSigma2;
 
-    ChipLogDetail(SecureChannel, "Sent Sigma2 msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
 
     return CHIP_NO_ERROR;
 }
@@ -775,7 +775,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
-    ChipLogDetail(SecureChannel, "Received Sigma2 msg");
+    ChipLogProgress(SecureChannel, "Received Sigma2 msg");
 
     tlvReader.Init(std::move(msg));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
@@ -1015,7 +1015,7 @@ CHIP_ERROR CASESession::SendSigma3()
                                      SendFlags(SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    ChipLogDetail(SecureChannel, "Sent Sigma3 msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma3 msg");
 
     err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
@@ -1064,7 +1064,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     uint32_t decodeTagIdSeq = 0;
 
-    ChipLogDetail(SecureChannel, "Received Sigma3 msg");
+    ChipLogProgress(SecureChannel, "Received Sigma3 msg");
 
     tlvReader.Init(std::move(msg));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));

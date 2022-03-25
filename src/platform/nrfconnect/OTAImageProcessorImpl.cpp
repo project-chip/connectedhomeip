@@ -25,6 +25,7 @@
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
 #include <dfu/mcuboot.h>
+#include <pm/device.h>
 #include <sys/reboot.h>
 
 namespace chip {
@@ -139,6 +140,45 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     }
 
     return CHIP_NO_ERROR;
+}
+
+// external flash power consumption optimization
+void ExtFlashHandler::DoAction(Action action)
+{
+#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR && !CONFIG_SOC_NRF52840 // nRF52 is optimized per default
+    // utilize the QSPI driver sleep power mode
+    const auto * qspi_dev = device_get_binding(DT_LABEL(DT_INST(0, nordic_qspi_nor)));
+    if (qspi_dev)
+    {
+        const auto requestedAction = Action::WAKE_UP == action ? PM_DEVICE_ACTION_RESUME : PM_DEVICE_ACTION_SUSPEND;
+        (void) pm_device_action_run(qspi_dev, requestedAction); // not much can be done in case of a failure
+    }
+#endif
+}
+
+OTAImageProcessorImplPMDevice::OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler) : mHandler(aHandler)
+{
+    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
+}
+
+CHIP_ERROR OTAImageProcessorImplPMDevice::PrepareDownload()
+{
+    mHandler.DoAction(ExtFlashHandler::Action::WAKE_UP);
+    return OTAImageProcessorImpl::PrepareDownload();
+}
+
+CHIP_ERROR OTAImageProcessorImplPMDevice::Abort()
+{
+    auto status = OTAImageProcessorImpl::Abort();
+    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
+    return status;
+}
+
+CHIP_ERROR OTAImageProcessorImplPMDevice::Apply()
+{
+    auto status = OTAImageProcessorImpl::Apply();
+    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
+    return status;
 }
 
 } // namespace DeviceLayer

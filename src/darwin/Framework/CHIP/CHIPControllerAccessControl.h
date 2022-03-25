@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
 #import <Foundation/Foundation.h>
 
-#import "CHIPDeviceControllerOverXPC.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPDeviceControllerOverXPC (AttributeCache)
+@interface CHIPControllerAccessControl : NSObject
 
-- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId completion:(void (^)(NSError * _Nullable error))completion;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
++ (instancetype)alloc NS_UNAVAILABLE;
 
-- (void)readAttributeCacheWithNodeId:(uint64_t)nodeId
-                          endpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
-                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
+/**
+ * Initialize the access control module. Must be called on the Matter task
+ * queue.
+ */
++ (void)init;
 
 @end
 

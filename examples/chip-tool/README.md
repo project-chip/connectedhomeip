@@ -105,6 +105,20 @@ devices log when they start up) and try to pair with the first one it discovers.
 In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
 (which must be a decimal number or a 0x-prefixed hex number).
 
+#### Trust Store
+
+Trust store will be automatically created using the default Test Attestation
+PAA. To use a different set of PAAs, pass the path using the optional parameter
+--paa-trust-store-path while running the built executable. Trusted PAAs are
+available at credentials/development/paa-root-certs/.
+
+The command below will select a set of trusted PAAs to be used during
+Attestation Verification. It will also discover devices with long discriminator
+3840 and try to pair with the first one it discovers using the provided setup
+code.
+
+    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840 --paa-trust-store-path path/to/PAAs
+
 ### Forget the currently-commissioned device
 
     $ chip-tool pairing unpair
@@ -119,6 +133,32 @@ The endpoint id must be between 1 and 240.
     $ chip-tool onoff on 1
 
 The client will send a single command packet and then exit.
+
+## Configuring the server side for Group Commands
+
+1. Commission and pair device with nodeId 1234
+
+2. Add Group to device
+
+    ```
+    $ chip-tool groups add-group 0x4141 Light 1234 1
+    ```
+
+3. Add group Keyset to device
+
+    ```
+    $ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+    "groupKeySecurityPolicy": 0, "epochKey0":
+    "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+    "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, }' 1234 0
+    ```
+
+4. Bind Key to group
+    ```
+    $ chip-tool groupkeymanagement write group-key-map
+    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
+    ```
 
 ## Configuring the client for Group Commands
 

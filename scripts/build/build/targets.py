@@ -113,11 +113,12 @@ class AcceptNameWithSubstrings:
 
 
 class BuildVariant:
-    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
+    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], requires: List[str] = [], **buildargs):
         self.name = name
         self.validator = validator
         self.conflicts = conflicts
         self.buildargs = buildargs
+        self.requires = requires
 
 
 def HasConflicts(items: List[BuildVariant]) -> bool:
@@ -127,12 +128,27 @@ def HasConflicts(items: List[BuildVariant]) -> bool:
     return False
 
 
+def AllRequirementsMet(items: List[BuildVariant]) -> bool:
+    """
+    Check that item.requires is satisfied for all items in the given list
+    """
+    available = set([item.name for item in items])
+
+    for item in items:
+        for requirement in item.requires:
+            if not requirement in available:
+                return False
+
+    return True
+
+
 class VariantBuilder:
     """Handles creating multiple build variants based on a starting target.
     """
 
-    def __init__(self, targets: List[Target]):
-        self.targets = targets
+    def __init__(self, targets: List[Target] = []):
+        # note the clone in case the default arg is used
+        self.targets = targets[:]
         self.variants = []
         self.glob_whitelist = []
 
@@ -174,6 +190,9 @@ class VariantBuilder:
             for variant_count in range(1, len(ok_variants) + 1):
                 for subgroup in combinations(ok_variants, variant_count):
                     if HasConflicts(subgroup):
+                        continue
+
+                    if not AllRequirementsMet(subgroup):
                         continue
 
                     # Target ready to be created - no conflicts
@@ -223,21 +242,22 @@ def HostTargets():
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
 
-    builder = VariantBuilder([])
+    builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
+    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
+        ['-all-clusters', '-chip-tool']), test_group=True),
+    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), separate_event_loop=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
-    builder.AppendVariant(
-        name="libfuzzer", use_libfuzzer=True, use_clang=True),
-    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
-        ['-all-clusters', '-chip-tool']), test_group=True),
-    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool']), separate_event_loop=False),
+    builder.AppendVariant(name="libfuzzer", requires=[
+                          "clang"], use_libfuzzer=True),
+    builder.AppendVariant(name="clang", use_clang=True),
 
     builder.WhitelistVariantNameForGlob('ipv6only')
 
@@ -308,7 +328,7 @@ def Efr32Targets():
             'only user requested')
     ]
 
-    builder = VariantBuilder([])
+    builder = VariantBuilder()
 
     for board_target in board_targets:
         builder.targets.append(board_target.Extend(

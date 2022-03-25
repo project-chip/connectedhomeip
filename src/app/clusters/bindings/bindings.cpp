@@ -49,6 +49,8 @@ public:
 private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
+
+    CHIP_ERROR NotifyBindingsChanged();
 };
 
 BindingTableAccess gAttrAccess;
@@ -191,6 +193,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -202,10 +205,19 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         CreateBindingEntry(target, path.mEndpointId);
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
+
+CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
+{
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+}
+
 } // namespace
 
 void MatterBindingPluginServerInitCallback()
@@ -221,12 +233,11 @@ void AddBindingEntry(const EmberBindingTableEntry & entry)
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
-            ChipLogProgress(
+            ChipLogError(
                 Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                 ChipLogValueX64(entry.nodeId), err.Format());
         }
     }
 
     BindingTable::GetInstance().Add(entry);
-    BindingManager::GetInstance().NotifyBindingAdded(entry);
 }

@@ -105,13 +105,6 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    ret = chip::Server::GetInstance().AddTestCommissioning();
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-        return ret;
-    }
-
     return CHIP_NO_ERROR;
 }
 
