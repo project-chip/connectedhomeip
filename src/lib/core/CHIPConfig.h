@@ -1771,6 +1771,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
 
+/*
+ * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
+ *
+ * @brief This buffer will used for holding debug text when handling synchronous invokes (AddOrUpdate / Reorder / Remove). Since we
+ * don't set this value for most cases and on most platforms, this value can be 0 to always ignore such field.
+ */
+#ifndef CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
+#define CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER 64
+#endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+
 /**
  * @}
  */
