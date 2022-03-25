@@ -170,7 +170,7 @@ void PacketBufferHandle::InternalRightSize()
     {
         mBuffer = lNewPacket;
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
-        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
+        ChipLogDetail(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
 }
 

@@ -31,7 +31,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
 

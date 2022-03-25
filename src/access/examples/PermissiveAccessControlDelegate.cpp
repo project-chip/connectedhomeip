@@ -59,8 +59,12 @@ public:
     // Iteration
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const override { return CHIP_NO_ERROR; }
 
-    // TODO(#13867): this will go away
-    bool TemporaryCheckOverride() const override { return true; }
+    // Check
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace

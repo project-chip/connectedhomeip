@@ -39,7 +39,7 @@ files required for CHIP.
 
 To start the console provide the path to the device, for example:
 
-    $ python -m chip_rpc.console --device /dev/ttyUSB0
+    $ chip-console --device /dev/ttyUSB0
 
 An example RPC command:
 

@@ -22,6 +22,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <assert.h>
 #include <inttypes.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
@@ -183,7 +184,7 @@ CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer
     err = writer.Finalize();
     SuccessOrExit(err);
 
-    ChipLogProgress(EventLogging, "Copy Event to next buffer with priority %u", static_cast<unsigned>(nextBuffer->GetPriority()));
+    ChipLogDetail(EventLogging, "Copy Event to next buffer with priority %u", static_cast<unsigned>(nextBuffer->GetPriority()));
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -608,10 +609,10 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
-        if (interestedPath->IsEventPathSupersetOf(path))
+        if (interestedPath->mValue.IsEventPathSupersetOf(path))
         {
             ret = CHIP_NO_ERROR;
-            if (!interestedPath->HasEventWildcard())
+            if (!interestedPath->mValue.HasEventWildcard())
             {
                 eventReadViaConcretePath = true;
                 break;
@@ -732,8 +733,9 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                             size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor)
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+                                             EventNumber & aEventMin, size_t & aEventCount,
+                                             const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -747,7 +749,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ClusterI
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     context.mSubjectDescriptor     = aSubjectDescriptor;
-    context.mpInterestedEventPaths = apClusterInfolist;
+    context.mpInterestedEventPaths = apEventPathList;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
 

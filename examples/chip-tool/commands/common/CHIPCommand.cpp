@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -35,6 +36,22 @@ constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
+
+namespace {
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    if (attestationTrustStore.IsInitialized())
+    {
+        return &attestationTrustStore;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+} // namespace
 
 CHIP_ERROR CHIPCommand::Run()
 {
@@ -58,8 +75,19 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    // TODO(issue #15209): Replace this trust store with file-based trust store
-    const chip::Credentials::AttestationTrustStore * trustStore = chip::Credentials::GetTestAttestationTrustStore();
+    const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
+        ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
+        : chip::Credentials::GetTestAttestationTrustStore();
+    ;
+    if (mPaaTrustStorePath.HasValue() && trustStore == nullptr)
+    {
+        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
+        ChipLogError(chipTool,
+                     "Please specify a valid path containing trusted PAA certificates using [--paa-trust-store-path paa/file/path] "
+                     "argument");
+
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId, trustStore));
@@ -107,7 +135,7 @@ void CHIPCommand::StartTracing()
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
-    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
     }
@@ -224,6 +252,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+                                                                            mCommissionerStorage.GetCommissionerCATs(),
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;

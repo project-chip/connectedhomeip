@@ -28,7 +28,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
-// TODO: Remove once the Attestation Credentials storage mechanism is updated.
 namespace chip {
 namespace TestCerts {
 extern const ByteSpan sTestCert_PAA_FFF1_Cert;

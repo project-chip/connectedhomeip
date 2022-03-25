@@ -89,6 +89,7 @@ extern NSString * const kCHIPNullValueType;
 extern NSString * const kCHIPStructureValueType;
 extern NSString * const kCHIPArrayValueType;
 
+@class CHIPAttributeCacheContainer;
 @class CHIPReadParams;
 @class CHIPSubscribeParams;
 
@@ -101,6 +102,9 @@ extern NSString * const kCHIPArrayValueType;
  * Subscribe to receive attribute reports for everything (all endpoints, all
  * clusters, all attributes, all events) on the device.
  *
+ * A non-nil attribute cache container will cache attribute values, retrievable
+ * through the designated attribute cache container.
+ *
  * reportHandler will be called any time a data update is available (with a
  * non-nil "value" and nil "error"), or any time there is an error for the
  * entire subscription (with a nil "value" and non-nil "error").  If it's called
@@ -109,6 +113,8 @@ extern NSString * const kCHIPArrayValueType;
  * The array passed to reportHandler will contain CHIPAttributeReport
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
+ *
+ * reportHandler is not supported over XPC at the moment.
  *
  * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
@@ -121,6 +127,7 @@ extern NSString * const kCHIPArrayValueType;
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
                      params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 

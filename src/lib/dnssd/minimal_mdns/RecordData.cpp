@@ -18,6 +18,7 @@
 #include "RecordData.h"
 
 #include <inet/arpa-inet-compatibility.h>
+#include <stdio.h>
 
 namespace mdns {
 namespace Minimal {
@@ -36,25 +37,30 @@ bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
         {
             return false;
         }
-        pos++;
 
         // name=value string of size length
-        const uint8_t * equalPos = pos;
-        while ((*equalPos != '=') && ((equalPos - pos) < length))
+        const uint8_t * equalPos = pos + 1;
+        while (((equalPos - pos) < length) && (*equalPos != '='))
         {
             equalPos++;
         }
 
-        if (pos + length == equalPos)
+        if (pos + length == equalPos && *equalPos == '=')
         {
-            callback->OnRecord(BytesRange(pos, equalPos), BytesRange());
+            // If there is an '=' sign with an empty value, just ignore it and position the end cursor directly onto
+            // the position of the '='
+            callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange());
+        }
+        else if (pos + length == equalPos && *equalPos != '=')
+        {
+            callback->OnRecord(BytesRange(pos + 1, equalPos + 1), BytesRange());
         }
         else
         {
-            callback->OnRecord(BytesRange(pos, equalPos), BytesRange(equalPos + 1, pos + length));
+            callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange(equalPos + 1, pos + 1 + length));
         }
 
-        pos += length;
+        pos += 1 + length;
     }
 
     return pos == data.End();

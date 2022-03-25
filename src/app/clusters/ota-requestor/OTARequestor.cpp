@@ -107,10 +107,33 @@ void OTARequestor::InitState(intptr_t context)
     OTARequestor * requestorCore = reinterpret_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    // This results in the initial periodic timer kicking off
-    requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-
+    // This initialization may occur due to the following:
+    //   1) Regular boot up - the states should already be correct
+    //   2) Reboot from applying an image - once the image has been confirmed, the provider will be notified of the new version and
+    //   all relevant states will reset for a new OTA update. If the image cannot be confirmed, the driver will be responsible for
+    //   resetting the states appropriately, including the current update state.
+    OtaRequestorServerSetUpdateState(requestorCore->mCurrentUpdateState);
     OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
+}
+
+CHIP_ERROR OTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
+                              BDXDownloader & downloader)
+{
+    mServer             = &server;
+    mCASESessionManager = server.GetCASESessionManager();
+    mStorage            = &storage;
+    mOtaRequestorDriver = &driver;
+    mBdxDownloader      = &downloader;
+
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
+
+    // Load data from KVS
+    LoadCurrentUpdateInfo();
+
+    // Schedule the initializations that needs to be performed in the CHIP context
+    DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
+
+    return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
 }
 
 void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
@@ -159,7 +182,6 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
             fileDesignator.reduce_size(update.fileDesignator.size());
             requestorCore->mFileDesignator = fileDesignator;
-            requestorCore->StoreCurrentUpdateInfo();
 
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
@@ -251,6 +273,22 @@ void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error
 
     ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
+}
+
+void OTARequestor::Reset()
+{
+    mProviderLocation.ClearValue();
+    mUpdateToken.reduce_size(0);
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+    mTargetVersion = 0;
+
+    // Persist in case of a reboot or crash
+    StoreCurrentUpdateInfo();
+}
+
+void OTARequestor::Shutdown(void)
+{
+    mServer->DispatchShutDownAndStopEventLoop();
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
@@ -362,17 +400,17 @@ void OTARequestor::CancelImageUpdate()
 
     mOtaRequestorDriver->UpdateCancelled();
 
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+    Reset();
 }
 
-CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
+CHIP_ERROR OTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
 {
     VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_BAD_REQUEST);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestor::GetState(EndpointId endpointId, OTAUpdateStateEnum & state)
+CHIP_ERROR OTARequestor::GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state)
 {
     VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == EMBER_ZCL_STATUS_SUCCESS, CHIP_ERROR_BAD_REQUEST);
     return CHIP_NO_ERROR;
@@ -504,6 +542,10 @@ void OTARequestor::DownloadUpdateDelayedOnUserConsent()
 void OTARequestor::ApplyUpdate()
 {
     RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
+
+    // If image is successfully applied, the device will reboot so persist all relevant data
+    StoreCurrentUpdateInfo();
+
     ConnectToProvider(kApplyUpdate);
 }
 
@@ -519,9 +561,6 @@ void OTARequestor::NotifyUpdateApplied()
     }
 
     OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
-
-    // There is no response for a notify so consider this OTA complete
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
 
     ConnectToProvider(kNotifyUpdateApplied);
 }
@@ -619,12 +658,17 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
+    // Issue#16151 tracks re-factoring error and state transitioning handling.
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
         mOtaRequestorDriver->HandleIdleState(idleStateReason);
+    }
+    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
+    {
+        mOtaRequestorDriver->HandleIdleStateExit();
     }
 
     mCurrentUpdateState = newState;
@@ -788,7 +832,9 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
-    mProviderLocation.ClearValue(); // Clearing the last used provider location to start afresh on reboot
+    // There is no response for a notify so consider this OTA complete. Clear the provider location and reset any states to indicate
+    // so.
+    Reset();
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
 }
@@ -796,16 +842,75 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
 void OTARequestor::StoreCurrentUpdateInfo()
 {
     // TODO: change OTA requestor storage interface to store both values at once
-    CHIP_ERROR error = mStorage->StoreCurrentProviderLocation(mProviderLocation.Value());
-
-    if (error == CHIP_NO_ERROR)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (mProviderLocation.HasValue())
     {
-        mStorage->StoreUpdateToken(mUpdateToken);
+        error = mStorage->StoreCurrentProviderLocation(mProviderLocation.Value());
+    }
+    else
+    {
+        error = mStorage->ClearCurrentProviderLocation();
     }
 
-    if (error != CHIP_NO_ERROR)
+    if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+    {
+        if (mUpdateToken.size() > 0)
+        {
+            error = mStorage->StoreUpdateToken(mUpdateToken);
+        }
+        else
+        {
+            error = mStorage->ClearUpdateToken();
+        }
+    }
+
+    if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+    {
+        error = mStorage->StoreCurrentUpdateState(mCurrentUpdateState);
+    }
+
+    if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+    {
+        if (mTargetVersion > 0)
+        {
+            error = mStorage->StoreTargetVersion(mTargetVersion);
+        }
+        else
+        {
+            error = mStorage->ClearTargetVersion();
+        }
+    }
+
+    if ((error != CHIP_NO_ERROR) && (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
     {
         ChipLogError(SoftwareUpdate, "Failed to store current update: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
+void OTARequestor::LoadCurrentUpdateInfo()
+{
+    mStorage->LoadDefaultProviders(mDefaultOtaProviderList);
+
+    ProviderLocationType providerLocation;
+    if (mStorage->LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
+    {
+        mProviderLocation.SetValue(providerLocation);
+    }
+
+    MutableByteSpan updateToken(mUpdateTokenBuffer);
+    if (mStorage->LoadUpdateToken(updateToken) == CHIP_NO_ERROR)
+    {
+        mUpdateToken = updateToken;
+    }
+
+    if (mStorage->LoadCurrentUpdateState(mCurrentUpdateState) != CHIP_NO_ERROR)
+    {
+        mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    }
+
+    if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)
+    {
+        mTargetVersion = 0;
     }
 }
 

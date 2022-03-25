@@ -95,6 +95,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
@@ -912,6 +913,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -1113,6 +1115,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
@@ -1435,3 +1438,4 @@ UTF
 localedef
 nameserver
 nmcli
+tsan

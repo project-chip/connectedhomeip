@@ -1283,7 +1283,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                 {
                     mDidSetDirty = true;
 
-                    ClusterInfo dirtyPath;
+                    AttributePathParams dirtyPath;
                     dirtyPath.mEndpointId  = Test::kMockEndpoint3;
                     dirtyPath.mClusterId   = Test::MockClusterId(2);
                     dirtyPath.mAttributeId = Test::MockAttributeId(4);
@@ -1525,28 +1525,28 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
         dirtyPath1.mAttributeId = 1;
 
-        chip::app::ClusterInfo dirtyPath2;
+        chip::app::AttributePathParams dirtyPath2;
         dirtyPath2.mClusterId   = kTestClusterId;
         dirtyPath2.mEndpointId  = kTestEndpointId;
         dirtyPath2.mAttributeId = 2;
 
-        chip::app::ClusterInfo dirtyPath3;
+        chip::app::AttributePathParams dirtyPath3;
         dirtyPath3.mClusterId   = kTestClusterId;
         dirtyPath3.mEndpointId  = kTestEndpointId;
         dirtyPath3.mAttributeId = 2;
         dirtyPath3.mListIndex   = 1;
 
-        chip::app::ClusterInfo dirtyPath4;
+        chip::app::AttributePathParams dirtyPath4;
         dirtyPath4.mClusterId   = kTestClusterId;
         dirtyPath4.mEndpointId  = kTestEndpointId;
         dirtyPath4.mAttributeId = 3;
 
-        chip::app::ClusterInfo dirtyPath5;
+        chip::app::AttributePathParams dirtyPath5;
         dirtyPath5.mClusterId   = kTestClusterId;
         dirtyPath5.mEndpointId  = kTestEndpointId;
         dirtyPath5.mAttributeId = 4;
@@ -1775,7 +1775,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             delegate.mGotReport                 = false;
             delegate.mNumAttributeResponse      = 0;
 
-            ClusterInfo dirtyPath;
+            AttributePathParams dirtyPath;
             dirtyPath.mEndpointId  = Test::kMockEndpoint2;
             dirtyPath.mClusterId   = Test::MockClusterId(3);
             dirtyPath.mAttributeId = Test::MockAttributeId(1);
@@ -1796,7 +1796,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             delegate.mGotReport                 = false;
             delegate.mNumAttributeResponse      = 0;
 
-            ClusterInfo dirtyPath;
+            AttributePathParams dirtyPath;
             dirtyPath.mEndpointId = Test::kMockEndpoint3;
 
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
@@ -2085,12 +2085,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
         dirtyPath1.mAttributeId = 1;
 
-        chip::app::ClusterInfo dirtyPath2;
+        chip::app::AttributePathParams dirtyPath2;
         dirtyPath2.mClusterId   = kTestClusterId;
         dirtyPath2.mEndpointId  = kTestEndpointId;
         dirtyPath2.mAttributeId = 2;
@@ -2404,7 +2404,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
@@ -2501,7 +2501,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);

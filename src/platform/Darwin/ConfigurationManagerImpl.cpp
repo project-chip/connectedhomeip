@@ -29,7 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>

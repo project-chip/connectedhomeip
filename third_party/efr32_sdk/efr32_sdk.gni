@@ -175,7 +175,8 @@ template("efr32_sdk") {
     # USART include files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code)) {
+        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.lcd_on) && invoker.lcd_on)) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       _include_dirs += [
@@ -505,25 +506,24 @@ template("efr32_sdk") {
       }
     }
 
-    if (defined(invoker.show_qr_code)) {
-      if (invoker.show_qr_code) {
-        sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
-          "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_bitmap.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_circle.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_narrow_6x8.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_normal_8x8.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_number_16x20.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_line.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
-        ]
-      }
+    if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.lcd_on) && invoker.lcd_on)) {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
+        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
+        "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_bitmap.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_circle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_narrow_6x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_normal_8x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_number_16x20.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_line.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
+      ]
     }
     if (use_wf200) {
       sources += [

@@ -22,6 +22,7 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -78,34 +79,34 @@ bool DnssdServer::HaveOperationalCredentials()
         }
     }
 
-    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
     return false;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-constexpr const char kExtendedDiscoveryTimeoutKeypairStorage[] = "ExtDiscKey";
-
 void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int16_t secs)
 {
-    ChipLogDetail(Discovery, "SetExtendedDiscoveryTimeoutSecs %d", secs);
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
+    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId16 "s", secs);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
 }
 
 int16_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     int16_t secs;
+    CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
+        DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), &secs);
 
-    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to get extended timeout configuration err: %s", chip::ErrorStr(err));
-        secs = CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
+        return secs;
     }
 
-    ChipLogDetail(Discovery, "GetExtendedDiscoveryTimeoutSecs %d", secs);
-    return secs;
+    if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Discovery, "Failed to load extended discovery timeout: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
 }
 
 /// Callback from Extended Discovery Expiration timer
@@ -118,11 +119,11 @@ void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, vo
 {
     if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpiration))
     {
-        ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for cleared session");
+        ChipLogDetail(Discovery, "Extended discovery timeout cancelled");
         return;
     }
 
-    ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for valid session");
+    ChipLogDetail(Discovery, "Extended discovery timed out");
 
     mExtendedDiscoveryExpiration = kTimeoutCleared;
 }
@@ -220,7 +221,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling Discovery timeout in secs=%d", mDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling discovery timeout in %" PRId16 "s", mDiscoveryTimeoutSecs);
 
     mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
 
@@ -236,7 +237,7 @@ CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling Extended Discovery timeout in secs=%d", extendedDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId16 "s", extendedDiscoveryTimeoutSecs);
 
     mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(extendedDiscoveryTimeoutSecs);
 
@@ -324,7 +325,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     uint32_t val32;
     if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Discovery, "Vendor ID not known");
+        ChipLogDetail(Discovery, "Vendor ID not known");
     }
     else
     {
@@ -333,7 +334,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     if (DeviceLayer::ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Discovery, "Product ID not known");
+        ChipLogDetail(Discovery, "Product ID not known");
     }
     else
     {
@@ -381,7 +382,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     {
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
         {
-            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
         }
         else
         {
@@ -390,7 +391,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
         {
-            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
         }
         else
         {
@@ -401,7 +402,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     {
         if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
         {
-            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
         }
         else
         {
@@ -410,7 +411,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
         if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
         {
-            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
         }
         else
         {
@@ -448,7 +449,7 @@ void DnssdServer::StartServer()
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
-    ChipLogDetail(Discovery, "DNS-SD StartServer mode=%d", static_cast<int>(mode));
+    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
 
     ClearTimeouts();
 
@@ -472,44 +473,33 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
     }
 
-    if (HaveOperationalCredentials())
+    if (mode != chip::Dnssd::CommissioningMode::kDisabled)
     {
-        ChipLogProgress(Discovery, "Have operational credentials");
-        if (mode != chip::Dnssd::CommissioningMode::kDisabled)
-        {
-            err = AdvertiseCommissionableNode(mode);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
-            }
-            // no need to set timeout because callers are currently doing that and their timeout might be longer than the default
-        }
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
-        {
-            err = AdvertiseCommissionableNode(mode);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
-            }
-            // set timeout
-            ScheduleExtendedDiscoveryExpiration();
-        }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    }
-    else
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
-        ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
         err = AdvertiseCommissionableNode(mode);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
+            ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
+        }
+
+        // If any fabrics exist, the commissioning window must have been opened by the administrator
+        // commissioning cluster commands which take care of the timeout.
+        if (!HaveOperationalCredentials())
+        {
+            ScheduleDiscoveryExpiration();
+        }
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
+    {
+        err = AdvertiseCommissionableNode(mode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
         }
         // set timeout
-        ScheduleDiscoveryExpiration();
-#endif
+        ScheduleExtendedDiscoveryExpiration();
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = AdvertiseCommissioner();

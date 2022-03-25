@@ -22,7 +22,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
@@ -990,7 +989,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    ClusterInfo info;
+    AttributePathParams info;
     info.mClusterId   = clusterId;
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
@@ -1010,7 +1009,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    ClusterInfo info;
+    AttributePathParams info;
     info.mEndpointId = endpoint;
 
     // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.

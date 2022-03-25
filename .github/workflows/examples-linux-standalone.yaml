@@ -90,8 +90,7 @@ jobs:
             - name: Build example Standalone All Clusters Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug \
-                    chip_bypass_rendezvous=true
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-app \
                     out/all_clusters_debug/chip-all-clusters-app \

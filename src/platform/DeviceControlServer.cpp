@@ -66,9 +66,7 @@ exit:
         ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %s", ErrorStr(err));
     }
 
-    // TODO(cecille): This command fails on ESP32, but it's blocking IP cluster-based commissioning so for now just return a success
-    // status.
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)

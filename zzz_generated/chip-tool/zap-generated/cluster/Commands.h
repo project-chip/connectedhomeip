@@ -2603,7 +2603,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7153,11 +7153,12 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * CurrentMode                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * OnMode                                                            | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * Description                                                       | 0x0004 |
+| * Description                                                       | 0x0000 |
+| * StandardNamespace                                                 | 0x0001 |
+| * SupportedModes                                                    | 0x0002 |
+| * CurrentMode                                                       | 0x0003 |
+| * StartUpMode                                                       | 0x0004 |
+| * OnMode                                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7197,6 +7198,32 @@ private:
     chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type mRequest;
 };
 
+class WriteModeSelectStartUpMode : public WriteAttribute
+{
+public:
+    WriteModeSelectStartUpMode(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("StartUpMode", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000004, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000004, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
 class WriteModeSelectOnMode : public WriteAttribute
 {
 public:
@@ -7211,16 +7238,16 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000002, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000005, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000005, mValue);
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -21783,24 +21810,27 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                                   //
-        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                                   //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<WriteModeSelectStartUpMode>(credsIssuerConfig),                                                             //
         make_unique<WriteModeSelectOnMode>(credsIssuerConfig),                                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
-        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

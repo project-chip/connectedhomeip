@@ -58,6 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          saveAs: CurrentLevelValue
           constraints:
               minValue: 0
               maxValue: 1
@@ -97,8 +98,7 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 2
-              maxValue: 3
+              notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

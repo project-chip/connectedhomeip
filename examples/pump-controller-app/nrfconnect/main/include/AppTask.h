@@ -44,7 +44,6 @@ private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
-    void InitOTARequestor();
 
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);

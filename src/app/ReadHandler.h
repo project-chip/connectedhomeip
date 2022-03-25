@@ -27,10 +27,13 @@
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
+#include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
+#include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
+#include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -157,10 +160,10 @@ public:
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
 
-    const ClusterInfo * GetAttributeClusterInfolist() const { return mpAttributeClusterInfoList; }
-    const ClusterInfo * GetEventClusterInfolist() const { return mpEventClusterInfoList; }
-    const ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
-
+    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
@@ -219,7 +222,7 @@ private:
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
-
+    
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
     // with snapshotted last event number. if current priority  is in the end, no valid
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
@@ -238,7 +241,7 @@ private:
         mDirty = true;
         // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
         // we've sent up till now are no longer valid and need to be invalidated.
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
@@ -322,10 +325,10 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                      = HandlerState::Idle;
-    ClusterInfo * mpAttributeClusterInfoList = nullptr;
-    ClusterInfo * mpEventClusterInfoList     = nullptr;
-    ClusterInfo * mpDataVersionFilterList    = nullptr;
+    HandlerState mState                                     = HandlerState::Idle;
+    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
+    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
+    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

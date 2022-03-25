@@ -723,10 +723,6 @@ exit:
 template <class ConfigClass>
 bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
 {
-#if CHIP_BYPASS_RENDEZVOUS
-    return true;
-#else // CHIP_BYPASS_RENDEZVOUS
-
     return
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         ConnectivityMgr().IsWiFiStationProvisioned() &&
@@ -735,7 +731,6 @@ bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
         ConnectivityMgr().IsThreadProvisioned() &&
 #endif
         true;
-#endif // CHIP_BYPASS_RENDEZVOUS
 }
 
 template <class ConfigClass>

@@ -94,6 +94,7 @@ template("chip_data_model") {
       "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/message.cpp",
+      "${_app_root}/util/privilege-storage.cpp",
       "${_app_root}/util/util.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]

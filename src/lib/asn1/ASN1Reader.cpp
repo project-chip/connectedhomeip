@@ -297,7 +297,7 @@ CHIP_ERROR ASN1Reader::DecodeHead()
 
     mHeadLen = static_cast<uint32_t>(p - mElemStart);
 
-    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && Constructed == false && ValueLen == 0);
+    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && !Constructed && ValueLen == 0);
 
     Value = p;
 

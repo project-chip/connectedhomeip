@@ -24,23 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class ContainerAttributeCacheCallback : public chip::app::AttributeCache::Callback {
-public:
-    void SetContainer(CHIPAttributeCacheContainer * container) { attributeCacheContainer = container; }
-
-    void OnDone() override;
-
-private:
-    __weak CHIPAttributeCacheContainer * _Nullable attributeCacheContainer;
-};
-
 @interface CHIPAttributeCacheContainer ()
 
-@property (nonatomic, readwrite) chip::app::AttributeCache * _Nullable cppAttributeCache;
-@property (nonatomic, readwrite) chip::app::ReadClient * _Nullable cppReadClient;
-@property (nonatomic, readwrite) ContainerAttributeCacheCallback * _Nullable attributeCacheCallback;
+@property (atomic, readwrite, nullable) chip::app::AttributeCache * cppAttributeCache;
 @property (nonatomic, readwrite) uint64_t deviceId;
-@property (atomic, readwrite, weak) CHIPDeviceControllerOverXPC * _Nullable xpcDeviceController;
+@property (nonatomic, readwrite, weak, nullable) CHIPDeviceControllerXPCConnection * xpcConnection;
+@property (nonatomic, readwrite, strong, nullable) id<NSCopying> xpcControllerId;
+@property (atomic, readwrite) BOOL shouldUseXPC;
 
 @end
 

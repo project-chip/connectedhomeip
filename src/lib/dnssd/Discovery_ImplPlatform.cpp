@@ -445,7 +445,7 @@ void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type
     }
     else
     {
-        ChipLogProgress(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
     }
 }
 

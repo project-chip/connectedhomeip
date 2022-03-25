@@ -230,7 +230,9 @@ public:
                               subscriptionEstablished:NULL
                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                             NSLog(@"AccessControl.Acl response %@", [value description]);
-                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                            if (error || !mWait) {
+                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                            }
                                         }];
 
         return CHIP_NO_ERROR;
@@ -307,7 +309,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"AccessControl.Extension response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -383,7 +387,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AccessControl.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -459,7 +465,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -534,7 +542,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccessControl.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -609,7 +619,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccessControl.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -809,7 +821,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AccountLogin.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -885,7 +899,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -960,7 +976,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccountLogin.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -1035,7 +1053,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccountLogin.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -1251,7 +1271,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"AdministratorCommissioning.WindowStatus response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -1331,7 +1353,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"AdministratorCommissioning.AdminFabricIndex response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -1411,7 +1435,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AdminVendorId response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -1491,7 +1517,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -1571,7 +1599,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -1651,7 +1681,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -1731,7 +1763,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AdministratorCommissioning.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -1833,7 +1867,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationBasic.VendorName response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -1912,7 +1948,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ApplicationBasic.VendorID response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -1991,7 +2029,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ApplicationName response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -2070,7 +2110,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ApplicationBasic.ProductID response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -2120,6 +2162,55 @@ public:
         }];
         return err;
     }
+};
+
+class SubscribeAttributeApplicationBasicApplication : public ModelCommand {
+public:
+    SubscribeAttributeApplicationBasicApplication()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "application");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeApplicationBasicApplication() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
+                                                                             endpoint:endpointId
+                                                                                queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeApplicationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                  params:params
+                                 subscriptionEstablished:NULL
+                                           reportHandler:^(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                               NSError * _Nullable error) {
+                                               NSLog(@"ApplicationBasic.Application response %@", [value description]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -2184,7 +2275,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"ApplicationBasic.Status response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -2264,7 +2357,9 @@ public:
                                                        reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ApplicationBasic.ApplicationVersion response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -2344,7 +2439,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ApplicationBasic.AllowedVendorList response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -2424,7 +2521,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ApplicationBasic.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -2504,7 +2603,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ApplicationBasic.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -2583,7 +2684,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationBasic.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -2662,7 +2765,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -2872,7 +2977,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ApplicationLauncher.CatalogList response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -2958,6 +3065,54 @@ public:
 private:
 };
 
+class SubscribeAttributeApplicationLauncherCurrentApp : public ModelCommand {
+public:
+    SubscribeAttributeApplicationLauncherCurrentApp()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-app");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeApplicationLauncherCurrentApp() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentAppWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                   NSError * _Nullable error) {
+                                                   NSLog(@"ApplicationLauncher.CurrentApp response %@", [value description]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute GeneratedCommandList
  */
@@ -3021,7 +3176,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ApplicationLauncher.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -3101,7 +3258,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ApplicationLauncher.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -3180,7 +3339,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationLauncher.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -3260,7 +3421,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationLauncher.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -3425,7 +3588,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"AudioOutput.OutputList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -3500,7 +3665,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.CurrentOutput response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -3576,7 +3743,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -3652,7 +3821,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -3727,7 +3898,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -3802,7 +3975,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -3968,7 +4143,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.BarrierMovingState response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -4044,7 +4221,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierSafetyStatus response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -4120,7 +4299,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierCapabilities response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -4195,7 +4376,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.BarrierPosition response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -4271,7 +4454,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BarrierControl.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -4347,7 +4532,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -4422,7 +4609,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -4497,7 +4686,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -4611,7 +4802,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.DataModelRevision response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -4686,7 +4879,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.VendorName response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -4761,7 +4956,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.VendorID response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -4836,7 +5033,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Basic.ProductName response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -4911,7 +5110,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.ProductID response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -5022,7 +5223,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.NodeLabel response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -5133,7 +5336,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.Location response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -5208,7 +5413,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.HardwareVersion response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -5284,7 +5491,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.HardwareVersionString response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -5359,7 +5568,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.SoftwareVersion response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -5435,7 +5646,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.SoftwareVersionString response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -5510,7 +5723,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.ManufacturingDate response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -5585,7 +5800,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.PartNumber response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -5660,7 +5877,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.ProductURL response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -5735,7 +5954,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.ProductLabel response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -5810,7 +6031,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.SerialNumber response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -5919,7 +6142,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Basic.LocalConfigDisabled response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -5994,7 +6219,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.Reachable response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -6069,7 +6296,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.UniqueID response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -6144,7 +6373,9 @@ public:
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -6219,7 +6450,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -6294,7 +6527,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Basic.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -6369,7 +6604,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -6508,7 +6745,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.OutOfService response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -6623,7 +6862,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.PresentValue response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -6702,7 +6943,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BinaryInputBasic.StatusFlags response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -6782,7 +7025,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BinaryInputBasic.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -6862,7 +7107,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BinaryInputBasic.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -6941,7 +7188,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BinaryInputBasic.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -7020,7 +7269,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BinaryInputBasic.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -7113,7 +7364,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"Binding.Binding response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -7189,7 +7442,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -7264,7 +7519,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -7339,7 +7596,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Binding.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -7414,7 +7673,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Binding.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -7506,7 +7767,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BooleanState.StateValue response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -7582,7 +7845,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BooleanState.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -7658,7 +7923,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -7733,7 +8000,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BooleanState.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -7808,7 +8077,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BooleanState.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -8374,7 +8645,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedActions.ActionList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -8449,7 +8722,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedActions.EndpointList response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -8524,7 +8799,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedActions.SetupUrl response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -8600,7 +8877,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BridgedActions.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -8676,7 +8955,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BridgedActions.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -8751,7 +9032,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedActions.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -8826,7 +9109,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BridgedActions.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -8939,7 +9224,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.VendorName response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -9018,7 +9305,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedDeviceBasic.VendorID response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -9097,7 +9386,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BridgedDeviceBasic.ProductName response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -9214,7 +9505,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.NodeLabel response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -9294,7 +9587,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.HardwareVersion response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -9374,7 +9669,9 @@ public:
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.HardwareVersionString response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -9454,7 +9751,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.SoftwareVersion response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -9534,7 +9833,9 @@ public:
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.SoftwareVersionString response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -9614,7 +9915,9 @@ public:
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"BridgedDeviceBasic.ManufacturingDate response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -9693,7 +9996,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.PartNumber response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -9772,7 +10077,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ProductURL response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -9851,7 +10158,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.ProductLabel response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -9930,7 +10239,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.SerialNumber response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -10009,7 +10320,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.Reachable response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -10088,7 +10401,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedDeviceBasic.UniqueID response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -10168,7 +10483,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -10248,7 +10565,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -10327,7 +10646,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedDeviceBasic.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -10407,7 +10728,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -10610,7 +10933,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Channel.ChannelList response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -10660,6 +10985,52 @@ public:
     }
 };
 
+class SubscribeAttributeChannelLineup : public ModelCommand {
+public:
+    SubscribeAttributeChannelLineup()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "lineup");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeChannelLineup() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeLineupWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                             params:params
+                            subscriptionEstablished:NULL
+                                      reportHandler:^(CHIPChannelClusterLineupInfo * _Nullable value, NSError * _Nullable error) {
+                                          NSLog(@"Channel.Lineup response %@", [value description]);
+                                          if (error || !mWait) {
+                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                          }
+                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute CurrentChannel
  */
@@ -10691,6 +11062,52 @@ public:
         }];
         return err;
     }
+};
+
+class SubscribeAttributeChannelCurrentChannel : public ModelCommand {
+public:
+    SubscribeAttributeChannelCurrentChannel()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-channel");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeChannelCurrentChannel() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentChannelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(
+                                                       CHIPChannelClusterChannelInfo * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"Channel.CurrentChannel response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -10752,7 +11169,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -10827,7 +11246,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -10902,7 +11323,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Channel.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -10977,7 +11400,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Channel.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -12000,7 +12425,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ColorControl.CurrentHue response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -12075,7 +12502,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.CurrentSaturation response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -12150,7 +12579,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.RemainingTime response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -12225,7 +12656,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentX response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -12300,7 +12733,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentY response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -12375,7 +12810,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.DriftCompensation response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -12450,7 +12887,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.CompensationText response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -12525,7 +12964,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.ColorTemperature response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -12600,7 +13041,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.ColorMode response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -12711,7 +13154,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ColorControl.ColorControlOptions response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -12786,7 +13231,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.NumberOfPrimaries response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -12861,7 +13308,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -12936,7 +13385,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13011,7 +13462,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary1Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -13086,7 +13539,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13161,7 +13616,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13236,7 +13693,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary2Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -13311,7 +13770,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13386,7 +13847,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13461,7 +13924,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary3Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -13536,7 +14001,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13611,7 +14078,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13686,7 +14155,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary4Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -13761,7 +14232,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13836,7 +14309,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -13911,7 +14386,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary5Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -13986,7 +14463,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6X response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -14061,7 +14540,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6Y response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -14136,7 +14617,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary6Intensity response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -14245,7 +14728,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointX response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -14354,7 +14839,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointY response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -14463,7 +14950,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRX response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -14572,7 +15061,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRY response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -14683,7 +15174,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointRIntensity response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -14792,7 +15285,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGX response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -14901,7 +15396,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGY response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -15012,7 +15509,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointGIntensity response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -15121,7 +15620,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBX response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -15230,7 +15731,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBY response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -15341,7 +15844,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointBIntensity response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -15417,7 +15922,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.EnhancedCurrentHue response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -15492,7 +15999,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.EnhancedColorMode response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -15567,7 +16076,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ColorLoopActive response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -15643,7 +16154,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopDirection response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -15718,7 +16231,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopTime response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -15796,7 +16311,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorLoopStartEnhancedHue response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -15874,7 +16391,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ColorControl.ColorLoopStoredEnhancedHue response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -15949,7 +16468,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.ColorCapabilities response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -16025,7 +16546,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMin response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -16101,7 +16624,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMax response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -16181,7 +16706,9 @@ public:
                                                                    NSLog(
                                                                        @"ColorControl.CoupleColorTempToLevelMinMireds response %@",
                                                                        [value description]);
-                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   if (error || !mWait) {
+                                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   }
                                                                }];
 
         return CHIP_NO_ERROR;
@@ -16296,7 +16823,9 @@ public:
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"ColorControl.StartUpColorTemperatureMireds response %@",
                                                                      [value description]);
-                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
                                                              }];
 
         return CHIP_NO_ERROR;
@@ -16372,7 +16901,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -16448,7 +16979,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -16523,7 +17056,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -16598,7 +17133,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -16776,7 +17313,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ContentLauncher.AcceptHeader response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -16890,7 +17429,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ContentLauncher.SupportedStreamingProtocols response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -16966,7 +17507,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ContentLauncher.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -17042,7 +17585,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ContentLauncher.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -17117,7 +17662,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ContentLauncher.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -17192,7 +17739,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ContentLauncher.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -17286,7 +17835,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.DeviceList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -17361,7 +17912,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ServerList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -17436,7 +17989,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ClientList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -17511,7 +18066,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Descriptor.PartsList response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -17587,7 +18144,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -17663,7 +18222,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -17738,7 +18299,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Descriptor.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -17813,7 +18376,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Descriptor.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -17948,7 +18513,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"DiagnosticLogs.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -18024,7 +18591,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DiagnosticLogs.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -18099,7 +18668,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DiagnosticLogs.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -18858,7 +19429,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.LockState response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -18933,7 +19506,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.LockType response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -19008,7 +19583,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ActuatorEnabled response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -19083,7 +19660,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.DoorState response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -19161,7 +19740,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"DoorLock.NumberOfTotalUsersSupported response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -19239,7 +19820,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"DoorLock.NumberOfPINUsersSupported response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -19317,7 +19900,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DoorLock.NumberOfRFIDUsersSupported response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -19398,8 +19983,10 @@ public:
                                                                                   @"NumberOfWeekDaySchedulesSupportedPerUser "
                                                                                   @"response %@",
                                                                                 [value description]);
-                                                                            SetCommandExitStatus(
-                                                                                [CHIPError errorToCHIPErrorCode:error]);
+                                                                            if (error || !mWait) {
+                                                                                SetCommandExitStatus(
+                                                                                    [CHIPError errorToCHIPErrorCode:error]);
+                                                                            }
                                                                         }];
 
         return CHIP_NO_ERROR;
@@ -19480,8 +20067,10 @@ public:
                                                                                   @"NumberOfYearDaySchedulesSupportedPerUser "
                                                                                   @"response %@",
                                                                                 [value description]);
-                                                                            SetCommandExitStatus(
-                                                                                [CHIPError errorToCHIPErrorCode:error]);
+                                                                            if (error || !mWait) {
+                                                                                SetCommandExitStatus(
+                                                                                    [CHIPError errorToCHIPErrorCode:error]);
+                                                                            }
                                                                         }];
 
         return CHIP_NO_ERROR;
@@ -19556,7 +20145,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MaxPINCodeLength response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -19631,7 +20222,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MinPINCodeLength response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -19706,7 +20299,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MaxRFIDCodeLength response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -19781,7 +20376,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MinRFIDCodeLength response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -19892,7 +20489,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.Language response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -20001,7 +20600,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"DoorLock.AutoRelockTime response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -20110,7 +20711,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"DoorLock.SoundVolume response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -20219,7 +20822,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.OperatingMode response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -20296,7 +20901,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.SupportedOperatingModes response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -20407,7 +21014,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.EnableOneTouchLocking response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -20519,7 +21128,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.EnablePrivacyModeButton response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -20628,7 +21239,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DoorLock.WrongCodeEntryLimit response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -20704,7 +21317,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -20779,7 +21394,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -20854,7 +21471,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -20929,7 +21548,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -21154,7 +21775,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.MeasurementType response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -21234,7 +21857,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ElectricalMeasurement.TotalActivePower response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -21313,7 +21938,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsVoltage response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -21393,7 +22020,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMin response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -21473,7 +22102,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMax response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -21552,7 +22183,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsCurrent response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -21632,7 +22265,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMin response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -21712,7 +22347,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMax response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -21791,7 +22428,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ElectricalMeasurement.ActivePower response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -21871,7 +22510,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMin response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -21951,7 +22592,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMax response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -22031,7 +22674,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -22111,7 +22756,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -22191,7 +22838,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -22271,7 +22920,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -22406,7 +23057,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.PHYRate response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -22485,7 +23138,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FullDuplex response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -22565,7 +23220,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketRxCount response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -22645,7 +23302,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketTxCount response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -22724,7 +23383,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.TxErrCount response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -22804,7 +23465,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.CollisionCount response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -22884,7 +23547,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.OverrunCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -22964,7 +23629,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.CarrierDetect response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -23044,7 +23711,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.TimeSinceReset response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -23124,7 +23793,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -23204,7 +23875,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -23284,7 +23957,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -23363,7 +24038,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -23443,7 +24120,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"EthernetNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -23569,7 +24248,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"FanControl.FanMode response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -23678,7 +24359,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.FanModeSequence response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -23754,7 +24437,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -23830,7 +24515,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -23905,7 +24592,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FanControl.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -23980,7 +24669,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"FanControl.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -24055,7 +24746,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -24146,7 +24839,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FixedLabel.LabelList response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -24222,7 +24917,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -24298,7 +24995,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -24373,7 +25072,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FixedLabel.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -24448,7 +25149,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FixedLabel.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -24542,7 +25245,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.MeasuredValue response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -24618,7 +25323,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MinMeasuredValue response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -24694,7 +25401,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MaxMeasuredValue response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -24769,7 +25478,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FlowMeasurement.Tolerance response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -24845,7 +25556,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"FlowMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -24921,7 +25634,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"FlowMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -24996,7 +25711,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -25071,7 +25788,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FlowMeasurement.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -25335,7 +26054,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.Breadcrumb response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -25385,6 +26106,57 @@ public:
         }];
         return err;
     }
+};
+
+class SubscribeAttributeGeneralCommissioningBasicCommissioningInfo : public ModelCommand {
+public:
+    SubscribeAttributeGeneralCommissioningBasicCommissioningInfo()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "basic-commissioning-info");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeGeneralCommissioningBasicCommissioningInfo() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
+                                                                                     endpoint:endpointId
+                                                                                        queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeBasicCommissioningInfoWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:NULL
+                                                      reportHandler:^(
+                                                          CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value,
+                                                          NSError * _Nullable error) {
+                                                          NSLog(@"GeneralCommissioning.BasicCommissioningInfo response %@",
+                                                              [value description]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
+                                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -25450,7 +26222,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"GeneralCommissioning.RegulatoryConfig response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -25530,7 +26304,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GeneralCommissioning.LocationCapability response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -25610,7 +26386,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -25690,7 +26468,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -25769,7 +26549,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralCommissioning.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -25849,7 +26631,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -25956,7 +26740,9 @@ public:
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.NetworkInterfaces response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -26035,7 +26821,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.RebootCount response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -26114,7 +26902,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"GeneralDiagnostics.UpTime response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -26194,7 +26984,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralDiagnostics.TotalOperationalHours response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -26273,7 +27065,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.BootReasons response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -26353,7 +27147,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralDiagnostics.ActiveHardwareFaults response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -26433,7 +27229,9 @@ public:
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.ActiveRadioFaults response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -26513,7 +27311,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralDiagnostics.ActiveNetworkFaults response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -26593,7 +27393,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -26673,7 +27475,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -26752,7 +27556,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralDiagnostics.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -26832,7 +27638,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralDiagnostics.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -27081,7 +27889,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GroupKeyManagement.GroupKeyMap response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -27162,7 +27972,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.GroupTable response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -27242,7 +28054,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GroupKeyManagement.MaxGroupsPerFabric response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -27322,7 +28136,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GroupKeyManagement.MaxGroupKeysPerFabric response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -27402,7 +28218,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GroupKeyManagement.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -27482,7 +28300,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GroupKeyManagement.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -27561,7 +28381,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GroupKeyManagement.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -27641,7 +28463,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -27950,7 +28774,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Groups.NameSupport response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -28025,7 +28851,9 @@ public:
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -28100,7 +28928,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -28175,7 +29005,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Groups.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -28250,7 +29082,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Groups.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -28481,7 +29315,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyTime response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -28556,7 +29392,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyType response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -28632,7 +29470,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -28707,7 +29547,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -28782,7 +29624,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Identify.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -28857,7 +29701,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Identify.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -28957,7 +29803,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.MeasuredValue response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -29037,7 +29885,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -29117,7 +29967,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -29196,7 +30048,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"IlluminanceMeasurement.Tolerance response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -29276,7 +30130,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.LightSensorType response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -29356,7 +30212,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -29436,7 +30294,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -29516,7 +30376,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -29596,7 +30458,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -29723,7 +30587,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -29799,7 +30665,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -29874,7 +30742,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"KeypadInput.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -29949,7 +30819,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"KeypadInput.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -30373,7 +31245,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.CurrentLevel response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -30448,7 +31322,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.RemainingTime response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -30523,7 +31399,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MinLevel response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -30598,7 +31476,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MaxLevel response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -30673,7 +31553,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.CurrentFrequency response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -30748,7 +31630,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MinFrequency response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -30823,7 +31707,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MaxFrequency response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -30932,7 +31818,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.Options response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -31043,7 +31931,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.OnOffTransitionTime response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -31152,7 +32042,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.OnLevel response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -31261,7 +32153,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.OnTransitionTime response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -31370,7 +32264,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"LevelControl.OffTransitionTime response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -31479,7 +32375,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.DefaultMoveRate response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -31590,7 +32488,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.StartUpCurrentLevel response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -31666,7 +32566,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"LevelControl.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -31742,7 +32644,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -31817,7 +32721,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -31892,7 +32798,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"LevelControl.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -31967,7 +32875,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -32103,7 +33013,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LocalizationConfiguration.ActiveLocale response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -32183,7 +33095,9 @@ public:
                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LocalizationConfiguration.SupportedLocales response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -32263,7 +33177,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -32343,7 +33259,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -32423,7 +33341,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LocalizationConfiguration.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -32544,7 +33464,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -32619,7 +33541,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -32694,7 +33618,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LowPower.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -32769,7 +33695,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LowPower.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -32994,7 +33922,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"MediaInput.InputList response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -33069,7 +33999,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaInput.CurrentInput response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -33145,7 +34077,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -33221,7 +34155,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -33296,7 +34232,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaInput.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -33371,7 +34309,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaInput.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -33834,7 +34774,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaPlayback.CurrentState response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -33909,7 +34851,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"MediaPlayback.StartTime response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -33984,7 +34928,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"MediaPlayback.Duration response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -34032,6 +34978,52 @@ public:
         }];
         return err;
     }
+};
+
+class SubscribeAttributeMediaPlaybackSampledPosition : public ModelCommand {
+public:
+    SubscribeAttributeMediaPlaybackSampledPosition()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "sampled-position");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeMediaPlaybackSampledPosition() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSampledPositionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                        NSError * _Nullable error) {
+                                                        NSLog(@"MediaPlayback.SampledPosition response %@", [value description]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -34092,7 +35084,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.PlaybackSpeed response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -34167,7 +35161,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaPlayback.SeekRangeEnd response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -34242,7 +35238,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaPlayback.SeekRangeStart response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -34318,7 +35316,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"MediaPlayback.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -34394,7 +35394,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -34469,7 +35471,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -34544,7 +35548,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaPlayback.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -34568,11 +35574,12 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * CurrentMode                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * OnMode                                                            | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * Description                                                       | 0x0004 |
+| * Description                                                       | 0x0000 |
+| * StandardNamespace                                                 | 0x0001 |
+| * SupportedModes                                                    | 0x0002 |
+| * CurrentMode                                                       | 0x0003 |
+| * StartUpMode                                                       | 0x0004 |
+| * OnMode                                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -34617,340 +35624,6 @@ private:
 };
 
 /*
- * Attribute CurrentMode
- */
-class ReadModeSelectCurrentMode : public ModelCommand {
-public:
-    ReadModeSelectCurrentMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectCurrentMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "current-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectCurrentMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute SupportedModes
- */
-class ReadModeSelectSupportedModes : public ModelCommand {
-public:
-    ReadModeSelectSupportedModes()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "supported-modes");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectSupportedModes()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "supported-modes");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectSupportedModes() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                          params:params
-                                         subscriptionEstablished:NULL
-                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                   }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute OnMode
- */
-class ReadModeSelectOnMode : public ModelCommand {
-public:
-    ReadModeSelectOnMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "on-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.OnMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class WriteModeSelectOnMode : public ModelCommand {
-public:
-    WriteModeSelectOnMode()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-
-        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
-
-        [cluster writeAttributeOnModeWithValue:value
-                             completionHandler:^(NSError * _Nullable error) {
-                                 err = [CHIPError errorToCHIPErrorCode:error];
-                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
-                                 SetCommandExitStatus(err);
-                             }];
-        return err;
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class SubscribeAttributeModeSelectOnMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectOnMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectOnMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                  params:params
-                                 subscriptionEstablished:NULL
-                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute StartUpMode
- */
-class ReadModeSelectStartUpMode : public ModelCommand {
-public:
-    ReadModeSelectStartUpMode()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
-public:
-    SubscribeAttributeModeSelectStartUpMode()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "start-up-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributeModeSelectStartUpMode() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                       params:params
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute Description
  */
 class ReadModeSelectDescription : public ModelCommand {
@@ -34966,7 +35639,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
@@ -34998,7 +35671,7 @@ public:
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
@@ -35008,8 +35681,463 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.Description response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute StandardNamespace
+ */
+class ReadModeSelectStandardNamespace : public ModelCommand {
+public:
+    ReadModeSelectStandardNamespace()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "standard-namespace");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStandardNamespace() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect StandardNamespace Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectStandardNamespace : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectStandardNamespace()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "standard-namespace");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectStandardNamespace() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStandardNamespaceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:NULL
+                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                          NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
+                                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportedModes
+ */
+class ReadModeSelectSupportedModes : public ModelCommand {
+public:
+    ReadModeSelectSupportedModes()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-modes");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect SupportedModes Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectSupportedModes : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectSupportedModes()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "supported-modes");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectSupportedModes() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CurrentMode
+ */
+class ReadModeSelectCurrentMode : public ModelCommand {
+public:
+    ReadModeSelectCurrentMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect CurrentMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectCurrentMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectCurrentMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "current-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectCurrentMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute StartUpMode
+ */
+class ReadModeSelectStartUpMode : public ModelCommand {
+public:
+    ReadModeSelectStartUpMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteModeSelectStartUpMode : public ModelCommand {
+public:
+    WriteModeSelectStartUpMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeStartUpModeWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      err = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+                                      SetCommandExitStatus(err);
+                                  }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectStartUpMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute OnMode
+ */
+class ReadModeSelectOnMode : public ModelCommand {
+public:
+    ReadModeSelectOnMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "on-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.OnMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteModeSelectOnMode : public ModelCommand {
+public:
+    WriteModeSelectOnMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeOnModeWithValue:value
+                             completionHandler:^(NSError * _Nullable error) {
+                                 err = [CHIPError errorToCHIPErrorCode:error];
+                                 ChipLogError(chipTool, "ModeSelect OnMode Error: %s", chip::ErrorStr(err));
+                                 SetCommandExitStatus(err);
+                             }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeModeSelectOnMode : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectOnMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectOnMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                  params:params
+                                 subscriptionEstablished:NULL
+                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                               NSLog(@"ModeSelect.OnMode response %@", [value description]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
+                                           }];
 
         return CHIP_NO_ERROR;
     }
@@ -35084,7 +36212,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -35160,7 +36290,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -35235,8 +36367,87 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ModeSelect.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadModeSelectFeatureMap : public ModelCommand {
+public:
+    ReadModeSelectFeatureMap()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "ModeSelect FeatureMap Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeModeSelectFeatureMap : public ModelCommand {
+public:
+    SubscribeAttributeModeSelectFeatureMap()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeModeSelectFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                   NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
+                                               }];
 
         return CHIP_NO_ERROR;
     }
@@ -35310,7 +36521,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ModeSelect.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -35670,7 +36883,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"NetworkCommissioning.MaxNetworks response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -35749,7 +36964,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"NetworkCommissioning.Networks response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -35829,7 +37046,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"NetworkCommissioning.ScanMaxTimeSeconds response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -35909,7 +37128,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.ConnectMaxTimeSeconds response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -36026,7 +37247,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"NetworkCommissioning.InterfaceEnabled response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -36106,7 +37329,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"NetworkCommissioning.LastNetworkingStatus response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -36185,7 +37410,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"NetworkCommissioning.LastNetworkID response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -36265,7 +37492,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.LastConnectErrorValue response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -36345,7 +37574,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"NetworkCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -36425,7 +37656,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"NetworkCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -36504,7 +37737,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -36584,7 +37819,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -36819,7 +38056,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OtaSoftwareUpdateProvider.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -36899,7 +38138,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateProvider.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -37054,7 +38295,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.DefaultOtaProviders response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -37134,7 +38377,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"OtaSoftwareUpdateRequestor.UpdatePossible response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -37214,7 +38459,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OtaSoftwareUpdateRequestor.UpdateState response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -37294,7 +38541,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.UpdateStateProgress response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -37374,7 +38623,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OtaSoftwareUpdateRequestor.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -37454,7 +38705,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateRequestor.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -37560,7 +38813,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"OccupancySensing.Occupancy response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -37640,7 +38895,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OccupancySensing.OccupancySensorType response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -37722,7 +38979,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OccupancySensing.OccupancySensorTypeBitmap response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -37802,7 +39061,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OccupancySensing.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -37882,7 +39143,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OccupancySensing.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -37961,7 +39224,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OccupancySensing.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -38040,7 +39305,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OccupancySensing.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -38334,7 +39601,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"OnOff.OnOff response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -38409,7 +39678,9 @@ public:
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OnOff.GlobalSceneControl response %@", [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -38518,7 +39789,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OnOff.OnTime response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -38627,7 +39900,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"OnOff.OffWaitTime response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -38736,7 +40011,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"OnOff.StartUpOnOff response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -38811,7 +40088,9 @@ public:
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -38886,7 +40165,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -38961,7 +40242,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OnOff.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -39036,7 +40319,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOff.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -39111,7 +40396,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOff.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -39207,7 +40494,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOffSwitchConfiguration.SwitchType response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -39324,7 +40613,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.SwitchActions response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -39404,7 +40695,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -39484,7 +40777,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -39564,7 +40859,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -39644,7 +40941,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOffSwitchConfiguration.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -40110,7 +41409,9 @@ public:
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"OperationalCredentials.NOCs response %@", [value description]);
-                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             if (error || !mWait) {
+                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             }
                                          }];
 
         return CHIP_NO_ERROR;
@@ -40191,7 +41492,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"OperationalCredentials.Fabrics response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -40271,7 +41574,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"OperationalCredentials.SupportedFabrics response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -40351,7 +41656,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OperationalCredentials.CommissionedFabrics response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -40431,7 +41738,9 @@ public:
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"OperationalCredentials.TrustedRootCertificates response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -40511,7 +41820,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OperationalCredentials.CurrentFabricIndex response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -40591,7 +41902,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OperationalCredentials.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -40671,7 +41984,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OperationalCredentials.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -40751,7 +42066,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OperationalCredentials.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -40831,7 +42148,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OperationalCredentials.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -40952,7 +42271,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PowerSource.Status response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -41027,7 +42348,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PowerSource.Order response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -41102,7 +42425,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PowerSource.Description response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -41177,7 +42502,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.BatteryVoltage response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -41254,7 +42581,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"PowerSource.BatteryPercentRemaining response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -41330,7 +42659,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.BatteryTimeRemaining response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -41406,7 +42737,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeLevel response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -41482,7 +42815,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.ActiveBatteryFaults response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -41558,7 +42893,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeState response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -41634,7 +42971,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -41710,7 +43049,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -41785,7 +43126,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -41860,7 +43203,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PowerSource.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -41935,7 +43280,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -42030,7 +43377,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PowerSourceConfiguration.Sources response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -42110,7 +43459,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -42190,7 +43541,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -42270,7 +43623,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PowerSourceConfiguration.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -42350,7 +43705,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSourceConfiguration.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -42453,7 +43810,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.MeasuredValue response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -42533,7 +43892,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MinMeasuredValue response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -42613,7 +43974,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MaxMeasuredValue response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -42692,7 +44055,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -42772,7 +44137,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PressureMeasurement.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -42908,7 +44275,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.MaxPressure response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -42987,7 +44356,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.MaxSpeed response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -43066,7 +44437,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxFlow response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -43146,7 +44519,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MinConstPressure response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -43226,7 +44601,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MaxConstPressure response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -43306,7 +44683,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MinCompPressure response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -43386,7 +44765,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MaxCompPressure response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -43466,7 +44847,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MinConstSpeed response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -43546,7 +44929,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MaxConstSpeed response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -43626,7 +45011,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstFlow response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -43706,7 +45093,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstFlow response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -43786,7 +45175,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstTemp response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -43866,7 +45257,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstTemp response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -43946,7 +45339,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.PumpStatus response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -44027,7 +45422,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.EffectiveOperationMode response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -44107,7 +45504,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.EffectiveControlMode response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -44186,7 +45585,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.Capacity response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -44265,7 +45666,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Speed response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -44382,7 +45785,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.LifetimeRunningHours response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -44461,7 +45866,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Power response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -44580,7 +45987,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.LifetimeEnergyConsumed response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -44697,7 +46106,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.OperationMode response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -44814,7 +46225,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.ControlMode response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -44893,7 +46306,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"PumpConfigurationAndControl.AlarmMask response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -44973,7 +46388,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -45053,7 +46470,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -45133,7 +46552,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -45213,7 +46634,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.FeatureMap response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -45293,7 +46716,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -45392,7 +46817,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.MeasuredValue response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -45472,7 +46899,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -45552,7 +46981,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -45631,7 +47062,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"RelativeHumidityMeasurement.Tolerance response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -45711,7 +47144,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -45791,7 +47226,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -45871,7 +47308,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -45951,7 +47390,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"RelativeHumidityMeasurement.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -46330,7 +47771,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneCount response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -46405,7 +47848,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentScene response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -46480,7 +47925,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentGroup response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -46555,7 +48002,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneValid response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -46630,7 +48079,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Scenes.NameSupport response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -46705,7 +48156,9 @@ public:
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -46780,7 +48233,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -46855,7 +48310,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Scenes.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -46930,7 +48387,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Scenes.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -47061,7 +48520,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.ThreadMetrics response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -47141,7 +48602,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapFree response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -47221,7 +48684,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapUsed response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -47303,7 +48768,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"SoftwareDiagnostics.CurrentHeapHighWatermark response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -47383,7 +48850,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -47463,7 +48932,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -47542,7 +49013,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -47621,7 +49094,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -47701,7 +49176,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.ClusterRevision response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -47801,7 +49278,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Switch.NumberOfPositions response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -47876,7 +49355,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.CurrentPosition response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -47951,7 +49432,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.MultiPressMax response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -48026,7 +49509,9 @@ public:
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -48101,7 +49586,9 @@ public:
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -48176,7 +49663,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -48251,7 +49740,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Switch.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -48326,7 +49817,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -48458,7 +49951,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TargetNavigator.TargetList response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -48533,7 +50028,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TargetNavigator.CurrentTarget response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -48609,7 +50106,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"TargetNavigator.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -48685,7 +50184,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"TargetNavigator.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -48760,7 +50261,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TargetNavigator.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -48835,7 +50338,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TargetNavigator.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -48934,7 +50439,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.MeasuredValue response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -49014,7 +50521,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -49094,7 +50603,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -49173,7 +50684,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TemperatureMeasurement.Tolerance response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -49253,7 +50766,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -49333,7 +50848,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TemperatureMeasurement.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -50173,7 +51690,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Boolean response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -50282,7 +51801,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Bitmap8 response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -50391,7 +51912,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap16 response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -50500,7 +52023,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap32 response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -50609,7 +52134,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap64 response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -50718,7 +52245,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8u response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -50827,7 +52356,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -50936,7 +52467,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51045,7 +52578,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51154,7 +52689,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51263,7 +52800,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51372,7 +52911,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51481,7 +53022,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64u response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51590,7 +53133,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8s response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -51699,7 +53244,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51808,7 +53355,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -51917,7 +53466,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52026,7 +53577,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52135,7 +53688,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52244,7 +53799,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52353,7 +53910,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64s response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52462,7 +54021,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Enum8 response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -52571,7 +54132,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Enum16 response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -52680,7 +54243,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatSingle response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -52789,7 +54354,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatDouble response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -52898,7 +54465,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.OctetString response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -52973,7 +54542,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TestCluster.ListInt8u response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -53048,7 +54619,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ListOctetString response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -53124,7 +54697,9 @@ public:
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.ListStructOctetString response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -53233,7 +54808,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.LongOctetString response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -53344,7 +54921,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TestCluster.CharString response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -53455,7 +55034,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.LongCharString response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -53564,7 +55145,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.EpochUs response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -53673,7 +55256,9 @@ public:
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.EpochS response %@", [value description]);
-                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               if (error || !mWait) {
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }
                                            }];
 
         return CHIP_NO_ERROR;
@@ -53782,7 +55367,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.VendorId response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -53861,7 +55448,9 @@ public:
                                                                    NSArray * _Nullable value, NSError * _Nullable error) {
                                                                    NSLog(@"TestCluster.ListNullablesAndOptionalsStruct response %@",
                                                                        [value description]);
-                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   if (error || !mWait) {
+                                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   }
                                                                }];
 
         return CHIP_NO_ERROR;
@@ -53970,7 +55559,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.EnumAttr response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -54050,6 +55641,52 @@ public:
     }
 
 private:
+};
+
+class SubscribeAttributeTestClusterStructAttr : public ModelCommand {
+public:
+    SubscribeAttributeTestClusterStructAttr()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "struct-attr");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeTestClusterStructAttr() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeStructAttrWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                   NSError * _Nullable error) {
+                                                   NSLog(@"TestCluster.StructAttr response %@", [value description]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -54146,7 +55783,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8u response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -54257,7 +55896,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8s response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -54368,7 +56009,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16u response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -54479,7 +56122,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16s response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -54555,7 +56200,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ListLongOctetString response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -54632,7 +56279,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.ListFabricScoped response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -54741,7 +56390,9 @@ public:
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"TestCluster.TimedWriteBoolean response %@", [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -54852,7 +56503,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.GeneralErrorBoolean response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -54963,7 +56616,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ClusterErrorBoolean response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -55072,7 +56727,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.Unsupported response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -55181,7 +56838,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBoolean response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -55290,7 +56949,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBitmap8 response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -55399,7 +57060,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap16 response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -55508,7 +57171,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap32 response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -55617,7 +57282,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap64 response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -55726,7 +57393,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8u response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -55835,7 +57504,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -55944,7 +57615,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56053,7 +57726,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56162,7 +57837,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56271,7 +57948,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56380,7 +58059,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56489,7 +58170,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64u response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56598,7 +58281,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8s response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -56707,7 +58392,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56816,7 +58503,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -56925,7 +58614,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57034,7 +58725,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57143,7 +58836,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57252,7 +58947,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57361,7 +59058,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64s response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57470,7 +59169,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableEnum8 response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -57579,7 +59280,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableEnum16 response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57690,7 +59393,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatSingle response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57801,7 +59506,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatDouble response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -57912,7 +59619,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableOctetString response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -58025,7 +59734,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableCharString response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -58134,7 +59845,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableEnumAttr response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -58214,6 +59927,52 @@ public:
     }
 
 private:
+};
+
+class SubscribeAttributeTestClusterNullableStruct : public ModelCommand {
+public:
+    SubscribeAttributeTestClusterNullableStruct()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "nullable-struct");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeTestClusterNullableStruct() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008025) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeNullableStructWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:NULL
+                                                   reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                       NSError * _Nullable error) {
+                                                       NSLog(@"TestCluster.NullableStruct response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -58312,7 +60071,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8u response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -58425,7 +60186,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8s response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -58540,7 +60303,9 @@ public:
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"TestCluster.NullableRangeRestrictedInt16u response %@",
                                                                      [value description]);
-                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
                                                              }];
 
         return CHIP_NO_ERROR;
@@ -58655,7 +60420,9 @@ public:
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"TestCluster.NullableRangeRestrictedInt16s response %@",
                                                                      [value description]);
-                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
                                                              }];
 
         return CHIP_NO_ERROR;
@@ -58731,7 +60498,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -58807,7 +60576,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -58882,7 +60653,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -58957,7 +60730,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -59272,7 +61047,9 @@ public:
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Thermostat.LocalTemperature response %@", [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -59349,7 +61126,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinHeatSetpointLimit response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59426,7 +61205,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxHeatSetpointLimit response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59503,7 +61284,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinCoolSetpointLimit response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59580,7 +61363,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxCoolSetpointLimit response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59692,7 +61477,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedCoolingSetpoint response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59804,7 +61591,9 @@ public:
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedHeatingSetpoint response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -59915,7 +61704,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinHeatSetpointLimit response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -60026,7 +61817,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxHeatSetpointLimit response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -60137,7 +61930,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinCoolSetpointLimit response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -60248,7 +62043,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxCoolSetpointLimit response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -60359,7 +62156,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Thermostat.MinSetpointDeadBand response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -60472,7 +62271,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Thermostat.ControlSequenceOfOperation response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -60581,7 +62382,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.SystemMode response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -60656,7 +62459,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Thermostat.StartOfWeek response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -60734,7 +62539,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Thermostat.NumberOfWeeklyTransitions response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -60812,7 +62619,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Thermostat.NumberOfDailyTransitions response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -60887,7 +62696,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Thermostat.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -60962,7 +62773,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -61037,7 +62850,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -61171,7 +62986,9 @@ public:
                                                                NSLog(@"ThermostatUserInterfaceConfiguration.TemperatureDisplayMode "
                                                                      @"response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -61285,7 +63102,9 @@ public:
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.KeypadLockout response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -61396,17 +63215,20 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                         params:params
-                                                        subscriptionEstablished:NULL
-                                                                  reportHandler:^(
-                                                                      NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                                      NSLog(@"ThermostatUserInterfaceConfiguration."
-                                                                            @"ScheduleProgrammingVisibility response %@",
-                                                                          [value description]);
-                                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                                  }];
+        [cluster
+            subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:NULL
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"ThermostatUserInterfaceConfiguration."
+                                                                       @"ScheduleProgrammingVisibility response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
 
         return CHIP_NO_ERROR;
     }
@@ -61484,7 +63306,9 @@ public:
                                                              NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList "
                                                                    @"response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -61564,7 +63388,9 @@ public:
                                                        NSLog(
                                                            @"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -61642,7 +63468,9 @@ public:
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.AttributeList response %@",
                                                           [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -61720,7 +63548,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThermostatUserInterfaceConfiguration.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -61910,7 +63740,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.Channel response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -61989,7 +63821,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RoutingRole response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -62068,7 +63902,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.NetworkName response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -62147,7 +63983,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.PanId response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -62227,7 +64065,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.ExtendedPanId response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -62307,7 +64147,9 @@ public:
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.MeshLocalPrefix response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -62387,7 +64229,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.OverrunCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -62467,7 +64311,9 @@ public:
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.NeighborTableList response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -62547,7 +64393,9 @@ public:
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RouteTableList response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -62626,7 +64474,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.PartitionId response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -62705,7 +64555,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ThreadNetworkDiagnostics.Weighting response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -62784,7 +64636,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.DataVersion response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -62864,7 +64718,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.StableDataVersion response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -62944,7 +64800,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.LeaderRouterId response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -63024,7 +64882,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.DetachedRoleCount response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -63104,7 +64964,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.ChildRoleCount response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -63184,7 +65046,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RouterRoleCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -63264,7 +65128,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.LeaderRoleCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -63344,7 +65210,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.AttachAttemptCount response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -63424,7 +65292,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.PartitionIdChangeCount response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -63498,18 +65368,20 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                        params:params
-                                                       subscriptionEstablished:NULL
-                                                                 reportHandler:^(
-                                                                     NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                                     NSLog(@"ThreadNetworkDiagnostics."
-                                                                           @"BetterPartitionAttachAttemptCount response %@",
-                                                                         [value description]);
-                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                                 }];
+        [cluster subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                             params:params
+                                                            subscriptionEstablished:NULL
+                                                                      reportHandler:^(
+                                                                          NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                          NSLog(@"ThreadNetworkDiagnostics."
+                                                                                @"BetterPartitionAttachAttemptCount response %@",
+                                                                              [value description]);
+                                                                          if (error || !mWait) {
+                                                                              SetCommandExitStatus(
+                                                                                  [CHIPError errorToCHIPErrorCode:error]);
+                                                                          }
+                                                                      }];
 
         return CHIP_NO_ERROR;
     }
@@ -63588,7 +65460,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.ParentChangeCount response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -63668,7 +65542,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxTotalCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -63748,7 +65624,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.TxUnicastCount response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -63828,7 +65706,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.TxBroadcastCount response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -63908,7 +65788,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.TxAckRequestedCount response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -63988,7 +65870,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxAckedCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -64068,7 +65952,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxNoAckRequestedCount response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -64147,7 +66033,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.TxDataCount response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -64227,7 +66115,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxDataPollCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -64307,7 +66197,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxBeaconCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -64387,7 +66279,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.TxBeaconRequestCount response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -64467,7 +66361,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxOtherCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -64547,7 +66443,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxRetryCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -64630,7 +66528,9 @@ public:
                                                                NSLog(@"ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount "
                                                                      @"response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -64704,17 +66604,20 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                         params:params
-                                                        subscriptionEstablished:NULL
-                                                                  reportHandler:^(
-                                                                      NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                                      NSLog(@"ThreadNetworkDiagnostics."
-                                                                            @"TxIndirectMaxRetryExpiryCount response %@",
-                                                                          [value description]);
-                                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                                  }];
+        [cluster
+            subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:NULL
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount "
+                                                                       @"response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
 
         return CHIP_NO_ERROR;
     }
@@ -64793,7 +66696,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxErrCcaCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -64873,7 +66778,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxErrAbortCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -64953,7 +66860,9 @@ public:
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxErrBusyChannelCount response %@",
                                                                   [value description]);
-                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
                                                           }];
 
         return CHIP_NO_ERROR;
@@ -65033,7 +66942,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxTotalCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -65113,7 +67024,9 @@ public:
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RxUnicastCount response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -65193,7 +67106,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.RxBroadcastCount response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -65272,7 +67187,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RxDataCount response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -65352,7 +67269,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxDataPollCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -65432,7 +67351,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxBeaconCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -65512,7 +67433,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.RxBeaconRequestCount response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -65592,7 +67515,9 @@ public:
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxOtherCount response %@", [value description]);
-                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                if (error || !mWait) {
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }
                                             }];
 
         return CHIP_NO_ERROR;
@@ -65672,7 +67597,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.RxAddressFilteredCount response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -65754,7 +67681,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.RxDestAddrFilteredCount response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -65834,7 +67763,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxDuplicatedCount response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -65914,7 +67845,9 @@ public:
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxErrNoFrameCount response %@",
                                                               [value description]);
-                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
                                                       }];
 
         return CHIP_NO_ERROR;
@@ -65997,7 +67930,9 @@ public:
                                                              NSLog(
                                                                  @"ThreadNetworkDiagnostics.RxErrUnknownNeighborCount response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -66079,7 +68014,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -66159,7 +68096,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrSecCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -66239,7 +68178,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrFcsCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -66319,7 +68260,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxErrOtherCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -66399,7 +68342,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ActiveTimestamp response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -66479,7 +68424,9 @@ public:
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.PendingTimestamp response %@",
                                                              [value description]);
-                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
                                                      }];
 
         return CHIP_NO_ERROR;
@@ -66558,7 +68505,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.Delay response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -66638,7 +68587,9 @@ public:
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.SecurityPolicy response %@",
                                                            [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -66717,7 +68668,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.ChannelMask response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -66800,7 +68753,9 @@ public:
                                                                 NSLog(@"ThreadNetworkDiagnostics.OperationalDatasetComponents "
                                                                       @"response %@",
                                                                     [value description]);
-                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
                                                             }];
 
         return CHIP_NO_ERROR;
@@ -66881,7 +68836,9 @@ public:
                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.ActiveNetworkFaultsList response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -66961,7 +68918,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -67041,7 +69000,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -67121,7 +69082,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -67200,7 +69163,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ThreadNetworkDiagnostics.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -67280,7 +69245,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -67413,7 +69380,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TimeFormatLocalization.HourFormat response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -67530,7 +69499,9 @@ public:
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"TimeFormatLocalization.ActiveCalendarType response %@",
                                                                [value description]);
-                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           if (error || !mWait) {
+                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                           }
                                                        }];
 
         return CHIP_NO_ERROR;
@@ -67610,7 +69581,9 @@ public:
                                                            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"TimeFormatLocalization.SupportedCalendarTypes response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -67690,7 +69663,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -67770,7 +69745,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -67850,7 +69827,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TimeFormatLocalization.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -67981,7 +69960,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.TemperatureUnit response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -68060,7 +70041,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"UnitLocalization.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -68139,7 +70122,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"UnitLocalization.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -68218,7 +70203,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -68309,7 +70296,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"UserLabel.LabelList response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -68385,7 +70374,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -68461,7 +70452,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -68536,7 +70529,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UserLabel.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -68627,7 +70622,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WakeOnLan.MACAddress response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -68703,7 +70700,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -68779,7 +70778,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -68854,7 +70855,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WakeOnLan.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -68929,7 +70932,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WakeOnLan.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -69071,7 +71076,9 @@ public:
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"WiFiNetworkDiagnostics.Bssid response %@", [value description]);
-                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
                                           }];
 
         return CHIP_NO_ERROR;
@@ -69150,7 +71157,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.SecurityType response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -69229,7 +71238,9 @@ public:
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"WiFiNetworkDiagnostics.WiFiVersion response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
                                                 }];
 
         return CHIP_NO_ERROR;
@@ -69309,7 +71320,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.ChannelNumber response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -69388,7 +71401,9 @@ public:
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WiFiNetworkDiagnostics.Rssi response %@", [value description]);
-                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             if (error || !mWait) {
+                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             }
                                          }];
 
         return CHIP_NO_ERROR;
@@ -69468,7 +71483,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.BeaconLostCount response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -69548,7 +71565,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.BeaconRxCount response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -69628,7 +71647,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastRxCount response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -69708,7 +71729,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastTxCount response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -69788,7 +71811,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastRxCount response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -69868,7 +71893,9 @@ public:
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastTxCount response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -69948,7 +71975,9 @@ public:
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"WiFiNetworkDiagnostics.CurrentMaxRate response %@", [value description]);
-                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
                                               }];
 
         return CHIP_NO_ERROR;
@@ -70027,7 +72056,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.OverrunCount response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -70107,7 +72138,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -70187,7 +72220,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -70267,7 +72302,9 @@ public:
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.AttributeList response %@", [value description]);
-                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
                                              }];
 
         return CHIP_NO_ERROR;
@@ -70346,7 +72383,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WiFiNetworkDiagnostics.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -70426,7 +72465,9 @@ public:
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -70774,7 +72815,9 @@ public:
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Type response %@", [value description]);
-                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             if (error || !mWait) {
+                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             }
                                          }];
 
         return CHIP_NO_ERROR;
@@ -70850,7 +72893,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionLift response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -70926,7 +72971,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionTilt response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -71001,7 +73048,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.ConfigStatus response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -71080,7 +73129,9 @@ public:
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"WindowCovering.CurrentPositionLiftPercentage response %@",
                                                                      [value description]);
-                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
                                                              }];
 
         return CHIP_NO_ERROR;
@@ -71159,7 +73210,9 @@ public:
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"WindowCovering.CurrentPositionTiltPercentage response %@",
                                                                      [value description]);
-                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
                                                              }];
 
         return CHIP_NO_ERROR;
@@ -71235,7 +73288,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.OperationalStatus response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -71315,7 +73370,9 @@ public:
                                                                    NSLog(@"WindowCovering.TargetPositionLiftPercent100ths response "
                                                                          @"%@",
                                                                        [value description]);
-                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   if (error || !mWait) {
+                                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   }
                                                                }];
 
         return CHIP_NO_ERROR;
@@ -71395,7 +73452,9 @@ public:
                                                                    NSLog(@"WindowCovering.TargetPositionTiltPercent100ths response "
                                                                          @"%@",
                                                                        [value description]);
-                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   if (error || !mWait) {
+                                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                   }
                                                                }];
 
         return CHIP_NO_ERROR;
@@ -71470,7 +73529,9 @@ public:
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WindowCovering.EndProductType response %@", [value description]);
-                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
                                                    }];
 
         return CHIP_NO_ERROR;
@@ -71540,18 +73601,20 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                       params:params
-                                                      subscriptionEstablished:NULL
-                                                                reportHandler:^(
-                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                                    NSLog(@"WindowCovering.CurrentPositionLiftPercent100ths "
-                                                                          @"response %@",
-                                                                        [value description]);
-                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                                }];
+        [cluster subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                            params:params
+                                                           subscriptionEstablished:NULL
+                                                                     reportHandler:^(
+                                                                         NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                         NSLog(@"WindowCovering.CurrentPositionLiftPercent100ths "
+                                                                               @"response %@",
+                                                                             [value description]);
+                                                                         if (error || !mWait) {
+                                                                             SetCommandExitStatus(
+                                                                                 [CHIPError errorToCHIPErrorCode:error]);
+                                                                         }
+                                                                     }];
 
         return CHIP_NO_ERROR;
     }
@@ -71620,18 +73683,20 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster
-            subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                                       params:params
-                                                      subscriptionEstablished:NULL
-                                                                reportHandler:^(
-                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                                    NSLog(@"WindowCovering.CurrentPositionTiltPercent100ths "
-                                                                          @"response %@",
-                                                                        [value description]);
-                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                                }];
+        [cluster subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                            params:params
+                                                           subscriptionEstablished:NULL
+                                                                     reportHandler:^(
+                                                                         NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                         NSLog(@"WindowCovering.CurrentPositionTiltPercent100ths "
+                                                                               @"response %@",
+                                                                             [value description]);
+                                                                         if (error || !mWait) {
+                                                                             SetCommandExitStatus(
+                                                                                 [CHIPError errorToCHIPErrorCode:error]);
+                                                                         }
+                                                                     }];
 
         return CHIP_NO_ERROR;
     }
@@ -71706,7 +73771,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitLift response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -71784,7 +73851,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitLift response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -71860,7 +73929,9 @@ public:
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitTilt response %@",
                                                                    [value description]);
-                                                               SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
                                                            }];
 
         return CHIP_NO_ERROR;
@@ -71938,7 +74009,9 @@ public:
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitTilt response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -72047,7 +74120,9 @@ public:
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Mode response %@", [value description]);
-                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             if (error || !mWait) {
+                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                             }
                                          }];
 
         return CHIP_NO_ERROR;
@@ -72122,7 +74197,9 @@ public:
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.SafetyStatus response %@", [value description]);
-                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
                                                  }];
 
         return CHIP_NO_ERROR;
@@ -72198,7 +74275,9 @@ public:
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WindowCovering.GeneratedCommandList response %@",
                                                                  [value description]);
-                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
                                                          }];
 
         return CHIP_NO_ERROR;
@@ -72274,7 +74353,9 @@ public:
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.AcceptedCommandList response %@",
                                                                 [value description]);
-                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
                                                         }];
 
         return CHIP_NO_ERROR;
@@ -72349,7 +74430,9 @@ public:
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WindowCovering.AttributeList response %@", [value description]);
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      if (error || !mWait) {
+                                                          SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                      }
                                                   }];
 
         return CHIP_NO_ERROR;
@@ -72424,7 +74507,9 @@ public:
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WindowCovering.FeatureMap response %@", [value description]);
-                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
                                                }];
 
         return CHIP_NO_ERROR;
@@ -72499,7 +74584,9 @@ public:
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WindowCovering.ClusterRevision response %@", [value description]);
-                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
                                                     }];
 
         return CHIP_NO_ERROR;
@@ -72599,6 +74686,8 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<SubscribeAttributeApplicationBasicApplicationName>(), //
         make_unique<ReadApplicationBasicProductID>(), //
         make_unique<SubscribeAttributeApplicationBasicProductID>(), //
+        make_unique<ReadApplicationBasicApplication>(), //
+        make_unique<SubscribeAttributeApplicationBasicApplication>(), //
         make_unique<ReadApplicationBasicStatus>(), //
         make_unique<SubscribeAttributeApplicationBasicStatus>(), //
         make_unique<ReadApplicationBasicApplicationVersion>(), //
@@ -72627,6 +74716,9 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ApplicationLauncherStopApp>(), //
         make_unique<ReadApplicationLauncherCatalogList>(), //
         make_unique<SubscribeAttributeApplicationLauncherCatalogList>(), //
+        make_unique<ReadApplicationLauncherCurrentApp>(), //
+        make_unique<WriteApplicationLauncherCurrentApp>(), //
+        make_unique<SubscribeAttributeApplicationLauncherCurrentApp>(), //
         make_unique<ReadApplicationLauncherGeneratedCommandList>(), //
         make_unique<SubscribeAttributeApplicationLauncherGeneratedCommandList>(), //
         make_unique<ReadApplicationLauncherAcceptedCommandList>(), //
@@ -72903,6 +74995,10 @@ void registerClusterChannel(Commands & commands)
         make_unique<ChannelSkipChannel>(), //
         make_unique<ReadChannelChannelList>(), //
         make_unique<SubscribeAttributeChannelChannelList>(), //
+        make_unique<ReadChannelLineup>(), //
+        make_unique<SubscribeAttributeChannelLineup>(), //
+        make_unique<ReadChannelCurrentChannel>(), //
+        make_unique<SubscribeAttributeChannelCurrentChannel>(), //
         make_unique<ReadChannelGeneratedCommandList>(), //
         make_unique<SubscribeAttributeChannelGeneratedCommandList>(), //
         make_unique<ReadChannelAcceptedCommandList>(), //
@@ -73371,6 +75467,8 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<ReadGeneralCommissioningBreadcrumb>(), //
         make_unique<WriteGeneralCommissioningBreadcrumb>(), //
         make_unique<SubscribeAttributeGeneralCommissioningBreadcrumb>(), //
+        make_unique<ReadGeneralCommissioningBasicCommissioningInfo>(), //
+        make_unique<SubscribeAttributeGeneralCommissioningBasicCommissioningInfo>(), //
         make_unique<ReadGeneralCommissioningRegulatoryConfig>(), //
         make_unique<SubscribeAttributeGeneralCommissioningRegulatoryConfig>(), //
         make_unique<ReadGeneralCommissioningLocationCapability>(), //
@@ -73691,6 +75789,8 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<SubscribeAttributeMediaPlaybackStartTime>(), //
         make_unique<ReadMediaPlaybackDuration>(), //
         make_unique<SubscribeAttributeMediaPlaybackDuration>(), //
+        make_unique<ReadMediaPlaybackSampledPosition>(), //
+        make_unique<SubscribeAttributeMediaPlaybackSampledPosition>(), //
         make_unique<ReadMediaPlaybackPlaybackSpeed>(), //
         make_unique<SubscribeAttributeMediaPlaybackPlaybackSpeed>(), //
         make_unique<ReadMediaPlaybackSeekRangeEnd>(), //
@@ -73715,23 +75815,28 @@ void registerClusterModeSelect(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ModeSelectChangeToMode>(), //
-        make_unique<ReadModeSelectCurrentMode>(), //
-        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectDescription>(), //
+        make_unique<SubscribeAttributeModeSelectDescription>(), //
+        make_unique<ReadModeSelectStandardNamespace>(), //
+        make_unique<SubscribeAttributeModeSelectStandardNamespace>(), //
         make_unique<ReadModeSelectSupportedModes>(), //
         make_unique<SubscribeAttributeModeSelectSupportedModes>(), //
+        make_unique<ReadModeSelectCurrentMode>(), //
+        make_unique<SubscribeAttributeModeSelectCurrentMode>(), //
+        make_unique<ReadModeSelectStartUpMode>(), //
+        make_unique<WriteModeSelectStartUpMode>(), //
+        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
         make_unique<ReadModeSelectOnMode>(), //
         make_unique<WriteModeSelectOnMode>(), //
         make_unique<SubscribeAttributeModeSelectOnMode>(), //
-        make_unique<ReadModeSelectStartUpMode>(), //
-        make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
-        make_unique<ReadModeSelectDescription>(), //
-        make_unique<SubscribeAttributeModeSelectDescription>(), //
         make_unique<ReadModeSelectGeneratedCommandList>(), //
         make_unique<SubscribeAttributeModeSelectGeneratedCommandList>(), //
         make_unique<ReadModeSelectAcceptedCommandList>(), //
         make_unique<SubscribeAttributeModeSelectAcceptedCommandList>(), //
         make_unique<ReadModeSelectAttributeList>(), //
         make_unique<SubscribeAttributeModeSelectAttributeList>(), //
+        make_unique<ReadModeSelectFeatureMap>(), //
+        make_unique<SubscribeAttributeModeSelectFeatureMap>(), //
         make_unique<ReadModeSelectClusterRevision>(), //
         make_unique<SubscribeAttributeModeSelectClusterRevision>(), //
     };
@@ -74368,6 +76473,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterEnumAttr>(), //
         make_unique<WriteTestClusterEnumAttr>(), //
         make_unique<SubscribeAttributeTestClusterEnumAttr>(), //
+        make_unique<ReadTestClusterStructAttr>(), //
+        make_unique<WriteTestClusterStructAttr>(), //
+        make_unique<SubscribeAttributeTestClusterStructAttr>(), //
         make_unique<ReadTestClusterRangeRestrictedInt8u>(), //
         make_unique<WriteTestClusterRangeRestrictedInt8u>(), //
         make_unique<SubscribeAttributeTestClusterRangeRestrictedInt8u>(), //
@@ -74480,6 +76588,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableEnumAttr>(), //
         make_unique<WriteTestClusterNullableEnumAttr>(), //
         make_unique<SubscribeAttributeTestClusterNullableEnumAttr>(), //
+        make_unique<ReadTestClusterNullableStruct>(), //
+        make_unique<WriteTestClusterNullableStruct>(), //
+        make_unique<SubscribeAttributeTestClusterNullableStruct>(), //
         make_unique<ReadTestClusterNullableRangeRestrictedInt8u>(), //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(), //
         make_unique<SubscribeAttributeTestClusterNullableRangeRestrictedInt8u>(), //

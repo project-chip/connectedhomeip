@@ -49,8 +49,8 @@ namespace SecureMessageCodec {
  *                      the encrypted message.
  * @return A CHIP_ERROR value consistent with the result of the encryption operation
  */
-CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msgBuf);
+CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
+                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
 
 /**
  * @brief
@@ -66,8 +66,8 @@ CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader,
  *                      the decrypted message.
  * @return A CHIP_ERROR value consistent with the result of the decryption operation
  */
-CHIP_ERROR Decrypt(const CryptoContext & context, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msgBuf);
+CHIP_ERROR Decrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
+                   const PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
 
 } // namespace SecureMessageCodec
 

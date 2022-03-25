@@ -576,6 +576,19 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
+{
+    for (auto & cat : cats.values)
+    {
+        if (cat != kUndefinedCAT)
+        {
+            ReturnErrorOnFailure(AddAttribute(chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag, cat));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrintableString)
 {
     uint8_t rdnCount = RDNCount();
