@@ -679,7 +679,7 @@ struct Instruction
 void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
-    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() { return callback->mOnSubscriptionEstablished; });
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
     NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
     NL_TEST_ASSERT(gSuite, callback->mOnSubscriptionEstablished);
     callback->mActionOn.clear();
@@ -688,7 +688,7 @@ void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
 void DriveIOUntilEndOfReport(TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
-    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() { return callback->mOnReportEnd; });
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
     NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
     callback->mActionOn.clear();
 }
