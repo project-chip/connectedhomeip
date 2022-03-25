@@ -70,7 +70,7 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
+Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan outDebugText, uint8_t * outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
@@ -91,7 +91,7 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
     return Status::kSuccess;
 }
 
-Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId)
+Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
@@ -109,7 +109,7 @@ Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan outDebugText)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
