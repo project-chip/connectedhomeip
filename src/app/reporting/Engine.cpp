@@ -268,8 +268,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     size_t eventCount = 0;
     TLV::TLVWriter backup;
     bool eventClean                = true;
-    const auto* eventList = apReadHandler->GetEventPathList();
-    EventNumber eventMin                = apReadHandler->GetEventMin();
+    const auto * eventList         = apReadHandler->GetEventPathList();
+    EventNumber eventMin           = apReadHandler->GetEventMin();
     EventManagement & eventManager = EventManagement::GetInstance();
     bool hasMoreChunks             = false;
 
