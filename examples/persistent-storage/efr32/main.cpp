@@ -31,6 +31,8 @@
 #include "KeyValueStorageTest.h"
 #include "init_efrPlatform.h"
 #include "sl_system_kernel.h"
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/EFR32/EFR32Config.h>
 #include <platform/KeyValueStoreManager.h>
 
 static TaskHandle_t sTestTaskHandle;
@@ -49,6 +51,7 @@ int main(void)
     init_efrPlatform();
 
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
+    chip::DeviceLayer::Internal::EFR32Config::Init();
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-persitent-storage-example starting");
     EFR32_LOG("==================================================");

@@ -225,7 +225,6 @@ SECTIONS
     __bss_end__ = .;
   } > RAM
 
-  /*
   .heap (COPY):
   {
     __HeapBase = .;
@@ -235,7 +234,7 @@ SECTIONS
     KEEP(*(.heap*))
     __HeapLimit = .;
   } > RAM
-  */  
+ 
   __main_flash_end__ = ORIGIN(FLASH) + LENGTH(FLASH);
 
   /* .stack_dummy section doesn't contains any symbols. It is only

@@ -34,21 +34,12 @@
 #include "nvm3_default.h"
 #include "nvm3_hal_flash.h"
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-
-// Matter NVM3 space is placed in the silabs default nvm3 section shared with other stack.
-// 'kMatterNvm3KeyDomain' identify the matter nvm3 domain.
-// The NVM3 default section is placed at end of Flash minus 1 page byt the linker file
-// See examples/platform/efr32/ldscripts/efr32mgXX.ld
-
+// Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
+// for an application controlled re-entrance protection
 #define EFR32_SEM_TIMEOUT_ms 5
 static SemaphoreHandle_t nvm3_Sem;
 static StaticSemaphore_t nvm3_SemStruct;
 
-// Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
-// for an application controlled re-entrance protection
 void nvm3_lockBegin(void)
 {
     VerifyOrDie(nvm3_Sem != NULL);
@@ -60,6 +51,14 @@ void nvm3_lockEnd(void)
     VerifyOrDie(nvm3_Sem != NULL);
     xSemaphoreGive(nvm3_Sem);
 }
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+
+// Matter NVM3 space is placed in the silabs default nvm3 section shared with other stack.
+// 'kMatterNvm3KeyDomain' identify the matter nvm3 domain.
+// The NVM3 default section is placed at end of Flash minus 1 page byt the linker file
+// See examples/platform/efr32/ldscripts/efr32mgXX.ld
 
 CHIP_ERROR EFR32Config::Init()
 {
@@ -88,9 +87,6 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool & val)
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
     SuccessOrExit(err);
@@ -112,9 +108,6 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t & val)
     uint32_t tmpVal;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
@@ -138,9 +131,6 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t & val)
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
     SuccessOrExit(err);
@@ -163,9 +153,6 @@ CHIP_ERROR EFR32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     outLen = 0;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
@@ -213,11 +200,7 @@ CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     size_t dataLen;
 
     outLen = 0;
-
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
@@ -232,10 +215,48 @@ CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
 
         err = MapNvm3Error(nvm3_readData(nvm3_defaultHandle, key, buf, dataLen));
         SuccessOrExit(err);
+
+        outLen = dataLen;
     }
 
-    outLen = dataLen;
+exit:
+    return err;
+}
 
+CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset)
+{
+    CHIP_ERROR err;
+    uint32_t objectType;
+    size_t dataLen;
+
+    outLen = 0;
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+
+    // Get nvm3 object info.
+    err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
+    SuccessOrExit(err);
+    VerifyOrExit(dataLen > 0, err = CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    if (buf != NULL)
+    {
+        // Read nvm3 bytes directly into output buffer- check buffer is long enough to take the data
+        // else read what we can but return CHIP_ERROR_BUFFER_TOO_SMALL.
+        size_t maxReadLength = dataLen - offset;
+        if (bufSize >= maxReadLength)
+        {
+            err = MapNvm3Error(nvm3_readPartialData(nvm3_defaultHandle, key, buf, offset, maxReadLength));
+            SuccessOrExit(err);
+            outLen = maxReadLength;
+        }
+        else
+        {
+            err = MapNvm3Error(nvm3_readPartialData(nvm3_defaultHandle, key, buf, offset, bufSize));
+            SuccessOrExit(err);
+            // read was succesful, but we did not read all the data from the object.
+            err    = CHIP_ERROR_BUFFER_TOO_SMALL;
+            outLen = bufSize;
+        }
+    }
 exit:
     return err;
 }
@@ -244,12 +265,9 @@ CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & va
 {
     CHIP_ERROR err;
     uint32_t tmpVal;
-    Key key = kMinConfigKey_ChipCounter + counterIdx;
+    Key key = kMinConfigKey_MatterCounter + counterIdx;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     // Read bytes into tmp.
     err = MapNvm3Error(nvm3_readCounter(nvm3_defaultHandle, key, &tmpVal));
@@ -266,9 +284,6 @@ CHIP_ERROR EFR32Config::WriteConfigValue(Key key, bool val)
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_ERROR_INVALID_ARGUMENT); // Verify key id.
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     err = MapNvm3Error(nvm3_writeData(nvm3_defaultHandle, key, &val, sizeof(val)));
     SuccessOrExit(err);
 
@@ -282,9 +297,6 @@ CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint32_t val)
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     err = MapNvm3Error(nvm3_writeData(nvm3_defaultHandle, key, &val, sizeof(val)));
     SuccessOrExit(err);
 
@@ -297,9 +309,6 @@ CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint64_t val)
     CHIP_ERROR err;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     err = MapNvm3Error(nvm3_writeData(nvm3_defaultHandle, key, &val, sizeof(val)));
     SuccessOrExit(err);
@@ -318,9 +327,6 @@ CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str, size_t st
     CHIP_ERROR err;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     if (str != NULL)
     {
@@ -344,9 +350,6 @@ CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     if (data != NULL)
     {
         if (dataLen > 0)
@@ -368,12 +371,9 @@ exit:
 CHIP_ERROR EFR32Config::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
     CHIP_ERROR err;
-    Key key = kMinConfigKey_ChipCounter + counterIdx;
+    Key key = kMinConfigKey_MatterCounter + counterIdx;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     err = MapNvm3Error(nvm3_writeCounter(nvm3_defaultHandle, key, val));
     SuccessOrExit(err);
@@ -385,9 +385,6 @@ exit:
 CHIP_ERROR EFR32Config::ClearConfigValue(Key key)
 {
     CHIP_ERROR err;
-
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
 
     // Delete the nvm3 object with the given key id.
     err = MapNvm3Error(nvm3_deleteObject(nvm3_defaultHandle, key));
@@ -402,9 +399,6 @@ bool EFR32Config::ConfigValueExists(Key key)
     uint32_t objectType;
     size_t dataLen;
 
-    // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-    // SuccessOrExit(err);
-
     // Find object with key id.
     CHIP_ERROR err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dataLen));
     return (err == CHIP_NO_ERROR);
@@ -418,11 +412,11 @@ CHIP_ERROR EFR32Config::FactoryResetConfig(void)
     CHIP_ERROR err;
 
     // Iterate over all the CHIP Config nvm3 records and delete each one...
-    err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
+    err = ForEachRecord(kMinConfigKey_MatterConfig, kMaxConfigKey_MatterConfig, false,
                         [](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
                             // Delete the nvm3 object with the given key id.
-                            err2 = MapNvm3Error(nvm3_deleteObject(nvm3_defaultHandle, nvm3Key));
+                            err2 = ClearConfigValue(nvm3Key);
                             SuccessOrExit(err2);
 
                         exit:
@@ -471,10 +465,6 @@ CHIP_ERROR EFR32Config::ForEachRecord(Key firstNvm3Key, Key lastNvm3Key, bool ad
         uint32_t objectType;
         size_t dataLen;
 
-        // // Open nvm3 handle for reading on each iteration.
-        // err = MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
-        // SuccessOrExit(err);
-
         // Find nvm3 object with current nvm3 iteration key.
         nvm3Res = nvm3_getObjectInfo(nvm3_defaultHandle, nvm3Key, &objectType, &dataLen);
         switch (nvm3Res)
@@ -509,9 +499,8 @@ exit:;
 
 bool EFR32Config::ValidConfigKey(Key key)
 {
-    // Returns true if the key is in the valid CHIP Config nvm3 key range.
-
-    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_ChipCounter))
+    // Returns true if the key is in the valid Matter Config nvm3 key range.
+    if ((key >= kMinConfigKey_MatterFactory) && (key <= kMaxConfigKey_MatterKvs))
     {
         return true;
     }
