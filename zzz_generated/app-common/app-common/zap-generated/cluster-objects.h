@@ -11002,6 +11002,7 @@ enum class Fields
 {
     kNetworkingStatus = 0,
     kDebugText        = 1,
+    kNetworkIndex     = 2,
 };
 
 struct Type
@@ -11012,7 +11013,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11028,7 +11030,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NetworkConfigResponse

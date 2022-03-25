@@ -11471,7 +11471,8 @@ public class ChipClusters {
     }
 
     public interface NetworkConfigResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex);
 
       void onError(Exception error);
     }
