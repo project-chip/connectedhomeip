@@ -32,6 +32,7 @@ import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.DACProviderStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
+import com.tcl.chip.tvapp.LevelManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
@@ -44,6 +45,8 @@ public class MatterServant {
   private ChipAppServer chipAppServer;
   private TvApp mTvApp;
   private boolean mIsOn = true;
+  private int mOnOffEndpoint;
+  private int mLevelEndpoint;
 
   private MatterServant() {}
 
@@ -87,7 +90,13 @@ public class MatterServant {
                   app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
                   break;
                 case Clusters.ClusterId_OnOff:
+                  mOnOffEndpoint = endpoint;
                   app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
+                  break;
+                case Clusters.ClusterId_LevelControl:
+                  mLevelEndpoint = endpoint;
+                  app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
+                  break;
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());
@@ -102,7 +111,7 @@ public class MatterServant {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    tvApp.postInit();
+    mTvApp.postInit();
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
@@ -114,7 +123,11 @@ public class MatterServant {
   }
 
   public void toggleOnOff() {
-    mTvApp.SetOnOff(1, mIsOn);
+    mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
+  }
+
+  public void updateLevel(int value) {
+    mTvApp.setCurrentLevel(mLevelEndpoint,value);
   }
 }

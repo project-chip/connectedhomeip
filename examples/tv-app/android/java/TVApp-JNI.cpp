@@ -21,6 +21,7 @@
 #include "ContentLauncherManager.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
+#include "LevelManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
@@ -151,7 +152,17 @@ JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject mana
     OnOffManager::NewManager(endpoint, manager);
 }
 
-JNI_METHOD(jboolean, SetOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
+JNI_METHOD(jboolean, setOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return OnOffManager::SetOnOff(endpoint, value);
+}
+
+JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    LevelManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return LevelManager::SetLevel(endpoint, value);
 }
