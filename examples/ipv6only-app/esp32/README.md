@@ -96,7 +96,7 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console:
 
-    $ python -m chip_rpc.console --device /dev/ttyUSB0 -b 115200
+    $ chip-console --device /dev/ttyUSB0 -b 115200
 
 An example flow of performing a scan, connecting, and getting the IPv6 address:
 

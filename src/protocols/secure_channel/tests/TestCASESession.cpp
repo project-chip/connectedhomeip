@@ -685,8 +685,8 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     gCommissionerStorageDelegate.Cleanup();
     gDeviceStorageDelegate.Cleanup();
-    gCommissionerFabrics.Reset();
-    gDeviceFabrics.Reset();
+    gCommissionerFabrics.DeleteAllFabrics();
+    gDeviceFabrics.DeleteAllFabrics();
     static_cast<TestContext *>(inContext)->Shutdown();
     return SUCCESS;
 }

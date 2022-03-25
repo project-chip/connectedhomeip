@@ -75,11 +75,13 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    const chip::Credentials::AttestationTrustStore * trustStore =
-        GetTestFileAttestationTrustStore(mPaaTrustStorePath.HasValue() ? mPaaTrustStorePath.Value() : ".");
-    if (trustStore == nullptr)
+    const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
+        ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
+        : chip::Credentials::GetTestAttestationTrustStore();
+    ;
+    if (mPaaTrustStorePath.HasValue() && trustStore == nullptr)
     {
-        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.HasValue() ? mPaaTrustStorePath.Value() : ".");
+        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
         ChipLogError(chipTool,
                      "Please specify a valid path containing trusted PAA certificates using [--paa-trust-store-path paa/file/path] "
                      "argument");
@@ -133,7 +135,7 @@ void CHIPCommand::StartTracing()
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
-    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
     }

@@ -36,8 +36,8 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msgBuf)
+CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
+                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -52,7 +52,7 @@ CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader,
     uint16_t totalLen = msgBuf->TotalLength();
 
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(context.Encrypt(data, totalLen, data, packetHeader, mac));
+    ReturnErrorOnFailure(context.Encrypt(data, totalLen, data, nonce, packetHeader, mac));
 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
@@ -63,8 +63,8 @@ CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decrypt(const CryptoContext & context, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msg)
+CHIP_ERROR Decrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
+                   const PacketHeader & packetHeader, System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -93,7 +93,7 @@ CHIP_ERROR Decrypt(const CryptoContext & context, PayloadHeader & payloadHeader,
     msg->SetDataLength(len);
 
     uint8_t * plainText = msg->Start();
-    ReturnErrorOnFailure(context.Decrypt(data, len, plainText, packetHeader, mac));
+    ReturnErrorOnFailure(context.Decrypt(data, len, plainText, nonce, packetHeader, mac));
 
     ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;

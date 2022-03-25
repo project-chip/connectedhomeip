@@ -127,7 +127,7 @@ to be On or Off.
 
 -   Launch the chip-rpc console after resetting Ameba board
 
-            $ python3 -m chip_rpc.console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
+            $ chip-console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
 
 -   Get and Set lighting directly using the RPC console
 

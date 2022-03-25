@@ -17,6 +17,7 @@
 
 #import "CHIPDeviceOverXPC.h"
 
+#import "CHIPAttributeCacheContainer+XPC.h"
 #import "CHIPCluster.h"
 #import "CHIPDeviceController+XPC.h"
 #import "CHIPDeviceControllerXPCConnection.h"
@@ -48,14 +49,42 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
 {
-    dispatch_async(queue, ^{
-        CHIP_LOG_ERROR("All attribute subscription is not supported by remote device");
-        subscriptionEstablishedHandler();
-        reportHandler(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
-    });
+    CHIP_LOG_DEBUG("Subscribing all attributes... Note that reportHandler is not supported.");
+    if (attributeCacheContainer) {
+        [attributeCacheContainer setXPCConnection:_xpcConnection controllerId:self.controller deviceId:self.nodeId];
+    }
+    [_xpcConnection getProxyHandleWithCompletion:^(
+        dispatch_queue_t _Nonnull proxyQueue, CHIPDeviceControllerXPCProxyHandle * _Nullable handle) {
+        if (handle) {
+            [handle.proxy subscribeWithController:self.controller
+                                           nodeId:self.nodeId
+                                      minInterval:@(minInterval)
+                                      maxInterval:@(maxInterval)
+                                           params:[CHIPDeviceController encodeXPCSubscribeParams:params]
+                                      shouldCache:(attributeCacheContainer != nil)
+                                       completion:^(NSError * _Nullable error) {
+                                           dispatch_async(queue, ^{
+                                               if (error) {
+                                                   reportHandler(nil, error);
+                                               } else {
+                                                   subscriptionEstablishedHandler();
+                                               }
+                                           });
+                                           __auto_type handleRetainer = handle;
+                                           (void) handleRetainer;
+                                       }];
+        } else {
+            CHIP_LOG_ERROR("Failed to obtain XPC connection to write attribute");
+            dispatch_async(queue, ^{
+                reportHandler(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
+            });
+        }
+    }];
 }
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
