@@ -36,12 +36,13 @@
 #include <shell_extension/launch.h>
 
 using chip::Callback::Callback;
-using namespace ::chip;
-using namespace ::chip::Shell;
-using namespace ::chip::System;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
+using namespace chip;
+using namespace chip::Shell;
+using namespace chip::System;
+using namespace chip::Credentials;
+using namespace chip::DeviceManager;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
 void OnTransferComplete(void * context);
@@ -124,7 +125,7 @@ static void InitServer(intptr_t context)
     ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
     if (otaImageLen > 0)
     {
-        otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
+        otaProvider.SetQueryImageStatus(OTAQueryStatus::kUpdateAvailable);
         otaProvider.SetOTAFilePath(otaFilename);
     }
 

@@ -25,9 +25,10 @@ tests:
     - label:
           "OTA-R/TH on completion of image download sends an
           ApplyUpdateRequestCommand to the DUT."
-      verification:
-          "Verify on the OTA Requestor logs [1645743059328] [97809:20280957]
-          CHIP: [SWU] ApplyUpdateResponse: [1645743059328] [97809:20280957]
-          CHIP: [SWU] action: 0 [1645743059328] [97809:20280957] CHIP: [SWU]
-          delayedActionTime: 0 seconds"
+      verification: |
+          Verify on the OTA Requestor logs
+
+          [1645743059328] [97809:20280957] CHIP: [SWU] ApplyUpdateResponse:
+          [1645743059328] [97809:20280957] CHIP: [SWU]   action: 0
+          [1645743059328] [97809:20280957] CHIP: [SWU]   delayedActionTime: 0 seconds
       disabled: true

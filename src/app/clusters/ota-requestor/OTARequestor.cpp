@@ -400,7 +400,7 @@ void OTARequestor::CancelImageUpdate()
 
     mOtaRequestorDriver->UpdateCancelled();
 
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+    Reset();
 }
 
 CHIP_ERROR OTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -658,12 +658,17 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
+    // Issue#16151 tracks re-factoring error and state transitioning handling.
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
         mOtaRequestorDriver->HandleIdleState(idleStateReason);
+    }
+    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
+    {
+        mOtaRequestorDriver->HandleIdleStateExit();
     }
 
     mCurrentUpdateState = newState;

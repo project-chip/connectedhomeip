@@ -23,37 +23,41 @@ config:
 
 tests:
     - label: "Reset DUT_CE to factory defaults"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
-      verification:
-          "1. Provision the device using 1st controller chip tool(use above
-          instructions) , "
+      verification: |
+          1. Provision the device using 1st controller chip tool(use above instructions) ,
       disabled: true
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE with a value of 15
           minutes"
-      verification:
-          "On 1st controller chip tool, open commissioning window For BCM,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window
-          900 1 0"
+      verification: |
+          On 1st controller chip tool, open commissioning window
+
+          For BCM,
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 900 1 0
       disabled: true
 
     - label: "Wait for commissioning Window to Timeout"
-      verification: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
       disabled: true
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
           seconds"
-      verification:
-          "On 1st controller chip tool, open commissioning window For BCM,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window
-          901 1 0"
+      verification: |
+          On 1st controller chip tool, open commissioning window
+
+          For BCM,
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 1 0
       disabled: true
 
     - label: "Wait for commissioning Window to Timeout"
-      verification: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
       disabled: true

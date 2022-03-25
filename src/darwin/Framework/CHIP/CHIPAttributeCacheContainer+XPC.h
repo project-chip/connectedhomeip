@@ -17,24 +17,14 @@
 
 #import <Foundation/Foundation.h>
 
-#import "CHIPDeviceControllerOverXPC.h"
+#import "CHIPAttributeCacheContainer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class CHIPSubscribeParams;
-
-@interface CHIPDeviceControllerOverXPC (AttributeCache)
-
-- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId
-                                   params:(CHIPSubscribeParams * _Nullable)params
-                               completion:(void (^)(NSError * _Nullable error))completion;
-
-- (void)readAttributeCacheWithNodeId:(uint64_t)nodeId
-                          endpointId:(NSNumber * _Nullable)endpointId
-                           clusterId:(NSNumber * _Nullable)clusterId
-                         attributeId:(NSNumber * _Nullable)attributeId
-                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
-
+@interface CHIPAttributeCacheContainer (XPC)
+- (void)setXPCConnection:(CHIPDeviceControllerXPCConnection *)xpcConnection
+            controllerId:(id<NSCopying>)controllerId
+                deviceId:(uint64_t)deviceId;
 @end
 
 NS_ASSUME_NONNULL_END

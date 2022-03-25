@@ -28,14 +28,24 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled as values needs to be stored for comparison
-    - label: "Reads MeasuredValue attribute from DUT"
+    - label: "Reads constraints of attribute: MinMeasuredValue"
+      command: "readAttribute"
+      attribute: "min measured value"
+      response:
+          constraints:
+              type: int16
+              minValue: 0
+              maxValue: 9999
+
+    - label: "Reads constraints of attribute: MaxMeasuredValue"
       disabled: true
       command: "readAttribute"
-      attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
+      attribute: "max measured value"
       response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: 1
+              maxValue: 10000
 
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
@@ -43,21 +53,14 @@ tests:
       PICS: A_RELATIVEHUMIDITY
       response:
           constraints:
-              type: uint16
+              type: int16
+              minValue: 0
+              maxValue: 10000
 
     #Disabled as UI prompts required for user action
     - label: "Operate on device to change the relative humidity significantly"
       disabled: true
       PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
-
-    #Disabled as values needs to be compared with the value read in step 2
-    - label: "Reads back MeasuredValue attribute from DUT after few seconds"
-      disabled: true
-      command: "readAttribute"
-      attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
-      response:
-          value: 0
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"

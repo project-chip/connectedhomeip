@@ -315,7 +315,7 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console
 
-    python -m chip_rpc.console --device /dev/ttyUSB0
+    chip-console --device /dev/ttyUSB0
 
 From within the console you can then invoke rpcs:
 
