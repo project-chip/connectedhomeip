@@ -13,20 +13,19 @@
 # limitations under the License.
 
 import os
-
-from typing import Any, List
 from itertools import combinations
+from typing import List
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
-from builders.cyw30739 import Cyw30739Builder, Cyw30739App, Cyw30739Board
-from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
-from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
-from builders.host import HostBuilder, HostApp, HostBoard
-from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
+from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
+from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.host import HostApp, HostBoard, HostBuilder
+from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
@@ -67,7 +66,8 @@ class Target:
         clone.create_kw_args.update(kargs)
         return clone
 
-    def Create(self, runner, repository_path: str, output_prefix: str, enable_flashbundle: bool):
+    def Create(self, runner, repository_path: str, output_prefix: str,
+               enable_flashbundle: bool):
         builder = self.builder_class(
             repository_path, runner=runner, **self.create_kw_args)
 
@@ -114,7 +114,9 @@ class AcceptNameWithSubstrings:
 
 
 class BuildVariant:
-    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], requires: List[str] = [], **buildargs):
+    def __init__(self, name: str, validator=AcceptAnyName(),
+                 conflicts: List[str] = [], requires: List[str] = [],
+                 **buildargs):
         self.name = name
         self.validator = validator
         self.conflicts = conflicts
@@ -137,7 +139,7 @@ def AllRequirementsMet(items: List[BuildVariant]) -> bool:
 
     for item in items:
         for requirement in item.requires:
-            if not requirement in available:
+            if requirement not in available:
                 return False
 
     return True
@@ -177,8 +179,8 @@ class VariantBuilder:
         """
         Yields a list of acceptable variants for the given targets.
 
-        Handles conflict resolution between build variants and globbing whiltelist
-        targets.
+        Handles conflict resolution between build variants and globbing
+        whitelist targets.
         """
         for target in self.targets:
             yield target
@@ -203,7 +205,8 @@ class VariantBuilder:
                             option.name, **option.buildargs)
 
                     # Only a few are whitelisted for globs
-                    if '-'.join([o.name for o in subgroup]) not in self.glob_whitelist:
+                    name = '-'.join([o.name for o in subgroup])
+                    if name not in self.glob_whitelist:
                         if not variant_target.glob_blacklist_reason:
                             variant_target = variant_target.GlobBlacklist(
                                 'Reduce default build variants')
@@ -277,9 +280,12 @@ def HostTargets():
     # Without extra build variants
     yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
     yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
-    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE, use_clang=True).GlobBlacklist("Reduce default build variants")
-    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
-    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE,
+                            use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE,
+                            use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
+                            use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
@@ -290,9 +296,12 @@ def Esp32Targets():
     esp32_target = Target('esp32', Esp32Builder)
 
     yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_rpcs=True)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_rpcs=True, enable_ipv4=False)
 
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
@@ -380,7 +389,8 @@ def NrfTargets():
 
         if '-nrf5340dk-' in rpc.name:
             rpc = rpc.GlobBlacklist(
-                'Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
+                'Compile failure due to pw_build args not forwarded to proto compiler. '
+                'https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
 
         yield rpc
 
@@ -422,8 +432,12 @@ def MbedTargets():
 
     for target in app_targets:
         yield target.Extend('release', profile=MbedProfile.RELEASE)
-        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
-        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist(
+            'Compile only for debugging purpose - '
+            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist(
+            'Compile only for debugging purpose - '
+            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
 
 
 def InfineonTargets():
@@ -452,10 +466,12 @@ def K32WTargets():
     yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
 
     yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
-    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT, tokenizer=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT,
+                        tokenizer=True, release=True).GlobBlacklist("Only on demand build")
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
-    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
+                        low_power=True, release=True).GlobBlacklist("Only on demand build")
 
 
 def cc13x2x7_26x2x7Targets():
@@ -468,10 +484,15 @@ def cc13x2x7_26x2x7Targets():
 
 
 def Cyw30739Targets():
-    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
-    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
-    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist("Running out of XIP flash space")
-    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
+    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
+    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist(
+                     "Running out of XIP flash space")
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
 
 
 def QorvoTargets():
