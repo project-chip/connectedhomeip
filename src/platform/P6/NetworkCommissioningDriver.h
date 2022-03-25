@@ -49,7 +49,7 @@ public:
         item.wiFiBand = (mpScanResults[mIternum].band == CY_WCM_WIFI_BAND_2_4GHZ)
             ? chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4
             : chip::DeviceLayer::NetworkCommissioning::WiFiBand::k5g;
-        item.rssi = mpScanResults[mIternum].signal_strength;
+        item.rssi     = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID, 6);
 
@@ -102,12 +102,13 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) override;
     Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan outDebugText,
+                              uint8_t * outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);

@@ -75,7 +75,7 @@ CHIP_ERROR LinuxThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
+Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan outDebugText, uint8_t * outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
@@ -91,7 +91,7 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
+Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
@@ -109,7 +109,7 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan outDebugText)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())

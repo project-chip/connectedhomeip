@@ -48,7 +48,7 @@ public:
 
         item.security = mScanResults[mIternum].get_security();
         item.ssidLen  = strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
-                               chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mScanResults[mIternum].get_channel();
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mScanResults[mIternum].get_rssi();
@@ -104,13 +104,14 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) override;
     Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
     void DisconnectNetwork(ByteSpan networkId);
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan outDebugText,
+                              uint8_t * outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     static WiFiDriverImpl & GetInstance()

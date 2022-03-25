@@ -91,7 +91,8 @@ bool P6WiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status P6WiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status P6WiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan outDebugText,
+                                        uint8_t * outNetworkIndex)
 {
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
@@ -108,7 +109,7 @@ Status P6WiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status P6WiFiDriver::RemoveNetwork(ByteSpan networkId)
+Status P6WiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex)
 {
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
@@ -117,7 +118,7 @@ Status P6WiFiDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status P6WiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status P6WiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan outDebugText)
 {
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
@@ -164,7 +165,7 @@ void P6WiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "P6 NetworkCommissioningDelegate: SSID: %s", mStagingNetwork.ssid);
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)
