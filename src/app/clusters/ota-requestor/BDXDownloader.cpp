@@ -58,10 +58,21 @@ System::Clock::Timeout BDXDownloader::GetTimeout()
     return mTimeout;
 }
 
-void BDXDownloader::Reset()
+void BDXDownloader::Reset(bool resetBdxTransfer, bool abortImageProcessing, OTAChangeReasonEnum reason)
 {
     mPrevBlockCounter = 0;
     DeviceLayer::SystemLayer().CancelTimer(TransferTimeoutCheckHandler, this);
+
+    SetState(State::kIdle, reason);
+
+    if (resetBdxTransfer)
+    {
+        mBdxTransfer.Reset();
+    }
+    if (abortImageProcessing && mImageProcessor)
+    {
+        mImageProcessor->Abort();
+    }
 }
 
 bool BDXDownloader::HasTransferTimedOut()
@@ -141,9 +152,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     else
     {
         ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
-        Reset();
-        mBdxTransfer.Reset();
-        SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
+        Reset(true, false, OTAChangeReasonEnum::kFailure);
     }
 
     return CHIP_NO_ERROR;
@@ -160,28 +169,20 @@ CHIP_ERROR BDXDownloader::FetchNextData()
 
 void BDXDownloader::OnDownloadTimeout()
 {
-    Reset();
-
     if (mState == State::kInProgress)
     {
         ChipLogDetail(BDX, "aborting due to timeout");
-        mBdxTransfer.Reset();
-        if (mImageProcessor != nullptr)
-        {
-            mImageProcessor->Abort();
-        }
-        SetState(State::kIdle, OTAChangeReasonEnum::kTimeOut);
+        Reset(true, true, OTAChangeReasonEnum::kTimeOut);
     }
     else
     {
+        Reset(false, false, OTAChangeReasonEnum::kSuccess);
         ChipLogError(BDX, "No download in progress");
     }
 }
 
 void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
-    Reset();
-
     if (mState == State::kInProgress)
     {
         bdx::StatusCode status = bdx::StatusCode::kUnknown;
@@ -196,17 +197,14 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
 
         // There is no method for a BDX receiving driver to cleanly end a transfer
         mBdxTransfer.AbortTransfer(status);
-        if (mImageProcessor != nullptr)
-        {
-            mImageProcessor->Abort();
-        }
-        SetState(State::kIdle, OTAChangeReasonEnum::kSuccess);
+        Reset(false, true, OTAChangeReasonEnum::kSuccess);
 
         // Because AbortTransfer() will generate a StatusReport to send.
         PollTransferSession();
     }
     else
     {
+        Reset(false, false, OTAChangeReasonEnum::kSuccess);
         ChipLogError(BDX, "No download in progress");
     }
 }
@@ -223,14 +221,6 @@ void BDXDownloader::PollTransferSession()
         CHIP_ERROR err = HandleBdxEvent(outEvent);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "HandleBDXEvent: %" CHIP_ERROR_FORMAT, err.Format()));
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
-}
-
-void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
-{
-    Reset();
-    mBdxTransfer.Reset();
-    SetState(State::kIdle, reason);
-    mImageProcessor->Abort();
 }
 
 CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent)
@@ -250,8 +240,8 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
-            Reset();
-
+            mPrevBlockCounter = 0;
+            DeviceLayer::SystemLayer().CancelTimer(TransferTimeoutCheckHandler, this);
             // BDX transfer is not complete until BlockAckEOF has been sent
             SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         }
@@ -273,15 +263,15 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
-        CleanupOnError(OTAChangeReasonEnum::kFailure);
+        Reset(true, true, OTAChangeReasonEnum::kFailure);
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");
-        CleanupOnError(OTAChangeReasonEnum::kFailure);
+        Reset(true, true, OTAChangeReasonEnum::kFailure);
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
-        CleanupOnError(OTAChangeReasonEnum::kTimeOut);
+        Reset(true, true, OTAChangeReasonEnum::kTimeOut);
         break;
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
