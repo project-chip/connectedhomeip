@@ -221,6 +221,7 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
+            Access::GetAccessControl().RemoveFabric(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
