@@ -1,9 +1,12 @@
 # Matter nRF Connect Light Switch Example Application
 
-The nRF Connect Light Switch Example demonstrates how to remotely control a lighting devices such as light bulbs or LEDs.
-The application should be used together with the [lighting app example](../../lighting-app/nrfconnect/README.md).
-The light switch uses buttons to test changing the lighting application example LED state and works as a brightness dimmer.
-You can use this example as a reference for creating your own application.
+The nRF Connect Light Switch Example demonstrates how to remotely control a
+lighting devices such as light bulbs or LEDs. The application should be used
+together with the
+[lighting app example](../../lighting-app/nrfconnect/README.md). The light
+switch uses buttons to test changing the lighting application example LED state
+and works as a brightness dimmer. You can use this example as a reference for
+creating your own application.
 
 <p align="center">
   <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
@@ -27,9 +30,9 @@ into an existing Matter network and can be controlled by this network.
 -   [Requirements](#requirements)
     -   [Supported devices](#supported_devices)
 -   [Device UI](#device-ui)
-    - [LEDs](#leds)
-    - [Buttons](#buttons)
-    - [Matter CLI](#matter-cli-commands)
+    -   [LEDs](#leds)
+    -   [Buttons](#buttons)
+    -   [Matter CLI](#matter-cli-commands)
 -   [Setting up the environment](#setting-up-the-environment)
     -   [Using Docker container for setup](#using-docker-container-for-setup)
     -   [Using native shell for setup](#using-native-shell-for-setup)
@@ -57,9 +60,17 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-A light switch device is a simple embedded controller, which has the ability to control lighting devices, such as light bulbs or LEDs. After commissioning into a Matter network, the light switch device does not know what it can control. In other words, it has no information about another device being connected to the same network. You must provide this information to the light switch through the process called binding, which links clusters and endpoints on both devices, so that the devices can interact with each other.
+A light switch device is a simple embedded controller, which has the ability to
+control lighting devices, such as light bulbs or LEDs. After commissioning into
+a Matter network, the light switch device does not know what it can control. In
+other words, it has no information about another device being connected to the
+same network. You must provide this information to the light switch through the
+process called binding, which links clusters and endpoints on both devices, so
+that the devices can interact with each other.
 
-The Matter device that runs the light switch application is controlled by the Matter controller device over the Thread protocol. By default, the Matter device has Thread disabled, and it should be paired with Matter controller and get
+The Matter device that runs the light switch application is controlled by the
+Matter controller device over the Thread protocol. By default, the Matter device
+has Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
@@ -93,19 +104,20 @@ Bluetooth LE advertising timeout expires.
 
 Last part of the rendezvous procedure, the provisioning operation involves
 sending the Thread network credentials from the Matter controller to the Matter
-device. As a result, the device is able to join the Thread network and communicate
-with other Thread devices in the network.
+device. As a result, the device is able to join the Thread network and
+communicate with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
 The example supports over-the-air (OTA) device firmware upgrade (DFU) using one
 of the two available methods:
 
--   Matter OTA DFU that is mandatory for Matter-compliant devices.
-    This option is enabled by default.
+-   Matter OTA DFU that is mandatory for Matter-compliant devices. This option
+    is enabled by default.
 -   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
-    over Bluetooth LE from Nordic Semiconductor's nRF Connect SDK. This is an optional proprietary method that is not part of the Matter specification and can be enabled to
-    work alongside the default Matter OTA DFU.
+    over Bluetooth LE from Nordic Semiconductor's nRF Connect SDK. This is an
+    optional proprietary method that is not part of the Matter specification and
+    can be enabled to work alongside the default Matter OTA DFU.
 
 For both methods, the
 [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
@@ -113,8 +125,8 @@ bootloader solution is used to replace the old firmware image with the new one.
 
 #### Matter Over-the-Air DFU
 
-The Matter over-the-air DFU distinguishes two types of nodes: OTA Provider
-and OTA Requestor.
+The Matter over-the-air DFU distinguishes two types of nodes: OTA Provider and
+OTA Requestor.
 
 An OTA Provider is a node that hosts a new firmware image and is able to respond
 on an OTA Requestor's queries regarding availability of new firmware images or
@@ -175,11 +187,15 @@ The example supports building and running on the following devices:
 
 ### Additional requirements for testing
 
-If you want to test the Light Switch Example application with other devices, you also need to flash and program the following examples using the compatible development kits:
+If you want to test the Light Switch Example application with other devices, you
+also need to flash and program the following examples using the compatible
+development kits:
 
-- [Lighting Example Application](../../lighting-app/nrfconnect/README.md)
+-   [Lighting Example Application](../../lighting-app/nrfconnect/README.md)
 
-Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to learn how to commission the lighting device to the same Matter network using the CHIP Tool.
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to
+learn how to commission the lighting device to the same Matter network using the
+CHIP Tool.
 
 <hr>
 
@@ -190,6 +206,7 @@ Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to lear
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
+
 ### LEDs
 
 This section describes all behaviors of LEDs located on platform image.
@@ -216,7 +233,8 @@ following states are possible:
 
 -   _Off_ &mdash; BLE is not advertising and DFU can not be performed.
 
--   _Rapid Even Flashing (30 ms off / 170 ms on)_ &mdash; BLE is advertising, DFU process can be started.
+-   _Rapid Even Flashing (30 ms off / 170 ms on)_ &mdash; BLE is advertising,
+    DFU process can be started.
 
 **LED 3** can be used to identify the device. The LED starts blinking evenly
 (500 ms on/500 ms off) when the Identify command of the Identify cluster is
@@ -225,7 +243,8 @@ effect.
 
 ### Buttons
 
-This section describes a reaction to pressing or holding buttons located on the platform image.
+This section describes a reaction to pressing or holding buttons located on the
+platform image.
 
 **Button 1** can be used for the following purposes:
 
@@ -242,14 +261,18 @@ This section describes a reaction to pressing or holding buttons located on the 
 
 **Button 2** can be used for the following purposes:
 
--   _Pressed once_ &mdash; Changes the light state to the opposite one on a bound lighting bulb device ([lighting-app](../../lighting-app/nrfconnect/) example).
+-   _Pressed once_ &mdash; Changes the light state to the opposite one on a
+    bound lighting bulb device ([lighting-app](../../lighting-app/nrfconnect/)
+    example).
 
--   _Pressed for more than 2 s_ &mdash; Changes the brightness of the light on a bound lighting bulb device ([lighting-app](../../lighting-app/nrfconnect/) example) (dimmer functionality).
-    The brightness is changing from 0% to 100% with 1% increments every 300 milliseconds as long as **Button 2** is pressed.
+-   _Pressed for more than 2 s_ &mdash; Changes the brightness of the light on a
+    bound lighting bulb device ([lighting-app](../../lighting-app/nrfconnect/)
+    example) (dimmer functionality). The brightness is changing from 0% to 100%
+    with 1% increments every 300 milliseconds as long as **Button 2** is
+    pressed.
 
-**Button 4** can be used to start the NFC tag emulation and
-enable Bluetooth LE advertising for the predefined period of time (15 minutes
-by default).
+**Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
+advertising for the predefined period of time (15 minutes by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -262,20 +285,25 @@ NFC.
 
 ### Matter CLI commands
 
-The Matter CLI allows to run commands via serial interface after USB cable connection to Nordic Semiconductor's kit.
+The Matter CLI allows to run commands via serial interface after USB cable
+connection to Nordic Semiconductor's kit.
 
-To enable the Matter CLI, you must compile the Light Switch Example application with the additional option __-DCONFIG_CHIP_LIB_SHELL=y__.
-Run the following command with _build-target_ replaced with the build target name of Nordic Semiconductor's kit you are using (for example, `nrf52840dk_nrf52840`):
+To enable the Matter CLI, you must compile the Light Switch Example application
+with the additional option **-DCONFIG_CHIP_LIB_SHELL=y**. Run the following
+command with _build-target_ replaced with the build target name of Nordic
+Semiconductor's kit you are using (for example, `nrf52840dk_nrf52840`):
 
     west build -b build-target -- -DCONFIG_CHIP_LIB_SHELL=y
 
-You can use the following commands to control a device that is programmed with the Light Switch Example application by using the Matter CLI:
+You can use the following commands to control a device that is programmed with
+the Light Switch Example application by using the Matter CLI:
 
     uart:~$ switch onoff on     : sends unicast On command to bound device
     uart:~$ switch onoff off    : sends unicast Off command to bound device
     uart:~$ switch onoff toggle : sends unicast Toggle command to bound device
 
-You can use the following commands a group of devices that are programmed with the Light Switch Example application by using the Matter CLI:
+You can use the following commands a group of devices that are programmed with
+the Light Switch Example application by using the Matter CLI:
 
     uart:~$ switch groups onoff on     : sends multicast On command to all bound devices in a group
     uart:~$ switch groups onoff off    : sends multicast Off command to  all bound devices in a group
@@ -554,92 +582,137 @@ directory:
 
 ## Testing the example
 
-After building and flashing the example, you can test its functionalities.
-For this purpose, you need to prepare a second device that is programmed with the [Lighting Example](../../lighting-app/nrfconnect/), perform the binding process, and add Access Control Lists (ACLs).
+After building and flashing the example, you can test its functionalities. For
+this purpose, you need to prepare a second device that is programmed with the
+[Lighting Example](../../lighting-app/nrfconnect/), perform the binding process,
+and add Access Control Lists (ACLs).
 
 ### Commissioning the lighting device
 
-To commission the Lighting Example Application to the same Matter network, read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md).
+To commission the Lighting Example Application to the same Matter network, read
+the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md).
 
 ### Binding cluster and endpoints
 
-Binding links clusters and endpoints on both devices, which enables them to communicate with each other.
+Binding links clusters and endpoints on both devices, which enables them to
+communicate with each other.
 
-To perform binding, you need a controller that can write the binding table to the light switch device and write proper ACL to the endpoint light bulb on the [Lighting Example application](../../lighting-app/nrfconnect/)). For example, you can use the [CHIP Tool for Windows or Linux](../../chip-tool/README.md) as the controller. The ACL should contain information about all clusters that can be called by the light switch application. See the section about [interacting with ZCL clusters](../../../docs/guides/chip_tool_guide.md#interacting-with-zcl-clusters) in the CHIP Tool's user guide for more information about ACLs.
+To perform binding, you need a controller that can write the binding table to
+the light switch device and write proper ACL to the endpoint light bulb on the
+[Lighting Example application](../../lighting-app/nrfconnect/)). For example,
+you can use the [CHIP Tool for Windows or Linux](../../chip-tool/README.md) as
+the controller. The ACL should contain information about all clusters that can
+be called by the light switch application. See the section about
+[interacting with ZCL clusters](../../../docs/guides/chip_tool_guide.md#interacting-with-zcl-clusters)
+in the CHIP Tool's user guide for more information about ACLs.
 
-You can perform the binding process to a single remote endpoint (unicast binding) or to a group of remote endpoints (group multicast).
+You can perform the binding process to a single remote endpoint (unicast
+binding) or to a group of remote endpoints (group multicast).
 
-> **Note:**
-> To use a light switch without brightness dimmer, apply only the first binding command with cluster no. 6.
+> **Note:** To use a light switch without brightness dimmer, apply only the
+> first binding command with cluster no. 6.
 
 #### Unicast binding to a remote endpoint using the CHIP Tool for Windows or Linux
 
-In this scenario, commands are provided for a light switch device with the ``nodeId = 2`` and a light bulb device with ``nodeId = 1``, both commissioned to the same Matter network.
+In this scenario, commands are provided for a light switch device with the
+`nodeId = 2` and a light bulb device with `nodeId = 1`, both commissioned to the
+same Matter network.
 
 To perform the unicast binding process, complete the following steps:
 
-1. Build the CHIP Tool according to the steps from the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
-2. Go to the CHIP Tool build directory.
-3. Add an ACL to the development kit that is programmed with the [Lighting Application Example](../../lighting-app/nrfconnect/) by running the following command:
+1.  Build the CHIP Tool according to the steps from the
+    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
+2.  Go to the CHIP Tool build directory.
+3.  Add an ACL to the development kit that is programmed with the
+    [Lighting Application Example](../../lighting-app/nrfconnect/) by running
+    the following command:
 
         chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
 
     In this command:
 
-    - ``{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`` is an ACL for the communication with the CHIP Tool.
-    - ``{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`` is an ACL for binding   (cluster no. 6 is the On/Off cluster and the cluster no. 8 is the Level Control cluster).
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
+      is an ACL for the communication with the CHIP Tool.
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+      is an ACL for binding (cluster no. 6 is the On/Off cluster and the cluster
+      no. 8 is the Level Control cluster).
 
-    This command adds permissions on the lighting application device that allows it to receive commands from the light switch device.
-4. Add a binding table to the Light Switch binding cluster:
+    This command adds permissions on the lighting application device that allows
+    it to receive commands from the light switch device.
+
+4.  Add a binding table to the Light Switch binding cluster:
 
         chip-tool binding write binding '[{"fabricIndex": 1, "node": 1, "endpoint": 1, "cluster": 6}, {"fabricIndex": 1, "node": 1, "endpoint": 1, "cluster": 8}]' 2 1
 
     In this command:
 
-    - ``{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 6}`` is a binding for the On/Off cluster.
-    - ``{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 8}`` is a binding for the Level Control cluster.
+    - `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 6}` is a
+      binding for the On/Off cluster.
+    - `{"fabricIndex": 1, "node": <1>, "endpoint": 1, "cluster": 8}` is a
+      binding for the Level Control cluster.
 
-> **Note:**
-> When a light switch device reboots, the binding table is restored from flash memory and the device tries to bind a known device that is programmed with the Lighting Application Example.
+> **Note:** When a light switch device reboots, the binding table is restored
+> from flash memory and the device tries to bind a known device that is
+> programmed with the Lighting Application Example.
 
 #### Group multicast binding to the group of remote endpoints using the CHIP Tool for Windows or Linux
 
-The group multicast binding lets you control more than one lighting device at a time using a single light switch.
+The group multicast binding lets you control more than one lighting device at a
+time using a single light switch.
 
-The group multicast binding targets all development kits that are programmed with the [Lighting Application Example](../../lighting-app/nrfconnect/) and added to the same multicast group.
-After the binding is established, the light switch device can send multicast requests, and all of the devices in the bound groups can run the received command.
+The group multicast binding targets all development kits that are programmed
+with the [Lighting Application Example](../../lighting-app/nrfconnect/) and
+added to the same multicast group. After the binding is established, the light
+switch device can send multicast requests, and all of the devices in the bound
+groups can run the received command.
 
-In this scenario, commands are provided for a light switch device with the ``nodeId = 2`` and a light bulb device with ``nodeId = 1``, both commissioned to the same Matter network.
+In this scenario, commands are provided for a light switch device with the
+`nodeId = 2` and a light bulb device with `nodeId = 1`, both commissioned to the
+same Matter network.
 
 To perform the unicast binding process, complete the following steps:
 
-1. Build the CHIP Tool according to the steps from the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
-2. Go to the CHIP Tool build directory.
-3. Add an ACL to the [lighting endpoint](../../lighting-app/nrfconnect/) permissions by running the following command:
+1.  Build the CHIP Tool according to the steps from the
+    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
+2.  Go to the CHIP Tool build directory.
+3.  Add an ACL to the [lighting endpoint](../../lighting-app/nrfconnect/)
+    permissions by running the following command:
 
-        chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
+         chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
 
-   In this command:
+    In this command:
 
-   - ``{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`` is an ACL for the communication with the CHIP Tool.
-   - ``{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`` is an ACL for binding (cluster ``no. 6`` is the On/Off cluster and the cluster ``no. 8`` is the Level Control cluster).
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
+      is an ACL for the communication with the CHIP Tool.
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+      is an ACL for binding (cluster `no. 6` is the On/Off cluster and the
+      cluster `no. 8` is the Level Control cluster).
 
-   This allows the lighting application device to receive commands from the light switch device.
-4. Add the light switch device to the multicast group by running the following command:
+    This allows the lighting application device to receive commands from the
+    light switch device.
+
+4.  Add the light switch device to the multicast group by running the following
+    command:
 
         chip-tool tests TestGroupDemoConfig --nodeId 1
 
-5. Add all light bulbs to the same multicast group by applying command below for each of the light bulbs, using the appropriate ``<node_id>`` (the user-defined ID of the node being commissioned except ``2`` due to use this ``<node_id>`` for light-switch) for each of them:
+5.  Add all light bulbs to the same multicast group by applying command below
+    for each of the light bulbs, using the appropriate `<node_id>` (the
+    user-defined ID of the node being commissioned except `2` due to use this
+    `<node_id>` for light-switch) for each of them:
 
         chip-tool tests TestGroupDemoConfig --nodeId <node_id>
 
-7. Add Binding commands for group multicast:
+6.  Add Binding commands for group multicast:
 
         chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 2 1
 
 ### Testing the communication
 
-To test the communication between the light switch device and the bound devices, use [light switch buttons](#buttons) or [Matter CLI commands](#matter-cli-commands), as described in the [Device UI](#device-ui) section.
+To test the communication between the light switch device and the bound devices,
+use [light switch buttons](#buttons) or
+[Matter CLI commands](#matter-cli-commands), as described in the
+[Device UI](#device-ui) section.
 
 ### Testing Device Firmware Upgrade
 
