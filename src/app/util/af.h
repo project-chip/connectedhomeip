@@ -79,7 +79,7 @@
 /** @name Attribute Storage */
 // @{
 
-#define emberEndpointNotFound (0xFFFF)
+static constexpr uint16_t kEmberEndpointNotFound = 0xFFFF;
 
 /**
  * @brief locate attribute metadata
