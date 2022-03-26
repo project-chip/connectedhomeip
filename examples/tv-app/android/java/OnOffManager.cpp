@@ -66,7 +66,7 @@ OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);
     return ((ep == kEmberEndpointNotFound || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
-                                                                                                         : gOnOffManagerTable[ep]);
+                                                                                                          : gOnOffManagerTable[ep]);
 }
 
 void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
