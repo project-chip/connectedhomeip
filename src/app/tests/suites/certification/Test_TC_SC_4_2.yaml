@@ -60,7 +60,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"
@@ -271,7 +271,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Check Instance Name"
       disabled: true
