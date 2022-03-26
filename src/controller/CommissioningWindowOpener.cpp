@@ -65,7 +65,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(
         !salt.HasValue() ||
-            (salt.Value().size() >= kSpake2p_Max_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
+            (salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
         CHIP_ERROR_INVALID_ARGUMENT);
 
     mSetupPayload = SetupPayload();
