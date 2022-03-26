@@ -754,7 +754,6 @@ function isWeaklyTypedEnum(label)
     "AttributeWritePermission",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
-    "BootReasonType",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
