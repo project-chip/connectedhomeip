@@ -53,9 +53,15 @@ using namespace ::chip::Logging;
 #include "radio.h"
 #endif
 
+#include "RNG_Interface.h"
+#include "MemManager.h"
+#include "TimersManager.h"
+
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
+
+extern "C" void boardFwkInit(void);
 
 /* low power requirements */
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
@@ -87,8 +93,13 @@ static sDualModeAppStates dualModeStates;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
+static char initString[] = "app";
+
 extern "C" void main_task(void const * argument)
 {
+    char *argv[1] = {0};
+    argv[0] = &initString[0];
+
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
     for (; pFunc < &__init_array_end; ++pFunc)
@@ -110,13 +121,16 @@ extern "C" void main_task(void const * argument)
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    /* Used for HW initializations */
-    otSysInit(0, NULL);
+   /* Initialize board framework services */
+    boardFwkInit();
+
+    /* Used for OT initializations */
+    otSysInit(1, argv);
 
     K32W_LOG("Welcome to NXP ELock Demo App");
 
     /* Mbedtls Threading support is needed because both
-     * Thread and Weave tasks are using it */
+     * Thread and Matter tasks are using it */
     freertos_mbedtls_mutex_init();
 
     // Init Chip memory management before the stack
@@ -125,7 +139,7 @@ extern "C" void main_task(void const * argument)
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        K32W_LOG("Error during PlatformMgr().InitWeaveStack()");
+        K32W_LOG("Error during PlatformMgr().InitMatterStack()");
         goto exit;
     }
 
@@ -324,4 +338,16 @@ static void BOARD_SetClockForWakeup(void)
     /* Enables the clock for the GPIO0 module */
     CLOCK_EnableClock(kCLOCK_Gpio0);
 }
+
+extern "C" void boardFwkInit(void)
+{
+    MEM_Init();
+
+    /* RNG initialization and PRNG initial seeding */
+    (void) RNG_Init();
+    RNG_SetPseudoRandomNoSeed(NULL);
+
+    TMR_Init();
+}
+
 #endif
