@@ -91,6 +91,9 @@ public:
     /// Return maximum supported download block size
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
+    /// Set maximum supported download block size
+    virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;
+
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 

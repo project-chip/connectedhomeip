@@ -36,7 +36,6 @@
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
-#include "TimersManager.h"
 #include "app_config.h"
 
 constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
@@ -53,7 +52,6 @@ static LEDWidget sLockLED;
 #endif
 
 static bool sIsThreadProvisioned = false;
-static bool sIsThreadEnabled     = false;
 static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
@@ -86,15 +84,13 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    PlatformMgr().ScheduleWork(InitServer, 0);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-    TMR_Init();
 
     /* HW init leds */
 #if !cPWR_UsePowerDownMode
@@ -157,6 +153,12 @@ CHIP_ERROR AppTask::Init()
     return err;
 }
 
+void AppTask::InitServer(intptr_t arg)
+{
+    // Init ZCL Data Model and start server
+    VerifyOrDie((chip::Server::GetInstance().Init()) == CHIP_NO_ERROR);
+}
+
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
@@ -193,9 +195,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
             K32WUartProcess();
 #endif
-
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
             sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
@@ -216,7 +215,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 #if !cPWR_UsePowerDownMode
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -536,6 +535,18 @@ void AppTask::BleHandler(void * aGenericEvent)
 #if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
+    if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
+    {
+        if (event->ServiceProvisioningChange.IsServiceProvisioned)
+        {
+            sIsThreadProvisioned = TRUE;
+        }
+        else
+        {
+            sIsThreadProvisioned = FALSE;
+        }
+    }
+
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
         if (!NFCMgr().IsTagEmulationStarted())
@@ -702,11 +713,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
+    PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
+}
+void AppTask::UpdateClusterStateInternal(intptr_t arg)
+{
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
     EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                                                (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
