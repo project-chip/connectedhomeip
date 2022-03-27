@@ -104,9 +104,12 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     }
 
     uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
-    if (currentVersion != requestor->GetTargetVersion())
+    if (currentVersion != targetVersion)
     {
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
+                     targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -167,8 +170,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     rename(imageProcessor->mImageFile, kImageExecPath);
     chmod(kImageExecPath, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
-    // Shutdown the stack and expect to boot into the new image once shutdown is complete
-    requestor->Shutdown();
+    // Shutdown the stack and expect to boot into the new image once the event loop is stopped
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().HandleServerShuttingDown(); });
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)

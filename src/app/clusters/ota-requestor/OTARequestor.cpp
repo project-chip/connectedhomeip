@@ -286,11 +286,6 @@ void OTARequestor::Reset()
     StoreCurrentUpdateInfo();
 }
 
-void OTARequestor::Shutdown(void)
-{
-    mServer->DispatchShutDownAndStopEventLoop();
-}
-
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const AnnounceOtaProvider::DecodableType & commandData)
