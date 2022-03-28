@@ -49,6 +49,7 @@ namespace chip {
 struct DeviceProxyInitParams
 {
     SessionManager * sessionManager                    = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
     Messaging::ExchangeManager * exchangeMgr           = nullptr;
     FabricTable * fabricTable                          = nullptr;
     CASEClientPoolDelegate * clientPool                = nullptr;
@@ -59,6 +60,7 @@ struct DeviceProxyInitParams
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(sessionResumptionStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);

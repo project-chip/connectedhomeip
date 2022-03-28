@@ -34,6 +34,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
@@ -85,6 +86,8 @@ public:
     }
 
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    ScopedNodeId GetScopedNodeId() const { return ScopedNodeId(mOperationalId.GetNodeId(), mFabricIndex); }
+    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const { return ScopedNodeId(node, mFabricIndex); }
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
