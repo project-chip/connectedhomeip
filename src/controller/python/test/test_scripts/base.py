@@ -255,10 +255,10 @@ class BaseTestHelper:
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
-        devCtrl2 = fabricAdmin2.NewController(
+        self.devCtrl2 = fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
@@ -310,8 +310,8 @@ class BaseTestHelper:
                 "Got back fabric indices that match for two different fabrics!")
             return False
 
-        devCtrl2.Shutdown()
-        fabricAdmin2.Shutdown()
+        self.devCtrl2.Shutdown()
+        self.fabricAdmin2.Shutdown()
 
         return True
 
