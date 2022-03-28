@@ -172,13 +172,11 @@ public:
      * @param role      Inidcates whether this object will be sending or receiving data
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
-     * @param timeout   The amount of time to wait for a response before considering the transfer failed
-     * @param curTime   The current time since epoch. Needed to set a start time for the transfer timeout.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData);
 
     /**
      * @brief
@@ -189,13 +187,11 @@ public:
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
-     * @param timeout         The amount of time to wait for a response before considering the transfer failed
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
-    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                               System::Clock::Timeout timeout);
+    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize);
 
     /**
      * @brief

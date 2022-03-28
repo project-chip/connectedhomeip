@@ -119,7 +119,7 @@ void TransferSession::PollOutput(OutputEvent & event)
     mPendingOutput = OutputEventType::kNone;
 }
 
-CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout)
+CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -161,7 +161,7 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
 }
 
 CHIP_ERROR TransferSession::WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                            uint16_t maxBlockSize, System::Clock::Timeout timeout)
+                                            uint16_t maxBlockSize)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
