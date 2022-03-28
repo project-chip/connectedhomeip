@@ -353,7 +353,7 @@ First, image directory 0 must be written:
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_0=0000000010000000
 ```
 
-Here is the interpretation of the fiels:
+Here is the interpretation of the fields:
 
 ```
 00000000 -> start address 0x00000000
@@ -368,7 +368,7 @@ Second, image directory 1 must be written:
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000CD040101
 ```
 
-Here is the interpretation of the fiels:
+Here is the interpretation of the fields:
 
 ```
 00400000 -> start address 0x00004000
@@ -409,8 +409,8 @@ The concept for OTA is the next one:
     It will be used for requesting OTA blocks from the OTA Provider;
 -   the controller (a linux application called chip-tool) will be used for
     commmissionning both the device and the OTA Provider App. The device will be
-    commissionned using the standard Matter flow (BLE + IEEE 802.15.4) while the
-    OTA Provider Application will be commissionned using the _onnetwork_ option
+    commissioned using the standard Matter flow (BLE + IEEE 802.15.4) while the
+    OTA Provider Application will be commissioned using the _onnetwork_ option
     of chip-tool;
 -   during commissioning, each device is assigned a node id by the chip-tool
     (can be specified manually by the user). Using the node id of the device and
