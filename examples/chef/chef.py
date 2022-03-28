@@ -353,6 +353,9 @@ true''')
                 queueCommand(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
                 queueCommand("idf.py fullclean")
             queueCommand("idf.py build")
+            queueCommand("idf.py build flashing_script")
+            queueCommand(f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz --files-from=chip-shell.flashbundle.txt)")
+            queueCommand(f"cp build/$(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz {paths['scriptFolder']}")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
