@@ -151,7 +151,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
         FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
-        VerifyOrDie(fabric != nullptr);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
