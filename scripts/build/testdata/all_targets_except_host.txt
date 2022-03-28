@@ -192,3 +192,10 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 tizen-arm-light
+tizen-arm-light-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-wifi-asan (NOGLOB: Reduce default build variants)

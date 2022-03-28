@@ -207,7 +207,7 @@ class VariantBuilder:
                     # Only a few are whitelisted for globs
                     name = '-'.join([o.name for o in subgroup])
                     if name not in self.glob_whitelist:
-                        if not variant_target.glob_blacklist_reason:
+                        if not variant_target.IsGlobBlacklisted:
                             variant_target = variant_target.GlobBlacklist(
                                 'Reduce default build variants')
 
@@ -216,9 +216,9 @@ class VariantBuilder:
 
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    targets = [
-        target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
-    ]
+    target_native = target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
+
+    targets = [target_native]
 
     # x64 linux  supports cross compile
     if (HostBoard.NATIVE.PlatformName() == 'linux') and (
@@ -229,9 +229,9 @@ def HostTargets():
 
     # Don't cross  compile some builds
     app_targets.append(
-        targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+        target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
-        targets[0].Extend('tv-app', app=HostApp.TV_APP))
+        target_native.Extend('tv-app', app=HostApp.TV_APP))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -278,14 +278,14 @@ def HostTargets():
         yield target
 
     # Without extra build variants
-    yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
-    yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
-    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE,
-                            use_clang=True).GlobBlacklist("Reduce default build variants")
-    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE,
-                            use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
-    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
-                            use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+    yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
+    yield target_native.Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
+    yield target_native.Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE,
+                               use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield target_native.Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE,
+                               use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
+                               use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
@@ -504,6 +504,23 @@ def QorvoTargets():
     yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
 
 
+def TizenTargets():
+
+    # Possible build variants.
+    # NOTE: The number of potential builds is exponential here.
+    builder = VariantBuilder()
+    builder.AppendVariant(name="no-ble", enable_ble=False)
+    builder.AppendVariant(name="no-wifi", enable_wifi=False)
+    builder.AppendVariant(name="asan", use_asan=True)
+
+    target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
+
+    builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
+
+    for target in builder.AllVariants():
+        yield target
+
+
 ALL = []
 
 target_generators = [
@@ -519,6 +536,7 @@ target_generators = [
     cc13x2x7_26x2x7Targets(),
     Cyw30739Targets(),
     QorvoTargets(),
+    TizenTargets(),
 ]
 
 for generator in target_generators:
@@ -528,8 +546,6 @@ for generator in target_generators:
 # Simple targets added one by one
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
-ALL.append(Target('tizen-arm-light', TizenBuilder,
-                  board=TizenBoard.ARM, app=TizenApp.LIGHT))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)
