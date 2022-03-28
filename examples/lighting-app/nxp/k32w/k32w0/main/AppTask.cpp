@@ -92,7 +92,7 @@ static DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
 static OTAImageProcessorImpl gImageProcessor;
 
-constexpr uint16_t requestedOtaBlockSize  = 1024;
+constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
 extern bool shouldReset;
@@ -240,7 +240,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
             K32WUartProcess();
 #endif
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -664,8 +664,8 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
 void AppTask::PostOTAResume()
 {
     AppEvent event;
-    event.Type              = AppEvent::kEventType_OTAResume;
-    event.Handler           = OTAResumeEventHandler;
+    event.Type    = AppEvent::kEventType_OTAResume;
+    event.Handler = OTAResumeEventHandler;
     PostEvent(&event);
 }
 
@@ -682,7 +682,7 @@ void AppTask::OTAResumeEventHandler(AppEvent * aEvent)
     }
 }
 
-extern "C" void vApplicationIdleHook( void )
+extern "C" void vApplicationIdleHook(void)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();
@@ -723,7 +723,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     // write the new on/off value
     EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
@@ -737,11 +737,11 @@ void AppTask::UpdateDeviceState(void)
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    bool onoffAttrValue  = 0;
+    bool onoffAttrValue = 0;
 
     /* get onoff attribute value */
-    (void)emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-	                          (uint8_t *) &onoffAttrValue, 1, NULL);
+    (void) emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t *) &onoffAttrValue,
+                                1, NULL);
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);

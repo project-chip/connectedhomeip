@@ -81,10 +81,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 void OTAImageProcessorImpl::TriggerNewRequestForData()
 {
-	if (mDownloader)
-	{
-		this->mDownloader->FetchNextData();
-	}
+    if (mDownloader)
+    {
+        this->mDownloader->FetchNextData();
+    }
 }
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
@@ -117,7 +117,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
     mParams.totalFileBytes = header.mPayloadSize;
-    mSoftwareVersion = header.mSoftwareVersion;
+    mSoftwareVersion       = header.mSoftwareVersion;
     mHeaderParser.Clear();
 
     return CHIP_NO_ERROR;
@@ -161,12 +161,12 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         {
             if (gOtaSuccess_c == OTA_StartImage(imageProcessor->mParams.totalFileBytes))
             {
-                uint8_t *ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+                uint8_t * ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
 
                 if (ptr != nullptr)
                 {
                     MutableByteSpan mutableBlock = MutableByteSpan(ptr, block.size());
-                    error = CopySpanToMutableSpan(block, mutableBlock);
+                    error                        = CopySpanToMutableSpan(block, mutableBlock);
 
                     if (error == CHIP_NO_ERROR)
                     {
@@ -266,11 +266,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    bool firstRun = true;
+    bool firstRun         = true;
 
     if (imageProcessor == nullptr)
-	{
-	    return;
+    {
+        return;
     }
 
     OTA_CommitImage(NULL);
@@ -306,7 +306,7 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::HandleBlockEraseComplete(uint32_t)
 {
-	GetAppTask().PostOTAResume();
+    GetAppTask().PostOTAResume();
 }
 
 } // namespace chip

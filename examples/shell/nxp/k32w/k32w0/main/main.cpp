@@ -40,10 +40,10 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
-#include "radio.h"
-#include "RNG_Interface.h"
 #include "MemManager.h"
+#include "RNG_Interface.h"
 #include "TimersManager.h"
+#include "radio.h"
 
 #include <AppTask.h>
 
@@ -81,8 +81,8 @@ static void shell_task(void * args)
 
 extern "C" void main_task(void const * argument)
 {
-    int status = 0;
-    char *argv[1] = {0};
+    int status     = 0;
+    char * argv[1] = { 0 };
     BaseType_t shellTaskHandle;
 
     /* Call C++ constructors */
