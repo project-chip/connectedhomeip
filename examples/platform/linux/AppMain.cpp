@@ -389,7 +389,7 @@ CHIP_ERROR InitCommissioner()
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
 
-    gGroupDataProvider.SetPersistentStorage(&gServerStorage);
+    gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     factoryParams.groupDataProvider = &gGroupDataProvider;
 
@@ -432,6 +432,20 @@ CHIP_ERROR InitCommissioner()
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
+
+    Credentials::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr);
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+    ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(),
+                                                                     defaultIpk, compressedFabricIdSpan));
+
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 

@@ -35,6 +35,7 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -46,7 +47,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
-
 using namespace chip::DeviceLayer;
 
 using chip::kMinValidFabricIndex;

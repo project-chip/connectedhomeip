@@ -54,6 +54,8 @@ constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 constexpr chip::FabricIndex kFabric1 = 1;
 constexpr chip::FabricIndex kFabric2 = 7;
 
+// Currently unused constants that are useful for context
+#if 0
 static const uint8_t kExampleOperationalRootPublicKey[65] = {
     0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1, 0x1e,
     0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9, 0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25,
@@ -62,14 +64,16 @@ static const uint8_t kExampleOperationalRootPublicKey[65] = {
 };
 static const ByteSpan kExampleOperationalRootPublicKeySpan{ kExampleOperationalRootPublicKey };
 
+constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
+constexpr chip::FabricId kFabricId2               = 0x5E1C0F1B2C813C7A;
+#endif
+
 // kFabricId1/kCompressedFabricIdBuffer1 matches the Compressed Fabric Identifier
 // example of spec section `4.3.2.2. Compressed Fabric Identifier`. It is based on
 // the public key in `kExampleOperationalRootPublicKey`.
-constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
 static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
 constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
 
-constexpr chip::FabricId kFabricId2               = 0x5E1C0F1B2C813C7A;
 static const uint8_t kCompressedFabricIdBuffer2[] = { 0x3f, 0xaa, 0xe2, 0x90, 0x93, 0xd5, 0xaf, 0x45 };
 constexpr ByteSpan kCompressedFabricId2(kCompressedFabricIdBuffer2);
 
