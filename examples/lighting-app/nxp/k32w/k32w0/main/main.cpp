@@ -64,7 +64,7 @@ extern "C" void main_task(void const * argument)
 {
     char *argv[1] = {0};
     argv[0] = &initString[0];
-   
+
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
     for (; pFunc < &__init_array_end; ++pFunc)
