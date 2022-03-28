@@ -76,9 +76,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 public:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     void StartWiFiManagement(void);
     void StopWiFiManagement(void);
 #endif
@@ -124,12 +124,14 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+#endif
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
