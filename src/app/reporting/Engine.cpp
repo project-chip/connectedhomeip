@@ -111,6 +111,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         // vs write paths.
         ConcreteAttributePath readPath;
 
+        ChipLogDetail(DataManagement,
+                      "Building Reports for ReadHandler with LastReportGeneration = %" PRIu64 " DirtyGeneration = %" PRIu64,
+                      apReadHandler->mPreviousReportsBeginGeneration, apReadHandler->mDirtyGeneration);
+
+        // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
+        if (!apReadHandler->IsReporting())
+        {
+            apReadHandler->ResetPathIterator();
+        }
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        uint32_t attributesRead = 0;
+#endif
+
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
@@ -122,8 +136,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
-                        concretePathDirty = true;
-                        return Loop::Break;
+                        // We don't need to worry about paths that were already marked dirty before the last time this read handler
+                        // started a report that it completed: those paths already got reported.
+                        if (dirtyPath->mGeneration > apReadHandler->mPreviousReportsBeginGeneration)
+                        {
+                            concretePathDirty = true;
+                            return Loop::Break;
+                        }
                     }
                     return Loop::Continue;
                 });
@@ -142,7 +161,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 }
             }
 
-            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+            attributesRead++;
+            if (attributesRead > mMaxAttributesPerChunk)
+            {
+                ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            }
+#endif
+
+            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty
+            // paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
@@ -580,6 +608,8 @@ void Engine::Run()
 
     if (allReadClean)
     {
+        ChipLogDetail(DataManagement, "All ReadHandler-s are clean, clear GlobalDirtySet");
+
         mGlobalDirtySet.ReleaseAll();
     }
 }
@@ -589,10 +619,12 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
         {
+            path->mGeneration = GetDirtySetGeneration();
             return Loop::Break;
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
+            path->mGeneration  = GetDirtySetGeneration();
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
@@ -603,6 +635,8 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
 
 CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
 {
+    BumpDirtySetGeneration();
+
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
         // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
         // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
@@ -614,7 +648,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
                 if (aAttributePath.IsAttributePathSupersetOf(object->mValue) ||
                     object->mValue.IsAttributePathSupersetOf(aAttributePath))
                 {
-                    handler->SetDirty();
+                    handler->SetDirty(aAttributePath);
                     break;
                 }
             }
@@ -632,7 +666,8 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
             ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
             return CHIP_ERROR_NO_MEMORY;
         }
-        *object = aAttributePath;
+        *object             = aAttributePath;
+        object->mGeneration = GetDirtySetGeneration();
     }
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
@@ -662,7 +697,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     for (auto object = aReadHandler.GetAttributePathList(); object != nullptr; object = object->mpNext)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if (path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path))
+            if ((path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path)) &&
+                path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
             {
                 intersected = true;
                 return Loop::Break;
@@ -676,8 +712,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     }
     if (!intersected)
     {
-        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
         aReadHandler.ClearDirty();
+        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
     }
 }
 

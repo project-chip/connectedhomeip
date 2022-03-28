@@ -132,8 +132,8 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     }
     else
     {
-        // Mark read handler dirty for read/subscribe priming stage
-        mDirty = true;
+        // Force us to be in a dirty state so we get processed by the reporting
+        mForceDirty = true;
     }
 
     return err;
@@ -226,6 +226,10 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
 
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!IsReporting())
+    {
+        mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    }
     mIsChunkedReport        = aMoreChunks;
     bool noResponseExpected = IsType(InteractionType::Read) && !mIsChunkedReport;
     if (!noResponseExpected)
@@ -252,6 +256,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
     if (!aMoreChunks)
     {
+        mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration;
         ClearDirty();
         InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
     }
@@ -710,7 +715,7 @@ void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, voi
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
     readHandler->mHoldReport = false;
-    if (readHandler->mDirty)
+    if (readHandler->IsDirty())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
@@ -743,6 +748,42 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
             System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
 
     return CHIP_NO_ERROR;
+}
+
+void ReadHandler::ResetPathIterator()
+{
+    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
+    mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
+}
+
+void ReadHandler::SetDirty(const AttributePathParams & aAttributeChanged)
+{
+    ConcreteAttributePath path;
+
+    mDirtyGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+
+    // We won't reset the path iterator for every SetDirty call to reduce the number of full data reports.
+    // The iterator will be reset after finishing each report session.
+    //
+    // Here we just reset the iterator to the beginning of the current cluster, if the dirty path affects it.
+    // This will ensure the reports are consistent within a single cluster generated from a single path in the request.
+
+    // TODO (#16699): Currently we can only gurentee the reports generated from a single path in the request are consistent. The
+    // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
+    // or make it consistent.
+    if (mAttributePathExpandIterator.Get(path) &&
+        (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
+        (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
+    {
+        ChipLogDetail(DataManagement,
+                      "The dirty path intersects the cluster we are currently reporting; reset the iterator to the beginning of "
+                      "that cluster");
+        // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
+        // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
+        // the state of the cluster as present on the server
+        mAttributePathExpandIterator.ResetCurrentCluster();
+        mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
+    }
 }
 } // namespace app
 } // namespace chip

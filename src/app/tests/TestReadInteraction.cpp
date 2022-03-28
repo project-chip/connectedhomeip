@@ -1319,10 +1319,11 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
         ctx.DrainAndServiceIO();
 
-        // We should receive another 2 * (6 + 1) = 14 attribute reports since the underlying path iterator should be reset.
+        // We should receive another (6 + 1) = 7 attribute reports since the underlying path iterator should be reset to the
+        // beginning of the cluster it is currently iterating.
         ChipLogError(DataManagement, "OLD: %d\n", currentAttributeResponsesWhenSetDirty);
         ChipLogError(DataManagement, "NEW: %d\n", delegate.mNumAttributeResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 14);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 7);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -1523,7 +1524,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
@@ -1702,7 +1703,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
         ctx.DrainAndServiceIO();
@@ -2083,7 +2084,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
 
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
@@ -2402,7 +2403,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
 
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
@@ -2499,7 +2500,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
 
         GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
