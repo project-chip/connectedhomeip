@@ -122,12 +122,20 @@ public:
 
     uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
 
-    uint64_t GetDirtyTick() const { return mDirtyTick; }
+    uint64_t GetDirtySetGeneration() const { return mDirtyGeneration; }
 
     void ScheduleUrgentEventDeliverySync();
 
 private:
     friend class TestReportingEngine;
+
+    struct AttributePathParamsWithGeneration : public AttributePathParams
+    {
+        AttributePathParamsWithGeneration() {}
+        AttributePathParamsWithGeneration(const AttributePathParams aPath) : AttributePathParams(aPath) {}
+        uint64_t mGeneration = 0;
+    };
+
     /**
      * Build Single Report Data including attribute changes and event data stream, and send out
      *
@@ -179,7 +187,7 @@ private:
      */
     bool MergeOverlappedAttributePath(AttributePathParams & aAttributePath);
 
-    inline void BumpDirtyTick() { mDirtyTick++; }
+    inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
@@ -209,17 +217,21 @@ private:
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    ObjectPool<AttributePathParamsWithTimestamp, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+    ObjectPool<AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
 
     /**
-     * A ticker for recording when an attribute is makred as dirty. Acts as a monotonic timestamp for attributes.
-     * ReadHandlers can save the tick value when it is generating reports, then we can tell if an attribute is not reported by
-     * checking this timestamp.
+     * A generation counter for the dirty attrbute set.
+     * ReadHandlers can save the tick value when generating reports.
      *
-     * mDirtyTick will increase by one when SetDirty is called.
-     * Count it from 1, so 0 will be used to indicate "the read handler has never been reported"
+     * Then we can tell whether they might have missed reporting an attribute by
+     * comparing its generation counter to the saved one.
+     *
+     * mDirtySetGeneration will increase by one when SetDirty is called.
+     *
+     * Count it from 1, so 0 can be used in ReadHandler to indicate "the read handler has never
+     * completed a report".
      */
-    uint64_t mDirtyTick = 1;
+    uint64_t mDirtyGeneration = 1;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint32_t mReservedSize          = 0;

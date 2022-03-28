@@ -112,7 +112,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         ConcreteAttributePath readPath;
 
         ChipLogDetail(DataManagement, "Building Reports for ReadHandler with LastReportTick = %" PRIu64 " DirtyTick = %" PRIu64,
-                      apReadHandler->mPreviousReportsBeginTick, apReadHandler->mDirtyTick);
+                      apReadHandler->mPreviousReportsBeginGeneration, apReadHandler->mDirtyGeneration);
 
         // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
         if (!apReadHandler->IsReporting())
@@ -121,7 +121,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         }
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-        uint32_t attributeCounts = 0;
+        uint32_t attributesRead = 0;
 #endif
 
         // For each path included in the interested path of the read handler...
@@ -135,9 +135,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
-                        // The attribute change might have not been reported if the attribute change happens after the last time
-                        // when this report handler generated reports.
-                        if (dirtyPath->mTickTouched > apReadHandler->mPreviousReportsBeginTick)
+                        // We don't need to worry about paths that were already marked dirty before the last time this read handler
+                        // started a report that it completed: those paths already got reported.
+                        if (dirtyPath->mGeneration > apReadHandler->mPreviousReportsBeginGeneration)
                         {
                             concretePathDirty = true;
                             return Loop::Break;
@@ -161,8 +161,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             }
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-            attributeCounts++;
-            if (attributeCounts > mMaxAttributesPerChunk)
+            attributesRead++;
+            if (attributesRead > mMaxAttributesPerChunk)
             {
                 ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
             }
@@ -618,12 +618,12 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
         {
-            path->mTickTouched = GetDirtyTick();
+            path->mGeneration = GetDirtySetGeneration();
             return Loop::Break;
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
-            path->mTickTouched = GetDirtyTick();
+            path->mGeneration  = GetDirtySetGeneration();
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
@@ -634,7 +634,7 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
 
 CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
 {
-    BumpDirtyTick();
+    BumpDirtySetGeneration();
 
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
         // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
@@ -665,8 +665,8 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
             ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
             return CHIP_ERROR_NO_MEMORY;
         }
-        *object              = aAttributePath;
-        object->mTickTouched = GetDirtyTick();
+        *object             = aAttributePath;
+        object->mGeneration = GetDirtySetGeneration();
     }
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
@@ -697,7 +697,7 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
             if ((path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path)) &&
-                path->mTickTouched > aReadHandler.mPreviousReportsBeginTick)
+                path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
             {
                 intersected = true;
                 return Loop::Break;

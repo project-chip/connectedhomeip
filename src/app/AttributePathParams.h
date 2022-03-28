@@ -87,15 +87,5 @@ struct AttributePathParams
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
 
-struct AttributePathParamsWithTimestamp : public AttributePathParams
-{
-    AttributePathParamsWithTimestamp() {}
-    AttributePathParamsWithTimestamp(const AttributePathParams aPath) : AttributePathParams(aPath) {}
-    AttributePathParamsWithTimestamp(const AttributePathParams aPath, uint64_t aTickTouched) :
-        AttributePathParams(aPath), mTickTouched(aTickTouched)
-    {}
-    uint64_t mTickTouched = 0;
-};
-
 } // namespace app
 } // namespace chip

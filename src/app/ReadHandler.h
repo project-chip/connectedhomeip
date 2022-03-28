@@ -134,6 +134,8 @@ public:
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+
+    // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
     void ResetPathIterator();
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
@@ -161,11 +163,11 @@ public:
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /**
-     * Marked the attribute as dirty, and reset the internal path iterator when required.
+     * Notify the read handler that a set of attribute paths has been marked dirty.
      */
-    void SetDirty(const AttributePathParams & apAttributeChanged);
-    bool IsDirty() const { return (mDirtyTick > mPreviousReportsBeginTick) || mOverrideDirty; }
-    void ClearDirty() { mOverrideDirty = false; }
+    void SetDirty(const AttributePathParams & aAttributeChanged);
+    bool IsDirty() const { return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mForceDirty; }
+    void ClearDirty() { mForceDirty = false; }
 
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
@@ -174,8 +176,8 @@ public:
 
     void UnblockUrgentEventDelivery()
     {
-        mHoldReport    = false;
-        mOverrideDirty = true;
+        mHoldReport = false;
+        mForceDirty = true;
     }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
@@ -286,36 +288,47 @@ private:
     // subscription alive on the client.
     bool mHoldSync = false;
 
-    // The timestamp when this read handler was marked as a dirty read handler.
-    // In SetDirty(), we reset the iterator to the beginning of the current cluster instead of the beginning of the whole report, we
-    // might miss the change and regard this ReadHandler as a clean ReadHandler by mistake. So we record the time when this
-    // ReadHandler was marked as a dirty ReadHandler, and another time when the Readhandler reports attribute change, then we can
-    // tell if the ReadHandler is clean by checking these timestamps. The timestamp is represented by a counter which will increment
-    // by 1 every time an attribute is marked dirty by the reporting engine.
-    uint64_t mDirtyTick = 0;
-    // Emitting new events won't notify the report enging except for the urgent events, we use a OverrideDirty flag to indicate this
-    // state that we have something to report for this ReadHandler.
-    bool mOverrideDirty = false;
+    // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
+    // marked dirty.
+    //
+    // This allows us to detemine whether any paths we care about might have
+    // been marked dirty after we had already sent reports for them, which would
+    // mean we should report those paths again, by comparing this generation to the
+    // current generation when we started sending the last set reports that we completed.
+    //
+    // This allows us to reset the iterator to the beginning of the current
+    // cluster instead of the beginning of the whole report in SetDirty, without
+    // permanently missing dirty any paths.
+    uint64_t mDirtyGeneration = 0;
+    // For subscriptions, we record the dirty set generation when we started to generate the last report.
+    // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
+    // has a meaningful value while IsReporting() is true.
+    //
+    // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
+    // chunk of the current report.  Anything that was dirty with a generation earlier than
+    // mPreviousReportsBeginGeneration has had its value sent to the client.
+    bool mForceDirty = false;
     // For subscriptions, we record the timestamp when we started to generate the last report.
-    // The mCurrentReportsBeginTick records the timestamp for the current report, which won;t be used for checking if this
+    // The mCurrentReportsBeginGeneration records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
-    // mPreviousReportsBeginTick will be set to mCurrentReportsBeginTick after we sent the last chunk of the current report.
-    uint64_t mPreviousReportsBeginTick = 0;
-    uint64_t mCurrentReportsBeginTick  = 0;
+    // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we sent the last chunk of the current
+    // report.
+    uint64_t mPreviousReportsBeginGeneration = 0;
+    uint64_t mCurrentReportsBeginGeneration  = 0;
     /*
-     *           (mDirtyTick = b > a, this is a dirty read handler)
-     *        +- Start Report -> mCurrentReportsBeginTick = c
-     *        |      +- SetDirty (Attribute Y) -> mDirtyTick = d
-     *        |      |     +- Last Chunk -> mPreviousReportBeginTick = mCurrentReportsBeginTick = c
-     *        |      |     |   +- (mDirtyTick = d) > (mPreviousReportBeginTick = c), this is a dirty read handler
-     *        |      |     |   |  Attribute X has a dirty tick less than c, Attribute Y has a dirty tick larger than c
+     *           (mDirtyGeneration = b > a, this is a dirty read handler)
+     *        +- Start Report -> mCurrentReportsBeginGeneration = c
+     *        |      +- SetDirty (Attribute Y) -> mDirtyGeneration = d
+     *        |      |     +- Last Chunk -> mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration = c
+     *        |      |     |   +- (mDirtyGeneration = d) > (mPreviousReportsBeginGeneration = c), this is a dirty read handler
+     *        |      |     |   |  Attribute X has a dirty generation less than c, Attribute Y has a dirty generation larger than c
      *        |      |     |   |  So Y will be included in the report but X will not be inclued in this report.
-     * -a--b--c------d-----e---f---> Tick
+     * -a--b--c------d-----e---f---> Generation
      *  |  |
-     *  |  +- SetDirty (Attribute X) (mDirtyTick = b)
+     *  |  +- SetDirty (Attribute X) (mDirtyGeneration = b)
      *  +- mPreviousReportTick
-     * For read handler, if mDirtyTick > mPreviousReportTick, then we regard it as a dirty read handler, and it should generate
-     * report on timeout reached.
+     * For read handler, if mDirtyGeneration > mPreviousReportTick, then we regard it as a dirty read handler, and it should
+     * generate report on timeout reached.
      */
 
     uint32_t mLastWrittenEventsBytes = 0;

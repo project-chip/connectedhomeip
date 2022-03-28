@@ -110,7 +110,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   ../../../out/debug/chip-all-clusters-app > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &

@@ -1320,7 +1320,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         ctx.DrainAndServiceIO();
 
         // We should receive another (6 + 1) = 7 attribute reports since the underlying path iterator should be reset to the
-        // beginning of the cluster it is current iterating.
+        // beginning of the cluster it is currently iterating.
         ChipLogError(DataManagement, "OLD: %d\n", currentAttributeResponsesWhenSetDirty);
         ChipLogError(DataManagement, "NEW: %d\n", delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 7);
