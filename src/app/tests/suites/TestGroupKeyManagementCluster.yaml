@@ -144,7 +144,7 @@ tests:
       arguments:
           value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0 }]
       response:
-          error: 0x87
+          error: CONSTRAINT_ERROR
 
     - label: "Write Group Keys"
       command: "writeAttribute"

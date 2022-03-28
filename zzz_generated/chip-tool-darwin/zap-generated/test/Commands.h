@@ -54308,7 +54308,7 @@ private:
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write Group Keys (invalid) Error: %@", err);
 
-                                      VerifyOrReturn(CheckValue("status", err, 135));
+                                      VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
                                       NextTest();
                                   }];
 

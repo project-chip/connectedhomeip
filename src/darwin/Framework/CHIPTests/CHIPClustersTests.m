@@ -47642,7 +47642,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write Group Keys (invalid) Error: %@", err);
 
-                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                   [expectation fulfill];
                               }];
 
