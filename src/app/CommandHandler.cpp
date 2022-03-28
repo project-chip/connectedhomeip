@@ -487,6 +487,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -524,11 +525,11 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPath)
 {
     ReturnErrorOnFailure(AllocateBuffer());
-    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -555,7 +556,7 @@ CHIP_ERROR CommandHandler::FinishStatus()
 
 CHIP_ERROR CommandHandler::RollbackResponse()
 {
-    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand || mState == State::AddingCommand,
+    VerifyOrReturnError(mState == State::Idle || mState == State::Preparing || mState == State::AddingCommand,
                         CHIP_ERROR_INCORRECT_STATE);
     mInvokeResponseBuilder.Rollback(mBackupWriter);
     mInvokeResponseBuilder.ResetError();
@@ -621,6 +622,9 @@ const char * CommandHandler::GetStateStr() const
     {
     case State::Idle:
         return "Idle";
+
+    case State::Preparing:
+        return "Preparing";
 
     case State::AddingCommand:
         return "AddingCommand";

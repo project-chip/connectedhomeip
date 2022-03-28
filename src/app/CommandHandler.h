@@ -163,11 +163,6 @@ public:
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
-     * Rollback the state to before encoding the current ResponseData (before calling PrepareCommand / PrepareStatus)
-     */
-    CHIP_ERROR RollbackResponse();
-
-    /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -180,38 +175,40 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        // We should not encode anything when we are not in the correct state, the user must be using CommandHandler incorrectly.
-        VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
-
+        // TryAddResponseData will ensure we are in the correct state when calling AddResponseData.
         CHIP_ERROR err = TryAddResponseData(aRequestCommandPath, aData);
         if (err != CHIP_NO_ERROR)
         {
-            // We have verified the state above, so this call must success since we must be one of the state required by
-            // ResetResponse.
+            // We have verified the state above, so this call must succeed since we must be in one of the states required by
+            // RollbackResponse.
             RollbackResponse();
         }
         return err;
     }
 
     /**
-     * API for adding a response, i.e. I will try to encode a data response (response command), if it failed to encode the response
-     * data, it will encode Protocols::InteractionModel::Status::Failure status code instead. The template parameter T is generally
-     * expected to be a ClusterName::Commands::CommandName::Type struct, but any object that can be encoded using the
-     * DataModel::Encode machinery and exposes the right command id will work.
+     * API for adding a response.  This will try to encode a data response (response command), and if that fails will encode a a
+     * Protocols::InteractionModel::Status::Failure status response instead.
+     *
+     * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
+     * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
+     *
+     * Since the function will call AddStatus when failed to encode the data, it cannot send any response when it failed to encode a
+     * status code since another AddStatus call will also fail. Users can check the log when thry failed to receive a response.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    CHIP_ERROR AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        CHIP_ERROR err = AddResponseData(aRequestCommandPath, aData);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        LogErrorOnFailure(err = AddResponseData(aRequestCommandPath, aData));
         if (err != CHIP_NO_ERROR)
         {
-            return AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+            LogErrorOnFailure(AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure));
         }
-        return err;
     }
 
     /**
@@ -237,6 +234,7 @@ private:
     enum class State
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
+        Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         CommandSent,         ///< The command has been sent successfully.
@@ -245,6 +243,11 @@ private:
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
+
+    /**
+     * Rollback the state to before encoding the current ResponseData (before calling PrepareCommand / PrepareStatus)
+     */
+    CHIP_ERROR RollbackResponse();
 
     /*
      * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
@@ -301,10 +304,8 @@ private:
                                  const Optional<ClusterStatus> & aClusterStatus);
 
     /**
-     * Adds a data response.  The template parameter T is generally
-     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
-     * object that can be encoded using the DataModel::Encode machinery and
-     * exposes the right command id will work.
+     * If this function fails, it may leave our TLV buffer in an inconsistent state.  Callers should snapshot as needed before
+     * calling this function, and roll back as needed afterward.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
