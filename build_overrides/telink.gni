@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-chip_device_platform = "telink"
-
-chip_build_tests = false
-
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-chip_ble_project_config_include = ""
-
-custom_toolchain = "${chip_root}/config/telink/chip-gn/toolchain:zephyr"
-
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
+declare_args() {
+  # Root directory for Telink SDK.
+  telink_sdk_build_root = "//third_party/telink_sdk"
+}

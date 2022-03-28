@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +14,10 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Telink platform.
- *
- */
-
-#pragma once
-
-// ==================== Platform Adaptations ====================
-
-#define BLE_CONNECTION_OBJECT uint16_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint16_t) 0xFFFF)
-#define BLE_MAX_RECEIVE_WINDOW_SIZE 5
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
+/ {
+    cpus {
+        cpu0: cpu@0 {
+            clock-frequency = <96000000>;
+        };
+    };
+};
