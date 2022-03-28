@@ -326,9 +326,9 @@ private:
      * -a--b--c------d-----e---f---> Generation
      *  |  |
      *  |  +- SetDirty (Attribute X) (mDirtyGeneration = b)
-     *  +- mPreviousReportTick
-     * For read handler, if mDirtyGeneration > mPreviousReportTick, then we regard it as a dirty read handler, and it should
-     * generate report on timeout reached.
+     *  +- mPreviousReportsBeginGeneration
+     * For read handler, if mDirtyGeneration > mPreviousReportsBeginGeneration, then we regard it as a dirty read handler, and it
+     * should generate report on timeout reached.
      */
 
     uint32_t mLastWrittenEventsBytes = 0;

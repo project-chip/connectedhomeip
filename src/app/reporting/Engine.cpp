@@ -111,7 +111,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         // vs write paths.
         ConcreteAttributePath readPath;
 
-        ChipLogDetail(DataManagement, "Building Reports for ReadHandler with LastReportTick = %" PRIu64 " DirtyTick = %" PRIu64,
+        ChipLogDetail(DataManagement,
+                      "Building Reports for ReadHandler with LastReportGeneration = %" PRIu64 " DirtyGeneration = %" PRIu64,
                       apReadHandler->mPreviousReportsBeginGeneration, apReadHandler->mDirtyGeneration);
 
         // This ReadHandler is not generating reports, so we reset the iterator for a clean start.

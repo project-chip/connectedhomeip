@@ -221,7 +221,7 @@ private:
 
     /**
      * A generation counter for the dirty attrbute set.
-     * ReadHandlers can save the tick value when generating reports.
+     * ReadHandlers can save the generation value when generating reports.
      *
      * Then we can tell whether they might have missed reporting an attribute by
      * comparing its generation counter to the saved one.
