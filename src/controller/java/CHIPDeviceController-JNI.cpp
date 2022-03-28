@@ -624,9 +624,9 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::SetupPayload setupPayload;
-    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
-                                                                 System::Clock::Seconds16(duration), iteration, discriminator,
-                                                                 MakeOptional(static_cast<uint32_t>(setupPinCode)), setupPayload);
+    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
+        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
