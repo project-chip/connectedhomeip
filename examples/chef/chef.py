@@ -165,8 +165,8 @@ Notes:
                                         metavar="TARGET",
                                         default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="doRPC")
-    parser.add_option("-v", "--vid", dest="vid", help="specifies the Vendor ID. Default is 0x235A", metavar="VID", default=0x235A)
-    parser.add_option("-p", "--pid", dest="pid", help="specifies the Product ID. Default is 0x454C", metavar="PID", default=0x454C)
+    parser.add_option("-v", "--vid", dest="vid", help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
+    parser.add_option("-p", "--pid", dest="pid", help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console", action="store_true", dest="doRPC_CONSOLE")
 
     options, _ = parser.parse_args(argv)
@@ -237,6 +237,7 @@ Notes:
     if options.doRunZap:
         queuePrint("Running ZAP script to generate artifacts")
         queueCommand(f"mkdir -p {paths['genFolder']}/")
+        queueCommand(f"rm {paths['genFolder']}/*")
         queueCommand(f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
         queueCommand(f"touch {paths['genFolder']}/af-gen-event.h") # sometimes af-gen-event.h is not generated
 

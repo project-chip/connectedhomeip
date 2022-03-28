@@ -20,10 +20,10 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../.. REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../../ REALPATH)
 get_filename_component(GEN_DIR ${CHEF}/zap-generated/ REALPATH)
 
-include(${CMAKE_CURRENT_LIST_DIR}/../../project_include.cmake)
+# include(${CMAKE_CURRENT_LIST_DIR}/../../project_include.cmake)
 
-message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
-message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
+# message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
+# message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
 
 set(CHIP_SHELL_DIR "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/shell")
 
@@ -37,7 +37,7 @@ set(PRIV_INCLUDE_DIRS_LIST
 )
 
 
-find_package(Python3 REQUIRED)
+# find_package(Python3 REQUIRED)
 set(ZAP_FILE ${CMAKE_CURRENT_LIST_DIR}/../../devices/${SAMPLE_NAME}.zap)
 execute_process(
   COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/zap_cluster_list.py --zap_file ${ZAP_FILE}
@@ -45,9 +45,9 @@ execute_process(
   ERROR_VARIABLE ERROR_MESSAGE
   RESULT_VARIABLE RC
 )
-if (NOT RC EQUAL 0)
-  message(FATAL_ERROR "Failed to execute zap_cluster_list.py: ${ERROR_MESSAGE}")
-endif()
+# if (NOT RC EQUAL 0)
+#   message(FATAL_ERROR "Failed to execute zap_cluster_list.py: ${ERROR_MESSAGE}")
+# endif()
 
 message(STATUS "** Start of Cluster List **")
 string(REPLACE "\n" ";" CLUSTER_LIST "${CLUSTER_LIST}")
@@ -107,6 +107,9 @@ idf_component_register(PRIV_INCLUDE_DIRS
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PUBLIC
+           "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
 
 if (CONFIG_ENABLE_PW_RPC)
 

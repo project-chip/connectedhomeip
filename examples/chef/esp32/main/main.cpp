@@ -153,16 +153,6 @@ void printQRCode() {
 
     ESP_LOGI(TAG, "Opening QR code screen");
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-    uint16_t discriminator;
-    if (ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
-    {
-        ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
-    }
-    uint32_t setupPINCode;
-    if (ConfigurationMgr().GetSetupPinCode(setupPINCode) == CHIP_NO_ERROR)
-    {
-        ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
-    }
     ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
 }
 #endif // CONFIG_HAVE_DISPLAY
