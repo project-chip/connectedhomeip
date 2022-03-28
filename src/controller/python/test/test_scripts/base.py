@@ -310,8 +310,8 @@ class BaseTestHelper:
                 "Got back fabric indices that match for two different fabrics!")
             return False
 
-        # devCtrl2.Shutdown()
-        # fabricAdmin2.Shutdown()
+        devCtrl2.Shutdown()
+        fabricAdmin2.Shutdown()
 
         return True
 

@@ -149,8 +149,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
-    # logger.info("Testing writing/reading fabric sensitive data")
-    # asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
+    logger.info("Testing writing/reading fabric sensitive data")
+    asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
 
 
 def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, paa_trust_store_path):
