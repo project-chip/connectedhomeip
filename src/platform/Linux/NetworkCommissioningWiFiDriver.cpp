@@ -108,6 +108,8 @@ bool LinuxWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan network
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                            uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
 
     static_assert(sizeof(WiFiNetwork::ssid) <= std::numeric_limits<decltype(WiFiNetwork::ssidLen)>::max(),
@@ -130,6 +132,8 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
 
 Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -139,6 +143,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 
 Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
     // We only support one network, so reorder is actually no-op.
 

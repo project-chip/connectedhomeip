@@ -94,6 +94,8 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Muta
 
 Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
@@ -112,6 +114,7 @@ Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & 
 
 Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {

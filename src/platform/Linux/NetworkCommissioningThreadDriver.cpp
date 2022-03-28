@@ -80,7 +80,8 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Mutabl
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
     Thread::OperationalDataset newDataset;
-
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
@@ -93,6 +94,8 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Mutabl
 
 Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
@@ -111,6 +114,7 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & ou
 
 Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
