@@ -49,9 +49,11 @@ int main()
 #if CHIP_ENABLE_OPENTHREAD
     chip::DeviceLayer::ThreadStackMgr().InitThreadStack();
 #ifdef CONFIG_OPENTHREAD_MTD_SED
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
+        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
+        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif /* CONFIG_OPENTHREAD_MTD_SED */
 #endif /* CHIP_ENABLE_OPENTHREAD */
 

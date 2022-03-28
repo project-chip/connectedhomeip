@@ -35,7 +35,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <app/server/Dnssd.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -43,12 +42,13 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/server/Dnssd.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 
-#include "ScreenManager.h"
-#include "QRCodeScreen.h"
 #include "Display.h"
+#include "QRCodeScreen.h"
+#include "ScreenManager.h"
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -135,7 +135,8 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 const char * TAG = "chef-app";
 
 #if CONFIG_HAVE_DISPLAY
-void printQRCode() {
+void printQRCode()
+{
     std::string qrCodeText;
 
     GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
@@ -201,7 +202,8 @@ extern "C" void app_main(void)
     xTaskCreate(&chip_shell_task, "chip_shell", 8192, NULL, 5, NULL);
 #endif /* CONFIG_ENABLE_CHIP_SHELL */
 
-    while (1) {
+    while (1)
+    {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
