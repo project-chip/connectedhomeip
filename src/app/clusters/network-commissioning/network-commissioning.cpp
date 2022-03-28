@@ -286,20 +286,10 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     }
 }
 
-void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
-{
-    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
-    Commands::NetworkConfigResponse::Type response;
-    MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER];
-    debugText = MutableCharSpan(debugTextBuffer);
-#endif
-    uint8_t outNetworkIndex   = 0;
-    response.networkingStatus = ToClusterObjectEnum(
-        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, &outNetworkIndex));
+namespace {
 
-    size_t debugTextLen = strnlen(debugText.data(), debugText.size());
+void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & resp, MutableCharSpan debugText, uint8_t networkIndex)
+{
     if (debugTextLen > 0)
     {
         response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
@@ -308,6 +298,23 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     {
         response.networkIndex.SetValue(outNetworkIndex);
     }
+}
+
+} // namespace
+
+void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
+{
+    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+    Commands::NetworkConfigResponse::Type response;
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex   = 0;
+    response.networkingStatus = ToClusterObjectEnum(
+        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -316,23 +323,14 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER];
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
-    uint8_t outNetworkIndex   = 0;
-    response.networkingStatus = ToClusterObjectEnum(
-        mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, &outNetworkIndex));
-
-    size_t debugTextLen = strnlen(debugText.data(), debugText.size());
-    if (debugTextLen > 0)
-    {
-        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
-    }
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
-    {
-        response.networkIndex.SetValue(outNetworkIndex);
-    }
+    uint8_t outNetworkIndex = 0;
+    response.networkingStatus =
+        ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -341,22 +339,13 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER];
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
     uint8_t outNetworkIndex   = 0;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, &outNetworkIndex));
-
-    size_t debugTextLen = strnlen(debugText.data(), debugText.size());
-    if (debugTextLen > 0)
-    {
-        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
-    }
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
-    {
-        response.networkIndex.SetValue(outNetworkIndex);
-    }
+    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -381,20 +370,12 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER];
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
-    size_t debugTextLen       = strnlen(debugText.data(), debugText.size());
-    if (debugTextLen > 0)
-    {
-        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
-    }
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
-    {
-        response.networkIndex.SetValue(req.networkIndex);
-    }
+    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 

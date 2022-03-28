@@ -231,8 +231,24 @@ public:
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
-    virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) = 0;
-    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan outDebugText)            = 0;
+    /**
+     * @brief Remove a network from the device. The driver can fill the outDebugText field to pass any human-readable messages to
+     * the client. On success, the driver should set outNetworkIndex to the index of the network just removed. The value of network
+     * index is discarded on failure.
+     *
+     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
+     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
+
+    /**
+     * @brief Reorder the networks on the device. The driver can fill the outDebugText field to pass any human-readable messages to
+     * the client.
+     *
+     * Note: The driver only need to check if the index equals to 0 if they only support one network. The capacity of outDebugText
+     * can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) = 0;
 
     /**
      * @brief Initializes a network join. callback->OnResult must be called, on both success and error. Callback can be
@@ -261,8 +277,16 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan outDebugText,
-                                      uint8_t * outNetworkIndex) = 0;
+    /**
+     * @brief Adds or updates a WiFi network on the device. The driver can fill the outDebugText field to pass any human-readable
+     * messages to the client. On success, the driver should set outNetworkIndex to the index of the network just added or updated.
+     * The value of network index is discarded on failure.
+     *
+     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
+     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                      uint8_t & outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a WiFi network scan. callback->OnFinished must be called, on both success and error. Callback can
@@ -295,7 +319,15 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan outDebugText, uint8_t * outNetworkIndex) = 0;
+    /**
+     * @brief Adds or updates a Thread network on the device. The driver can fill the outDebugText field to pass any human-readable
+     * messages to the client. On success, the driver should set outNetworkIndex to the index of the network just added or updated.
+     * The value of network index is discarded on failure.
+     *
+     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
+     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a Thread network scan. callback->OnFinished must be called, on both success and error. Callback can

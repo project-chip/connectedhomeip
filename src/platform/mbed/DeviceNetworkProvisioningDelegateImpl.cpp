@@ -29,7 +29,7 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     auto err = WiFiDriverImpl::GetInstance().AddOrUpdateNetwork(
-        ByteSpan(Uint8::from_const_char(ssid), strlen(ssid), MutableCharSpan outDebugText, uint8_t * outNetworkIndex),
+        ByteSpan(Uint8::from_const_char(ssid), strlen(ssid), MutableCharSpan & outDebugText, uint8_t & outNetworkIndex),
         ByteSpan(Uint8::from_const_char(key), strlen(key)));
     if (err != Status::kSuccess)
     {
