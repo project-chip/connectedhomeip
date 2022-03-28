@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <inet/EndPointStateOpenThread.h>
 #include <inet/UDPEndPoint.h>
 
 #include <openthread/error.h>
@@ -31,7 +32,7 @@
 namespace chip {
 namespace Inet {
 
-class UDPEndPointImplOT : public UDPEndPoint
+class UDPEndPointImplOT : public UDPEndPoint, public EndPointStateOpenThread
 {
 public:
     UDPEndPointImplOT(EndPointManager<UDPEndPoint> & endPointManager) :

@@ -52,18 +52,6 @@ enum EmberAfBarrierControlMovingState : uint8_t
     EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
 };
 
-// Enum for BootReasonType
-enum EmberAfBootReasonType : uint8_t
-{
-    EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED               = 0,
-    EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT           = 1,
-    EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET           = 2,
-    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET   = 3,
-    EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET   = 4,
-    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 5,
-    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET            = 6,
-};
-
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
