@@ -122,7 +122,6 @@ CHIP_ERROR InitCredentialSets()
     FabricInfo commissionerFabric;
 
     P256SerializedKeypair opKeysSerialized;
-    // TODO: Change NodeID of controller versus device
     // TODO: Rename gCommissioner* to gInitiator*
     memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
     memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,

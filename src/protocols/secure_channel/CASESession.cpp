@@ -191,8 +191,6 @@ CHIP_ERROR CASESession::Init(uint16_t localSessionId, SessionEstablishmentDelega
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: DO NOT MERGE WITH THIS Remove this assert once testing completed
-    VerifyOrDie(mGroupDataProvider != nullptr);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Clear();
