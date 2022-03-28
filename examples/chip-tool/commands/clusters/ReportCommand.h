@@ -305,33 +305,35 @@ protected:
                 params.mKeepSubscriptions = mKeepSubscriptions.Value();
             }
         }
-        }
-
-        mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
-                                                              device->GetExchangeManager(), mBufferedReadAdapter, interactionType);
-        return mReadClient->SendRequest(params);
     }
 
-    // Use a 3x-longer-than-default timeout because wildcard reads can take a
-    // while.
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return mTimeout.HasValue() ? chip::System::Clock::Seconds16(mTimeout.Value()) : (ModelCommand::GetWaitDuration() * 3);
-    }
+    mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
+                                                          device->GetExchangeManager(), mBufferedReadAdapter, interactionType);
+    return mReadClient->SendRequest(params);
+}
 
-    std::unique_ptr<chip::app::ReadClient> mReadClient;
-    chip::app::BufferedReadCallback mBufferedReadAdapter;
+// Use a 3x-longer-than-default timeout because wildcard reads can take a
+// while.
+chip::System::Clock::Timeout
+GetWaitDuration() const override
+{
+    return mTimeout.HasValue() ? chip::System::Clock::Seconds16(mTimeout.Value()) : (ModelCommand::GetWaitDuration() * 3);
+}
 
-    // mFabricFiltered is really only used by the attribute commands, but we end
-    // up needing it in our class's shared code.
-    chip::Optional<bool> mFabricFiltered;
+std::unique_ptr<chip::app::ReadClient> mReadClient;
+chip::app::BufferedReadCallback mBufferedReadAdapter;
 
-    // mKeepSubscriptions is really only used by the subscribe commands, but we end
-    // up needing it in our class's shared code.
-    chip::Optional<bool> mKeepSubscriptions;
+// mFabricFiltered is really only used by the attribute commands, but we end
+// up needing it in our class's shared code.
+chip::Optional<bool> mFabricFiltered;
 
-    CHIP_ERROR mError = CHIP_NO_ERROR;
-};
+// mKeepSubscriptions is really only used by the subscribe commands, but we end
+// up needing it in our class's shared code.
+chip::Optional<bool> mKeepSubscriptions;
+
+CHIP_ERROR mError = CHIP_NO_ERROR;
+}
+;
 
 class ReadAttribute : public ReportCommand
 {
