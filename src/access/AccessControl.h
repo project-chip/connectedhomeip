@@ -468,6 +468,8 @@ public:
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
+    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex);
+
     /**
      * Iterates over entries in the access control list.
      *

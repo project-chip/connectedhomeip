@@ -188,6 +188,22 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
+CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
+{
+    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
+
+    CHIP_ERROR err;
+    do
+    {
+        err = DeleteEntry(0, &fabricIndex);
+    } while (err == CHIP_NO_ERROR);
+
+    // Sentinel error is OK, just means there was no such entry.
+    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {

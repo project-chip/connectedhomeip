@@ -652,9 +652,6 @@ enum class LogsTransferProtocol : uint8_t
 
 namespace GeneralDiagnostics {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
@@ -666,9 +663,6 @@ enum class BootReasonType : uint8_t
     kSoftwareUpdateCompleted = 0x05,
     kSoftwareReset           = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using BootReasonType                  = EmberAfBootReasonType;
-#endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.

@@ -207,10 +207,10 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 
     if (generalDiagnosticsDelegate != nullptr)
     {
-        uint8_t bootReason;
+        BootReasonType bootReason;
 
         if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
-            generalDiagnosticsDelegate->OnDeviceRebooted(static_cast<BootReasonType>(bootReason));
+            generalDiagnosticsDelegate->OnDeviceRebooted(bootReason);
     }
 }
 

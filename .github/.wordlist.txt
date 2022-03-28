@@ -895,6 +895,7 @@ OTADownloader
 otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
+OTAImageProcessorImpl
 OTAImageProcessorInterface
 OTAProvider
 OTAProviderIpAddress
@@ -1176,6 +1177,7 @@ SulfurDioxideConcentrationMeasurement
 svg
 SVR
 SWD
+SWU
 symlinks
 sysconfdir
 SysConfig
@@ -1248,6 +1250,7 @@ TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
 transitionTime
+TransferSession
 TransportMgrBase
 TrustedRootCertificates
 TSG
@@ -1354,12 +1357,14 @@ xab
 xaver
 xb
 xbef
+xBEEF
 xc
 xcd
 Xcode
 xcodeproj
 xcworkspace
 xd
+xDEAD
 xDEADBEEF
 xdeadbeefcafe
 xds
