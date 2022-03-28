@@ -178,6 +178,12 @@ public:
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr FixedSpan(Span<U> & span) : mDataBuf(span.data())
+    {
+        VerifyOrDie(N == span.size());
+    }
+
     // Allow implicit construction from a FixedSpan of sufficient size over a
     // type that matches our type, up to const-ness.
     template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>

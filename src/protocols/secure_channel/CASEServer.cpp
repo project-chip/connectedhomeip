@@ -34,6 +34,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
                                                      Ble::BleLayer * bleLayer,
 #endif
                                                      SessionManager * sessionManager, FabricTable * fabrics,
+                                                     SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -46,6 +47,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mBleLayer = bleLayer;
 #endif
     mSessionManager    = sessionManager;
+    mSessionResumptionStorage = sessionResumptionStorage;
     mFabrics           = fabrics;
     mExchangeManager   = exchangeManager;
     mGroupDataProvider = responderGroupDataProvider;
@@ -77,7 +79,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     // Setup CASE state machine using the credentials for the current fabric.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
     ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
-        *mSessionManager, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+        *mSessionManager, mFabrics, mSessionResumptionStorage, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());

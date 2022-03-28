@@ -40,6 +40,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
+#include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
 #include <transport/PairingSession.h>
@@ -48,23 +49,9 @@
 
 namespace chip {
 
-constexpr size_t kCASEResumptionIDSize = 16;
-
 #ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
-
-struct CASESessionCachable
-{
-    uint16_t mSharedSecretLen                              = 0;
-    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length] = { 0 };
-    FabricIndex mLocalFabricIndex                          = 0;
-    NodeId mPeerNodeId                                     = kUndefinedNodeId;
-    CATValues mPeerCATs;
-    uint8_t mResumptionId[kCASEResumptionIDSize] = { 0 };
-    uint64_t mSessionSetupTimeStamp              = 0;
-    uint8_t mIPK[kIPKSize]                       = { 0 };
-};
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
@@ -86,7 +73,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -104,7 +91,7 @@ public:
      */
     CHIP_ERROR
     EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
-                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate,
+                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -152,16 +139,6 @@ public:
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
-    /**
-     * @brief Serialize the CASESession to the given cachableSession data structure for secure pairing
-     **/
-    CHIP_ERROR ToCachable(CASESessionCachable & output);
-
-    /**
-     * @brief Reconstruct secure pairing class from the cachableSession data structure.
-     **/
-    CHIP_ERROR FromCachable(const CASESessionCachable & output);
-
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
@@ -175,11 +152,6 @@ public:
      **/
     void Clear();
 
-    /**
-     * Parse the TLV for Sigma1 message.
-     */
-    CHIP_ERROR ParseSigma1();
-
 private:
     enum State : uint8_t
     {
@@ -187,7 +159,8 @@ private:
         kSentSigma1       = 1,
         kSentSigma2       = 2,
         kSentSigma3       = 3,
-        kSentSigma2Resume = 4,
+        kSentSigma1Resume = 4,
+        kSentSigma2Resume = 5,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
@@ -201,6 +174,8 @@ private:
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma1(System::PacketBufferHandle && msg);
+    CHIP_ERROR TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
+                                ByteSpan initiatorRandom);
     CHIP_ERROR SendSigma2();
     CHIP_ERROR HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
@@ -260,26 +235,23 @@ private:
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
 
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    Messaging::ExchangeContext * mExchangeCtxt           = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     FabricTable * mFabricsTable    = nullptr;
     const FabricInfo * mFabricInfo = nullptr;
 
-    uint8_t mResumptionId[kCASEResumptionIDSize];
+    // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
+    SessionResumptionStorage::ResumptionIdStorage mResumptionId;
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
 
-    uint8_t mLocalFabricIndex       = 0;
-    uint64_t mSessionSetupTimeStamp = 0;
-
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
 protected:
     bool mCASESessionEstablished = false;
-
-    void SetSessionTimeStamp(uint64_t timestamp) { mSessionSetupTimeStamp = timestamp; }
 };
 
 } // namespace chip

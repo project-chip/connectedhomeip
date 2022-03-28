@@ -148,11 +148,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     stateParams.fabricTable           = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
+    stateParams.sessionResumptionStorage = chip::Platform::New<SessionResumptionStorage>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider     = params.groupDataProvider;
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    ReturnErrorOnFailure(stateParams.sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
@@ -186,7 +188,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
             nullptr,
 #endif
-            stateParams.sessionMgr, stateParams.fabricTable, stateParams.groupDataProvider));
+            stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage, stateParams.groupDataProvider));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4

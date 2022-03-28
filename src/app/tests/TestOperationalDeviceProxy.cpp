@@ -45,6 +45,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     Platform::MemoryInit();
     TestTransportMgr transportMgr;
     SessionManager sessionManager;
+    SessionResumptionStorage sessionResumptionStorage;
     ExchangeManager exchangeMgr;
     Inet::UDPEndPointManagerImpl udpEndPointManager;
     System::LayerImpl systemLayer;
@@ -61,6 +62,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     udpEndPointManager.Init(systemLayer);
     transportMgr.Init(UdpListenParameters(udpEndPointManager).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT));
     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager, &deviceStorage);
+    sessionResumptionStorage.Init(&deviceStorage);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
     groupDataProvider.SetPersistentStorage(&deviceStorage);
@@ -69,6 +71,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
 
     DeviceProxyInitParams params = {
         .sessionManager    = &sessionManager,
+        .sessionResumptionStorage = &sessionResumptionStorage,
         .exchangeMgr       = &exchangeMgr,
         .fabricInfo        = fabric,
         .groupDataProvider = &groupDataProvider,

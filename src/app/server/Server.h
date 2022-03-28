@@ -198,6 +198,8 @@ public:
 
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
+    SessionResumptionStorage & GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
     Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
@@ -298,6 +300,7 @@ private:
 
     ServerTransportMgr mTransports;
     SessionManager mSessions;
+    SessionResumptionStorage mSessionResumptionStorage;
     CASEServer mCASEServer;
 
     CASESessionManager mCASESessionManager;

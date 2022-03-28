@@ -169,6 +169,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable());
     SuccessOrExit(err);
 
+    err = mSessionResumptionStorage.Init(mDeviceStorage);
+    SuccessOrExit(err);
+
     err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
     mFabrics.AddFabricDelegate(&mFabricDelegate);
@@ -237,6 +240,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     caseSessionManagerConfig = {
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
+            .sessionResumptionStorage = &mSessionResumptionStorage,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
@@ -255,7 +259,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
-                                                    &mSessions, &mFabrics, mGroupsProvider);
+                                                    &mSessions, &mFabrics, &mSessionResumptionStorage, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
