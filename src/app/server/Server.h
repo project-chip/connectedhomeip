@@ -39,7 +39,9 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
+#if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
+#endif
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -221,6 +223,7 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
+            Access::GetAccessControl().RemoveFabric(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 

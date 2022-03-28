@@ -23,28 +23,27 @@ tests:
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string"
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/ 1
-          1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/ 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string and a display string"
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/
-          'Test content' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest  https://csa-iot.org/  'Test content' 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string and a brand information object."
-      verification: "Not supported by chip-tool"
+      verification: |
+          Not supported by chip-tool
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the DUT with a known unreachable
           content URL string."
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://badurl 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest  https://badurl 1 1
       disabled: true

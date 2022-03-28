@@ -68,6 +68,8 @@ private:
     static void LockActionEventHandler(AppEvent * event);
     static void TimerEventHandler(TimerHandle_t timer);
 
+    static void UpdateCluster(intptr_t context);
+
     void StartTimer(uint32_t aTimeoutMs);
 
     enum class Function
