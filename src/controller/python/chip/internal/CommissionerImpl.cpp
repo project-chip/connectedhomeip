@@ -19,6 +19,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -91,6 +92,8 @@ private:
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
+// TODO: Should this be injected?
+chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
 } // namespace
@@ -126,6 +129,13 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
+
+        // Initialize group data provider for local group key state and IPKs
+        // TODO(songguo): Can you figure-out where we can setup group data here?
+        gGroupDataProvider.SetPersistentStorage(&gServerStorage);
+        err = gGroupDataProvider.Init();
+        SuccessOrExit(err);
+        factoryParams.groupDataProvider = &gGroupDataProvider;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
         commissionerParams.storageDelegate = &gServerStorage;

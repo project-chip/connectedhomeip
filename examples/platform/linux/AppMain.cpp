@@ -378,6 +378,7 @@ MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 
 CHIP_ERROR InitCommissioner()
 {
@@ -387,6 +388,10 @@ CHIP_ERROR InitCommissioner()
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
+
+    gGroupDataProvider.SetPersistentStorage(&gServerStorage);
+    ReturnErrorOnFailure(gGroupDataProvider.Init());
+    factoryParams.groupDataProvider = &gGroupDataProvider;
 
     params.storageDelegate                = &gServerStorage;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;

@@ -24,6 +24,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -83,6 +84,8 @@ private:
 
     ChipDeviceControllerPtr mController;
     AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
+    // TODO: This may need to be injected as a GroupDataProvider*
+    GroupDataProviderImpl mGroupDataProvider;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

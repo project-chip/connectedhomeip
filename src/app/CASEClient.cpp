@@ -47,6 +47,7 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
+    mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
     ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), keyID, exchange, this,
                                                        mInitParams.mrpLocalConfig));
     mConnectionSuccessCallback = onConnection;

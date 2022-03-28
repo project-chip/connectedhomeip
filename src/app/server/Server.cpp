@@ -85,26 +85,11 @@ static ::chip::PersistedCounter sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-Server::Server() :
-    mCASESessionManager(CASESessionManagerConfig {
-        .sessionInitParams =  {
-            .sessionManager = &mSessions,
-            .exchangeMgr    = &mExchangeMgr,
-            .idAllocator    = &mSessionIDAllocator,
-            .fabricTable    = &mFabrics,
-            .clientPool     = &mCASEClientPool,
-        },
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache          = nullptr,
-#endif
-        .devicePool        = &mDevicePool,
-    })
-{}
-
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    CASESessionManagerConfig caseSessionManagerConfig;
 
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
@@ -178,7 +163,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage, &GetFabricTable());
     SuccessOrExit(err);
 
-    err = mFabricDelegate.Init(&mSessions);
+    err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
     mFabrics.AddFabricDelegate(&mFabricDelegate);
 
@@ -243,14 +228,30 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
+    caseSessionManagerConfig = {
+        .sessionInitParams =  {
+            .sessionManager    = &mSessions,
+            .exchangeMgr       = &mExchangeMgr,
+            .idAllocator       = &mSessionIDAllocator,
+            .fabricTable       = &mFabrics,
+            .clientPool        = &mCASEClientPool,
+            .groupDataProvider = &mGroupsProvider,
+        },
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache          = nullptr,
+#endif
+        .devicePool        = &mDevicePool,
+    };
+
+    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
+    SuccessOrExit(err);
+
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
-                                                    &mSessions, &mFabrics);
+                                                    &mSessions, &mFabrics, &mGroupsProvider);
     SuccessOrExit(err);
-
-    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them

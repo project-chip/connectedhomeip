@@ -34,6 +34,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
 
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -129,6 +130,17 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     initParams.fabricIndependentStorage        = setupParams.storageDelegate;
 
+    mGroupDataProvider.SetStorageDelegate(setupParams.storageDelegate);
+
+    CHIP_ERROR err = mGroupDataProvider.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
+    }
+    initParams.groupDataProvider = &mGroupDataProvider;
+
+    // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
@@ -174,6 +186,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     setupParams.controllerRCAC     = rcacSpan;
     setupParams.controllerICAC     = icacSpan;
     setupParams.controllerNOC      = nocSpan;
+
+    // TODO: From FabricID/NodeID, setup GroupDataProvider w/ IPK
 
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)

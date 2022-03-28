@@ -36,6 +36,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <trace/trace.h>
@@ -91,7 +92,6 @@ static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Cloc
 
 CASESession::CASESession() : PairingSession(Transport::SecureSession::Type::kCASE)
 {
-    mTrustedRootId = CertificateKeyId();
 }
 
 CASESession::~CASESession()
@@ -109,6 +109,7 @@ void CASESession::Clear()
     PairingSession::Clear();
 
     mState = kInitialized;
+    Crypto::ClearSecretData(&mIPK[0], sizeof(mIPK));
 
     AbortExchange();
 }
@@ -151,12 +152,12 @@ CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
     {
         cachableSession.mPeerCATs.values[i] = LittleEndian::HostSwap32(GetPeerCATs().values[i]);
     }
-    // TODO: Get the fabric index
-    cachableSession.mLocalFabricIndex      = 0;
+    cachableSession.mLocalFabricIndex      = (mFabricInfo != nullptr) ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
     cachableSession.mSessionSetupTimeStamp = LittleEndian::HostSwap64(mSessionSetupTimeStamp);
 
     memcpy(cachableSession.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(cachableSession.mSharedSecret, mSharedSecret, mSharedSecret.Length());
+    memcpy(cachableSession.mIPK, mIPK, sizeof(mIPK));
 
     return CHIP_NO_ERROR;
 }
@@ -176,14 +177,12 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     }
     SetPeerCATs(peerCATs);
     SetSessionTimeStamp(LittleEndian::HostSwap64(cachableSession.mSessionSetupTimeStamp));
-    // TODO: Set the fabric index correctly
     mLocalFabricIndex = cachableSession.mLocalFabricIndex;
 
     memcpy(mResumptionId, cachableSession.mResumptionId, sizeof(mResumptionId));
 
-    const ByteSpan * ipkListSpan = GetIPKList();
-    VerifyOrReturnError(ipkListSpan->size() == sizeof(mIPK), CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
+    // TODO: Handle data dependency between IPK caching and the possible underlying changes of that IPK
+    memcpy(mIPK, cachableSession.mIPK, sizeof(mIPK));
 
     mCASESessionEstablished = true;
 
@@ -193,6 +192,10 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
 CHIP_ERROR CASESession::Init(uint16_t localSessionId, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TODO: DO NOT MERGE WITH THIS Remove this assert once testing completed
+    VerifyOrDie(mGroupDataProvider != nullptr);
+    VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Clear();
 
@@ -311,6 +314,37 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CASESession::RecoverInitiatorIpk()
+{
+    Credentials::GroupDataProvider::KeySet ipkKeySet;
+    FabricIndex fabricIndex = mFabricInfo->GetFabricIndex();
+
+    CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricIndex, ipkKeySet);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Failed to obtain IPK for initiating: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    else if ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax))
+    {
+        ChipLogError(SecureChannel, "Found invalid IPK keyset for initiator.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // For the generation of the Destination Identifier,
+    // the originator SHALL use the operational group key with the second oldest
+    // EpochStartTime, if one exists, otherwise it SHALL use the single operational
+    // group key available. The EpochStartTime are already ordered
+    size_t ipkIndex = (ipkKeySet.num_keys_used > 1) ? ((ipkKeySet.num_keys_used - 1) - 1) : 0;
+    memcpy(&mIPK[0], ipkKeySet.epoch_keys[ipkIndex].key, sizeof(mIPK));
+
+    ChipLogError(Support,"RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider, (unsigned)mFabricInfo->GetFabricIndex());
+    ChipLogByteSpan(Support, ByteSpan(mIPK));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma1", "CASESession");
@@ -342,13 +376,22 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mInitiatorRandom)));
     // Retrieve Session Identifier
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
-    // Generate a Destination Identifier
+    // Generate a Destination Identifier based on the node we are attempting to reach
     {
-        MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        memcpy(mIPK, GetIPKList()->data(), sizeof(mIPK));
+
+        // Obtain originator IPK matching the fabric where we are trying to open a session. mIPK
+        // will be properly set thereafter.
+        ReturnErrorOnFailure(RecoverInitiatorIpk());
+
+        FabricId fabricId = mFabricInfo->GetFabricId();
+        uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
+        Credentials::P256PublicKeySpan rootPubKeySpan(&rootPubKeyBuf[0]);
+        ReturnErrorOnFailure(mFabricInfo->GetRootPubkey(rootPubKeySpan));
+
+        MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorOnFailure(
-            mFabricInfo->GenerateDestinationID(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), GetPeerNodeId(), destinationIdSpan));
+            GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId, GetPeerNodeId(), destinationIdSpan));
     }
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(3), destinationIdentifier, sizeof(destinationIdentifier)));
 
@@ -402,6 +445,57 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
+{
+    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    bool found = false;
+    for (const FabricInfo & fabricInfo : *mFabricsTable)
+    {
+        // Basic data for candidate fabric, used to compute candidate destination identifiers
+        FabricId fabricId = fabricInfo.GetFabricId();
+        NodeId nodeId = fabricInfo.GetNodeId();
+        uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
+        Credentials::P256PublicKeySpan rootPubKeySpan(&rootPubKeyBuf[0]);
+        ReturnErrorOnFailure(fabricInfo.GetRootPubkey(rootPubKeySpan));
+
+        // Get IPK operational group key set for current candidate fabric
+        GroupDataProvider::KeySet ipkKeySet;
+        CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
+        if ((err != CHIP_NO_ERROR) || ((ipkKeySet.num_keys_used == 0) ||
+            (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
+        {
+            continue;
+        }
+
+        // Try every IPK candidate we have for a match
+        for (size_t keyIdx = 0; keyIdx <= ipkKeySet.num_keys_used; ++keyIdx)
+        {
+            uint8_t candidateDestinationId[kSHA256_Hash_Length];
+            MutableByteSpan candidateDestinationIdSpan(candidateDestinationId);
+            ByteSpan candidateIpkSpan(ipkKeySet.epoch_keys[keyIdx].key);
+
+            err = GenerateCaseDestinationId(ByteSpan(candidateIpkSpan), ByteSpan(initiatorRandom), rootPubKeySpan, fabricId, nodeId, candidateDestinationIdSpan);
+            if ((err == CHIP_NO_ERROR) && (candidateDestinationIdSpan.data_equal(destinationId)))
+            {
+                // Found a match, stop working, cache IPK, update local fabric context
+                found = true;
+                MutableByteSpan ipkSpan(mIPK);
+                CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
+                mFabricInfo = &fabricInfo;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            break;
+        }
+    }
+
+    return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
+}
+
 CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma1", "CASESession");
@@ -418,9 +512,6 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan resumptionId;
     ByteSpan resume1MIC;
     ByteSpan initiatorPubKey;
-
-    const ByteSpan * ipkListSpan = GetIPKList();
-    FabricIndex fabricIndex      = kUndefinedFabricIndex;
 
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
@@ -447,15 +538,17 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
         }
     }
 
-    memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
-
-    VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    fabricIndex =
-        mFabricsTable->FindDestinationIDCandidate(destinationIdentifier, initiatorRandom, ipkListSpan, GetIPKListEntries());
-    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, err = CHIP_ERROR_KEY_NOT_FOUND);
-
-    mFabricInfo = mFabricsTable->FindFabricWithIndex(fabricIndex);
-    VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = FindLocalNodeFromDestionationId(destinationIdentifier, initiatorRandom);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
+            static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mFabricInfo->GetNodeId()));
+    }
+    else
+    {
+        ChipLogError(SecureChannel, "CASE failed to match destination ID with local fabrics");
+        ChipLogByteSpan(SecureChannel, destinationIdentifier);
+    }
 
     // ParseSigma1 ensures that:
     // mRemotePubKey.Length() == initiatorPubKey.size() == kP256_PublicKey_Length.
@@ -541,9 +634,6 @@ CHIP_ERROR CASESession::SendSigma2()
 
     ByteSpan nocCert;
     ReturnErrorOnFailure(mFabricInfo->GetNOCCert(nocCert));
-
-    ReturnErrorOnFailure(mFabricInfo->GetTrustedRootId(mTrustedRootId));
-    VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_INTERNAL);
 
     // Fill in the random value
     uint8_t msg_rand[kSigmaParamRandomNumberSize];
@@ -927,9 +1017,6 @@ CHIP_ERROR CASESession::SendSigma3()
 
     SuccessOrExit(err = mFabricInfo->GetICACert(icaCert));
     SuccessOrExit(err = mFabricInfo->GetNOCCert(nocCert));
-
-    SuccessOrExit(err = mFabricInfo->GetTrustedRootId(mTrustedRootId));
-    VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
     // Prepare Sigma3 TBS Data Blob
     msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
@@ -1317,12 +1404,6 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     ReturnErrorOnFailure(tlvWriter.Finalize());
     tbsDataLen = static_cast<size_t>(tlvWriter.GetLengthWritten());
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASESession::RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk)
-{
-    memset(ipk.data(), static_cast<int>(fabricId), ipk.size());
     return CHIP_NO_ERROR;
 }
 

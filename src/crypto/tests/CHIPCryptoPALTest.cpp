@@ -2170,6 +2170,11 @@ const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYT
 const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xaa, 0x97, 0x9a, 0x48, 0xbd, 0x8c,
                                                                                         0xdf, 0x29, 0x3a, 0x07, 0x09, 0xb9,
                                                                                         0xc1, 0xeb, 0x19, 0x30 };
+
+static const uint8_t kCompressedFabricId2[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
+const uint8_t kEpochKeyBuffer3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x23, 0x5b, 0xf7, 0xe6, 0x28, 0x23, 0xd3, 0x58, 0xdc, 0xa4, 0xba, 0x50, 0xb1, 0x53, 0x5f, 0x4b };
+const uint8_t kGroupOperationalKey3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa6, 0xf5, 0x30, 0x6b, 0xaf, 0x6d, 0x05, 0x0a, 0xf2, 0x3b, 0xa4, 0xbd, 0x6b, 0x9d, 0xd9, 0x60 };
+
 const uint16_t kGroupSessionId1                                                     = 0x6c80;
 const uint16_t kGroupSessionId2                                                     = 0x0c48;
 
@@ -2192,6 +2197,12 @@ static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inC
     epoch_key = ByteSpan(kEpochKeyBuffer2, sizeof(kEpochKeyBuffer2));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey2, sizeof(kGroupOperationalKey2)));
+
+    // Epoch Key 3 (example from spec)
+    epoch_key = ByteSpan(kEpochKeyBuffer3, sizeof(kEpochKeyBuffer3));
+    compressed_fabric_id = ByteSpan(kCompressedFabricId2);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey3, sizeof(kGroupOperationalKey3)));
 }
 
 static void TestGroup_SessionIdDerivation(nlTestSuite * inSuite, void * inContext)

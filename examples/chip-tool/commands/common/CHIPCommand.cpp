@@ -65,8 +65,20 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
 
     chip::Controller::FactoryInitParams factoryInitParams;
+
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
-    uint16_t port                              = mDefaultStorage.GetListenPort();
+
+    // Init group data provider that will be used for all group keys and IPKs for the
+    // chip-tool-configured fabrics. This is OK to do once since the fabric tables
+    // and the DeviceControllerFactory all "share" in the same underlying data.
+    // Different commissioner implementations may want to use alternate implementations
+    // of GroupDataProvider for injection through factoryInitParams.
+    mGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    ReturnLogErrorOnFailure(mGroupDataProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&mGroupDataProvider);
+    factoryInitParams.groupDataProvider = &mGroupDataProvider;
+
+    uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)
     {
         // Make sure different commissioners run on different ports.
@@ -94,8 +106,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
-    // Initialize Group Data
-    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider(mDefaultStorage));
+    // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
         chip::FabricInfo * fabric = it->second->GetFabricInfo();
@@ -104,7 +115,15 @@ CHIP_ERROR CHIPCommand::Run()
             uint8_t compressed_fabric_id[sizeof(uint64_t)];
             chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
             ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
-            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+            // key is the same, but the derived keys will be different for each fabric.
+            // This has to be done here after we know the Compressed Fabric ID of all
+            // chip-tool-managed fabrics
+            chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(), defaultIpk, compressed_fabric_id_span));
         }
     }
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
@@ -261,6 +280,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     }
 
     commissionerParams.storageDelegate                = &mCommissionerStorage;
+    // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 

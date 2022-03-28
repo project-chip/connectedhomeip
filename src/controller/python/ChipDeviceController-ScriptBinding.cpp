@@ -55,6 +55,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
@@ -94,6 +95,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
+chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -216,6 +218,14 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
+
+    // TODO: Provide a means to Python-configure the group data provider to update local IPK
+    sGroupDataProvider.SetStorageDelegate(&sStorageAdapter);
+    ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
+
+    // TODO: Set IPK from src/lib/support/TestGroupData.h:DefaultIpkValue::GetDefaultIpk()
+
+    factoryParams.groupDataProvider = sGroupDataProvider;
     factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());

@@ -127,13 +127,22 @@ public:
      *
      * @param key - Poison key to add to the set.
      */
-    void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
+    virtual void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
 
     /**
      * @brief Clear all "poison keys"
      *
      */
-    void ClearPoisonKeys() { mPoisonKeys.clear(); }
+    virtual void ClearPoisonKeys() { mPoisonKeys.clear(); }
+
+    /**
+     * @brief Reset entire contents back to empty. This does NOT clear the "poison keys"
+     *
+     */
+    virtual void ClearStorage()
+    {
+        mStorage.clear();
+    }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;
