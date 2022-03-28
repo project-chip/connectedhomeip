@@ -443,8 +443,8 @@ CHIP_ERROR InitCommissioner()
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(),
-                                                                     defaultIpk, compressedFabricIdSpan));
+    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                                    compressedFabricIdSpan));
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
