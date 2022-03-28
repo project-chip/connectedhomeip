@@ -25,11 +25,13 @@ from sys import platform
 global commandQueue
 commandQueue = ""
 
+
 class TermColors:
-    STRBOLD='\033[1m'
-    STRRESET='\033[0m'
-    STRCYAN='\033[1;36m'
-    STRYELLOW='\033[1;33m'
+    STRBOLD = '\033[1m'
+    STRRESET = '\033[0m'
+    STRCYAN = '\033[1;36m'
+    STRYELLOW = '\033[1;33m'
+
 
 def splash():
     splashText = TermColors.STRBOLD + TermColors.STRYELLOW + '''\
@@ -56,7 +58,8 @@ def definePaths():
     paths["genFolder"] = paths["rootSampleFolder"] + "/zap-generated"
     paths["devices"] = []
     for filepath in Path(f"{paths['rootSampleFolder']}/devices").rglob('*.zap'):
-        paths["devices"].append(str(os.path.splitext(os.path.basename(filepath))[0]))
+        paths["devices"].append(
+            str(os.path.splitext(os.path.basename(filepath))[0]))
     return paths
 
 
@@ -66,11 +69,13 @@ def checkPythonVersion():
               str(sys.version_info[0]))
         exit(1)
 
+
 def queuePrint(str):
     global commandQueue
     if (len(commandQueue) > 0):
         commandQueue = commandQueue + "; "
     commandQueue = commandQueue + "echo -e " + str
+
 
 def queueCommand(command):
     global commandQueue
@@ -78,10 +83,12 @@ def queueCommand(command):
         commandQueue = commandQueue + "; "
     commandQueue = commandQueue + command
 
+
 def execQueue():
     global commandQueue
     subprocess.run(commandQueue, shell=True, executable=shellApp)
     commandQueue = ""
+
 
 def hexInputToInt(valIn):
     '''Parses inputs as hexadecimal numbers, takes into account optional 0x
@@ -96,6 +103,7 @@ def hexInputToInt(valIn):
     else:
         valOut = valIn
     return valOut
+
 
 def main(argv):
     checkPythonVersion()
@@ -123,7 +131,6 @@ def main(argv):
         print('Please edit chef_config.py file and change the <configured> flag to True')
         exit(1)
 
-
     #
     # Arguments parser
     #
@@ -146,28 +153,42 @@ Notes:
 '''
     parser = optparse.OptionParser(usage=usage)
 
-    parser.add_option("-u", "--update_toolchain", help="updates toolchain & installs zap", action="store_true", dest="doUpdateToolchain")
-    parser.add_option("-b", "--build", help="builds", action="store_true", dest="doBuild")
-    parser.add_option("-c", "--clean", help="clean build. Only valid if also building", action="store_true", dest="doClean")
-    parser.add_option("-f", "--flash", help="flashes device", action="store_true", dest="doFlash")
-    parser.add_option("-e", "--erase", help="erases flash before flashing. Only valid if also flashing", action="store_true", dest="doErase")
-    parser.add_option("-i", "--terminal", help="opens terminal to interact with with device", action="store_true", dest="doInteract")
-    parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it", action="store_true", dest="doMenuconfig")
-    parser.add_option("", "--bootstrap_zap", help="installs zap dependencies", action="store_true", dest="doBootstrapZap")
-    parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts", action="store_true", dest="doRunZap")
-    parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model", action="store_true", dest="doRunGui")
-    parser.add_option("-d", "--device", dest="sampleDeviceTypeName", help="specifies device type. Default is lighting. See info above for supported device types", metavar="TARGET", default="lighting")
+    parser.add_option("-u", "--update_toolchain", help="updates toolchain & installs zap",
+                      action="store_true", dest="doUpdateToolchain")
+    parser.add_option("-b", "--build", help="builds",
+                      action="store_true", dest="doBuild")
+    parser.add_option("-c", "--clean", help="clean build. Only valid if also building",
+                      action="store_true", dest="doClean")
+    parser.add_option("-f", "--flash", help="flashes device",
+                      action="store_true", dest="doFlash")
+    parser.add_option("-e", "--erase", help="erases flash before flashing. Only valid if also flashing",
+                      action="store_true", dest="doErase")
+    parser.add_option("-i", "--terminal", help="opens terminal to interact with with device",
+                      action="store_true", dest="doInteract")
+    parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
+                      action="store_true", dest="doMenuconfig")
+    parser.add_option("", "--bootstrap_zap", help="installs zap dependencies",
+                      action="store_true", dest="doBootstrapZap")
+    parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
+                      action="store_true", dest="doRunZap")
+    parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
+                      action="store_true", dest="doRunGui")
+    parser.add_option("-d", "--device", dest="sampleDeviceTypeName",
+                      help="specifies device type. Default is lighting. See info above for supported device types", metavar="TARGET", default="lighting")
     parser.add_option("-t", "--target", type='choice',
-                                        action='store',
-                                        dest="buildTarget",
-                                        help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
-                                        choices=['nrf52840dk_nrf52840', 'esp32', 'linux',],
-                                        metavar="TARGET",
-                                        default="esp32")
+                      action='store',
+                      dest="buildTarget",
+                      help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
+                      choices=['nrf52840dk_nrf52840', 'esp32', 'linux', ],
+                      metavar="TARGET",
+                      default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="doRPC")
-    parser.add_option("-v", "--vid", dest="vid", help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
-    parser.add_option("-p", "--pid", dest="pid", help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
-    parser.add_option("", "--rpc_console", help="Opens PW RPC Console", action="store_true", dest="doRPC_CONSOLE")
+    parser.add_option("-v", "--vid", dest="vid",
+                      help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
+    parser.add_option("-p", "--pid", dest="pid",
+                      help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
+    parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
+                      action="store_true", dest="doRPC_CONSOLE")
 
     options, _ = parser.parse_args(argv)
 
@@ -180,17 +201,18 @@ Notes:
     queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
     queuePrint("Setting up environment...")
     if options.buildTarget == "esp32":
-        paths["platFolder"] = os.path.normpath(paths["rootSampleFolder"] + "/esp32")
+        paths["platFolder"] = os.path.normpath(
+            paths["rootSampleFolder"] + "/esp32")
         queueCommand(f"source {config.esp32Folder}/export.sh")
     elif options.buildTarget == "nrf52840dk_nrf52840":
-        paths["platFolder"] = os.path.normpath(paths["rootSampleFolder"] + "/nrfconnect")
+        paths["platFolder"] = os.path.normpath(
+            paths["rootSampleFolder"] + "/nrfconnect")
         queueCommand(f"source {config.nrfconnectFolder}/zephyr/zephyr-env.sh")
         queueCommand("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
         pass
     else:
         print(f"Target {options.buildTarget} not supported")
-
 
     queueCommand(f"source {paths['matterFolder']}/scripts/activate.sh")
 
@@ -203,7 +225,8 @@ Notes:
             queuePrint("ESP32 toolchain update not supported. Skipping")
         elif options.buildTarget == "nrf52840dk_nrf52840":
             queuePrint("Updating toolchain")
-            queueCommand(f"cd {paths['matterFolder']} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
+            queueCommand(
+                f"cd {paths['matterFolder']} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
         elif options.buildTarget == "linux":
             queuePrint("Linux toolchain update not supported. Skipping")
 
@@ -218,11 +241,12 @@ Notes:
         if platform == "darwin":
             queuePrint("Installation of ZAP OS packages not supported on MacOS")
         if platform == "win32":
-            queuePrint("Installation of ZAP OS packages not supported on Windows")
+            queuePrint(
+                "Installation of ZAP OS packages not supported on Windows")
 
         queuePrint("Running NPM to install ZAP Node.JS dependencies")
-        queueCommand(f"cd {paths['matterFolder']}/third_party/zap/repo/ && npm install")
-
+        queueCommand(
+            f"cd {paths['matterFolder']}/third_party/zap/repo/ && npm install")
 
     #
     # Cluster customization
@@ -231,16 +255,17 @@ Notes:
     if options.doRunGui:
         queuePrint("Starting ZAP GUI editor")
         queueCommand(f"cd {paths['rootSampleFolder']}/devices")
-        queueCommand(f"{paths['matterFolder']}/scripts/tools/zap/run_zaptool.sh {options.sampleDeviceTypeName}.zap")
-
+        queueCommand(
+            f"{paths['matterFolder']}/scripts/tools/zap/run_zaptool.sh {options.sampleDeviceTypeName}.zap")
 
     if options.doRunZap:
         queuePrint("Running ZAP script to generate artifacts")
         queueCommand(f"mkdir -p {paths['genFolder']}/")
         queueCommand(f"rm {paths['genFolder']}/*")
-        queueCommand(f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
-        queueCommand(f"touch {paths['genFolder']}/af-gen-event.h") # sometimes af-gen-event.h is not generated
-
+        queueCommand(
+            f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
+        # sometimes af-gen-event.h is not generated
+        queueCommand(f"touch {paths['genFolder']}/af-gen-event.h")
 
     #
     # Menuconfig
@@ -264,13 +289,16 @@ Notes:
         queuePrint("Building...")
         if options.doRPC:
             queuePrint("RPC PW enabled")
-            queueCommand(f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig_rpc.defaults")
+            queueCommand(
+                f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig_rpc.defaults")
         else:
             queuePrint("RPC PW disabled")
-            queueCommand(f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig.defaults")
+            queueCommand(
+                f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig.defaults")
         options.vid = hexInputToInt(options.vid)
         options.pid = hexInputToInt(options.pid)
-        queuePrint(f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
+        queuePrint(
+            f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         queueCommand(f"cd {paths['rootSampleFolder']}")
 
         if (options.buildTarget == "esp32") or (options.buildTarget == "nrf52840dk_nrf52840"):
@@ -330,7 +358,8 @@ true''')
         if options.buildTarget == "esp32":
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doErase:
-                queueCommand(f"idf.py -p {config.esp32SerialDevice} erase_flash")
+                queueCommand(
+                    f"idf.py -p {config.esp32SerialDevice} erase_flash")
             queueCommand(f"idf.py -p {config.esp32SerialDevice} flash")
         elif options.buildTarget == "nrf52840dk_nrf52840":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
@@ -352,14 +381,17 @@ true''')
             queueCommand("killall screen")
             queueCommand(f"screen {config.nrfConnectSerialDevice} 115200")
         elif options.buildTarget == "linux":
-            queuePrint(f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
-            queueCommand(f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
+            queuePrint(
+                f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
+            queueCommand(
+                f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
 
     #
     # RPC Console
     #
     if options.doRPC_CONSOLE:
-        queueCommand(f"python3 -m chip_rpc.console --device {config.esp32SerialDevice}")
+        queueCommand(
+            f"python3 -m chip_rpc.console --device {config.esp32SerialDevice}")
 
     queuePrint("Done")
 
