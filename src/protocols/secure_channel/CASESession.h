@@ -116,10 +116,7 @@ public:
      * @param groupDataProvider - Pointer to the group data provider (if nullptr, will error at start of
      *                            establishment, not here).
      */
-    void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider)
-    {
-        mGroupDataProvider = groupDataProvider;
-    }
+    void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
     /**
      * Parse a sigma1 message.  This function will return success only if the

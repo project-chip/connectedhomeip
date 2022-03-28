@@ -69,7 +69,7 @@ private:
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
 
-    FabricTable * mFabrics = nullptr;
+    FabricTable * mFabrics                              = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
     SessionIDAllocator mSessionIDAllocator;
 

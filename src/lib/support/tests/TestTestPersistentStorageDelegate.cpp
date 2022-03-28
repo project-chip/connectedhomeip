@@ -223,11 +223,9 @@ void TestClearStorage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == sizeof(buf));
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("Test basic API", TestBasicApi),
-    NL_TEST_DEF("Test ClearStorage method of TestPersistentStorageDelegate", TestClearStorage),
-    NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("Test basic API", TestBasicApi),
+                          NL_TEST_DEF("Test ClearStorage method of TestPersistentStorageDelegate", TestClearStorage),
+                          NL_TEST_SENTINEL() };
 
 } // namespace
 

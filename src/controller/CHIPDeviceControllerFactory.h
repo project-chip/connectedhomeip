@@ -162,7 +162,7 @@ public:
             VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager = sessionManager;
+            mSessionManager    = sessionManager;
             mGroupDataProvider = groupDataProvider;
             return CHIP_NO_ERROR;
         };
@@ -184,7 +184,7 @@ public:
         void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
     private:
-        SessionManager * mSessionManager = nullptr;
+        SessionManager * mSessionManager                    = nullptr;
         Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
     };
 

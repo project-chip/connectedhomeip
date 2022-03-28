@@ -34,7 +34,6 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
 
-
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;

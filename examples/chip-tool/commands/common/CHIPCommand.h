@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <credentials/GroupDataProviderImpl.h>
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
+#include <credentials/GroupDataProviderImpl.h>
 
 #pragma once
 
@@ -95,7 +95,7 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
-    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{kMaxGroupsPerFabric, kMaxGroupKeysPerFabric};
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

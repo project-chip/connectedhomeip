@@ -1725,7 +1725,7 @@ bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & output)
     VerifyOrReturnError(CHIP_NO_ERROR == keyset.Load(mProvider.mStorage), false);
 
     mCount++;
-    mNextId              = keyset.next;
+    mNextId = keyset.next;
     output.ClearKeys();
     output.keyset_id     = keyset.keyset_id;
     output.policy        = keyset.policy;
@@ -1837,9 +1837,9 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
     // If the keyset ID doesn't match, we have a ... problem.
     VerifyOrReturnError(keyset.keyset_id == kIdentityProtectionKeySetId, CHIP_ERROR_INTERNAL);
 
-    out_keyset.keyset_id = keyset.keyset_id;
+    out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.num_keys_used = keyset.keys_count;
-    out_keyset.policy = keyset.policy;
+    out_keyset.policy        = keyset.policy;
 
     for (size_t key_idx = 0; key_idx < KeySet::kEpochKeysMax; ++key_idx)
     {

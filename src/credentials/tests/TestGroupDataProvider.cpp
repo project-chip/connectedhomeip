@@ -51,26 +51,25 @@ constexpr uint16_t kMaxGroupsPerFabric    = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
 // If test cases covering more than 2 fabrics are added, update `ResetProvider` function.
-constexpr chip::FabricIndex kFabric1    = 1;
-constexpr chip::FabricIndex kFabric2    = 7;
+constexpr chip::FabricIndex kFabric1 = 1;
+constexpr chip::FabricIndex kFabric2 = 7;
 
 static const uint8_t kExampleOperationalRootPublicKey[65] = {
-  0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1,
-  0x1e, 0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9, 0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c,
-  0xb8, 0x25, 0x4a, 0x2e, 0x56, 0xd4, 0xe2, 0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4,
-  0xa7, 0x73, 0xe9, 0x30, 0x27, 0x7b, 0x4d, 0x9f, 0xbe, 0xde, 0x8a, 0x05, 0x26, 0x86, 0xbf, 0xac,
-  0xfa,
+    0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1, 0x1e,
+    0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9, 0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25,
+    0x4a, 0x2e, 0x56, 0xd4, 0xe2, 0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4, 0xa7, 0x73, 0xe9,
+    0x30, 0x27, 0x7b, 0x4d, 0x9f, 0xbe, 0xde, 0x8a, 0x05, 0x26, 0x86, 0xbf, 0xac, 0xfa,
 };
-static const ByteSpan kExampleOperationalRootPublicKeySpan{kExampleOperationalRootPublicKey};
+static const ByteSpan kExampleOperationalRootPublicKeySpan{ kExampleOperationalRootPublicKey };
 
 // kFabricId1/kCompressedFabricIdBuffer1 matches the Compressed Fabric Identifier
 // example of spec section `4.3.2.2. Compressed Fabric Identifier`. It is based on
 // the public key in `kExampleOperationalRootPublicKey`.
-constexpr chip::FabricId kFabricId1 = 0x2906C908D115D362;
+constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
 static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
 constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
 
-constexpr chip::FabricId kFabricId2 = 0x5E1C0F1B2C813C7A;
+constexpr chip::FabricId kFabricId2               = 0x5E1C0F1B2C813C7A;
 static const uint8_t kCompressedFabricIdBuffer2[] = { 0x3f, 0xaa, 0xe2, 0x90, 0x93, 0xd5, 0xaf, 0x45 };
 constexpr ByteSpan kCompressedFabricId2(kCompressedFabricIdBuffer2);
 
@@ -153,7 +152,6 @@ public:
     }
 };
 static TestListener sListener;
-
 
 void ResetProvider(GroupDataProvider * provider)
 {
@@ -830,8 +828,8 @@ void TestIpk(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet3));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
-    const uint8_t kIpkEpochKeyFromSpec[] = {0x23, 0x5b, 0xf7, 0xe6, 0x28, 0x23, 0xd3, 0x58,
-                                            0xdc, 0xa4, 0xba, 0x50, 0xb1, 0x53, 0x5f, 0x4b};
+    const uint8_t kIpkEpochKeyFromSpec[] = { 0x23, 0x5b, 0xf7, 0xe6, 0x28, 0x23, 0xd3, 0x58,
+                                             0xdc, 0xa4, 0xba, 0x50, 0xb1, 0x53, 0x5f, 0x4b };
 
     KeySet fabric1KeySet0(kKeysetId0, SecurityPolicy::kTrustFirst, 1);
     fabric1KeySet0.epoch_keys[0].start_time = 1234;
@@ -842,25 +840,31 @@ void TestIpk(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
     // Make sure the derived key matches spec test vector
-    const uint8_t kExpectedIpkFromSpec[] = {0xa6, 0xf5, 0x30, 0x6b, 0xaf, 0x6d, 0x05, 0x0a, 0xf2, 0x3b, 0xa4, 0xbd, 0x6b, 0x9d, 0xd9, 0x60};
+    const uint8_t kExpectedIpkFromSpec[] = { 0xa6, 0xf5, 0x30, 0x6b, 0xaf, 0x6d, 0x05, 0x0a,
+                                             0xf2, 0x3b, 0xa4, 0xbd, 0x6b, 0x9d, 0xd9, 0x60 };
 
     NL_TEST_ASSERT(apSuite, 0 == ipkOperationalKeySet.keyset_id);
     NL_TEST_ASSERT(apSuite, 1 == ipkOperationalKeySet.num_keys_used);
     NL_TEST_ASSERT(apSuite, SecurityPolicy::kTrustFirst == ipkOperationalKeySet.policy);
     NL_TEST_ASSERT(apSuite, 1234 == ipkOperationalKeySet.epoch_keys[0].start_time);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(ipkOperationalKeySet.epoch_keys[0].key, kExpectedIpkFromSpec, sizeof(kExpectedIpkFromSpec)));
+    NL_TEST_ASSERT(apSuite,
+                   0 == memcmp(ipkOperationalKeySet.epoch_keys[0].key, kExpectedIpkFromSpec, sizeof(kExpectedIpkFromSpec)));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId0));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == chip::Credentials::SetSingleIpkEpochKey(provider, kFabric1, ByteSpan(kIpkEpochKeyFromSpec), kCompressedFabricId1));
+    NL_TEST_ASSERT(
+        apSuite,
+        CHIP_NO_ERROR ==
+            chip::Credentials::SetSingleIpkEpochKey(provider, kFabric1, ByteSpan(kIpkEpochKeyFromSpec), kCompressedFabricId1));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
     NL_TEST_ASSERT(apSuite, 0 == ipkOperationalKeySet.keyset_id);
     NL_TEST_ASSERT(apSuite, 1 == ipkOperationalKeySet.num_keys_used);
     NL_TEST_ASSERT(apSuite, SecurityPolicy::kTrustFirst == ipkOperationalKeySet.policy);
     NL_TEST_ASSERT(apSuite, 0 == ipkOperationalKeySet.epoch_keys[0].start_time); // default time is zero for SetSingleIpkEpochKey
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(ipkOperationalKeySet.epoch_keys[0].key, kExpectedIpkFromSpec, sizeof(kExpectedIpkFromSpec)));
+    NL_TEST_ASSERT(apSuite,
+                   0 == memcmp(ipkOperationalKeySet.epoch_keys[0].key, kExpectedIpkFromSpec, sizeof(kExpectedIpkFromSpec)));
 }
 
 void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)

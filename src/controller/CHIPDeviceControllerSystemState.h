@@ -181,7 +181,7 @@ private:
     SessionIDAllocator * mSessionIDAllocator                       = nullptr;
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
-    Credentials::GroupDataProvider *mGroupDataProvider             = nullptr;
+    Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

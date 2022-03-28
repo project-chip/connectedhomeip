@@ -31,7 +31,7 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    using SecurityPolicy = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
 
     struct GroupInfo
@@ -378,9 +378,11 @@ protected:
  * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT on any bad argument, other CHIP_ERROR values
  *         from implementation on other errors
  */
-inline CHIP_ERROR SetSingleIpkEpochKey(GroupDataProvider * provider, FabricIndex fabric_index, const ByteSpan & ipk_epoch_span, const ByteSpan & compressed_fabric_id)
+inline CHIP_ERROR SetSingleIpkEpochKey(GroupDataProvider * provider, FabricIndex fabric_index, const ByteSpan & ipk_epoch_span,
+                                       const ByteSpan & compressed_fabric_id)
 {
-    GroupDataProvider::KeySet ipkKeySet(GroupDataProvider::kIdentityProtectionKeySetId, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+    GroupDataProvider::KeySet ipkKeySet(GroupDataProvider::kIdentityProtectionKeySetId,
+                                        GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
 
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(ipk_epoch_span.size() == sizeof(ipkKeySet.epoch_keys[0].key), CHIP_ERROR_INVALID_ARGUMENT);

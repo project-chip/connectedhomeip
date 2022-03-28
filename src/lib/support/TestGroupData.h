@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <credentials/GroupDataProvider.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
 
@@ -27,20 +27,20 @@ namespace GroupTesting {
 
 class DefaultIpkValue
 {
-  public:
+public:
     DefaultIpkValue() {}
 
     static ByteSpan GetDefaultIpk()
     {
         static const uint8_t mDefaultIpk[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = {
-            't', 'e', 'm','p','o','r', 'a', 'r', 'y', ' ', 'i', 'p', 'k', ' ', '0', '1'
+            't', 'e', 'm', 'p', 'o', 'r', 'a', 'r', 'y', ' ', 'i', 'p', 'k', ' ', '0', '1'
         };
         return ByteSpan(mDefaultIpk);
     }
-
 };
 
-inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider *provider, chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
+inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip::FabricIndex fabric_index,
+                           const ByteSpan & compressed_fabric_id)
 {
     static const chip::GroupId kGroup1   = 0x0101;
     static const chip::GroupId kGroup2   = 0x0102;

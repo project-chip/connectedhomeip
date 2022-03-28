@@ -116,14 +116,16 @@ CHIP_ERROR CHIPCommand::Run()
             chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
             ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
 
-            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
+            ReturnLogErrorOnFailure(
+                chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
 
             // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
             // key is the same, but the derived keys will be different for each fabric.
             // This has to be done here after we know the Compressed Fabric ID of all
             // chip-tool-managed fabrics
             chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(), defaultIpk, compressed_fabric_id_span));
+            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(),
+                                                                            defaultIpk, compressed_fabric_id_span));
         }
     }
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
@@ -279,7 +281,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate                = &mCommissionerStorage;
+    commissionerParams.storageDelegate = &mCommissionerStorage;
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;

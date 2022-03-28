@@ -90,9 +90,7 @@ using HKDF_sha_crypto = HKDF_sha;
 // The session establishment fails if the response is not received within timeout window.
 static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(30);
 
-CASESession::CASESession() : PairingSession(Transport::SecureSession::Type::kCASE)
-{
-}
+CASESession::CASESession() : PairingSession(Transport::SecureSession::Type::kCASE) {}
 
 CASESession::~CASESession()
 {
@@ -339,7 +337,8 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
     size_t ipkIndex = (ipkKeySet.num_keys_used > 1) ? ((ipkKeySet.num_keys_used - 1) - 1) : 0;
     memcpy(&mIPK[0], ipkKeySet.epoch_keys[ipkIndex].key, sizeof(mIPK));
 
-    ChipLogError(Support,"RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider, (unsigned)mFabricInfo->GetFabricIndex());
+    ChipLogError(Support, "RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider,
+                 (unsigned) mFabricInfo->GetFabricIndex());
     ChipLogByteSpan(Support, ByteSpan(mIPK));
 
     return CHIP_NO_ERROR;
@@ -390,8 +389,8 @@ CHIP_ERROR CASESession::SendSigma1()
         ReturnErrorOnFailure(mFabricInfo->GetRootPubkey(rootPubKeySpan));
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
-        ReturnErrorOnFailure(
-            GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId, GetPeerNodeId(), destinationIdSpan));
+        ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId,
+                                                       GetPeerNodeId(), destinationIdSpan));
     }
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(3), destinationIdentifier, sizeof(destinationIdentifier)));
 
@@ -454,7 +453,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
     {
         // Basic data for candidate fabric, used to compute candidate destination identifiers
         FabricId fabricId = fabricInfo.GetFabricId();
-        NodeId nodeId = fabricInfo.GetNodeId();
+        NodeId nodeId     = fabricInfo.GetNodeId();
         uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
         Credentials::P256PublicKeySpan rootPubKeySpan(&rootPubKeyBuf[0]);
         ReturnErrorOnFailure(fabricInfo.GetRootPubkey(rootPubKeySpan));
@@ -462,8 +461,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
         CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
-        if ((err != CHIP_NO_ERROR) || ((ipkKeySet.num_keys_used == 0) ||
-            (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
+        if ((err != CHIP_NO_ERROR) ||
+            ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
         {
             continue;
         }
@@ -475,7 +474,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
             MutableByteSpan candidateDestinationIdSpan(candidateDestinationId);
             ByteSpan candidateIpkSpan(ipkKeySet.epoch_keys[keyIdx].key);
 
-            err = GenerateCaseDestinationId(ByteSpan(candidateIpkSpan), ByteSpan(initiatorRandom), rootPubKeySpan, fabricId, nodeId, candidateDestinationIdSpan);
+            err = GenerateCaseDestinationId(ByteSpan(candidateIpkSpan), ByteSpan(initiatorRandom), rootPubKeySpan, fabricId, nodeId,
+                                            candidateDestinationIdSpan);
             if ((err == CHIP_NO_ERROR) && (candidateDestinationIdSpan.data_equal(destinationId)))
             {
                 // Found a match, stop working, cache IPK, update local fabric context
@@ -542,7 +542,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
-            static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mFabricInfo->GetNodeId()));
+                        static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mFabricInfo->GetNodeId()));
     }
     else
     {

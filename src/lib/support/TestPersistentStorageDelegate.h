@@ -139,10 +139,7 @@ public:
      * @brief Reset entire contents back to empty. This does NOT clear the "poison keys"
      *
      */
-    virtual void ClearStorage()
-    {
-        mStorage.clear();
-    }
+    virtual void ClearStorage() { mStorage.clear(); }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;

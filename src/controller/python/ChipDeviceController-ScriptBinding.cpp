@@ -225,7 +225,7 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     // TODO: Set IPK from src/lib/support/TestGroupData.h:DefaultIpkValue::GetDefaultIpk()
 
-    factoryParams.groupDataProvider = sGroupDataProvider;
+    factoryParams.groupDataProvider        = sGroupDataProvider;
     factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());

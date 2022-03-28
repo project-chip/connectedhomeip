@@ -28,8 +28,8 @@ namespace chip {
 
 using namespace chip::Crypto;
 
-CHIP_ERROR GenerateCaseDestinationId(const ByteSpan & ipk, const ByteSpan & initiatorRandom, const ByteSpan & rootPubKey, FabricId fabricId, NodeId nodeId,
-                                     MutableByteSpan & outDestinationId)
+CHIP_ERROR GenerateCaseDestinationId(const ByteSpan & ipk, const ByteSpan & initiatorRandom, const ByteSpan & rootPubKey,
+                                     FabricId fabricId, NodeId nodeId, MutableByteSpan & outDestinationId)
 {
     VerifyOrReturnError(ipk.size() == kIPKSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(initiatorRandom.size() == kSigmaParamRandomNumberSize, CHIP_ERROR_INVALID_ARGUMENT);
