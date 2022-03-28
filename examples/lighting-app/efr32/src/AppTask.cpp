@@ -628,33 +628,29 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
         chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
- // The rest of this function is temporary test code, trying to get
+
+    // The rest of this function is temporary test code, trying to get
     // bootloader to work
     // !!!!! DO NOT MERGE INTO MASTER !!!!!!!!!!!
 
-#define STORAGE_SLOT 0
-
-    static bool firstTime = true;
-
-    if(firstTime == true) {
-        bootloader_init();
-        firstTime = false;
-    }
+    CORE_CRITICAL_SECTION(bootloader_init();)
 
     BootloaderStorageSlot_t slotInfo;
-    CORE_CRITICAL_SECTION(
-
-                          bootloader_getStorageSlotInfo(STORAGE_SLOT, &slotInfo);)
+    CORE_CRITICAL_SECTION( bootloader_getStorageSlotInfo(0, &slotInfo);)
     EFR32_LOG("Boot slot info: image addr: 0x%x size: %d", slotInfo.address, slotInfo.length);
 
-    // This call to bootloader_getStorageInfo() corrupts the stack
     BootloaderStorageInformation_t bootInfo;
-
     CORE_CRITICAL_SECTION(bootloader_getStorageInfo(&bootInfo);)
     EFR32_LOG("Boot info: storageType %d, numStorageSlots %d info 0x%x", bootInfo.storageType, bootInfo.numStorageSlots,bootInfo.info );
 
-    EFR32_LOG("Storage info: descr: %s version: %d size %d", bootInfo.info->partDescription, bootInfo.info->version, bootInfo.info->partSize);
-
+    if(bootInfo.info != NULL)
+        {
+            EFR32_LOG("Storage info: descr: %s version: %d size %d", bootInfo.info->partDescription, bootInfo.info->version, bootInfo.info->partSize);
+        }
+    else
+        {
+            EFR32_LOG("Boot info is NULL!!!");
+        }
 
 }
 
