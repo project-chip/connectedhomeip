@@ -282,7 +282,7 @@ CHIP_ERROR OTAProviderExample::SendQueryImageResponse(chip::app::CommandHandler 
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
 
-    VerifyOrReturnError(commandObj->AddResponse(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    commandObj->AddResponse(commandPath, response);
     return CHIP_NO_ERROR;
 }
 
@@ -389,7 +389,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     // Reset back to success case for subsequent uses
     mUpdateAction = OTAApplyUpdateAction::kProceed;
 
-    VerifyOrReturnError(commandObj->AddResponse(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    commandObj->AddResponse(commandPath, response);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
