@@ -16,6 +16,7 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 get_filename_component(GEN_DIR ${CHEF}/zap-generated/ REALPATH)
@@ -69,7 +70,6 @@ target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/cmd_ping.cpp
     ${APP_ROOT}/shell_common/cmd_send.cpp
     ${APP_ROOT}/nrfconnect/main.cpp
-    ${GEN_DIR}/CHIPClientCallbacks.cpp
     ${GEN_DIR}/callback-stub.cpp
     ${GEN_DIR}/IMClusterCommandHandler.cpp
     ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
