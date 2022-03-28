@@ -45,7 +45,7 @@ template("k32w0_sdk") {
 
   assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
   assert(chip_with_OM15082 == 0 || chip_with_DK6,
-    "OM15082 expansion board is only supported on DK6 board")
+         "OM15082 expansion board is only supported on DK6 board")
   assert(
       chip_with_low_power == 0 ||
           (chip_with_low_power == 1 && chip_with_OM15082 == 0 &&
@@ -67,20 +67,14 @@ template("k32w0_sdk") {
 
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
-        _sdk_include_dirs += [
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm",
-        ]
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm" ]
       } else {
-        _sdk_include_dirs += [
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
-        ]
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm" ]
       }
     }
 
     if (chip_with_low_power != 0) {
-      _sdk_include_dirs += [
-        "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common",
-      ]
+      _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common" ]
     }
 
     _sdk_include_dirs += [
@@ -368,7 +362,6 @@ template("k32w0_sdk") {
     ]
 
     if (chip_with_DK6) {
-
       if (chip_with_low_power != 0) {
         sources += [
           "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/board.c",
