@@ -37,10 +37,10 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
-#include "radio.h"
-#include "RNG_Interface.h"
 #include "MemManager.h"
+#include "RNG_Interface.h"
 #include "TimersManager.h"
+#include "radio.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -62,8 +62,8 @@ static char initString[] = "app";
 
 extern "C" void main_task(void const * argument)
 {
-    char *argv[1] = {0};
-    argv[0] = &initString[0];
+    char * argv[1] = { 0 };
+    argv[0]        = &initString[0];
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;

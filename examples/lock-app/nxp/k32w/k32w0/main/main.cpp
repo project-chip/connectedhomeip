@@ -53,8 +53,8 @@ using namespace ::chip::Logging;
 #include "radio.h"
 #endif
 
-#include "RNG_Interface.h"
 #include "MemManager.h"
+#include "RNG_Interface.h"
 #include "TimersManager.h"
 
 typedef void (*InitFunc)(void);
@@ -97,8 +97,8 @@ static char initString[] = "app";
 
 extern "C" void main_task(void const * argument)
 {
-    char *argv[1] = {0};
-    argv[0] = &initString[0];
+    char * argv[1] = { 0 };
+    argv[0]        = &initString[0];
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -121,7 +121,7 @@ extern "C" void main_task(void const * argument)
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-   /* Initialize board framework services */
+    /* Initialize board framework services */
     boardFwkInit();
 
     /* Used for OT initializations */

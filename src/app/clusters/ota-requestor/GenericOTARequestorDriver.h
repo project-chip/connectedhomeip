@@ -89,7 +89,7 @@ protected:
     uint32_t mOtaStartDelaySec                   = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
     uint32_t mWatchdogTimeInterval = (6 * 60 * 60); // Timeout (in seconds) for checking if Requestor has reverted back to idle mode
-    uint16_t maxDownloadBlockSize                = 1024;
+    uint16_t maxDownloadBlockSize  = 1024;
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
     uint8_t mProviderRetryCount; // Track retry count for the current provider
