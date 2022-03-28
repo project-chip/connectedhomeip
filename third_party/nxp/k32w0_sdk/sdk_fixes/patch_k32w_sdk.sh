@@ -41,9 +41,9 @@ convert_to_dos "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/MemManager/
 patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/MemManager/Interface -p1 <"$SOURCE_DIR/MemManager_h.patch"
 
 SIGN_FILE_PATH="$NXP_K32W061_SDK_ROOT"/tools/imagetool/sign_images.sh
-convert_to_dos $SIGN_FILE_PATH
+convert_to_dos "$SIGN_FILE_PATH"
 patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/tools/imagetool/ -p1 <"$SOURCE_DIR/sign_images_sh.patch"
-sed -i 's/\r$//' $SIGN_FILE_PATH
+sed -i 's/\r$//' "$SIGN_FILE_PATH"
 
 echo "K32W SDK MR3 QP1 was patched!"
 exit 0
