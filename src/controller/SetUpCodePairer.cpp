@@ -30,11 +30,15 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 
+constexpr uint32_t kDeviceDiscoveredTimeout = 30 * chip::kMillisecondsPerSecond;
+
 namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     SetupPayload payload;
     mConnectionType = commission;
 
@@ -45,7 +49,10 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     mRemoteId     = remoteId;
     mSetUpPINCode = payload.setUpPINCode;
 
-    return Connect(payload);
+    ReturnErrorOnFailure(Connect(payload));
+
+    return mSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(kDeviceDiscoveredTimeout),
+                                    OnDeviceDiscoveredTimeoutCallback, this);
 }
 
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
@@ -135,6 +142,8 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
+    mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
+
     if (mConnectionType == SetupCodePairerBehaviour::kCommission)
     {
         LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
@@ -200,6 +209,15 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
     OnDeviceDiscovered(params);
+}
+
+void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context)
+{
+    SetUpCodePairer * pairer = static_cast<SetUpCodePairer *>(context);
+    LogErrorOnFailure(pairer->StopConnectOverBle());
+    LogErrorOnFailure(pairer->StopConnectOverIP());
+    LogErrorOnFailure(pairer->StopConnectOverSoftAP());
+    pairer->mCommissioner->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 } // namespace Controller
