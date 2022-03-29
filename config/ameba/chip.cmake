@@ -8,6 +8,8 @@ set(chip_c_flags "")
 set(chip_cpp_flags "")
 set(chip-gn chip-gn)
 
+set(matter_enable_rotating_id 1)
+
 get_filename_component(CHIP_ROOT ${chip_dir} REALPATH)
 get_filename_component(CHIP_OUTPUT ${chip_dir_output} REALPATH)
 get_filename_component(LIB_ROOT ${prj_root}/GCC-RELEASE/project_hp/asdk/lib/application REALPATH)
@@ -119,10 +121,13 @@ if (matter_enable_ota_requestor)
 string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
 endif (matter_enable_ota_requestor)
 
-if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
-    string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising"   "true")
-    string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id"            "true")
-endif()
+if (matter_enable_rotating_id)
+    string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = true\n")
+    string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = true\n")
+else(matter_enable_rotating_id)
+    string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = false\n")
+    string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = false\n")
+endif(matter_enable_rotating_id)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
