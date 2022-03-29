@@ -288,7 +288,7 @@ class {{filename}}Suite: public TestCommand
 
         {{#if isWriteAttribute}}
         {{#if isGroupCommand}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(groupId, {{>device}}->GetSecureSession().Value()->GetFabricIndex(), {{>device}}->GetDeviceId(),{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(groupId, {{>device}}->GetSecureSession().Value()->GetFabricIndex(), {{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
             {{~> maybeTimedInteractionTimeout ~}}
             , {{>staticDoneResponse}}
             ));

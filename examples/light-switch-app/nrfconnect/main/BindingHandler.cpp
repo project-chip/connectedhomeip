@@ -60,10 +60,8 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         else
         {
 
-            NodeId sourceNodeId = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aBinding.fabricIndex)->GetNodeId();
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, sourceNodeId,
-                                                        toggleCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, toggleCommand);
         }
         break;
 
@@ -76,10 +74,8 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         }
         else
         {
-            NodeId sourceNodeId = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aBinding.fabricIndex)->GetNodeId();
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, sourceNodeId,
-                                                        onCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, onCommand);
         }
         break;
 
@@ -92,10 +88,8 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         }
         else
         {
-            NodeId sourceNodeId = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aBinding.fabricIndex)->GetNodeId();
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, sourceNodeId,
-                                                        onCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, onCommand);
         }
         break;
     default:
@@ -134,10 +128,8 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
         }
         else
         {
-            NodeId sourceNodeId = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aBinding.fabricIndex)->GetNodeId();
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, sourceNodeId,
-                                                        moveToLevelCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToLevelCommand);
         }
     }
     break;

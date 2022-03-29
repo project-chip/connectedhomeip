@@ -76,10 +76,7 @@ private:
 class OutgoingGroupSession : public Session
 {
 public:
-    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
-    {
-        SetFabricIndex(fabricIndex);
-    }
+    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
     ~OutgoingGroupSession() override { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
@@ -111,11 +108,8 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() const { return mSourceNodeId; }
-
 private:
     const GroupId mGroupId;
-    const NodeId mSourceNodeId;
 };
 
 } // namespace Transport
