@@ -50,6 +50,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Commission from alpha when the commissioning window is not opened"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeIdForDuplicateCommissioning
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
     - label: "Open Commissioning Window from alpha"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
