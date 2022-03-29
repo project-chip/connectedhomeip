@@ -165,6 +165,17 @@ public:
          * SendAutoResubscribeRequest is not called, this function will not be called.
          */
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
+
+        /**
+         * This function is invoked when using read/subscribeRequest, where the ReadClient would use cached cluster data version to
+         * update data version filter list
+         */
+        virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       DataVersionFilter * apDataVersionFilterList,
+                                                       size_t aDataVersionFilterListSize)
+        {
+            return 0;
+        }
     };
 
     enum class InteractionType : uint8_t
@@ -291,7 +302,8 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize);
+                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize,
+                                             bool aEnableCachedDataVersionFilter);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -345,6 +357,18 @@ private:
     InteractionModelEngine * mpImEngine = nullptr;
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
+
+    // Reserved size for the FabricFiltered boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
+    static constexpr uint16_t kFabricFiltered = 1 + 1;
+    // End Of Container (0x18) uses one byte.
+    static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    static constexpr uint16_t kReservedSizeForIMRevision = 1 + 1 + 1;
+    // Reserved buffer for TLV level overhead (the overhead for fabric filter flag, end
+    // of RequestMessage (another end of container)).
+    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
+        kFabricFiltered + kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
 };
 
 }; // namespace app

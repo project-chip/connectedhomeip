@@ -48,6 +48,7 @@ struct ReadPrepareParams
     size_t mAttributePathParamsListSize             = 0;
     DataVersionFilter * mpDataVersionFilterList     = nullptr;
     size_t mDataVersionFilterListSize               = 0;
+    bool mEnableCachedDataVersionFilter             = false;
     EventNumber mEventNumber                        = 0;
     System::Clock::Timeout mTimeout                 = kImMessageTimeout;
     uint16_t mMinIntervalFloorSeconds               = 0;
@@ -67,6 +68,7 @@ struct ReadPrepareParams
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mpDataVersionFilterList            = other.mpDataVersionFilterList;
         mDataVersionFilterListSize         = other.mDataVersionFilterListSize;
+        mEnableCachedDataVersionFilter     = other.mEnableCachedDataVersionFilter;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
@@ -92,6 +94,7 @@ struct ReadPrepareParams
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mpDataVersionFilterList            = other.mpDataVersionFilterList;
         mDataVersionFilterListSize         = other.mDataVersionFilterListSize;
+        mEnableCachedDataVersionFilter     = other.mEnableCachedDataVersionFilter;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;

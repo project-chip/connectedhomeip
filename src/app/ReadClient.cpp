@@ -213,7 +213,18 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
         VerifyOrReturnError(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
+	uint16_t reservedSize = 0;
+
+	if (msgBuf->AvailableDataLength() > kMaxSecureSduLengthBytes)
+	{
+            reservedSize = static_cast<uint16_t>(msgBuf->AvailableDataLength() - kMaxSecureSduLengthBytes);
+	}
+
+        reservedSize = reservedSize + static_cast<uint16_t>(Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
+
         writer.Init(std::move(msgBuf));
+
+        ReturnErrorOnFailure(writer.ReserveBuffer(reservedSize));
 
         ReturnErrorOnFailure(request.Init(&writer));
 
@@ -227,9 +238,29 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             {
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder,
-                                                                   aReadPrepareParams.mpDataVersionFilterList,
-                                                                   aReadPrepareParams.mDataVersionFilterListSize));
+                ReturnErrorOnFailure(GenerateDataVersionFilterList(
+                    dataVersionFilterListBuilder, aReadPrepareParams.mpDataVersionFilterList,
+                    aReadPrepareParams.mDataVersionFilterListSize, aReadPrepareParams.mEnableCachedDataVersionFilter));
+            }
+            else
+            {
+                if (aReadPrepareParams.mEnableCachedDataVersionFilter)
+                {
+                    TLV::TLVWriter backup;
+                    request.Checkpoint(backup);
+                    DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+                    ReturnErrorOnFailure(request.GetError());
+                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder,
+                                                                 aReadPrepareParams.mpDataVersionFilterList,
+                                                                 aReadPrepareParams.mDataVersionFilterListSize) == 0)
+                    {
+                        request.Rollback(backup);
+                    }
+                    else
+                    {
+                        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                    }
+                }
             }
         }
 
@@ -254,6 +285,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             }
         }
 
+        ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
         ReturnErrorOnFailure(request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfReadRequestMessage().GetError());
         ReturnErrorOnFailure(writer.Finalize(&msgBuf));
     }
@@ -306,7 +338,8 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
 }
 
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                     DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize)
+                                                     DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize,
+                                                     bool aEnableCachedDataVersionFilter)
 {
     for (size_t index = 0; index < aDataVersionFilterListSize; index++)
     {
@@ -322,6 +355,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         VerifyOrReturnError(apDataVersionFilterList[index].mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(
             filter.DataVersion(apDataVersionFilterList[index].mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+    }
+
+    if (aEnableCachedDataVersionFilter)
+    {
+        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, apDataVersionFilterList, aDataVersionFilterListSize);
     }
 
     return aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs().GetError();
@@ -810,7 +848,19 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         err = CHIP_ERROR_INVALID_ARGUMENT);
+
+
+    uint16_t reservedSize = 0;
+
+    if (msgBuf->AvailableDataLength() > kMaxSecureSduLengthBytes)
+    {
+        reservedSize = static_cast<uint16_t>(msgBuf->AvailableDataLength() - kMaxSecureSduLengthBytes);
+    }
+
+    reservedSize = reservedSize + static_cast<uint16_t>(Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
+
     writer.Init(std::move(msgBuf));
+    ReturnErrorOnFailure(writer.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(request.Init(&writer));
 
@@ -828,9 +878,29 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         {
             DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
             ReturnErrorOnFailure(request.GetError());
-            ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder,
-                                                               aReadPrepareParams.mpDataVersionFilterList,
-                                                               aReadPrepareParams.mDataVersionFilterListSize));
+            ReturnErrorOnFailure(GenerateDataVersionFilterList(
+                dataVersionFilterListBuilder, aReadPrepareParams.mpDataVersionFilterList,
+                aReadPrepareParams.mDataVersionFilterListSize, aReadPrepareParams.mEnableCachedDataVersionFilter));
+        }
+        else
+        {
+            if (aReadPrepareParams.mEnableCachedDataVersionFilter)
+            {
+                TLV::TLVWriter backup;
+                request.Checkpoint(backup);
+                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+                ReturnErrorOnFailure(request.GetError());
+                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder,
+                                                             aReadPrepareParams.mpDataVersionFilterList,
+                                                             aReadPrepareParams.mDataVersionFilterListSize) == 0)
+                {
+                    request.Rollback(backup);
+                }
+                else
+                {
+                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                }
+            }
         }
     }
 
@@ -856,8 +926,9 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         ReturnErrorOnFailure(err = eventFilters.GetError());
     }
 
-    request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfSubscribeRequestMessage();
-    ReturnErrorOnFailure(err = request.GetError());
+    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+    ReturnErrorOnFailure(
+        err = request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfSubscribeRequestMessage().GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
