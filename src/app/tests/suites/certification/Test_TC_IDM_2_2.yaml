@@ -84,7 +84,7 @@ tests:
           with the right attribute value."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           sudo ./chip-tool onoff read on-off 1 1
       disabled: true
 

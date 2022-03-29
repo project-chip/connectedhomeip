@@ -24,8 +24,8 @@ tests:
           "DUT sends a subscription request message to the target node/reference
           device for a single attribute of data type bool."
       verification: |
-          1. The subscripbe tests sudo ./chip-tool tests TestSubscribe_OnOff 1 , can be a good example how controller subscribes and DUT responds to. 
-          TH here is all-cluster/lighting app that the the DUT can subscribe to. 
+          1. The subscripbe tests sudo ./chip-tool tests TestSubscribe_OnOff 1 , can be a good example how controller subscribes and DUT responds to.
+          TH here is all-cluster/lighting app that the the DUT can subscribe to.
 
           1. Verify the on refernce application receives Subscription request Msg
 
@@ -118,7 +118,7 @@ tests:
           should send the modified data to the DUT. Repeat the above steps
           multiple times (3 times)."
       verification: |
-          1. Activate the subscription on the DUT 
+          1. Activate the subscription on the DUT
 
           2. Modify the attribute value on the TH by sending below cmd Ex:
           chip-device-ctrl > ./chip-tool onoff off 1 0
@@ -139,13 +139,13 @@ tests:
           [1633065482.893948][1591764:1591772] CHIP:DMG:                                 ClusterId = 0x6,
           [1633065482.893983][1591764:1591772] CHIP:DMG:                                 FieldTag = 0x0,
           [1633065482.894016][1591764:1591772] CHIP:DMG:                         }
-          [1633065482.894055][1591764:1591772] CHIP:DMG:                                 
-          [1633065482.894091][1591764:1591772] CHIP:DMG:                         Data = false, 
+          [1633065482.894055][1591764:1591772] CHIP:DMG:
+          [1633065482.894091][1591764:1591772] CHIP:DMG:                         Data = false,
           [1633065482.894125][1591764:1591772] CHIP:DMG:                         DataElementVersion = 0x0,
           [1633065482.894156][1591764:1591772] CHIP:DMG:                 },
-          [1633065482.894188][1591764:1591772] CHIP:DMG:                 
+          [1633065482.894188][1591764:1591772] CHIP:DMG:
           [1633065482.894211][1591764:1591772] CHIP:DMG:         ],
-          [1633065482.894239][1591764:1591772] CHIP:DMG:         
+          [1633065482.894239][1591764:1591772] CHIP:DMG:
           [1633065482.894260][1591764:1591772] CHIP:DMG: }
           [1633065482.894712][1591764:1591772] CHIP:ZCL: ReadAttributesResponse:
           [1633065482.894752][1591764:1591772] CHIP:ZCL:   ClusterId: 0x0000_0006
@@ -180,7 +180,7 @@ tests:
           1. configure the max interval timeout for few seconds on the DUT
           2. create a situation that the accessory cant reach controller for 20 secs (like removing ethernet cable ..etc)
           3. After the timer expiry we should see the repor on the controller like below
-          > [1633722365.411081][731663:731671] CHIP:DMG: Subscription Liveness timeout with peer node 0xbc614e, shutting down 
+          > [1633722365.411081][731663:731671] CHIP:DMG: Subscription Liveness timeout with peer node 0xbc614e, shutting down
           [1633722365.411147][731663:731671] CHIP:ZCL: ReadAttributesResponse:
           [1633722365.411168][731663:731671] CHIP:ZCL:   ClusterId: 0x0000_0000
           [1633722365.411193][731663:731671] CHIP:ZCL: IMReadReportAttributesResponseCallback: Missing success callback

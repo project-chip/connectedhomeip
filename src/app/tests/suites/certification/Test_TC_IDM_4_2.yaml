@@ -34,7 +34,7 @@ tests:
           action to the TH TH sends a status response"
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           sudo ./chip-tool onoff  subscribe on-time   0 100 0 1 1
       disabled: true
 
@@ -89,7 +89,7 @@ tests:
           interval time specified during the subscription activation."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           sudo ./chip-tool basic write  node-label 1 1 0
           sudo ./chip-tool basic subscribe node-label 0 100 0  1 0
 
@@ -104,7 +104,7 @@ tests:
           interval time specified during the subscription activation."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           sudo ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
           sudo ./chip-tool any subscribe-by-id  0x0008 0x0010 0 100 0 1  1
           Verify the above command multiple times(3 times)
