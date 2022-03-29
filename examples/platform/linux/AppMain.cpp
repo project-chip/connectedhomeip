@@ -442,6 +442,8 @@ CHIP_ERROR InitCommissioner()
     ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
+    // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
+    // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
     ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
     ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
                                                                     compressedFabricIdSpan));

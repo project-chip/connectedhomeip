@@ -854,9 +854,12 @@ void TestIpk(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite,
                    0 == memcmp(ipkOperationalKeySet.epoch_keys[0].key, kExpectedIpkFromSpec, sizeof(kExpectedIpkFromSpec)));
 
+    // Remove IPK, verify removal
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId0));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
+
+    // Set a single IPK with the SetSingleIpkEpochKey helper, validate key derivation follows spec
     NL_TEST_ASSERT(
         apSuite,
         CHIP_NO_ERROR ==
