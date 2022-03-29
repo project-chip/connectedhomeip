@@ -12854,6 +12854,149 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_GC_1_1_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_GC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH1 reads the BreadCrumb Attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH1 reads the BreadCrumb Attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_GC_1_1_000002_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH1 writes the BreadCrumb attribute as 1 to the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id breadcrumbArgument;
+    breadcrumbArgument = [NSNumber numberWithUnsignedLongLong:1ULL];
+    [cluster writeAttributeBreadcrumbWithValue:breadcrumbArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"TH1 writes the BreadCrumb attribute as 1 to the DUT Error: %@", err);
+
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_GC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH1 reads the BreadCrumb attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH1 reads the BreadCrumb attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedLongLongValue], 1ULL);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_GC_1_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH1 reads the RegulatoryConfig attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRegulatoryConfigWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH1 reads the RegulatoryConfig attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 2);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_GC_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH1 reads the LocationCapability attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLocationCapabilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH1 reads the LocationCapability attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 2);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_I_1_1_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
@@ -12999,6 +13142,367 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_I_2_3_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"1.Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000001_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 "
+                                         @"blink and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:0];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the "
+                             @"effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000002_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a blink effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a blink effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000003_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 "
+                                         @"breathe and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the "
+                             @"effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000004_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a breathe effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a breathe effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000005_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay "
+                                         @"and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:2];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay and the "
+                             @"effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000006_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes an okay effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes an okay effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000007_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b "
+                                         @"channel change and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:11];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b channel change "
+                             @"and the effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000008_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a channel change effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a channel change effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000009_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 "
+                                         @"breathe and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the "
+                             @"effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000010_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a breathe effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a breathe effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000011_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe "
+                                         @"finish effect and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:254];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe finish effect "
+                             @"and the effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000012_UserPrompt
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Manually check DUT stops the breathe effect after the current effect sequence"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT stops the breathe effect after the current effect sequence");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000013_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 "
+                                         @"breathe and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the "
+                             @"effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000014_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a breathe effect"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a breathe effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000015_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop "
+                                         @"effect and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:255];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and "
+                             @"the effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000016_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check DUT stops the breathe effect as soon as possible."];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT stops the breathe effect as soon as possible");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000017_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 "
+                                         @"blink and the effect variant field set to 0x42 unknown"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:0];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:66];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the "
+                             @"effect variant field set to 0x42 unknown Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000018_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check DUT executes a blink effect."];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT executes a blink effect");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000019_TriggerEffect
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop "
+                                         @"effect and the effect variant field set to 0x00 default"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+    params.effectIdentifier = [NSNumber numberWithUnsignedChar:255];
+    params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+    [cluster triggerEffectWithParams:params
+                   completionHandler:^(NSError * _Nullable err) {
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and "
+                             @"the effect variant field set to 0x00 default Error: %@",
+                           err);
+
+                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                       [expectation fulfill];
+                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_I_2_3_000020_UserPrompt
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check DUT stops any effect that may be still running as soon as possible"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"DUT stops any effect that may be still running as soon as possible");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_ILL_1_1_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
@@ -13083,6 +13587,138 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
     [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_ILL_2_1_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ILL_2_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads MinMeasuredValue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads MinMeasuredValue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 65533U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ILL_2_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads MaxMeasuredValue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads MaxMeasuredValue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 2U);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 65534U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ILL_2_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads Tolerance attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads Tolerance attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 2048U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ILL_2_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads LightSensorType attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLightSensorTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads LightSensorType attribute from DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -16693,6 +17329,144 @@ NSNumber * _Nonnull CurrentLevelValue;
             id actualValue = value;
             XCTAssertLessThanOrEqual([actualValue length], 32);
         }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_MC_10_1_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MC_10_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the AcceptHeader attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAcceptHeaderWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads the AcceptHeader attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MC_10_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH reads the SupportedStreamingProtocols attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSupportedStreamingProtocolsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads the SupportedStreamingProtocols attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_MOD_1_1_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MOD_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the ClusterRevision attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads the ClusterRevision attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MOD_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the AttributeList attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads the AttributeList attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MOD_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AcceptedCommandList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MOD_1_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: GeneratedCommandList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
