@@ -336,7 +336,7 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
     memcpy(&mIPK[0], ipkKeySet.epoch_keys[ipkIndex].key, sizeof(mIPK));
 
     ChipLogProgress(Support, "RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider,
-                 (unsigned) mFabricInfo->GetFabricIndex());
+                    (unsigned) mFabricInfo->GetFabricIndex());
     ChipLogByteSpan(Support, ByteSpan(mIPK));
 
     return CHIP_NO_ERROR;
