@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on webOS platforms.
+ *          Layer on Linux platforms.
  *
  */
 
@@ -27,6 +27,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+// struct BluezConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

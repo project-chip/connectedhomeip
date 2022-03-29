@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP System
- *          Layer on webOS platforms.
+ *          Layer on Linux platforms.
  *
  */
 
@@ -46,4 +46,4 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
-#define CHIP_CONFIG_MDNS_CACHE_SIZE 0
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 4

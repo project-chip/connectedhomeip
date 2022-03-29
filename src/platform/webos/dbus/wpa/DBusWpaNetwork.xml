@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://raw.githubusercontent.com/freedesktop/dbus/master/doc/introspect.dtd">
+<node>
+    <interface name="fi.w1.wpa_supplicant1.Network">
+        <signal name="PropertiesChanged">
+            <arg name="properties" type="a{sv}" />
+        </signal>
+        <property name="Properties" type="a{sv}" access="readwrite" />
+        <property name="Enabled" type="b" access="readwrite" />
+    </interface>
+</node>

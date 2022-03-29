@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          on webOS platforms.
+ *          on Linux platforms.
  */
 
 #pragma once
@@ -43,9 +43,11 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
+
 // ========== Platform-specific Configuration =========
 
-// These are configuration options that are unique to webOs platforms.
+// These are configuration options that are unique to Linux platforms.
 // These can be overridden by the application as needed.
 
 /**

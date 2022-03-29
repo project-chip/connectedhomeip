@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,18 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include <platform/Linux/dbus/wpa/DBusWpa.h>
+#include <platform/Linux/dbus/wpa/DBusWpaBss.h>
+#include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
+#include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+
+#include <mutex>
+#endif
+
+#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
 namespace chip {
 namespace Inet {
@@ -76,7 +87,7 @@ struct GDBusWpaSupplicant
 #endif
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for webOs platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -12,4 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-chip_device_platform = "linux"
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
+
+gdbus_library("openthread") {
+  sources = [ "introspect.xml" ]
+
+  c_namespace = "Openthread"
+  c_generate_object_manager = false
+  dbus_out_dir = "platform/Linux/dbus/openthread"
+}
