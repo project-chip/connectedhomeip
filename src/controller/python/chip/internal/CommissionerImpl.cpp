@@ -156,7 +156,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
 
         {
-            chip::FabricInfo * fabricInfo = nullptr;
+            chip::FabricInfo * fabricInfo                = nullptr;
             uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
             chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
             chip::ByteSpan defaultIpk;
@@ -188,7 +188,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
             defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
             SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
-                                                                   compressedFabricIdSpan));
+                                                                  compressedFabricIdSpan));
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));

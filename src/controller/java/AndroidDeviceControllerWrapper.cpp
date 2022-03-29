@@ -218,8 +218,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
-    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
-                                                                compressedFabricIdSpan);
+    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(),
+                                                                defaultIpk, compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
