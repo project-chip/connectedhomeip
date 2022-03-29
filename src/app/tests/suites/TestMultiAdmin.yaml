@@ -63,13 +63,15 @@ tests:
       identity: "alpha"
       cluster: "CommissionerCommands"
       command: "PairWithQRCode"
-      additionalArguments: ", CHIP_ERROR_FABRIC_EXISTS"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeIdForDuplicateCommissioning
               - name: "payload"
                 value: payload
+      response:
+          error: FAILURE
+          clusterError: 0x09 #OperationalCertStatus::kFabricConflict
 
     - label: "Check that we just have the one fabric and did not add a new one"
       identity: "alpha"

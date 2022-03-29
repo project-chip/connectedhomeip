@@ -94,7 +94,7 @@ class {{filename}}Suite: public TestCommand
             This check can be removed once the cluster APIs have been converted from Invoke to
             ReadClient/WriteClient/CommandSender
         }}
-        {{~#if (isStrEqual cluster "DiscoveryCommands")~}}
+        {{~#if (isTestOnlyCluster cluster)~}}
         case {{index}}:
             {{>test_step_response}}
             break;
@@ -209,8 +209,7 @@ class {{filename}}Suite: public TestCommand
           {{~else if (isString type)}}"{{definedValue}}"
           {{else}}{{definedValue}}
           {{~/if~}}
-          {{/chip_tests_item_parameters}}
-          {{additionalArguments}});
+          {{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()

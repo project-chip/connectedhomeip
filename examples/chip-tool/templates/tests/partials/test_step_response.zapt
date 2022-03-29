@@ -1,3 +1,10 @@
+{{~#*inline "maybeCheckClusterError"}}
+{{#if response.clusterError}}
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.HasValue(), true));
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.Value(), {{response.clusterError}}));
+{{/if}}
+{{/inline~}}
+
 {{~#*inline "maybeContinueWithoutWaitingOnDone"}}
     {{~#if isWaitForReport}}shouldContinue = true;{{/if~}}
     {{~#if (isTestOnlyCluster cluster)}}shouldContinue = true;{{/if~}}
@@ -16,6 +23,7 @@
 {{! --- Test Step Response Content --}}
 {{#if response.error}}
     VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+    {{>maybeCheckClusterError}}
 {{else}}
     {{>maybeReturnOnUnsupported}}
     VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
