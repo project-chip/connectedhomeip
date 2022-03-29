@@ -23,27 +23,48 @@ tests:
     - label:
           "TH sends a subscription message to the DUT. DUT sends a report data
           action to the TH"
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool onoff subscribe on-time 0 100 0 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool onoff  subscribe on-time   0 100 0 1 1
       disabled: true
 
     - label:
           "TH sends a subscription message to the DUT. DUT sends a report data
           action to the TH TH sends a status response"
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool onoff subscribe on-time 0 100 0 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+           
+          sudo ./chip-tool onoff  subscribe on-time   0 100 0 1 1
+      disabled: true
+
+    - label:
+          "DUT and TH activate the subscription. Change the value of the
+          attribute which is being subscribed on the DUT by manually changing
+          some settings on the device. Example: Temperature sensor may update
+          the value of the room temperature. Turning on/off on a light bulb."
+      verification: |
+
       disabled: true
 
     - label:
           "DUT and TH activate the subscription. Change the value of the
           attribute which is being subscribed on the DUT by sending an IMWrite
           or Invoke message to the DUT from the TH."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool levelcontrol write on-level 2 1 1 sudo ./chip-tool
-          levelcontrol subscribe on-level 0 100 0 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool levelcontrol write on-level 2 1 1
+          sudo ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1
+      disabled: true
+
+    - label:
+          "DUT and TH activate the subscription. Change the value of the
+          attribute which is being subscribed on the DUT. TH force sends a
+          status response with an 'inactive subscription'. Change the value of
+          the attribute which is being subscribed on the DUT."
+      verification: |
+
       disabled: true
 
     - label:
@@ -52,11 +73,12 @@ tests:
           should send the report data with the modified attribute value. Repeat
           the above steps multiple times (3 times) before the max interval time
           specified during the subscription activation."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool basic write local-config-disabled 1 1 0 sudo ./chip-tool
-          basic subscribe local-config-disabled 0 100 0 1 0 Verify the above
-          command multiple times(3 times)"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool basic write local-config-disabled 1 1 0
+          sudo ./chip-tool basic subscribe local-config-disabled 0 100 0 1 0
+          Verify the above command multiple times(3 times)
       disabled: true
 
     - label:
@@ -65,62 +87,84 @@ tests:
           DUT should send the report data with the modified attribute value
           Repeat the above steps multiple times (3 times) before the max
           interval time specified during the subscription activation."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool basic write node-label 1 1 0 sudo ./chip-tool basic
-          subscribe node-label 0 100 0 1 0 Verify the above command multiple
-          times(3 times)"
+      verification: |
+          In case of chip tool, here is an example command to use
+           
+          sudo ./chip-tool basic write  node-label 1 1 0
+          sudo ./chip-tool basic subscribe node-label 0 100 0  1 0
+
+          Verify the above command multiple times(3 times)
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "unsigned integer". Modify that attribute on
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'unsigned integer'. Modify that attribute on
           the DUT. DUT should send the report data with the modified attribute
           value. Repeat the above steps multiple times (3 times) before the max
-          interval time specified during the subscription activation.'
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any write-by-id 0x0008 0x0010 1 1 1 sudo ./chip-tool any
-          subscribe-by-id 0x0008 0x0010 0 100 0 1 1 Verify the above command
-          multiple times(3 times)"
+          interval time specified during the subscription activation."
+      verification: |
+          In case of chip tool, here is an example command to use
+           
+          sudo ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+          sudo ./chip-tool any subscribe-by-id  0x0008 0x0010 0 100 0 1  1
+          Verify the above command multiple times(3 times)
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "signed integer". Modify that attribute on
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'signed integer'. Modify that attribute on
           the DUT. DUT should send the report data with the modified attribute
           value. Repeat the above steps multiple times (3 times)before the max
-          interval time specified during the subscription activation.'
-      verification:
-          "wirte to an attribute of type signed integer to the Harness"
+          interval time specified during the subscription activation."
+      verification: |
+          wirte to an attribute of type signed integer to the Harness
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "floating point". Modify that attribute on
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'floating point'. Modify that attribute on
           the DUT. DUT should send the report data with the modified attribute
           value. Repeat the above steps multiple times (3 times) before the max
-          interval time specified during the subscription activation.'
-      verification: "wirte to an attribute of type floating to the Harness"
+          interval time specified during the subscription activation."
+      verification: |
+          wirte to an attribute of type floating to the Harness
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for any
+          attribute After the Maximum interval time is elapsed, TH should send
+          another subscription request message with different parameters than
+          before. Change the value of the attribute requested on the DUT."
+      verification: |
+
       disabled: true
 
     - label:
           "Activate the subscription between the DUT and the TH for any
           attribute After the Maximum interval time is elapsed, change the value
           of the attribute requested on the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool levelcontrol write on-level 2 1 1 sudo ./chip-tool
-          levelcontrol subscribe on-level 0 100 0 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool levelcontrol write on-level 2 1 1
+          sudo ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          Reboot the DUT. Change the value of the attribute on the DUT."
+      verification: |
+
       disabled: true
 
     - label:
           "Activate the subscription between the DUT and the TH for an attribute
           There are no attribute value changes before MaxInterval elapses."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any write-by-id 0x0204 0 1 1 1 sudo ./chip-tool any
-          subscribe-by-id 0x0204 0 1 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any write-by-id 0x0204 0  1  1 1
+          sudo ./chip-tool any subscribe-by-id 0x0204 0  1  1 1
       disabled: true
 
     - label:
@@ -129,7 +173,8 @@ tests:
           should send the report data with the modified attribute value. Repeat
           the above steps multiple times (3 times) before the max interval time
           specified during the subscription activation."
-      verification: "wirte to an attribute of type list integer to the Harness"
+      verification: |
+          wirte to an attribute of type list integer to the Harness
       disabled: true
 
     - label:
@@ -138,7 +183,8 @@ tests:
           between DUT and the TH. Initiate another subscription request action
           to the DUT for another attribute with the KeepSubscriptions flag set
           to True. Change both the attribute values on the DUT."
-      verification: "https://github.com/project-chip/connectedhomeip/issues/15845"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15845
       disabled: true
 
     - label:
@@ -147,7 +193,24 @@ tests:
           between DUT and the TH. Initiate another subscription request action
           to the DUT for the same attribute with the KeepSubscriptions flag set
           to True. Change both the attribute values on the DUT."
-      verification: "https://github.com/project-chip/connectedhomeip/issues/15845"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15845
+      disabled: true
+
+    - label:
+          "TH sends a subscription request action for multiple
+          attributes/events. (1 attribute, 1 event). Change the value of the
+          attribute and trigger an action on the DUT to trigger the event."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends a subscription request action for attribute wildcard -
+          AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]]. Change
+          all or few of the attributes on the DUT"
+      verification: |
+
       disabled: true
 
     - label:
@@ -157,7 +220,7 @@ tests:
           with the data version. Tear down the subscription for that attribute.
           Start another subscription with the DataVersionFilter field set to the
           data version received above."
-      verification:
-          "Unsupported in TE8
-          https://github.com/project-chip/connectedhomeip/issues/15812"
+      verification: |
+          Unsupported in TE8
+          https://github.com/project-chip/connectedhomeip/issues/15812
       disabled: true
