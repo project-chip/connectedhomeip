@@ -550,7 +550,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     err = writeClient->SendWriteRequest(sessionHandle);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(10),
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(15),
                                     [&]() { return ctx.GetExchangeManager().GetNumActiveExchanges() == 0; });
 
     NL_TEST_ASSERT(apSuite, onGoingPath == app::ConcreteAttributePath());
@@ -603,7 +603,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 

@@ -23,7 +23,7 @@ namespace chip {
 namespace app {
 
 #ifdef CONFIG_IM_BUILD_FOR_UNIT_TEST
-static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(2);
+static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
 #else
 static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
 #endif
