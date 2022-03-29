@@ -56,7 +56,6 @@ const char * StageToString(CommissioningStage stage);
 struct WiFiCredentials
 {
     ByteSpan ssid;
-    // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
     WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
