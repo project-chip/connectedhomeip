@@ -234,7 +234,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.
     ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
-    // The below static assert
+    // The below static assert validates a key assumption in types used (needed for public API conformance)
     static_assert(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == kAES_CCM128_Key_Length, "IPK span sizing must match");
 
     // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
