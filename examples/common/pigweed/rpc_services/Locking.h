@@ -23,6 +23,7 @@
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
@@ -35,6 +36,7 @@ public:
     virtual pw::Status Set(const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
     {
         bool locked = request.locked;
+        DeviceLayer::StackLock lock;
         RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Set(kEndpoint, locked));
         return pw::OkStatus();
     }
@@ -42,6 +44,7 @@ public:
     virtual pw::Status Get(const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
     {
         bool locked;
+        DeviceLayer::StackLock lock;
         RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Get(kEndpoint, &locked));
         response.locked = locked;
         return pw::OkStatus();
