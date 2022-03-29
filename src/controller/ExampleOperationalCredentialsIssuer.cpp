@@ -234,7 +234,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.
     ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
-    uint8_t ipkValue[kAES_CCM128_Key_Length];
+    // The below static assert
+    static_assert(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == kAES_CCM128_Key_Length, "IPK span sizing must match");
+
+    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
+    // would obtain a suitable key per fabric.
+    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
 
     ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
@@ -243,6 +248,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     Optional<Crypto::AesCcm128KeySpan> ipkSpanValue;
     ipkSpanValue.SetValue(ipkSpan);
 
+    // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
     onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, ipkSpanValue, Optional<NodeId>());
     return CHIP_NO_ERROR;
