@@ -25,7 +25,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
@@ -43,12 +42,11 @@
 #include <nlunit-test.h>
 #include <utility>
 
+using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app::Clusters;
 
 namespace {
-
-using TestContext = chip::Test::AppContext;
 
 uint32_t gIterationCount = 0;
 nlTestSuite * gSuite     = nullptr;
@@ -67,14 +65,12 @@ constexpr EndpointId kTestEndpointId4    = 4;
 constexpr EndpointId kTestEndpointId5    = 5;
 constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
-constexpr AttributeId kTestListLargeAttribute = 8; // This attribute will be larger than the event size we used in this test.
-constexpr size_t kSizeOfEventUsedInThisTest   = 60;
 
 class TestCommandInteraction
 {
 public:
     TestCommandInteraction() {}
-    static void TestAttributeChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestChunking(nlTestSuite * apSuite, void * apContext);
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext);
@@ -104,7 +100,7 @@ DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, n
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListLargeAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
@@ -132,8 +128,6 @@ public:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
-    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
-
     void OnDone() override;
 
     void OnReportEnd() override { mOnReportEnd = true; }
@@ -141,7 +135,6 @@ public:
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount        = 0;
-    uint32_t mEventCount            = 0;
     bool mOnReportEnd               = false;
     bool mOnSubscriptionEstablished = false;
     app::BufferedReadCallback mBufferedCallback;
@@ -182,15 +175,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     {
         // Nothing to check for this one; depends on the endpoint.
     }
-    else if (aPath.mAttributeId == kTestListLargeAttribute)
-    {
-        app::DataModel::DecodableList<ByteSpan> v;
-        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
-        auto it          = v.begin();
-        size_t arraySize = 0;
-        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, arraySize == 4);
-    }
     else if (aPath.mAttributeId != kTestListAttribute)
     {
         uint8_t v;
@@ -212,12 +196,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, arraySize == 5);
     }
     mAttributeCount++;
-}
-
-void TestReadCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * aStatus)
-{
-    VerifyOrReturn(apData != nullptr);
-    mEventCount++;
 }
 
 void TestReadCallback::OnDone() {}
@@ -300,16 +278,6 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
         return aEncoder.EncodeList([](const auto & encoder) {
             return encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, sizeof(sAnStringThatCanNeverFitIntoTheMTU)));
         });
-    case kTestListLargeAttribute:
-        return aEncoder.EncodeList([](const auto & encoder) {
-            for (int i = 0; i < 4; i++)
-            {
-                // When putting even numbers of list entries, there is a point (a range of iterations) that we can put an event
-                // between two list items in the same chunk.
-                ReturnErrorOnFailure(encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, kSizeOfEventUsedInThisTest)));
-            }
-            return CHIP_NO_ERROR;
-        });
     default:
         return aEncoder.Encode((uint8_t) gIterationCount);
     }
@@ -389,7 +357,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
  * as we can possibly cover.
  *
  */
-void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -925,7 +893,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestAttributeChunking", TestCommandInteraction::TestAttributeChunking),
+    NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
     NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
     NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),

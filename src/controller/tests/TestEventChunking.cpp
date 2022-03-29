@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,11 +92,11 @@ nlTestSuite * gSuite     = nullptr;
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
 // number higher than that for our dynamic test endpoint.
 //
-constexpr EndpointId kTestEndpointId     = 2;
-constexpr AttributeId kTestListAttribute = 6;
-constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
+constexpr EndpointId kTestEndpointId          = 2;
 constexpr AttributeId kTestListLargeAttribute = 8; // This attribute will be larger than the event size we used in this test.
-constexpr size_t kSizeOfEventUsedInThisTest   = 60;
+
+// The size of the attribute which is a bit larger than the size of event used in the test.
+constexpr size_t kSizeOfLargeAttribute = 60;
 
 class TestReadEvents
 {
@@ -198,25 +198,11 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 4);
     }
-    else if (aPath.mAttributeId != kTestListAttribute)
+    else
     {
         uint8_t v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, v == (uint8_t) gIterationCount);
-    }
-    else
-    {
-        app::DataModel::DecodableList<uint8_t> v;
-        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
-        auto it          = v.begin();
-        size_t arraySize = 0;
-        while (it.Next())
-        {
-            NL_TEST_ASSERT(gSuite, it.GetValue() == static_cast<uint8_t>(gIterationCount));
-        }
-        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, arraySize == 5);
     }
     mAttributeCount++;
 }
@@ -248,27 +234,13 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
 {
     switch (aPath.mAttributeId)
     {
-    case kTestListAttribute:
-        return aEncoder.EncodeList([](const auto & encoder) {
-            for (int i = 0; i < 5; i++)
-            {
-                ReturnErrorOnFailure(encoder.Encode((uint8_t) gIterationCount));
-            }
-            return CHIP_NO_ERROR;
-        });
-    case kTestBadAttribute:
-        // The "BadAttribute" is implemented by encoding a very large octet string, then the encode will always return
-        // CHIP_NO_MEMORY.
-        return aEncoder.EncodeList([](const auto & encoder) {
-            return encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, sizeof(sAnStringThatCanNeverFitIntoTheMTU)));
-        });
     case kTestListLargeAttribute:
         return aEncoder.EncodeList([](const auto & encoder) {
             for (int i = 0; i < 4; i++)
             {
                 // When putting even numbers of list entries, there is a point (a range of iterations) that we can put an event
                 // between two list items in the same chunk.
-                ReturnErrorOnFailure(encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, kSizeOfEventUsedInThisTest)));
+                ReturnErrorOnFailure(encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, kSizeOfLargeAttribute)));
             }
             return CHIP_NO_ERROR;
         });
@@ -316,8 +288,7 @@ void GenerateEvents(nlTestSuite * apSuite, chip::EventNumber & firstEventNumber,
  *
  * Importantly, this test tries to re-use *as much as possible* the actual IM constructs used by real
  * server-side applications. Consequently, this is why it registers a dynamic endpoint + fake attribute access + fake event
- generation
- * interface to simulate faithfully a real application. This ensures validation of as much production logic pathways
+ * generation interface to simulate faithfully a real application. This ensures validation of as much production logic pathways
  * as we can possibly cover.
  *
  */
@@ -552,7 +523,7 @@ const nlTest sTests[] =
 // clang-format off
 nlTestSuite sSuite =
 {
-    "TestReadEventsChunking",
+    "TestEventChunking",
     &sTests[0],
     TestContext::InitializeAsync,
     TestContext::Finalize
