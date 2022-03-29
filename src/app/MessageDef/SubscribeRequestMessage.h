@@ -39,11 +39,11 @@ enum class Tag : uint8_t
     kMinIntervalFloorSeconds   = 1,
     kMaxIntervalCeilingSeconds = 2,
     kAttributeRequests         = 3,
-    kDataVersionFilters        = 4,
-    kEventRequests             = 5,
-    kEventFilters              = 6,
-    kIsProxy                   = 7,
-    kIsFabricFiltered          = 8,
+    kEventRequests             = 4,
+    kEventFilters              = 5,
+    kIsProxy                   = 6,
+    kIsFabricFiltered          = 7,
+    kDataVersionFilters        = 8,
 };
 
 class Parser : public MessageParser

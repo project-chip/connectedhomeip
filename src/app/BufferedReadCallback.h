@@ -56,7 +56,7 @@ private:
      *  2. The path provided in aPath is similar to what is buffered but we've hit the end of the report.
      *
      */
-    CHIP_ERROR DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
+    CHIP_ERROR DispatchBufferedData(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
 
     /*
      * Buffer up list data as they arrive.
@@ -82,6 +82,21 @@ private:
     {
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
+
+    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                           const Span<AttributePathParams> & aAttributePaths) override
+    {
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
+    }
+
+    virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) override
+    {
+        mCallback.OnAddWildcardAttributePath(aAttributePathParams);
+    }
+    virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override
+    {
+        mCallback.OnClearWildcardAttributePath(apReadClient);
+    };
 
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where

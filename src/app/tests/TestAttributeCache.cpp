@@ -191,6 +191,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
         writer.Init(std::move(handle), true);
         status            = StatusIB();
         path.mAttributeId = instruction.GetAttributeId();
+        path.mDataVersion.SetValue(1);
 
         ChipLogProgress(DataManagement, "\t -- Generating Instruction ID %d", instruction.mInstructionId);
 
