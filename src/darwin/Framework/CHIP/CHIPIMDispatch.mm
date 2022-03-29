@@ -61,8 +61,8 @@ constexpr EndpointId kSupportedEndpoint = 0;
 namespace chip {
 namespace app {
 
-    using Protocols::InteractionModel::Status;
     using Access::SubjectDescriptor;
+    using Protocols::InteractionModel::Status;
 
     namespace {
 
@@ -159,6 +159,10 @@ namespace app {
         Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
         return aWriteHandler->AddStatus(aPath, status);
     }
+
+    // No attribute access override on iOS for now.
+    // NOTE: This function will be moved to InteractionModelEngine.
+    AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId) { return nullptr; }
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {
