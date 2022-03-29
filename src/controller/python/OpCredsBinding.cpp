@@ -33,8 +33,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -96,7 +98,9 @@ private:
 
 extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
 extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
+extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+
 bool sTestCommissionerUsed = false;
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
@@ -190,6 +194,24 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    // Setup IPK in Group Data Provider for controller
+    FabricInfo * fabricInfo = devCtrl->GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL.AsInteger());
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                  compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();

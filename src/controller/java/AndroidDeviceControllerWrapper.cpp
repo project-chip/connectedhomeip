@@ -211,7 +211,7 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };

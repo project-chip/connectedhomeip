@@ -183,7 +183,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INTERNAL);
 
             SuccessOrExit(fabricInfo->GetCompressedId(compressedFabricIdSpan));
-            ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
+            ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
             ChipLogByteSpan(Support, compressedFabricIdSpan);
 
             defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();

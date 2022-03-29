@@ -34,6 +34,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -433,13 +434,13 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
 
-    Credentials::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
-    VerifyOrReturnError(fabricInfo != nullptr);
+    chip::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
 
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     MutableByteSpan compressedFabricIdSpan(compressedFabricId);
     ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
-    ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
