@@ -218,7 +218,7 @@ endif (matter_enable_rpc)
 list(
     APPEND chip_main_flags
 
-    -DINET_CONFIG_ENABLE_IPV4=1
+    -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG

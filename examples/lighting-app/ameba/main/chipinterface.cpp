@@ -105,10 +105,6 @@ extern "C" void amebaApplyUpdateCmdHandler()
 
 static void InitOTARequestor(void)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
-
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
@@ -165,6 +161,10 @@ static Identify gIdentify1 = {
 
 static void InitServer(intptr_t context)
 {
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    InitOTARequestor();
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init();
 
@@ -177,10 +177,6 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
 }
 
 extern "C" void ChipTest(void)
