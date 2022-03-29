@@ -336,12 +336,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    if (mGroupDataProvider != nullptr)
-    {
-        mGroupDataProvider->Finish();
-        mGroupDataProvider = nullptr;
-    }
-
     // mSessionIDAllocator, mCASEClientPool, and mDevicePool must be deallocated
     // after mCASESessionManager, which uses them.
     if (mSessionIDAllocator != nullptr)

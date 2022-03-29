@@ -31,6 +31,7 @@
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
 
@@ -198,25 +199,25 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     }
 
     // Setup IPK
-    chip::FabricInfo * fabricInfo = result->GetFabricInfo();
+    chip::FabricInfo * fabricInfo = wrapper->Controller()->GetFabricInfo();
     if (fabricInfo == nullptr)
     {
         *errInfoOnFailure = CHIP_ERROR_INTERNAL;
         return nullptr;
     }
 
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
     *errInfoOnFailure = fabricInfo->GetCompressedId(compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
     }
-
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
                     static_cast<unsigned>(fabricInfo->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
-    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
-    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(),

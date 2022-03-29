@@ -83,7 +83,7 @@ private:
     ChipP256KeypairPtr mIssuerKey;
     uint64_t mIssuerId = 1234;
 
-    uint8_t mIPK[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    uint8_t mIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";
