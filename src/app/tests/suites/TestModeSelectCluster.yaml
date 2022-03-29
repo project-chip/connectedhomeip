@@ -112,6 +112,14 @@ tests:
       response:
           value: currentModeBeforeToggle
 
+    - label: "Change to Unsupported OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+        value: 2
+      response:
+        error: CONSTRAINT_ERROR
+
     - label: "Change OnMode"
       command: "writeAttribute"
       attribute: "OnMode"
