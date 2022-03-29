@@ -162,7 +162,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
     }
 
     NSLog(@"Stored the keys");
-    mGenerateRootCert = true;
+    mForceRootCertRegeneration = true;
     return CHIP_NO_ERROR;
 }
 
@@ -192,6 +192,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
+    bool haveRootCert = false;
 
     if (!ToChipEpochTime(0, validityStart)) {
         NSLog(@"Failed in computing certificate validity start date");
@@ -204,13 +205,16 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     ChipDN rcac_dn;
-    if (!mGenerateRootCert) {
+    if (!mForceRootCertRegeneration) {
         uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen)));
-        rcac.reduce_size(rcacBufLen);
-        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
-    } else {
+            haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
+        if (haveRootCert) {
+            rcac.reduce_size(rcacBufLen);
+            ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+        }
+    }
+    if (!haveRootCert) {
         ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
         ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
 
@@ -222,7 +226,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
             ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
 
-        mGenerateRootCert = false;
+        mForceRootCertRegeneration = false;
     }
 
     icac.reduce_size(0);
