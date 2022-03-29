@@ -858,7 +858,6 @@ void TestIpk(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId0));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetIpkKeySet(kFabric1, ipkOperationalKeySet));
 
-
     // Set a single IPK with the SetSingleIpkEpochKey helper, validate key derivation follows spec
     NL_TEST_ASSERT(
         apSuite,
