@@ -48,6 +48,7 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
+constexpr uint32_t kDelayNotifyUpdateApplied                 = 10; // Delay before sending notify update applied command
 
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
@@ -56,7 +57,16 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 } // namespace
 
-void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
+void ScheduleNotifyUpdateApplied(chip::System::Layer * systemLayer, void * appState)
+{
+    OTARequestorInterface * requestor = static_cast<OTARequestorInterface *>(appState);
+    if (requestor != nullptr)
+    {
+        requestor->NotifyUpdateApplied();
+    }
+}
+
+void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
 {
     mRequestor          = requestor;
     mImageProcessor     = processor;
@@ -74,7 +84,8 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
                 return;
             }
 
-            mRequestor->NotifyUpdateApplied();
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kDelayNotifyUpdateApplied),
+                                                        ScheduleNotifyUpdateApplied, mRequestor);
         });
     }
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))

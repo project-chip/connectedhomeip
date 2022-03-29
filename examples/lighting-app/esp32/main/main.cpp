@@ -111,7 +111,6 @@ static void InitServer(intptr_t context)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
-    InitOTARequestor();
 }
 
 extern "C" void app_main()

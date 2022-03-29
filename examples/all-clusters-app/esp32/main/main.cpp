@@ -106,6 +106,18 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 } // namespace
 
+static void InitOTARequestor(void)
+{
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+#endif
+}
+
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -124,18 +136,8 @@ static void InitServer(intptr_t context)
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-}
 
-static void InitOTARequestor(void)
-{
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
+    InitOTARequestor();
 }
 
 extern "C" void app_main()
@@ -173,8 +175,6 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
-
-    InitOTARequestor();
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     error = GetAppTask().StartAppTask();
