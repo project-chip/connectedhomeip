@@ -38,9 +38,11 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
@@ -50,6 +52,8 @@ static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.com
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
+static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
@@ -67,6 +71,11 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+// We use TestPersistentStorageDelegate just to get an in-memory store to back
+// our group data provider impl.  We initialize this store correctly on every
+// controller startup, so don't need to actually persist it.
+@property (readonly) chip::TestPersistentStorageDelegate * groupStorageDelegate;
+@property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
@@ -117,6 +126,23 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+
+        _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
+        if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
+            return nil;
+        }
+
+        // For now default args are fine, since we are just using this for the IPK.
+        _groupDataProvider = new chip::Credentials::GroupDataProviderImpl();
+        if ([self checkForInitError:(_groupDataProvider != nullptr) logMsg:kErrorGroupProviderInit]) {
+            return nil;
+        }
+
+        _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
+        errorCode = _groupDataProvider->Init();
+        if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
+            return nil;
+        }
     }
     return self;
 }
@@ -131,6 +157,15 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     dispatch_async(_chipWorkQueue, ^{
         if (self->_cppCommissioner) {
             CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
+            chip::FabricIndex fabricIdx;
+            CHIP_ERROR err = self->_cppCommissioner->GetFabricIndex(&fabricIdx);
+            if (err == CHIP_NO_ERROR && self->_groupDataProvider) {
+                // Clear out out group keys for this fabric index, just in case
+                // we get a different fabric index assigned when we are started
+                // again, since _groupDataProvider lives across shutdown/startup
+                // cycles.
+                self->_groupDataProvider->RemoveGroupKeys(fabricIdx);
+            }
             self->_cppCommissioner->Shutdown();
             delete self->_cppCommissioner;
             self->_cppCommissioner = nullptr;
@@ -172,7 +207,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }
-        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge));
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge), nil);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -181,7 +216,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         [self _getControllerNodeId];
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if ([self checkForInitError:(_cppCommissioner != nullptr) logMsg:kErrorMemoryInit]) {
+        if ([self checkForStartError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerInit]) {
             return;
         }
 
@@ -198,7 +233,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        // TODO: Init group data provider
+        params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
@@ -233,7 +268,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         if (_kvsPath != nullptr) {
             errorCode = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(_kvsPath);
-            if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKVSInit]) {
+            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKVSInit]) {
                 return;
             }
         }
@@ -247,6 +282,25 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        chip::FabricIndex fabricIdx = 0;
+        errorCode = _cppCommissioner->GetFabricIndex(&fabricIdx);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+            return;
+        }
+
+        uint8_t compressedIdBuffer[sizeof(uint64_t)];
+        chip::MutableByteSpan compressedId(compressedIdBuffer);
+        errorCode = _cppCommissioner->GetFabricInfo()->GetCompressedId(compressedId);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+            return;
+        }
+
+        errorCode = chip::Credentials::SetSingleIpkEpochKey(
+            _groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
 
@@ -607,6 +661,17 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         _persistentStorageDelegateBridge = NULL;
     }
 
+    if (_groupDataProvider) {
+        _groupDataProvider->Finish();
+        delete _groupDataProvider;
+        _groupDataProvider = NULL;
+    }
+
+    if (_groupStorageDelegate) {
+        delete _groupStorageDelegate;
+        _groupStorageDelegate = NULL;
+    }
+
     return YES;
 }
 
@@ -619,6 +684,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     CHIP_LOG_ERROR("Error: %@", logMsg);
 
     if (_cppCommissioner) {
+        _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = NULL;
     }
