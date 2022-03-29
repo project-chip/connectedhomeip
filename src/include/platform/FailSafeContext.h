@@ -93,8 +93,8 @@ private:
 
     /**
      * @brief
-     *  The callback function to be called asynchronously when "fail-safe timer"
-     *  expires. We use this function to conduct a sequence of clean-up works.
+     *  The callback function to be called asynchronously after various cleanup work has completed
+     *  to actually disarm the fail-safe.
      */
     static void HandleDisarmFailSafe(intptr_t arg);
 
