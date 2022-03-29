@@ -45,7 +45,44 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-using TestContext = chip::Test::AppContext;
+static uint8_t gDebugEventBuffer[4096];
+static uint8_t gInfoEventBuffer[4096];
+static uint8_t gCritEventBuffer[4096];
+static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+
+class TestContext : public chip::Test::AppContext
+{
+public:
+    static int InitializeAsync(void * context)
+    {
+        if (AppContext::InitializeAsync(context) != SUCCESS)
+            return FAILURE;
+
+        auto * ctx = static_cast<TestContext *>(context);
+
+        chip::app::LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        };
+
+        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
+                                                          sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+
+        return SUCCESS;
+    }
+
+    static int Finalize(void * context)
+    {
+        chip::app::EventManagement::DestroyEventManagement();
+
+        if (AppContext::Finalize(context) != SUCCESS)
+            return FAILURE;
+
+        return SUCCESS;
+    }
+};
 
 uint32_t gIterationCount = 0;
 nlTestSuite * gSuite     = nullptr;
@@ -55,24 +92,19 @@ nlTestSuite * gSuite     = nullptr;
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
 // number higher than that for our dynamic test endpoint.
 //
-constexpr EndpointId kTestEndpointId = 2;
-// Another endpoint, with a list attribute only.
-constexpr EndpointId kTestEndpointId3 = 3;
-// Another endpoint, for adding / enabling during running.
-constexpr EndpointId kTestEndpointId4    = 4;
+constexpr EndpointId kTestEndpointId     = 2;
 constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
 constexpr AttributeId kTestListLargeAttribute = 8; // This attribute will be larger than the event size we used in this test.
 constexpr size_t kSizeOfEventUsedInThisTest   = 60;
 
-class TestCommandInteraction
+class TestReadEvents
 {
 public:
-    TestCommandInteraction() {}
-    static void TestAttributeChunking(nlTestSuite * apSuite, void * apContext);
-    static void TestListChunking(nlTestSuite * apSuite, void * apContext);
-    static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
-    static void TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext);
+    TestReadEvents() {}
+    static void TestEventChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -87,15 +119,6 @@ DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
-
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint3)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(kTestBadAttribute, ARRAY, 1, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
-DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
-
-DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
 DECLARE_DYNAMIC_ATTRIBUTE(kTestListLargeAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
@@ -259,24 +282,46 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+namespace {
+
+void GenerateEvents(nlTestSuite * apSuite, chip::EventNumber & firstEventNumber, chip::EventNumber & lastEventNumber)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TestCluster::Events::TestEvent::Type content;
+    content.arg1 = static_cast<uint8_t>(gIterationCount);
+
+    for (int i = 0; i < 5; i++)
+    {
+        NL_TEST_ASSERT(apSuite, (err = app::LogEvent(content, kTestEndpointId, lastEventNumber)) == CHIP_NO_ERROR);
+        if (i == 0)
+        {
+            firstEventNumber = lastEventNumber;
+        }
+    }
+}
+
+} // namespace
+
 /*
  * This validates all the various corner cases encountered during chunking by
- * artificially reducing the size of a packet buffer used to encode attribute data
- * to force chunking to happen over multiple packets even with a small number of attributes
+ * artificially reducing the size of a packet buffer used to encode attribute & event data
+ * to force chunking to happen over multiple packets even with a small number of attributes or events
  * and then slowly increasing the available size by 1 byte in each test iteration and re-running
  * the report generation logic. This 1-byte incremental approach sweeps through from a base scenario of
- * N attributes fitting in a report, to eventually resulting in N+1 attributes fitting in a report.
+ * N attributes fitting in a report, to eventually resulting in N+1 attributes or events fitting in a report.
 
  * This will cause all the various corner cases encountered of closing out the various containers within
  * the report and thoroughly and definitely validate those edge cases.
  *
  * Importantly, this test tries to re-use *as much as possible* the actual IM constructs used by real
- * server-side applications. Consequently, this is why it registers a dynamic endpoint + fake attribute access
+ * server-side applications. Consequently, this is why it registers a dynamic endpoint + fake attribute access + fake event
+ generation
  * interface to simulate faithfully a real application. This ensures validation of as much production logic pathways
  * as we can possibly cover.
  *
  */
-void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void * apContext)
+void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -289,15 +334,25 @@ void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void *
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
+    chip::EventNumber firstEventNumber;
+    chip::EventNumber lastEventNumber;
+
+    GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
+
+    app::EventPathParams eventPath;
+    eventPath.mEndpointId = kTestEndpointId;
+    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
-    readParams.mpAttributePathParamsList    = &attributePath;
-    readParams.mAttributePathParamsListSize = 1;
+    readParams.mpEventPathParamsList    = &eventPath;
+    readParams.mEventPathParamsListSize = 1;
+    readParams.mEventNumber             = firstEventNumber;
+
+    // Since we will always read from the first event, we only generate event once.
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
-    // AttributeDataIBs into the packet. ~30-40 bytes covers a single AttributeDataIB, but let's 2-3x that
+    // AttributeDataIBs into the packet. ~30-40 bytes covers a single EventDataIB, but let's 2-3x that
     // to ensure we'll sweep from fitting 2 IBs to 3-4 IBs.
     //
     for (int i = 100; i > 0; i--)
@@ -308,7 +363,7 @@ void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void *
 
         gIterationCount = (uint32_t) i;
 
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
 
         app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
@@ -316,15 +371,84 @@ void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+
+        NL_TEST_ASSERT(apSuite, readCallback.mEventCount == static_cast<uint32_t>((lastEventNumber - firstEventNumber) + 1));
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+        //
+        // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
+        //
+        if (apSuite->flagError)
+        {
+            break;
+        }
+    }
+
+    emberAfClearDynamicEndpoint(0);
+}
+
+// Similar to the tests above, but it will read attributes AND events
+void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    chip::EventNumber firstEventNumber;
+    chip::EventNumber lastEventNumber;
+
+    // We will always read from the first event, so it is enough to only generate events once.
+    GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
+
+    app::EventPathParams eventPath;
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
+    eventPath.mEndpointId = kTestEndpointId;
+    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = &attributePath;
+    readParams.mAttributePathParamsListSize = 1;
+    readParams.mpEventPathParamsList        = &eventPath;
+    readParams.mEventPathParamsListSize     = 1;
+    readParams.mEventNumber                 = firstEventNumber;
+
+    //
+    // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
+    // AttributeDataIBs into the packet. ~30-40 bytes covers a single EventDataIB, but let's 2-3x that
+    // to ensure we'll sweep from fitting 2 IBs to 3-4 IBs.
+    //
+    for (int i = 100; i > 0; i--)
+    {
+        TestReadCallback readCallback;
+
+        ChipLogDetail(DataManagement, "Running iteration %d\n", i);
+
+        gIterationCount = (uint32_t) i;
+
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
+
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Read);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
 
         //
         // Always returns the same number of attributes read (5 + revision +
         // AttributeList + ClientGeneratedCommandList +
         // ServerGeneratedCommandList = 9).
         //
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
-        readCallback.mAttributeCount = 0;
+        NL_TEST_ASSERT(apSuite, readCallback.mEventCount == static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
@@ -340,8 +464,10 @@ void TestCommandInteraction::TestAttributeChunking(nlTestSuite * apSuite, void *
     emberAfClearDynamicEndpoint(0);
 }
 
-// Similar to the test above, but for the list chunking feature.
-void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apContext)
+// Similar to the tests above, however, there is one another case -- the event payload is very large usually, so when it is failed
+// to encode an attribute, it is usually impossible to encode a event data, so we cannot verify the case when events and attributes
+// can be encoded in to one chunk in the tests above. This test will force it by reading only one attribtue and read many events.
+void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -351,18 +477,30 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
+    chip::EventNumber firstEventNumber;
+    chip::EventNumber lastEventNumber;
+
+    // We will always read from the first event, so it is enough to only generate events once.
+    GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
+
+    app::EventPathParams eventPath;
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListLargeAttribute);
+    eventPath.mEndpointId = kTestEndpointId;
+    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
     readParams.mAttributePathParamsListSize = 1;
+    readParams.mpEventPathParamsList        = &eventPath;
+    readParams.mEventPathParamsListSize     = 1;
+    readParams.mEventNumber                 = firstEventNumber;
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
-    // AttributeDataIBs into the packet. ~30-40 bytes covers a single AttributeDataIB, but let's 2-3x that
+    // AttributeDataIBs into the packet. ~30-40 bytes covers a single EventDataIB, but let's 2-3x that
     // to ensure we'll sweep from fitting 2 IBs to 3-4 IBs.
     //
     for (int i = 100; i > 0; i--)
@@ -373,7 +511,7 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
 
         gIterationCount = (uint32_t) i;
 
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
 
         app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
@@ -381,14 +519,10 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
-        //
-        // Always returns the same number of attributes read (merged by buffered read callback). The content is checked in
-        // TestReadCallback::OnAttributeData
-        //
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 1);
-        readCallback.mAttributeCount = 0;
+        NL_TEST_ASSERT(apSuite, readCallback.mEventCount == static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
@@ -400,143 +534,6 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
             break;
         }
     }
-
-    emberAfClearDynamicEndpoint(0);
-}
-
-// Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
-void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
-    auto sessionHandle                   = ctx.GetSessionBobToAlice();
-    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-
-    // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
-
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
-
-    // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
-
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
-    app::ReadPrepareParams readParams(sessionHandle);
-
-    readParams.mpAttributePathParamsList    = &attributePath;
-    readParams.mAttributePathParamsListSize = 1;
-
-    TestReadCallback readCallback;
-
-    {
-        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
-                                   app::ReadClient::InteractionType::Read);
-
-        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
-
-        ctx.DrainAndServiceIO();
-
-        // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing
-        // (then shuts down the read handler) for the second report.
-        //
-
-        // Nothing is actually encoded. buffered callback does not handle the message to us.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
-        NL_TEST_ASSERT(apSuite, !readCallback.mOnReportEnd);
-
-        // The server should shutted down, while the client is still alive (pending for the attribute data.)
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-    }
-
-    // Sanity check
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-
-    emberAfClearDynamicEndpoint(0);
-}
-
-/*
- * This test contains two parts, one is to enable a new endpoint on the fly, another is to disable it and re-enable it.
- */
-void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
-    auto sessionHandle                   = ctx.GetSessionBobToAlice();
-    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-
-    // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
-
-    // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint4Clusters)];
-
-    app::AttributePathParams attributePath;
-    app::ReadPrepareParams readParams(sessionHandle);
-
-    readParams.mpAttributePathParamsList    = &attributePath;
-    readParams.mAttributePathParamsListSize = 1;
-    readParams.mMaxIntervalCeilingSeconds   = 1;
-
-    TestReadCallback readCallback;
-
-    {
-
-        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
-
-        ctx.DrainAndServiceIO();
-
-        // We should not receive any reports in initial reports, so check mOnSubscriptionEstablished instead.
-        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
-        readCallback.mAttributeCount = 0;
-
-        // Enable the new endpoint
-        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
-
-        ctx.DrainAndServiceIO();
-
-        // Ensure we have received the report, we do not care about the initial report here.
-        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not included in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
-
-        // We have received all report data.
-        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
-
-        readCallback.mAttributeCount = 0;
-        readCallback.mOnReportEnd    = false;
-
-        // Disable the new endpoint
-        emberAfEndpointEnableDisable(kTestEndpointId4, false);
-
-        ctx.DrainAndServiceIO();
-
-        // We may receive some attribute reports for descriptor cluster, but we do not care about it for now.
-
-        // Enable the new endpoint
-
-        readCallback.mAttributeCount = 0;
-        readCallback.mOnReportEnd    = false;
-
-        emberAfEndpointEnableDisable(kTestEndpointId4, true);
-        ctx.DrainAndServiceIO();
-
-        // Ensure we have received the report, we do not care about the initial report here.
-        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
-
-        // We have received all report data.
-        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
-    }
-
-    chip::test_utils::SleepMillis(secondsToMilliseconds(2));
-
-    // Destroying the read client will terminate the subscription transaction.
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -544,10 +541,9 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestAttributeChunking", TestCommandInteraction::TestAttributeChunking),
-    NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
-    NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
-    NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),
+    NL_TEST_DEF("TestEventChunking", TestReadEvents::TestEventChunking),
+    NL_TEST_DEF("TestMixedEventsAndAttributesChunking", TestReadEvents::TestMixedEventsAndAttributesChunking),
+    NL_TEST_DEF("TestMixedEventsAndLargeAttributesChunking", TestReadEvents::TestMixedEventsAndLargeAttributesChunking),
     NL_TEST_SENTINEL()
 };
 
@@ -556,7 +552,7 @@ const nlTest sTests[] =
 // clang-format off
 nlTestSuite sSuite =
 {
-    "TestReadChunking",
+    "TestReadEventsChunking",
     &sTests[0],
     TestContext::InitializeAsync,
     TestContext::Finalize
