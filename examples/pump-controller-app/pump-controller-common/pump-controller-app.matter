@@ -65,6 +65,7 @@ server cluster AccessControl = 31 {
   attribute AccessControlEntry acl[] = 0;
   attribute ExtensionEntry extension[] = 1;
   readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -84,6 +85,7 @@ server cluster AdministratorCommissioning = 60 {
   readonly attribute int8u windowStatus = 0;
   readonly attribute fabric_idx adminFabricIndex = 1;
   readonly attribute int16u adminVendorId = 2;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct OpenCommissioningWindowRequest {
@@ -137,6 +139,7 @@ server cluster Basic = 40 {
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -153,6 +156,7 @@ server cluster Descriptor = 29 {
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -176,6 +180,7 @@ server cluster DiagnosticLogs = 50 {
     kBdx = 1;
   }
 
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
@@ -196,6 +201,7 @@ server cluster DiagnosticLogs = 50 {
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -356,6 +362,7 @@ server cluster GeneralDiagnostics = 51 {
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -393,6 +400,7 @@ server cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct KeySetWriteRequest {
@@ -427,6 +435,7 @@ server cluster GroupKeyManagement = 63 {
 
 server cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
@@ -505,6 +514,7 @@ server cluster Identify = 3 {
 
   attribute int16u identifyTime = 0;
   readonly attribute enum8 identifyType = 1;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
@@ -528,6 +538,7 @@ server cluster Identify = 3 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -769,6 +780,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -855,6 +867,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
@@ -1237,6 +1250,7 @@ server cluster TimeFormatLocalization = 44 {
   attribute HourFormat hourFormat = 0;
   attribute CalendarType activeCalendarType = 1;
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1258,6 +1272,7 @@ server cluster UnitLocalization = 45 {
 
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
