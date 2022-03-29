@@ -77,6 +77,9 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Muta
     uint8_t newExtpanid[kSizeExtendedPanId];
     Thread::OperationalDataset newDataset;
 
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
+
     newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 

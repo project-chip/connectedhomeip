@@ -28,9 +28,11 @@ namespace DeviceLayer {
 CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    auto err = WiFiDriverImpl::GetInstance().AddOrUpdateNetwork(
-        ByteSpan(Uint8::from_const_char(ssid), strlen(ssid), MutableCharSpan & outDebugText, uint8_t & outNetworkIndex),
-        ByteSpan(Uint8::from_const_char(key), strlen(key)));
+    MutableCharSpan emptyBufferForDebugText;
+    uint8_t outNetworkIndex;
+    auto err = WiFiDriverImpl::GetInstance().AddOrUpdateNetwork(ByteSpan(Uint8::from_const_char(ssid), strlen(ssid)),
+                                                                ByteSpan(Uint8::from_const_char(key), strlen(key)), emptySpan,
+                                                                outNetworkIndex);
     if (err != Status::kSuccess)
     {
         ChipLogError(NetworkProvisioning, "Failed to add WiFi network: 0x%" PRIx16, int(err));
