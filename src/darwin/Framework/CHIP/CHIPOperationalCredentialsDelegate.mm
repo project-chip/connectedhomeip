@@ -162,7 +162,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
     }
 
     NSLog(@"Stored the keys");
-    mGenerateRootCert = true;
+    mForceRootCertRegeneration = true;
     return CHIP_NO_ERROR;
 }
 
@@ -203,11 +203,12 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_ERROR_INTERNAL;
     }
 
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+                      haveRootCert = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR);
+
     ChipDN rcac_dn;
-    if (!mGenerateRootCert) {
-        uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen)));
+    if (!mForceRootCertRegeneration && haveRootCert) {
         rcac.reduce_size(rcacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
     } else {
@@ -222,7 +223,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
             ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
 
-        mGenerateRootCert = false;
+        mForceRootCertRegeneration = false;
+        haveRootCert = true;
     }
 
     icac.reduce_size(0);

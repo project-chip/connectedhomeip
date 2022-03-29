@@ -79,7 +79,8 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId = 1;
     bool mNodeIdRequested = false;
-    bool mGenerateRootCert = false;
+    bool mForceRootCertRegeneration = false;
+    bool haveRootCert = false;
 };
 
 NS_ASSUME_NONNULL_END
