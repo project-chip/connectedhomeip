@@ -168,7 +168,7 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatusIB,
+CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteDataAttributePath & aPath, const StatusIB & aStatusIB,
                                                       bool aEndOfReport)
 {
     if (aPath == mBufferedPath)

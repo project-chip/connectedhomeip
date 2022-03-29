@@ -19,10 +19,12 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+class ReadClient;
 struct AttributePathParams
 {
     //
@@ -81,10 +83,49 @@ struct AttributePathParams
         return true;
     }
 
-    ClusterId mClusterId     = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId = kInvalidAttributeId; // uint32
-    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
-    ListIndex mListIndex     = kInvalidListIndex;   // uint16
+    bool IsAttributePathIntersect(const DataVersionFilter & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    bool IsAttributePathIntersect(const ConcreteClusterPath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    bool IsWildcardRequest(const AttributePathParams & aOther) const
+    {
+        if (HasWildcardEndpointId())
+        {
+            return true;
+        }
+        if (HasWildcardClusterId())
+        {
+            return true;
+        }
+        if (mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && HasWildcardAttributeId())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool operator<(const AttributePathParams & aOther) const
+    {
+        return mpReadClient < aOther.mpReadClient || mEndpointId < aOther.mEndpointId || mClusterId < aOther.mClusterId;
+    }
+
+    ClusterId mClusterId      = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId  = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId    = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex      = kInvalidListIndex;   // uint16
+    ReadClient * mpReadClient = nullptr;
 };
 
 } // namespace app
