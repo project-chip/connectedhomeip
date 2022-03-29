@@ -23,12 +23,19 @@
 namespace chip {
 namespace ota {
 
-class DefaultOTAProviderUserConsentProvider : public OTAProviderUserConsentDelegate
+/**
+ * @brief Default implementation of OTAProviderUserConsentDelegate interface.
+ *
+ * This class provides API to set the user consent state, and this state is then used by
+ * OTA Provider to send an apporpriate response to QueryImage request.
+ */
+
+class DefaultOTAProviderUserConsent : public OTAProviderUserConsentDelegate
 {
 public:
-    DefaultOTAProviderUserConsentProvider() = default;
+    DefaultOTAProviderUserConsent() = default;
 
-    ~DefaultOTAProviderUserConsentProvider() = default;
+    ~DefaultOTAProviderUserConsent() = default;
 
     // This method returns kGranted unless explicitly set by the user by calling SetGlobalUserConsentState()
     UserConsentState GetUserConsentState(const UserConsentSubject & subject) override
