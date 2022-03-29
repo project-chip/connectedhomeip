@@ -195,7 +195,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
             return static_cast<uint8_t>(index - FIXED_ENDPOINT_COUNT);
         }
     }
-    return kEmberEndpointNotFound;
+    return kEmberInvalidEndpointIndex;
 }
 
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
@@ -664,7 +664,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
 {
     uint16_t ep = emberAfIndexFromEndpoint(endpointId);
-    if (ep == kEmberEndpointNotFound)
+    if (ep == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -742,7 +742,7 @@ bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
 // This will find the first server that has the clusterId given from the index of endpoint.
 bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 {
-    if (index == kEmberEndpointNotFound)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return false;
     }
@@ -787,7 +787,7 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
     uint16_t ep = emberAfIndexFromEndpoint(endpoint);
-    if (ep == kEmberEndpointNotFound)
+    if (ep == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -826,7 +826,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 
     if (emberAfFindCluster(endpoint, clusterId, mask) == nullptr)
     {
-        return kEmberEndpointNotFound;
+        return kEmberInvalidEndpointIndex;
     }
 
     for (i = 0; i < emberAfEndpointCount(); i++)
@@ -853,7 +853,7 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
             return epi;
         }
     }
-    return kEmberEndpointNotFound;
+    return kEmberInvalidEndpointIndex;
 }
 
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
@@ -861,9 +861,9 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
     uint16_t index = findIndexFromEndpoint(endpoint,
                                            false); // ignore disabled endpoints?
 
-    EMBER_TEST_ASSERT(kEmberEndpointNotFound != index);
+    EMBER_TEST_ASSERT(kEmberInvalidEndpointIndex != index);
 
-    if (kEmberEndpointNotFound == index)
+    if (kEmberInvalidEndpointIndex == index)
     {
         return false;
     }
@@ -877,7 +877,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                                            false); // ignore disabled endpoints?
     bool currentlyEnabled;
 
-    if (kEmberEndpointNotFound == index)
+    if (kEmberInvalidEndpointIndex == index)
     {
         return false;
     }
@@ -991,7 +991,7 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == kEmberEndpointNotFound)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return 0;
     }
@@ -1031,7 +1031,7 @@ uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, boo
 uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == kEmberEndpointNotFound)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return 0;
     }
@@ -1052,7 +1052,7 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
     EmberAfDefinedEndpoint * definedEndpoint;
 
-    if (endpointIndex == kEmberEndpointNotFound)
+    if (endpointIndex == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -1068,9 +1068,9 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
 uint16_t emberAfGetDeviceIdForEndpoint(EndpointId endpoint)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    if (endpointIndex == kEmberEndpointNotFound)
+    if (endpointIndex == kEmberInvalidEndpointIndex)
     {
-        return kEmberEndpointNotFound;
+        return kEmberInvalidEndpointIndex;
     }
     return emAfEndpoints[endpointIndex].deviceId;
 }
@@ -1084,7 +1084,7 @@ const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool
     uint8_t i, c = 0;
     const EmberAfCluster * cluster;
 
-    if (index == kEmberEndpointNotFound)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -1133,7 +1133,7 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
     for (i = 0; i < clusterCount; i++)
     {
         cluster        = emberAfGetNthCluster(endpoint, i, server);
-        clusterList[i] = (cluster == nullptr ? kEmberEndpointNotFound : cluster->clusterId);
+        clusterList[i] = (cluster == nullptr ? kEmberInvalidEndpointIndex : cluster->clusterId);
     }
     return clusterCount;
 }
@@ -1166,7 +1166,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
         if (endpoint != EMBER_BROADCAST_ENDPOINT)
         {
             ep = emberAfIndexFromEndpoint(endpoint);
-            if (ep == kEmberEndpointNotFound)
+            if (ep == kEmberInvalidEndpointIndex)
             {
                 return;
             }
@@ -1419,7 +1419,7 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
 {
     uint16_t index = emberAfIndexFromEndpoint(aConcreteClusterPath.mEndpointId);
-    if (index == kEmberEndpointNotFound)
+    if (index == kEmberInvalidEndpointIndex)
     {
         // Unknown endpoint.
         return nullptr;

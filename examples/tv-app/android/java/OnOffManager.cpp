@@ -44,7 +44,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfFindClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id);
-    VerifyOrReturn(ep != kEmberEndpointNotFound && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
+    VerifyOrReturn(ep != kEmberInvalidEndpointIndex && ep < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
     VerifyOrReturn(gOnOffManagerTable[ep] == nullptr,
@@ -65,7 +65,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id);
-    return ((ep == kEmberEndpointNotFound || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
+    return ((ep == kEmberInvalidEndpointIndex || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
                                                                                                           : gOnOffManagerTable[ep]);
 }
 
