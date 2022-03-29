@@ -43,7 +43,6 @@ public class MatterServantService extends Service {
             .build();
     startForeground(1, notification);
     return super.onStartCommand(intent, flags, startId);
-
   }
 
   private void createNotificationChannel() {
