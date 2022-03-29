@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
@@ -35,6 +36,7 @@ public:
 
     virtual void DeviceTypeList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_DeviceType> & writer)
     {
+        DeviceLayer::StackLock lock;
         constexpr uint16_t kInvalidEndpointIndex = 0xFFFF;
         uint16_t index                           = emberAfIndexFromEndpoint(request.endpoint);
         if (index == kInvalidEndpointIndex)
@@ -50,16 +52,19 @@ public:
 
     void ServerList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Cluster> & writer)
     {
+        DeviceLayer::StackLock lock;
         ClusterList(request.endpoint, true /*server*/, writer);
     }
 
     void ClientList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Cluster> & writer)
     {
+        DeviceLayer::StackLock lock;
         ClusterList(request.endpoint, false /*server*/, writer);
     }
 
     void PartsList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Endpoint> & writer)
     {
+        DeviceLayer::StackLock lock;
         if (request.endpoint == 0x00)
         {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
