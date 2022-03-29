@@ -216,11 +216,9 @@ private:
         void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
         {
             (void) compressedId;
-            auto * sessionManager = &(mServer->GetSecureSessionManager());
-            if (sessionManager != nullptr)
-            {
-                sessionManager->FabricRemoved(fabricIndex);
-            }
+            auto & sessionManager = mServer->GetSecureSessionManager();
+            sessionManager.FabricRemoved(fabricIndex);
+
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
             {
