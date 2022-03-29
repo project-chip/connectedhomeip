@@ -52,7 +52,7 @@ template("ti_simplelink_executable") {
       inputs = [ ldscript ]
 
       ldflags = [
-        "-L" + rebase_path(ti_simplelink_sdk_root + "/source"),
+        "-L" + rebase_path(ti_simplelink_sdk_root + "/source", root_build_dir),
         rebase_path(
             "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
             root_build_dir),

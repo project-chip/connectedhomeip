@@ -81,7 +81,7 @@ template("ti_sysconfig") {
     args = [
       ti_sysconfig_root,
       "-s",
-      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json"),
+      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json", root_build_dir),
       "-o",
       rebase_path(output_dir, root_build_dir),
       "--compiler",
@@ -380,18 +380,18 @@ template("ti_simplelink_sdk") {
 
     if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       libs += [
-        rebase_path(ti_simplelink_sdk_root + "/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a"),
-        rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/libraries/cc26x2r1/OneLib.a"),
-        rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/libraries/cc26x2r1/StackWrapper.a"),
-        rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/libraries/cc26x2r1/ble_r2.symbols"),
+        "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/OneLib.a",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/StackWrapper.a",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/ble_r2.symbols",
       ]
     }
 
     cflags = [
       "-Wno-conversion",
       "-Wno-comment",
-      "@" + rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/config/build_components.opt"),
-      "@" + rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/config/factory_config.opt"),
+      "@" + rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/config/build_components.opt", root_build_dir),
+      "@" + rebase_path(ti_simplelink_sdk_root + "/source/ti/ble5stack/config/factory_config.opt", root_build_dir),
     ]
   }
 
