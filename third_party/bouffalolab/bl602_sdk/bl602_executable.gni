@@ -31,8 +31,8 @@ template("bl602_executable") {
 
   flashing_runtime_target = target_name + ".flashing_runtime"
   flashing_script_inputs = [
-    "${chip_root}/scripts/flashing/efr32_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
+    "${chip_root}/scripts/flashing/bl602_firmware_utils.py",
   ]
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs

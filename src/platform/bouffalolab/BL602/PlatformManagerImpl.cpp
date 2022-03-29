@@ -27,7 +27,7 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
 

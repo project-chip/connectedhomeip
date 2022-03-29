@@ -43,7 +43,7 @@ static_library("BL602") {
     "DnssdImpl.cpp",
     "InetPlatformConfig.h",
     "Logging.cpp",
-    "NetworkCommissioningWiFiDriver.cpp",
+    "NetworkCommissioningDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",

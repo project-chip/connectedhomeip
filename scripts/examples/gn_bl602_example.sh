@@ -58,6 +58,6 @@ for arg; do
     esac
 done
 
-gn clean out/lighting_app_bl602
+#gn clean out/lighting_app_bl602
 gn gen "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="bl602_sdk_root=\"$BL602_SDK_ROOT\" bl602_board=\"$BL602_BOARD\" ${GN_ARGS[*]}"
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
