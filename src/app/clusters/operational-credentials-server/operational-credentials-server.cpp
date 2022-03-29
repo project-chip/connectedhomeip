@@ -632,7 +632,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
     err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    if (err != CHIP_NO_ERROR)
+    {
+        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        nocResponse = ConvertToNOCResponseStatus(err);
+        SuccessOrExit(err);
+    }
 
     // Keep this after other possible failures, so it doesn't need to be rolled back in case of
     // subsequent failures. This should only typically fail if there is no space for the new entry.
@@ -706,6 +711,11 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index associated with the UpdateNOC command being invoked.
+    err = failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     err = fabric->SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -713,11 +723,6 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     fabricIndex = fabric->GetFabricIndex();
-
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index associated with the UpdateNOC command being invoked.
-    err = failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.

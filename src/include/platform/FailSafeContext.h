@@ -49,7 +49,11 @@ public:
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
+    inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
+
     inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
+
+    inline void SetFailSafeBusy(bool val) { mFailSafeBusy = val; }
 
     inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
@@ -74,6 +78,7 @@ private:
     // ===== Private members reserved for use by this class only.
 
     bool mFailSafeArmed                  = false;
+    bool mFailSafeBusy                   = false;
     bool mAddNocCommandHasBeenInvoked    = false;
     bool mUpdateNocCommandHasBeenInvoked = false;
     FabricIndex mFabricIndex             = kUndefinedFabricIndex;

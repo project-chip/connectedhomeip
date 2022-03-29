@@ -45,6 +45,7 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
     FailSafeContext * this_ = reinterpret_cast<FailSafeContext *>(arg);
 
+    this_->mFailSafeBusy                   = false;
     this_->mFailSafeArmed                  = false;
     this_->mAddNocCommandHasBeenInvoked    = false;
     this_->mUpdateNocCommandHasBeenInvoked = false;
@@ -73,6 +74,8 @@ void FailSafeContext::FailSafeTimerExpired()
     {
         ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
     }
+
+    mFailSafeBusy = true;
 
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }

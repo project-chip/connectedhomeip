@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -274,6 +275,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 
         err = PlatformMgr().PostEvent(&event);
         SuccessOrExit(err);
+
+        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(true);
 
         // Ensure HandleFailSafeContextCleanup runs after the timer-expired event has been processed.
         PlatformMgr().ScheduleWork(HandleFailSafeContextCleanup);
@@ -910,6 +913,8 @@ void GenericConfigurationManagerImpl<ConfigClass>::HandleFailSafeContextCleanup(
     {
         ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
     }
+
+    DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(false);
 }
 
 } // namespace Internal
