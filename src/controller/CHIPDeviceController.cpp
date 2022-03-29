@@ -463,9 +463,11 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcServer->SetInstanceNameResolver(this);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+    mSetUpCodePairer.SetSystemLayer(mSystemState->SystemLayer());
 #if CONFIG_NETWORK_LAYER_BLE
     mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
 #endif // CONFIG_NETWORK_LAYER_BLE
+
     return CHIP_NO_ERROR;
 }
 
