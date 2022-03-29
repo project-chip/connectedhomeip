@@ -151,6 +151,11 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
         return false;
     }
 }
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
+}
 } // namespace app
 } // namespace chip
 
