@@ -26,7 +26,7 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 80
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -81,7 +81,7 @@ jobs:
                      out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example All Clusters App C3
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |
@@ -111,7 +111,7 @@ jobs:
 
     esp32_1:
         name: ESP32_1
-        timeout-minutes: 70
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

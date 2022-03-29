@@ -95,6 +95,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
@@ -176,6 +177,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDEEDC
 CDVersionNumber
 ced
 cfg
@@ -342,6 +344,7 @@ detokenizer
 dev
 devcontainer
 devCtrl
+DevelopmentCerts
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -441,6 +444,8 @@ entrypoint
 enum
 Enums
 env
+epochKey
+epochStartTime
 eq
 errorValue
 esd
@@ -477,6 +482,7 @@ FC
 FDDE
 fddead
 fde
+fdx
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -545,6 +551,8 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+groupKeySecurityPolicy
+groupKeySetID
 groupsettings
 gtk
 GUA
@@ -650,6 +658,7 @@ kAdminister
 kBusy
 kCase
 Kconfig
+kDacPublicKey
 KeypadInput
 keyset
 kGroup
@@ -886,6 +895,7 @@ OTADownloader
 otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
+OTAImageProcessorImpl
 OTAImageProcessorInterface
 OTAProvider
 OTAProviderIpAddress
@@ -904,6 +914,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -1105,6 +1116,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
@@ -1165,6 +1177,7 @@ SulfurDioxideConcentrationMeasurement
 svg
 SVR
 SWD
+SWU
 symlinks
 sysconfdir
 SysConfig
@@ -1237,6 +1250,7 @@ TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
 transitionTime
+TransferSession
 TransportMgrBase
 TrustedRootCertificates
 TSG
@@ -1252,7 +1266,7 @@ TXD
 txt
 uargument
 UART
-udc
+UDC
 udcport
 udhcpc
 UDP
@@ -1279,6 +1293,7 @@ ureverse
 URI
 urlrequest
 usbmodem
+usbserial
 USBtoUART
 uscif
 UserConsentNeeded
@@ -1342,12 +1357,14 @@ xab
 xaver
 xb
 xbef
+xBEEF
 xc
 xcd
 Xcode
 xcodeproj
 xcworkspace
 xd
+xDEAD
 xDEADBEEF
 xdeadbeefcafe
 xds
@@ -1426,3 +1443,4 @@ UTF
 localedef
 nameserver
 nmcli
+tsan

@@ -72,8 +72,9 @@ public:
                     DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * networks) override;
 
 private:
-    static void _OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    void OnCommissioningComplete(CHIP_ERROR err);
+    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void OnCommissioningComplete();
+    void OnFailSafeTimerExpired();
 
     const BitFlags<NetworkCommissioningFeature> mFeatureFlags;
 

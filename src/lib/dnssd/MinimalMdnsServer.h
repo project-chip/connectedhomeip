@@ -23,12 +23,13 @@ namespace chip {
 namespace Dnssd {
 
 namespace Internal {
+
 /// Checks if the current interface is powered on
 /// and not local loopback.
 template <typename T>
 bool IsCurrentInterfaceUsable(T & iterator)
 {
-    if (!iterator.IsUp() || !iterator.SupportsMulticast())
+    if (!iterator.IsUp())
     {
         return false; // not a usable interface
     }

@@ -174,7 +174,7 @@ void BDXDownloader::OnDownloadTimeout()
     }
     else
     {
-        ChipLogError(BDX, "no download in progress");
+        ChipLogError(BDX, "No download in progress");
     }
 }
 
@@ -207,7 +207,7 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
     }
     else
     {
-        ChipLogError(BDX, "no download in progress");
+        ChipLogError(BDX, "No download in progress");
     }
 }
 

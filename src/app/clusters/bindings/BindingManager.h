@@ -47,8 +47,6 @@ struct BindingManagerInitParams
     PersistentStorageDelegate * mStorage     = nullptr;
 };
 
-using BindingAddedHandler = void (*)(const EmberBindingTableEntry & binding);
-
 /**
  *
  * The BindingManager class manages the connections for unicast bindings and notifies the application
@@ -71,15 +69,6 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
-    CHIP_ERROR RegisterBindingAddedHandler(BindingAddedHandler handler)
-    {
-        if (mBindingAddedHandler == nullptr)
-        {
-            mBindingAddedHandler = handler;
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
 
     CHIP_ERROR Init(const BindingManagerInitParams & params);
 
@@ -113,11 +102,6 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
-    /*
-     * Notify the BindingAddedHandler that a binding was added.
-     */
-    CHIP_ERROR NotifyBindingAdded(const EmberBindingTableEntry & binding);
-
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
@@ -134,7 +118,6 @@ private:
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
-    BindingAddedHandler mBindingAddedHandler;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

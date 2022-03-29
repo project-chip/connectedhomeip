@@ -24,6 +24,7 @@ from enum import Enum, auto
 from random import randrange
 
 TEST_NODE_ID = '0x12344321'
+DEVELOPMENT_PAA_LIST = './credentials/development/paa-root-certs'
 
 
 class App:
@@ -39,13 +40,12 @@ class App:
 
     def start(self, discriminator):
         if not self.process:
-            self.process = None
-            process, outpipe, errpipe = self.__startServer(
+            # Make sure to assign self.process before we do any operations that
+            # might fail, so attempts to kill us on failure actually work.
+            self.process, self.outpipe, errpipe = self.__startServer(
                 self.runner, self.command, discriminator)
-            self.waitForAnyAdvertisement(process, outpipe)
-            self.__updateSetUpCode(outpipe)
-            self.process = process
-            self.outpipe = outpipe
+            self.waitForAnyAdvertisement()
+            self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
                 self.cv_stopped.notify()
@@ -78,8 +78,8 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self, process, outpipe):
-        self.__waitFor("mDNS service published:", process, outpipe)
+    def waitForAnyAdvertisement(self):
+        self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
     def waitForCommissionableAdvertisement(self):
         self.__waitFor("mDNS service published: _matterc._udp",
@@ -135,8 +135,8 @@ class App:
 
         logging.debug('Success waiting for: %s' % waitForString)
 
-    def __updateSetUpCode(self, outpipe):
-        qrLine = outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
+    def __updateSetUpCode(self):
+        qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
         if not qrLine:
             raise Exception("Unable to find QR code")
         self.setupCode = qrLine.group(1)
@@ -201,7 +201,7 @@ class TestDefinition:
     run_name: str
     target: TestTarget
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -232,18 +232,23 @@ class TestDefinition:
                     os.unlink(f)
 
             app = App(runner, app_cmd)
+            # Add the App to the register immediately, so if it fails during
+            # start() we will be able to clean things up properly.
+            apps_register.add("default", app)
             # Remove server application storage (factory reset),
             # so it will be commissionable again.
             app.factoryReset()
             app.start(str(randrange(1, 4096)))
-            apps_register.add("default", app)
 
             runner.RunSubprocess(
-                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
+                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
                 name='PAIR', dependencies=[apps_register])
 
             runner.RunSubprocess(
-                tool_cmd + ['tests', self.run_name],
+                tool_cmd + ['tests', self.run_name] +
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] +
+                ['--PICS', pics_file],
                 name='TEST', dependencies=[apps_register])
 
         except Exception:

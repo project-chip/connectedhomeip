@@ -20,9 +20,11 @@
 
 constexpr uint16_t kPayloadMaxSize = 64;
 
-CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload, CHIP_ERROR expectedStatus)
 {
     VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mExpectedStatus = expectedStatus;
 
     GetCurrentCommissioner().RegisterPairingDelegate(this);
 
@@ -35,6 +37,8 @@ CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const c
 {
     VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
+    mExpectedStatus = CHIP_NO_ERROR;
+
     GetCurrentCommissioner().RegisterPairingDelegate(this);
 
     char manualCode[kPayloadMaxSize];
@@ -44,6 +48,8 @@ CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const c
 
 CHIP_ERROR CommissionerCommands::Unpair(chip::NodeId nodeId)
 {
+    mExpectedStatus = CHIP_NO_ERROR;
+
     return GetCurrentCommissioner().UnpairDevice(nodeId);
 }
 
@@ -71,9 +77,22 @@ void CommissionerCommands::OnPairingComplete(CHIP_ERROR err)
 
 void CommissionerCommands::OnPairingDeleted(CHIP_ERROR err)
 {
-    if (CHIP_NO_ERROR != err)
+    if (mExpectedStatus != err)
     {
-        ChipLogError(chipTool, "Pairing Delete Failure: %s", ErrorStr(err));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Pairing Delete Failure: %s", ErrorStr(err));
+        }
+        else
+        {
+            ChipLogError(chipTool, "Got success but expected: %s", ErrorStr(mExpectedStatus));
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+    else
+    {
+        // Treat as success.
+        err = CHIP_NO_ERROR;
     }
 
     LogErrorOnFailure(ContinueOnChipMainThread(err));
@@ -81,9 +100,22 @@ void CommissionerCommands::OnPairingDeleted(CHIP_ERROR err)
 
 void CommissionerCommands::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR err)
 {
-    if (CHIP_NO_ERROR != err)
+    if (mExpectedStatus != err)
     {
-        ChipLogError(chipTool, "Commissioning Complete Failure: %s", ErrorStr(err));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Commissioning Complete Failure: %s", ErrorStr(err));
+        }
+        else
+        {
+            ChipLogError(chipTool, "Got success but expected: %s", ErrorStr(mExpectedStatus));
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+    else
+    {
+        // Treat as success.
+        err = CHIP_NO_ERROR;
     }
 
     LogErrorOnFailure(ContinueOnChipMainThread(err));

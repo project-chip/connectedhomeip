@@ -22,7 +22,7 @@
 #include <platform/mbed/ConnectivityManagerImpl.h>
 #include <platform/mbed/NetworkCommissioningDriver.h>
 
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 

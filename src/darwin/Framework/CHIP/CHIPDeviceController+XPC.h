@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <CHIP/CHIPCluster.h>
 #import <CHIP/CHIPDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -47,6 +48,26 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSDictionary<NSString *, id> *> * _Nullable)decodeXPCResponseValues:
     (NSArray<NSDictionary<NSString *, id> *> * _Nullable)values;
 
+/**
+ * Returns a serialized read parameter object to send over XPC
+ */
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCReadParams:(CHIPReadParams *)params;
+
+/**
+ * Returns a deserialized read parameter object from an object received over XPC
+ */
++ (CHIPReadParams * _Nullable)decodeXPCReadParams:(NSDictionary<NSString *, id> * _Nullable)params;
+
+/**
+ * Returns a serialized subscribe parameter object to send over XPC
+ */
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(CHIPSubscribeParams *)params;
+
+/**
+ * Returns a deserialized subscribe parameter object from an object received over XPC
+ */
++ (CHIPSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params;
+
 @end
 /**
  * Protocol that remote object must support over XPC
@@ -69,9 +90,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)readAttributeWithController:(id _Nullable)controller
                              nodeId:(uint64_t)nodeId
-                         endpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+                         endpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(NSDictionary<NSString *, id> * _Nullable)params
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 /**
@@ -79,10 +101,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)writeAttributeWithController:(id _Nullable)controller
                               nodeId:(uint64_t)nodeId
-                          endpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+                          endpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                           completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 /**
@@ -90,10 +113,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)invokeCommandWithController:(id _Nullable)controller
                              nodeId:(uint64_t)nodeId
-                         endpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+                         endpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                              fields:(id)fields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 /**
@@ -101,28 +125,38 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)subscribeAttributeWithController:(id _Nullable)controller
                                   nodeId:(uint64_t)nodeId
-                              endpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(NSDictionary<NSString *, id> * _Nullable)params
                       establishedHandler:(void (^)(void))establishedHandler;
 
 /**
- * Requests a specific node attribute subscription into a cache
+ * Requests to stop reporting
  */
-- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
-                                       nodeId:(uint64_t)nodeId
-                                   completion:(void (^)(NSError * _Nullable error))completion;
+- (void)stopReportsWithController:(id _Nullable)controller nodeId:(uint64_t)nodeId completion:(void (^)(void))completion;
+
+/**
+ * Requests subscription of all attributes.
+ */
+- (void)subscribeWithController:(id _Nullable)controller
+                         nodeId:(uint64_t)nodeId
+                    minInterval:(NSNumber *)minInterval
+                    maxInterval:(NSNumber *)maxInterval
+                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                    shouldCache:(BOOL)shouldCache
+                     completion:(void (^)(NSError * _Nullable error))completion;
 
 /**
  * Requests reading attribute cache
  */
 - (void)readAttributeCacheWithController:(id _Nullable)controller
                                   nodeId:(uint64_t)nodeId
-                              endpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
                               completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 @end

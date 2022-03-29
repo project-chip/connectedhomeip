@@ -41,6 +41,14 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp"
 
+    - label: "Reads the Status attribute"
+      disabled: true
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 1
+
     # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"
       disabled: true
@@ -63,7 +71,7 @@ tests:
               - name: "applicationId"
                 value: "NonAvailableApp"
       response:
-          error: UNSUPPORTED_WRITE
+          error: APP_NOT_AVAILABLE
 
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
@@ -91,4 +99,4 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp2"
       response:
-          error: INVALID_COMMAND
+          error: SYSTEM_BUSY

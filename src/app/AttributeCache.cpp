@@ -115,12 +115,19 @@ void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TL
     //
     VerifyOrDie(!aPath.IsListItemOperation());
 
+    // Copy the reader for forwarding
+    TLV::TLVReader dataSnapshot;
+    if (apData)
+    {
+        dataSnapshot.Init(*apData);
+    }
+
     UpdateCache(aPath, apData, aStatus);
 
     //
     // Forward the call through.
     //
-    mCallback.OnAttributeData(aPath, apData, aStatus);
+    mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
 
 CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)

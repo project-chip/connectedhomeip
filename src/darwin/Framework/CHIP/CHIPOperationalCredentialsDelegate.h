@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
+#include <lib/core/CASEAuthTag.h>
 #include <platform/Darwin/CHIPP256KeypairNativeBridge.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -52,7 +53,7 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
-    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
+    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
         chip::MutableByteSpan & noc);
 
@@ -66,7 +67,7 @@ private:
     bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
-    uint32_t mIssuerId = 1234;
+    uint64_t mIssuerId = 1234;
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";

@@ -60,9 +60,9 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, mClusterId, mCommandId, mPayload);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, mClusterId, mCommandId, mPayload);
     }
 
     /////////// CommandSender Callback Interface /////////
@@ -117,8 +117,8 @@ public:
     }
 
     template <class T>
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId,
-                                chip::ClusterId clusterId, chip::CommandId commandId, const T & value)
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
+                                chip::CommandId commandId, const T & value)
     {
         chip::app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, clusterId, commandId,
                                                      (chip::app::CommandPathFlags::kGroupIdValid) };
@@ -130,7 +130,7 @@ public:
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
 
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
         commandSender.release();
 

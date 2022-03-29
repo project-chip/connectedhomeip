@@ -278,6 +278,16 @@ public class ChipDeviceController {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
+  /**
+   * Returns the compressed fabric ID based on the given root certificate and node operational
+   * credentials.
+   *
+   * @param rcac the root certificate (in Matter cert form)
+   * @param noc the NOC (in Matter cert form)
+   * @see #convertX509CertToMatterCert(byte[])
+   */
+  public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }

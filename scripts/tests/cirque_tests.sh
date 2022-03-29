@@ -40,6 +40,7 @@ CIRQUE_TESTS=(
     "MobileDeviceTest"
     "CommissioningTest"
     "InteractionModelTest"
+    "SplitCommissioningTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

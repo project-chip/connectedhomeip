@@ -31,7 +31,7 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"

@@ -17,12 +17,17 @@
 
 #import "CHIPDeviceController+XPC.h"
 
+#import "CHIPCluster.h"
 #import "CHIPDevice.h"
 #import "CHIPDeviceControllerOverXPC.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSArray * _Nullable serializeAttributePath(CHIPAttributePath * _Nullable path)
+static NSString * const kFabricFilteredKey = @"fabricFiltered";
+static NSString * const kKeepPreviousSubscriptionsKey = @"keepPreviousSubscriptions";
+static NSString * const kAutoResubscribeKey = @"autoResubscribe";
+
+static NSArray * _Nullable encodeAttributePath(CHIPAttributePath * _Nullable path)
 {
     if (!path) {
         return nil;
@@ -30,7 +35,7 @@ static NSArray * _Nullable serializeAttributePath(CHIPAttributePath * _Nullable 
     return @[ path.endpoint, path.cluster, path.attribute ];
 }
 
-static NSArray * _Nullable serializeCommandPath(CHIPCommandPath * _Nullable path)
+static NSArray * _Nullable encodeCommandPath(CHIPCommandPath * _Nullable path)
 {
     if (!path) {
         return nil;
@@ -38,7 +43,7 @@ static NSArray * _Nullable serializeCommandPath(CHIPCommandPath * _Nullable path
     return @[ path.endpoint, path.cluster, path.command ];
 }
 
-static CHIPAttributePath * _Nullable deserializeAttributePath(NSArray * _Nullable pathArray)
+static CHIPAttributePath * _Nullable decodeAttributePath(NSArray * _Nullable pathArray)
 {
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
@@ -46,12 +51,17 @@ static CHIPAttributePath * _Nullable deserializeAttributePath(NSArray * _Nullabl
     return [CHIPAttributePath attributePathWithEndpointId:pathArray[0] clusterId:pathArray[1] attributeId:pathArray[2]];
 }
 
-static CHIPCommandPath * _Nullable deserializeCommandPath(NSArray * _Nullable pathArray)
+static CHIPCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArray)
 {
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
     }
     return [CHIPCommandPath commandPathWithEndpointId:pathArray[0] clusterId:pathArray[1] commandId:pathArray[2]];
+}
+
+static void decodeReadParams(NSDictionary<NSString *, id> * inParams, CHIPReadParams * outParams)
+{
+    outParams.fabricFiltered = inParams[kFabricFilteredKey];
 }
 
 @implementation CHIPDeviceController (XPC)
@@ -77,10 +87,10 @@ static CHIPCommandPath * _Nullable deserializeCommandPath(NSArray * _Nullable pa
         NSMutableDictionary<NSString *, id> * resultValue = [NSMutableDictionary dictionaryWithCapacity:[value count]];
         [resultValue addEntriesFromDictionary:value];
         if (value[kCHIPAttributePathKey]) {
-            resultValue[kCHIPAttributePathKey] = serializeAttributePath(value[kCHIPAttributePathKey]);
+            resultValue[kCHIPAttributePathKey] = encodeAttributePath(value[kCHIPAttributePathKey]);
         }
         if (value[kCHIPCommandPathKey]) {
-            resultValue[kCHIPCommandPathKey] = serializeCommandPath(value[kCHIPCommandPathKey]);
+            resultValue[kCHIPCommandPathKey] = encodeCommandPath(value[kCHIPCommandPathKey]);
         }
         [result addObject:resultValue];
     }
@@ -101,13 +111,63 @@ static CHIPCommandPath * _Nullable deserializeCommandPath(NSArray * _Nullable pa
         NSMutableDictionary<NSString *, id> * resultValue = [NSMutableDictionary dictionaryWithCapacity:[value count]];
         [resultValue addEntriesFromDictionary:value];
         if (value[kCHIPAttributePathKey]) {
-            resultValue[kCHIPAttributePathKey] = deserializeAttributePath(value[kCHIPAttributePathKey]);
+            resultValue[kCHIPAttributePathKey] = decodeAttributePath(value[kCHIPAttributePathKey]);
         }
         if (value[kCHIPCommandPathKey]) {
-            resultValue[kCHIPCommandPathKey] = deserializeCommandPath(value[kCHIPCommandPathKey]);
+            resultValue[kCHIPCommandPathKey] = decodeCommandPath(value[kCHIPCommandPathKey]);
         }
         [result addObject:resultValue];
     }
+    return result;
+}
+
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCReadParams:(CHIPReadParams *)params
+{
+    if (!params) {
+        return nil;
+    }
+    NSMutableDictionary<NSString *, id> * result = [NSMutableDictionary dictionary];
+    if (params.fabricFiltered) {
+        result[kFabricFilteredKey] = params.fabricFiltered;
+    }
+    return result;
+}
+
++ (CHIPReadParams * _Nullable)decodeXPCReadParams:(NSDictionary<NSString *, id> * _Nullable)params
+{
+    if (!params) {
+        return nil;
+    }
+    CHIPReadParams * result = [[CHIPReadParams alloc] init];
+    decodeReadParams(params, result);
+    return result;
+}
+
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(CHIPSubscribeParams *)params
+{
+    if (!params) {
+        return nil;
+    }
+    NSMutableDictionary<NSString *, id> * result =
+        [NSMutableDictionary dictionaryWithDictionary:[CHIPDeviceController encodeXPCReadParams:params]];
+    if (params.keepPreviousSubscriptions) {
+        result[kKeepPreviousSubscriptionsKey] = params.keepPreviousSubscriptions;
+    }
+    if (params.autoResubscribe) {
+        result[kAutoResubscribeKey] = params.autoResubscribe;
+    }
+    return result;
+}
+
++ (CHIPSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params
+{
+    if (!params) {
+        return nil;
+    }
+    CHIPSubscribeParams * result = [[CHIPSubscribeParams alloc] init];
+    decodeReadParams(params, result);
+    result.keepPreviousSubscriptions = params[kKeepPreviousSubscriptionsKey];
+    result.autoResubscribe = params[kAutoResubscribeKey];
     return result;
 }
 

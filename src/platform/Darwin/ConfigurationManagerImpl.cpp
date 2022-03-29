@@ -29,7 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -160,7 +160,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        ReturnErrorOnFailure(StoreBootReason(BootReasonType::Unspecified));
+        ReturnErrorOnFailure(StoreBootReason(to_underlying(BootReasonType::kUnspecified)));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))

@@ -85,8 +85,7 @@ CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
@@ -489,27 +488,34 @@ exit:
     }
 }
 
-void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     Instance * this_ = reinterpret_cast<Instance *>(arg);
-    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-    this_->OnCommissioningComplete(event->CommissioningComplete.Status);
+
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        this_->OnCommissioningComplete();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        this_->OnFailSafeTimerExpired();
+    }
 }
 
-void Instance::OnCommissioningComplete(CHIP_ERROR err)
+void Instance::OnCommissioningComplete()
 {
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
-        mpWirelessDriver->CommitConfiguration();
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
-        mpWirelessDriver->RevertConfiguration();
-    }
+    ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
+    mpWirelessDriver->CommitConfiguration();
+}
+
+void Instance::OnFailSafeTimerExpired()
+{
+    VerifyOrReturn(mpWirelessDriver != nullptr);
+
+    ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
+    mpWirelessDriver->RevertConfiguration();
 }
 
 bool NullNetworkDriver::GetEnabled()

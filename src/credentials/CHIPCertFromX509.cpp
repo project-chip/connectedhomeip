@@ -50,136 +50,11 @@ using namespace chip::TLV;
 using namespace chip::Protocols;
 using namespace chip::Crypto;
 
-static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, Tag tag, uint64_t & subjectOrIssuer,
-                                           Optional<uint64_t> & fabric)
+static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, Tag tag)
 {
-    CHIP_ERROR err;
-    TLVType outerContainer;
-    OID attrOID;
-
-    err = writer.StartContainer(tag, kTLVType_List, outerContainer);
-    SuccessOrExit(err);
-
-    // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
-    ASN1_PARSE_ENTER_SEQUENCE
-    {
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
-            ASN1_ENTER_SET
-            {
-                // AttributeTypeAndValue ::= SEQUENCE
-                ASN1_PARSE_ENTER_SEQUENCE
-                {
-                    // type AttributeType
-                    // AttributeType ::= OBJECT IDENTIFIER
-                    ASN1_PARSE_OBJECT_ID(attrOID);
-                    VerifyOrExit(GetOIDCategory(attrOID) == kOIDCategory_AttributeType, err = ASN1_ERROR_INVALID_ENCODING);
-
-                    // AttributeValue ::= ANY -- DEFINED BY AttributeType
-                    ASN1_PARSE_ANY;
-
-                    // Can only support UTF8String, PrintableString and IA5String.
-                    VerifyOrExit(reader.GetClass() == kASN1TagClass_Universal &&
-                                     (reader.GetTag() == kASN1UniversalTag_PrintableString ||
-                                      reader.GetTag() == kASN1UniversalTag_UTF8String ||
-                                      reader.GetTag() == kASN1UniversalTag_IA5String),
-                                 err = ASN1_ERROR_UNSUPPORTED_ENCODING);
-
-                    // CHIP attributes must be UTF8Strings.
-                    if (IsChipDNAttr(attrOID))
-                    {
-                        VerifyOrExit(reader.GetTag() == kASN1UniversalTag_UTF8String, err = ASN1_ERROR_INVALID_ENCODING);
-                    }
-
-                    // Derive the TLV tag number from the enum value assigned to the attribute type OID. For attributes that can be
-                    // either UTF8String or PrintableString, use the high bit in the tag number to distinguish the two.
-                    uint8_t tlvTagNum = GetOIDEnum(attrOID);
-                    if (reader.GetTag() == kASN1UniversalTag_PrintableString)
-                    {
-                        tlvTagNum |= 0x80;
-                    }
-
-                    // If 64-bit CHIP attribute.
-                    if (IsChip64bitDNAttr(attrOID))
-                    {
-                        uint64_t chipAttr;
-                        VerifyOrReturnError(Encoding::UppercaseHexToUint64(reinterpret_cast<const char *>(reader.GetValue()),
-                                                                           static_cast<size_t>(reader.GetValueLen()),
-                                                                           chipAttr) == sizeof(uint64_t),
-                                            err = ASN1_ERROR_INVALID_ENCODING);
-
-                        // Certificates use a combination of OIDs for Issuer and Subject.
-                        // NOC: Issuer  = kOID_AttributeType_ChipRootId or kOID_AttributeType_ChipICAId
-                        //      Subject = kOID_AttributeType_ChipNodeId
-                        // ICA: Issuer  = kOID_AttributeType_ChipRootId
-                        //      Subject = kOID_AttributeType_ChipICAId
-                        // Root: Issuer = kOID_AttributeType_ChipRootId
-                        //      Subject = kOID_AttributeType_ChipRootId
-                        //
-                        // This function is called first for the Issuer DN, and later for Subject DN.
-                        // Since the caller knows if Issuer or Subject DN is being parsed, it's left up to
-                        // the caller to use the returned value (subjectOrIssuer) appropriately.
-                        if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId ||
-                            attrOID == chip::ASN1::kOID_AttributeType_ChipICAId ||
-                            attrOID == chip::ASN1::kOID_AttributeType_ChipRootId)
-                        {
-                            if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
-                            {
-                                VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
-                            }
-                            subjectOrIssuer = chipAttr;
-                        }
-                        else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
-                        {
-                            VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
-                            fabric.SetValue(chipAttr);
-                        }
-
-                        ReturnErrorOnFailure(writer.Put(ContextTag(tlvTagNum), chipAttr));
-                    }
-                    // If 32-bit CHIP attribute.
-                    else if (IsChip32bitDNAttr(attrOID))
-                    {
-                        CASEAuthTag chipAttr;
-                        VerifyOrReturnError(Encoding::UppercaseHexToUint32(reinterpret_cast<const char *>(reader.GetValue()),
-                                                                           reader.GetValueLen(), chipAttr) == sizeof(CASEAuthTag),
-                                            err = ASN1_ERROR_INVALID_ENCODING);
-
-                        VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
-
-                        ReturnErrorOnFailure(writer.Put(ContextTag(tlvTagNum), chipAttr));
-                    }
-                    // Otherwise, it is a string.
-                    else
-                    {
-                        ReturnErrorOnFailure(
-                            writer.PutString(ContextTag(tlvTagNum), Uint8::to_const_char(reader.GetValue()), reader.GetValueLen()));
-                    }
-                }
-                ASN1_EXIT_SEQUENCE;
-
-                // Only one AttributeTypeAndValue allowed per RDN.
-                err = reader.Next();
-                if (err == CHIP_NO_ERROR)
-                {
-                    ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
-                }
-                if (err != ASN1_END)
-                {
-                    ExitNow();
-                }
-            }
-            ASN1_EXIT_SET;
-        }
-    }
-    ASN1_EXIT_SEQUENCE;
-
-    err = writer.EndContainer(outerContainer);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ChipDN dn;
+    ReturnErrorOnFailure(dn.DecodeFromASN1(reader));
+    return dn.EncodeToTLV(writer, tag);
 }
 
 static CHIP_ERROR ConvertValidity(ASN1Reader & reader, TLVWriter & writer)
@@ -553,8 +428,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, Tag tag, uint64_t & issuer, uint64_t & subject,
-                                     Optional<uint64_t> & fabric)
+static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, Tag tag)
 {
     CHIP_ERROR err;
     int64_t version;
@@ -603,7 +477,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, Ta
             ASN1_EXIT_SEQUENCE;
 
             // issuer Name
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer), issuer, fabric);
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer));
             SuccessOrExit(err);
 
             // validity Validity,
@@ -611,7 +485,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, Ta
             SuccessOrExit(err);
 
             // subject Name,
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject), subject, fabric);
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject));
             SuccessOrExit(err);
 
             err = ConvertSubjectPublicKeyInfo(reader, writer);
@@ -686,9 +560,6 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
     ASN1Reader reader;
     TLVWriter writer;
 
-    uint64_t issuer, subject;
-    Optional<uint64_t> fabric;
-
     VerifyOrReturnError(!x509Cert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -696,7 +567,7 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
 
     writer.Init(chipCert);
 
-    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag(), issuer, subject, fabric));
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag()));
 
     ReturnErrorOnFailure(writer.Finalize());
 

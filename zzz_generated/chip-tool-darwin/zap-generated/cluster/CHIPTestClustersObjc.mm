@@ -45,8 +45,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -55,7 +54,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AccessControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = AccessControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -85,8 +84,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -95,7 +93,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AccessControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = AccessControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -195,8 +193,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -205,7 +202,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AccountLogin::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = AccountLogin::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -235,8 +232,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -245,7 +241,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AccountLogin::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = AccountLogin::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -399,8 +395,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -409,7 +404,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AdministratorCommissioning::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = AdministratorCommissioning::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -439,8 +434,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -449,7 +443,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AdministratorCommissioning::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -717,8 +711,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -727,7 +720,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ApplicationBasic::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -757,8 +750,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -767,7 +759,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ApplicationBasic::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -906,8 +898,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -916,7 +907,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ApplicationLauncher::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -946,8 +937,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -956,7 +946,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ApplicationLauncher::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1117,8 +1107,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1127,7 +1116,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AudioOutput::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = AudioOutput::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1157,8 +1146,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1167,7 +1155,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = AudioOutput::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = AudioOutput::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1339,8 +1327,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1349,7 +1336,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BarrierControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = BarrierControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1379,8 +1366,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1389,7 +1375,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BarrierControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = BarrierControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1779,8 +1765,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1789,7 +1774,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Basic::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Basic::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1819,8 +1804,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1829,7 +1813,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Basic::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Basic::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1947,8 +1931,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1957,7 +1940,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BinaryInputBasic::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = BinaryInputBasic::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -1987,8 +1970,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -1997,7 +1979,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BinaryInputBasic::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = BinaryInputBasic::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2097,8 +2079,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2107,7 +2088,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Binding::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Binding::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2137,8 +2118,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2147,7 +2127,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Binding::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Binding::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2265,8 +2245,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2275,7 +2254,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BooleanState::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = BooleanState::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2305,8 +2284,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2315,7 +2293,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BooleanState::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = BooleanState::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2546,8 +2524,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2556,7 +2533,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BridgedActions::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = BridgedActions::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2586,8 +2563,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2596,7 +2572,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BridgedActions::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = BridgedActions::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2950,8 +2926,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2960,7 +2935,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BridgedDeviceBasic::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = BridgedDeviceBasic::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2990,8 +2965,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3000,7 +2974,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = BridgedDeviceBasic::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = BridgedDeviceBasic::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -3223,8 +3197,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3233,7 +3206,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Channel::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Channel::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -3263,8 +3236,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3273,7 +3245,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Channel::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Channel::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4078,8 +4050,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4088,7 +4059,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ColorControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ColorControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4118,8 +4089,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4128,7 +4098,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ColorControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ColorControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4267,8 +4237,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4277,7 +4246,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ContentLauncher::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ContentLauncher::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4307,8 +4276,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4317,7 +4285,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ContentLauncher::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ContentLauncher::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4574,8 +4542,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4584,7 +4551,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Descriptor::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Descriptor::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4614,8 +4581,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4624,7 +4590,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Descriptor::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Descriptor::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4724,8 +4690,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4734,7 +4699,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = DiagnosticLogs::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = DiagnosticLogs::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4764,8 +4729,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4774,7 +4738,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = DiagnosticLogs::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = DiagnosticLogs::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5124,8 +5088,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5134,7 +5097,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = DoorLock::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = DoorLock::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5164,8 +5127,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5174,7 +5136,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = DoorLock::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = DoorLock::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5472,8 +5434,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5482,7 +5443,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5512,8 +5473,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5522,7 +5482,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5799,8 +5759,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5809,7 +5768,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5839,8 +5798,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5849,7 +5807,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -5967,8 +5925,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5977,7 +5934,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = FanControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6007,8 +5964,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6017,7 +5973,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = FanControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6175,8 +6131,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6185,7 +6140,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FixedLabel::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = FixedLabel::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6215,8 +6170,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6225,7 +6179,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FixedLabel::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = FixedLabel::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6412,8 +6366,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6422,7 +6375,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FlowMeasurement::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = FlowMeasurement::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6452,8 +6405,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6462,7 +6414,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = FlowMeasurement::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = FlowMeasurement::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6617,8 +6569,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6627,7 +6578,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GeneralCommissioning::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = GeneralCommissioning::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -6657,8 +6608,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6667,7 +6617,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GeneralCommissioning::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = GeneralCommissioning::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7059,8 +7009,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7069,7 +7018,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GeneralDiagnostics::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = GeneralDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7099,8 +7048,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7109,7 +7057,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GeneralDiagnostics::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = GeneralDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7312,8 +7260,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7322,7 +7269,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GroupKeyManagement::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = GroupKeyManagement::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7352,8 +7299,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7362,7 +7308,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GroupKeyManagement::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = GroupKeyManagement::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7480,8 +7426,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7490,7 +7435,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Groups::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Groups::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7520,8 +7465,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7530,7 +7474,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Groups::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Groups::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7648,8 +7592,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7658,7 +7601,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Identify::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Identify::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7688,8 +7631,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7698,7 +7640,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Identify::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Identify::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7908,8 +7850,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7918,7 +7859,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = IlluminanceMeasurement::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = IlluminanceMeasurement::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -7948,8 +7889,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -7958,7 +7898,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = IlluminanceMeasurement::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = IlluminanceMeasurement::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8058,8 +7998,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8068,7 +8007,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = KeypadInput::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = KeypadInput::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8098,8 +8037,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8108,7 +8046,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = KeypadInput::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = KeypadInput::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8334,8 +8272,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8344,7 +8281,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LevelControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = LevelControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8374,8 +8311,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8384,7 +8320,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LevelControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = LevelControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8541,8 +8477,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8551,7 +8486,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LocalizationConfiguration::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8581,8 +8516,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8591,7 +8525,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LocalizationConfiguration::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8652,8 +8586,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8662,7 +8595,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LowPower::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = LowPower::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8692,8 +8625,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8702,7 +8634,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = LowPower::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = LowPower::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8864,8 +8796,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8874,7 +8805,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = MediaInput::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = MediaInput::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -8904,8 +8835,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8914,7 +8844,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = MediaInput::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = MediaInput::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9172,8 +9102,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9182,7 +9111,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = MediaPlayback::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = MediaPlayback::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9212,8 +9141,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9222,7 +9150,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = MediaPlayback::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = MediaPlayback::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9322,7 +9250,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeCurrentModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9331,9 +9259,32 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ModeSelect::Attributes::CurrentMode::TypeInfo;
+            using TypeInfo = ModeSelect::Attributes::Description::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = [self asCharSpan:value];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeStandardNamespaceWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ModeSelect::Attributes::StandardNamespace::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -9381,7 +9332,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCurrentModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9390,7 +9341,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ModeSelect::Attributes::StartUpMode::TypeInfo;
+            using TypeInfo = ModeSelect::Attributes::CurrentMode::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -9399,7 +9350,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9408,26 +9359,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ModeSelect::Attributes::Description::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = [self asCharSpan:value];
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ModeSelect::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ModeSelect::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9457,8 +9389,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9467,7 +9398,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ModeSelect::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ModeSelect::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9530,6 +9461,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ModeSelect::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -9733,8 +9682,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9743,7 +9691,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = NetworkCommissioning::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -9773,8 +9721,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9783,7 +9730,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = NetworkCommissioning::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10116,8 +10063,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10126,7 +10072,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OccupancySensing::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = OccupancySensing::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10156,8 +10102,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10166,7 +10111,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OccupancySensing::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = OccupancySensing::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10302,8 +10247,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10312,7 +10256,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OnOff::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = OnOff::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10342,8 +10286,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10352,7 +10295,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OnOff::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = OnOff::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10488,8 +10431,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10498,7 +10440,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OnOffSwitchConfiguration::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10528,8 +10470,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10538,7 +10479,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OnOffSwitchConfiguration::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10822,8 +10763,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10832,7 +10772,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OperationalCredentials::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = OperationalCredentials::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -10862,8 +10802,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10872,7 +10811,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OperationalCredentials::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = OperationalCredentials::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -11156,8 +11095,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11166,7 +11104,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PowerSource::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = PowerSource::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -11196,8 +11134,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11206,7 +11143,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PowerSource::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = PowerSource::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -11363,8 +11300,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11373,7 +11309,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PowerSourceConfiguration::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = PowerSourceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -11403,8 +11339,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11413,7 +11348,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PowerSourceConfiguration::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = PowerSourceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12013,8 +11948,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12023,7 +11957,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PumpConfigurationAndControl::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12053,8 +11987,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12063,7 +11996,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = PumpConfigurationAndControl::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12253,8 +12186,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12263,7 +12195,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = RelativeHumidityMeasurement::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12293,8 +12225,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12303,7 +12234,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = RelativeHumidityMeasurement::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12493,8 +12424,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12503,7 +12433,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Scenes::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Scenes::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12533,8 +12463,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12543,7 +12472,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Scenes::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Scenes::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12741,8 +12670,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12751,7 +12679,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = SoftwareDiagnostics::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = SoftwareDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12781,8 +12709,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12791,7 +12718,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = SoftwareDiagnostics::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = SoftwareDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -12963,8 +12890,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -12973,7 +12899,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Switch::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = Switch::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13003,8 +12929,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13013,7 +12938,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Switch::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = Switch::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13189,8 +13114,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13199,7 +13123,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TargetNavigator::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = TargetNavigator::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13229,8 +13153,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13239,7 +13162,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TargetNavigator::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = TargetNavigator::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13496,8 +13419,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13506,7 +13428,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = TestCluster::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13536,8 +13458,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13546,7 +13467,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = TestCluster::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13884,8 +13805,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13894,7 +13814,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -13924,8 +13844,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -13934,7 +13853,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15320,8 +15239,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15330,7 +15248,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15360,8 +15278,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15370,7 +15287,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15529,8 +15446,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15539,7 +15455,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TimeFormatLocalization::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = TimeFormatLocalization::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15569,8 +15485,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15579,7 +15494,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = TimeFormatLocalization::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = TimeFormatLocalization::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15728,8 +15643,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15738,7 +15652,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = UserLabel::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = UserLabel::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15768,8 +15682,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15778,7 +15691,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = UserLabel::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = UserLabel::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15857,8 +15770,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15867,7 +15779,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WakeOnLan::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = WakeOnLan::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -15897,8 +15809,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15907,7 +15818,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WakeOnLan::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = WakeOnLan::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -16268,8 +16179,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16278,7 +16188,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WiFiNetworkDiagnostics::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -16308,8 +16218,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16318,7 +16227,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WiFiNetworkDiagnostics::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -16792,8 +16701,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16802,7 +16710,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WindowCovering::Attributes::ServerGeneratedCommandList::TypeInfo;
+            using TypeInfo = WindowCovering::Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -16832,8 +16740,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -16842,7 +16749,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = WindowCovering::Attributes::ClientGeneratedCommandList::TypeInfo;
+            using TypeInfo = WindowCovering::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;

@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -125,6 +126,15 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
 
     invokeRequests.GetReader(&invokeRequestsReader);
+
+    {
+        // We don't support handling multiple commands but the protocol is ready to support it in the future, reject all of them and
+        // IM Engine will send a status response.
+        size_t commandCount = 0;
+        TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+        VerifyOrReturnError(commandCount == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);

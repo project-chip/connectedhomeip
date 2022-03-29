@@ -153,11 +153,12 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     # asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
 
 
-def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin):
+def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, paa_trust_store_path):
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=controller_nodeid)
+    test = BaseTestHelper(nodeid=controller_nodeid,
+                          paaTrustStorePath=paa_trust_store_path)
 
     chip.logging.RedirectToPythonLogging()
 
@@ -198,7 +199,8 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 @click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
 @click.option('--log-format', default=None, type=str, help="Override logging format")
 @click.option('--print-test-list', is_flag=True, help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
-def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format, print_test_list):
+@click.option('--paa-trust-store-path', default='', type=str, help="Path that contains valid and trusted PAA Root Certificates.")
+def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format, print_test_list, paa_trust_store_path):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:
@@ -219,7 +221,7 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
     do_tests(controller_nodeid, device_nodeid, address, timeout,
-             discriminator, setup_pin)
+             discriminator, setup_pin, paa_trust_store_path)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,16 @@ tests:
                 value: nodeId
 
     # Remove disable flag when SDK supports command.
+    - label: "Read attribute media input list"
+      disabled: true
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          constraints:
+              type: list
+              saveAs: InputListValues
+
+    # Remove disable flag when SDK supports command. #13029
     - label: "Rename Input Command"
       disabled: true
       command: "RenameInput"
@@ -38,7 +48,7 @@ tests:
                 value: 1
               - name: "name"
                 value: "A1"
-    # Remove disable flag when SDK supports command.
+    # Remove disable flag when SDK supports command. #13029
     - label: "Rename Input Command"
       disabled: true
       command: "RenameInput"
@@ -48,7 +58,7 @@ tests:
                 value: 1
               - name: "name"
                 value: "A2"
-    # Remove disable flag when SDK supports command.
+    # Remove disable flag when SDK supports command. #13029
     - label: "Read attribute media input list"
       disabled: true
       command: "readAttribute"

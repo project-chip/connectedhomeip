@@ -165,30 +165,30 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    bootReason = BootReasonType::Unspecified;
+    bootReason = BootReasonType::kUnspecified;
     uint8_t reason;
     reason = static_cast<uint8_t>(esp_reset_reason());
     if (reason == ESP_RST_UNKNOWN)
     {
-        bootReason = BootReasonType::Unspecified;
+        bootReason = BootReasonType::kUnspecified;
     }
     else if (reason == ESP_RST_POWERON)
     {
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
     }
     else if (reason == ESP_RST_BROWNOUT)
     {
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
     }
     else if (reason == ESP_RST_SW)
     {
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
     }
     else if (reason == ESP_RST_INT_WDT)
     {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         /* Reboot can be due to hardware or software watchdog*/
     }
     return CHIP_NO_ERROR;

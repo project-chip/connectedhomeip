@@ -39,7 +39,9 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
+#if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
+#endif
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -66,8 +68,6 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-    CHIP_ERROR AddTestCommissioning();
 
     /**
      * @brief Call this function to rejoin existing groups found in the GroupDataProvider
@@ -223,6 +223,7 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
+            Access::GetAccessControl().RemoveFabric(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 

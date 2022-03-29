@@ -51,6 +51,18 @@ step. To install these components manually, follow these steps:
           $ git checkout v4.4
           $ git submodule update --init
           $ ./install.sh
+          $ . ./export.sh
+
+    To update an existing esp-idf toolchain to v4.4:
+
+          $ cd ~/tools/esp-idf
+          $ git fetch origin
+          $ git checkout v4.4
+          $ git reset --hard origin/v4.4
+          $ git submodule update --init
+          $ git clean -fdx
+          $ ./install.sh
+          $ . ./export.sh
 
 -   Install ninja-build
 
@@ -112,10 +124,11 @@ that are currently supported include `ESP32-DevKitC` (default),
 -   After building the application, to flash it outside of VSCode, connect your
     device via USB. Then run the following command to flash the demo application
     onto the device and then monitor its output. If necessary, replace
-    `/dev/tty.SLAB_USBtoUART`(MacOS) with the correct USB device name for your
-    system(like `/dev/ttyUSB0` on Linux). Note that sometimes you might have to
-    press and hold the `boot` button on the device while it's trying to connect
-    before flashing. For ESP32-DevKitC devices this is labeled in the
+    `/dev/tty.SLAB_USBtoUART` with the correct USB device name for your system
+    (like `/dev/ttyUSB0` on Linux or `/dev/tty.usbserial-01CDEEDC` on Mac). Note
+    that sometimes you might have to press and hold the `boot` button on the
+    device while it's trying to connect before flashing. For ESP32-DevKitC
+    devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
           $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
@@ -135,18 +148,20 @@ that are currently supported include `ESP32-DevKitC` (default),
 
 ## Commissioning and cluster control
 
-Commissioning can be carried out using WiFi, BLE or Bypass.
+Commissioning can be carried out using WiFi or BLE.
 
 1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
     Rendezvous mode is BLE.
 
          $ idf.py menuconfig
 
-Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
-ByPass then set the credentials of the WiFi Network (i.e. SSID and Password from
-menuconfig).
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`.
 
-`idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
+NOTE: to avoid build error
+`undefined reference to 'chip::DevelopmentCerts::kDacPublicKey'`, set VID to
+0xFFF1 and PID in range 0x8000..0x8005.
+
+`idf.py menuconfig -> Component config -> CHIP Device Layer -> Device Identification Options`
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
@@ -300,7 +315,7 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console
 
-    python -m chip_rpc.console --device /dev/ttyUSB0
+    chip-console --device /dev/ttyUSB0
 
 From within the console you can then invoke rpcs:
 

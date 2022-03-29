@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #import "CHIPDeviceController.h"
 
 #import "CHIPCommissioningParameters.h"
+#import "CHIPControllerAccessControl.h"
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
@@ -36,11 +37,13 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <system/SystemClock.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
@@ -158,6 +161,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return;
         }
 
+        [CHIPControllerAccessControl init];
+
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
@@ -214,7 +219,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::MutableByteSpan icac;
 
         errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
-            _localDeviceId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcac, icac, noc);
+            _localDeviceId, /* fabricId = */ 1, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcac, icac, noc);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -479,9 +484,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         return NO;
     }
 
-    chip::SetupPayload setupPayload;
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0,
-        chip::Controller::DeviceController::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
+        self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -502,8 +506,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::SetupPayload setupPayload;
-
     if (duration > UINT16_MAX) {
         CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
@@ -518,15 +520,15 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
         return nil;
-    } else {
-        setupPayload.discriminator = (uint16_t) discriminator;
     }
 
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
-    setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator,
-        chip::Controller::DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
+    chip::SetupPayload setupPayload;
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
+        chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
+        static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
+        setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));

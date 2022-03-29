@@ -18,120 +18,30 @@
 
 #include "RequiredPrivilege.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-
-namespace {
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::Access;
-
-// Privilege override entries are stored in a table per operation (read attribute,
-// write attribute, invoke command, read entry). Cluster cannot be invalid, but
-// endpoint and field can be invalid, which means wildcard. For each cluster,
-// more specific entries should be before less specific entries, so they take effect.
-struct PrivilegeOverride
-{
-    ClusterId mCluster;
-    EndpointId mEndpoint;
-    Privilege mPrivilege; // NOTE: here so packing is tighter
-    FieldId mField;
-
-    constexpr PrivilegeOverride(ClusterId cluster, EndpointId endpoint, FieldId field, Privilege privilege) :
-        mCluster(cluster), mEndpoint(endpoint), mPrivilege(privilege), mField(field)
-    {}
-
-    static_assert(sizeof(FieldId) >= sizeof(AttributeId), "FieldId must be able to hold AttributeId");
-    static_assert(sizeof(FieldId) >= sizeof(CommandId), "FieldId must be able to hold CommandId");
-    static_assert(sizeof(FieldId) >= sizeof(EventId), "FieldId must be able to hold EventId");
-};
-
-// WARNING: for each cluster, put more specific entries before less specific entries
-constexpr PrivilegeOverride kPrivilegeOverrideForReadAttribute[] = {
-    PrivilegeOverride(Clusters::AccessControl::Id, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-};
-
-// WARNING: for each cluster, put more specific entries before less specific entries
-constexpr PrivilegeOverride kPrivilegeOverrideForWriteAttribute[] = {
-    PrivilegeOverride(Clusters::AccessControl::Id, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-};
-
-// WARNING: for each cluster, put more specific entries before less specific entries
-constexpr PrivilegeOverride kPrivilegeOverrideForInvokeCommand[] = {
-    PrivilegeOverride(Clusters::AccessControl::Id, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-};
-
-// WARNING: for each cluster, put more specific entries before less specific entries
-constexpr PrivilegeOverride kPrivilegeOverrideForReadEvent[] = {
-    PrivilegeOverride(Clusters::AccessControl::Id, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-};
-
-enum class Operation
-{
-    kReadAttribute  = 0,
-    kWriteAttribute = 1,
-    kInvokeCommand  = 2,
-    kReadEvent      = 3
-};
-
-constexpr Privilege kDefaultPrivilege[] = {
-    Privilege::kView,    // for read attribute
-    Privilege::kOperate, // for write attribute
-    Privilege::kOperate, // for invoke command
-    Privilege::kView     // for read event
-};
-
-const PrivilegeOverride * const kPrivilegeOverride[] = { kPrivilegeOverrideForReadAttribute, kPrivilegeOverrideForWriteAttribute,
-                                                         kPrivilegeOverrideForInvokeCommand, kPrivilegeOverrideForReadEvent };
-
-constexpr size_t kNumPrivilegeOverride[] = { ArraySize(kPrivilegeOverrideForReadAttribute),
-                                             ArraySize(kPrivilegeOverrideForWriteAttribute),
-                                             ArraySize(kPrivilegeOverrideForInvokeCommand),
-                                             ArraySize(kPrivilegeOverrideForReadEvent) };
-
-Privilege GetRequiredPrivilege(Operation operation, ClusterId cluster, EndpointId endpoint, FieldId field)
-{
-    VerifyOrDie(cluster != kInvalidClusterId && endpoint != kInvalidEndpointId && field != kInvalidFieldId);
-
-    const auto * const pStart = kPrivilegeOverride[static_cast<int>(operation)];
-    const auto * const pEnd   = pStart + kNumPrivilegeOverride[static_cast<int>(operation)];
-
-    for (const auto * p = pStart; p < pEnd; ++p)
-    {
-        if (p->mCluster == cluster && (p->mEndpoint == endpoint || p->mEndpoint == kInvalidEndpointId) &&
-            (p->mField == field || p->mField == kInvalidFieldId))
-        {
-            return p->mPrivilege;
-        }
-    }
-
-    return kDefaultPrivilege[static_cast<int>(operation)];
-}
-
-} // namespace
-
 namespace chip {
 namespace app {
 
-Privilege RequiredPrivilege::ForReadAttribute(const ConcreteAttributePath & path)
-{
-    return GetRequiredPrivilege(Operation::kReadAttribute, path.mClusterId, path.mEndpointId, path.mAttributeId);
-}
-
-Privilege RequiredPrivilege::ForWriteAttribute(const ConcreteAttributePath & path)
-{
-    return GetRequiredPrivilege(Operation::kWriteAttribute, path.mClusterId, path.mEndpointId, path.mAttributeId);
-}
-
-Privilege RequiredPrivilege::ForInvokeCommand(const ConcreteCommandPath & path)
-{
-    return GetRequiredPrivilege(Operation::kInvokeCommand, path.mClusterId, path.mEndpointId, path.mCommandId);
-}
-
-Privilege RequiredPrivilege::ForReadEvent(const ConcreteEventPath & path)
-{
-    return GetRequiredPrivilege(Operation::kReadEvent, path.mClusterId, path.mEndpointId, path.mEventId);
-}
+constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
 
 } // namespace app
 } // namespace chip
+
+int __attribute__((weak)) MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
+
+int __attribute__((weak)) MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
+
+int __attribute__((weak)) MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
+
+int __attribute__((weak)) MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
+{
+    return kMatterAccessPrivilegeAdminister;
+}

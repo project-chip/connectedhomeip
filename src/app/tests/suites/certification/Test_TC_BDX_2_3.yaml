@@ -24,10 +24,10 @@ tests:
           "IF (PICS_DT_Receiver_Driver) TH sends a SendInit message to DUT + DUT
           sends a SendAccept message back to TH + DUT sends a BlockQuery message
           to TH + TH sends a Block message back to DUT"
-      verification:
-          "1. Verify that the OTA Reference Provider App logs show BlockQuery
-          message from DUT [1636410922974] [59203:62969336] CHIP: [ATM] Handling
-          received BDX Message [1636410922974] [59203:62969336] CHIP: [ATM]
-          BlockQuery [1636410922974] [59203:62969336] CHIP: [ATM] Block Counter:
-          0"
+      verification: |
+          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
+
+          [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
+          [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
+          [1636410922974] [59203:62969336] CHIP: [ATM]   Block Counter: 0
       disabled: true

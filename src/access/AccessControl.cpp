@@ -188,6 +188,22 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
+CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
+{
+    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
+
+    CHIP_ERROR err;
+    do
+    {
+        err = DeleteEntry(0, &fabricIndex);
+    } while (err == CHIP_NO_ERROR);
+
+    // Sentinel error is OK, just means there was no such entry.
+    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
@@ -206,11 +222,14 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
-    // TODO(#13867): this will go away
-    if (mDelegate->TemporaryCheckOverride())
     {
-        ChipLogProgress(DataManagement, "AccessControl: temporary check override (this will go away)");
-        return CHIP_NO_ERROR;
+        CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
+        if (result != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
+                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+            return result;
+        }
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
@@ -318,6 +337,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         }
 
         // Entry passed all checks: access is allowed.
+        ChipLogProgress(DataManagement, "AccessControl: allowed");
         return CHIP_NO_ERROR;
     }
 

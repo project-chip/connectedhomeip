@@ -54,6 +54,9 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
+# Enables LCD on supported devices
+lcd_on = show_qr_code
+
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
@@ -102,7 +105,6 @@ efr32_executable("ota_requestor_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -123,9 +125,14 @@ efr32_executable("ota_requestor_app") {
     ]
   }
 
-  if (show_qr_code) {
+  if (lcd_on) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
   }
 
   if (chip_enable_pw_rpc) {

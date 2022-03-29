@@ -498,8 +498,8 @@ exit:
 
 void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
 
     if (mpCallback != nullptr)
     {

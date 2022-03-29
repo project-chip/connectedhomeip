@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -33,6 +34,13 @@
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 namespace {
+
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    return &attestationTrustStore;
+}
 
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
@@ -93,7 +101,8 @@ pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDe
     gPairingDelegate.SetPairingCompleteCallback(callback);
 }
 
-extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_New(uint64_t localDeviceId)
+extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_New(uint64_t localDeviceId,
+                                                                                   uint32_t localCommissionerCAT)
 {
     std::unique_ptr<chip::Controller::DeviceCommissioner> result;
     CHIP_ERROR err;
@@ -111,8 +120,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Crypto::P256Keypair ephemeralKey;
 
         // Initialize device attestation verifier
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        // TODO: add option to pass in custom PAA Trust Store path to the python controller app
+        const chip::Credentials::AttestationTrustStore * testingRootStore =
+            GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
@@ -138,8 +148,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, /* fabricId = */ 1,
-                                                                                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(
+                localDeviceId, /* fabricId = */ 1, { { localCommissionerCAT, chip::kUndefinedCAT, chip::kUndefinedCAT } },
+                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;

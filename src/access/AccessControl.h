@@ -341,12 +341,19 @@ public:
         // Iteration
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_NO_ERROR; }
 
+        // Check
+        // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,
+        // CHIP_ERROR_NOT_IMPLEMENTED to use the default check algorithm (against entries),
+        // or any other CHIP_ERROR if another error occurred.
+        virtual CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                 Privilege requestPrivilege)
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
+
         // Listening
         virtual void SetListener(Listener & listener) { mListener = &listener; }
         virtual void ClearListener() { mListener = nullptr; }
-
-        // TODO(#13867): this will go away
-        virtual bool TemporaryCheckOverride() const { return false; }
 
     private:
         Listener * mListener = nullptr;
@@ -460,6 +467,8 @@ public:
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
+
+    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex);
 
     /**
      * Iterates over entries in the access control list.

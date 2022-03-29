@@ -62,7 +62,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 
 AndroidDeviceControllerWrapper *
 AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                            chip::System::Layer * systemLayer,
+                                            const chip::CATValues & cats, chip::System::Layer * systemLayer,
                                             chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
                                             chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
                                             AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
@@ -163,8 +163,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcacSpan,
-                                                                       icacSpan, nocSpan);
+    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
+                                                                       rcacSpan, icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

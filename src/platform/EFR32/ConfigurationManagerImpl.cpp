@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -107,57 +107,57 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 uint32_t ConfigurationManagerImpl::GetBootReason(void)
 {
     // rebootCause is obtained at bootup.
-    uint32_t matterBootCause;
+    BootReasonType matterBootCause;
 #if defined(_SILICON_LABS_32B_SERIES_1)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
-        matterBootCause = BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
     {
-        matterBootCause = BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::kBrownOutReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
     {
-        matterBootCause = BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::kSoftwareReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
     {
-        matterBootCause = BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::kSoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #elif defined(_SILICON_LABS_32B_SERIES_2)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
-        matterBootCause = BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
              rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
-        matterBootCause = BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::kBrownOutReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
     {
-        matterBootCause = BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::kSoftwareReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
     {
-        matterBootCause = BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::kSoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #else
-    matterBootCause = BootReasonType::Unspecified;
+    matterBootCause = BootReasonType::kUnspecified;
 #endif
 
-    return matterBootCause;
+    return to_underlying(matterBootCause);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

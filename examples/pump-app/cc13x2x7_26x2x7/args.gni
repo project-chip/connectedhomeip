@@ -34,7 +34,6 @@ chip_enable_ota_requestor = true
 
 # BLE options
 chip_config_network_layer_ble = true
-chip_bypass_rendezvous = false
 
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder
