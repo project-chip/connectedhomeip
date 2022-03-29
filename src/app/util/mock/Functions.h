@@ -34,5 +34,7 @@ namespace Test {
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
                                      app::AttributeReportIBs::Builder & aAttributeReports,
                                      app::AttributeValueEncoder::AttributeEncodeState * apEncoderState);
+void BumpVersion();
+DataVersion GetVersion();
 } // namespace Test
 } // namespace chip
