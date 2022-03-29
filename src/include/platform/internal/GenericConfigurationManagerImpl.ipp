@@ -275,6 +275,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         err = PlatformMgr().PostEvent(&event);
         SuccessOrExit(err);
 
+        // Ensure HandleFailSafeContextCleanup runs after the timer-expired event has been processed.
         PlatformMgr().ScheduleWork(HandleFailSafeContextCleanup);
     }
 
