@@ -33,19 +33,40 @@ using namespace ::chip::DeviceLayer::Internal;
 
 #define CONVERT_KEYMAP_INDEX_TO_NVM3KEY(index) (EFR32Config::kConfigKey_KvsFirstKeySlot + index)
 #define CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key) (nvm3Key - EFR32Config::kConfigKey_KvsFirstKeySlot)
-
+uint32_t keyCount = 0;
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-void KeyValueStoreManagerImpl::Init(void)
+CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 {
+    CHIP_ERROR err;
+    keyCount = 0;
+    err      = EFR32Config::Init();
+    SuccessOrExit(err);
+
     memset(mKvsStoredKeyString, 0, sizeof(mKvsStoredKeyString));
     size_t outLen;
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsStoredKeyString),
                                     sizeof(mKvsStoredKeyString), outLen);
+
+    for (uint8_t keyIndex = 0; keyIndex < kMaxEntries; keyIndex++)
+    {
+        if (mKvsStoredKeyString[keyIndex][0] != 0)
+        {
+            keyCount++;
+        }
+    }
+
+exit:
+    return err;
+}
+
+bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
+{
+    return ((EFR32Config::kConfigKey_KvsFirstKeySlot <= nvm3Key) && (nvm3Key <= EFR32Config::kConfigKey_KvsLastKeySlot));
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded) const
@@ -57,6 +78,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t 
         if (strcmp(key, mKvsStoredKeyString[keyIndex]) == 0)
         {
             nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(keyIndex);
+            VerifyOrDie(IsValidKvsNvm3Key(nvm3Key) == true);
             return CHIP_NO_ERROR;
         }
 
@@ -71,7 +93,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t 
         if (firstEmptyKeySlot != kMaxEntries)
         {
             nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(firstEmptyKeySlot);
-            err     = CHIP_NO_ERROR;
+            VerifyOrDie(IsValidKvsNvm3Key(nvm3Key) == true);
+            err = CHIP_NO_ERROR;
+            keyCount++;
         }
         else
         {
@@ -120,8 +144,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     {
         uint32_t keyIndex = nvm3Key - EFR32Config::kConfigKey_KvsFirstKeySlot;
         strncpy(mKvsStoredKeyString[keyIndex], key, sizeof(mKvsStoredKeyString[keyIndex]) - 1);
-        EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap,
-                                         reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
+        err ==
+            EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap,
+                                             reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
     }
 
     return err;
@@ -138,6 +163,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     err = EFR32Config::ClearConfigValue(nvm3Key);
     if (err == CHIP_NO_ERROR)
     {
+        keyCount--;
         uint32_t keyIndex = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
         memset(mKvsStoredKeyString[keyIndex], 0, sizeof(mKvsStoredKeyString[keyIndex]));
         EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap,

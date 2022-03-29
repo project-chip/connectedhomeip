@@ -255,7 +255,7 @@ SECTIONS
     KEEP(*(.simee*))
   } > FLASH
 
-  linker_nvm_end = __main_flash_end__;
+  linker_nvm_end = __main_flash_end__ - 2048;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
   /*

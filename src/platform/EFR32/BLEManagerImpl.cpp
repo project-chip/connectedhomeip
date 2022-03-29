@@ -249,6 +249,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
                 RAIL_GetVersion(&railVer, true);
                 ChipLogProgress(DeviceLayer, "RAIL version:, v%d.%d.%d-b%d", railVer.major, railVer.minor, railVer.rev,
                                 railVer.build);
+                sl_bt_connection_set_default_parameters(16, 100, 0, 200, 0, 0xffff);
             }
             break;
 
@@ -257,7 +258,19 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             }
             break;
             case sl_bt_evt_connection_parameters_id: {
-                // ChipLogProgress(DeviceLayer, "Connection parameter ID received. Nothing to do");
+                ChipLogProgress(DeviceLayer, "Connection parameter ID received.c:%d,i:%d,l:%d,t:%d,s:%d,txs:%d",
+                                bluetooth_evt->data.evt_connection_parameters.connection,
+                                bluetooth_evt->data.evt_connection_parameters.interval,
+                                bluetooth_evt->data.evt_connection_parameters.latency,
+                                bluetooth_evt->data.evt_connection_parameters.timeout,
+                                bluetooth_evt->data.evt_connection_parameters.security_mode,
+                                bluetooth_evt->data.evt_connection_parameters.txsize);
+
+                // if (bluetooth_evt->data.evt_connection_parameters.timeout < 80)
+                // {
+                //     sl_bt_connection_set_parameters(bluetooth_evt->data.evt_connection_parameters.connection, 16, 100, 0, 200, 0,
+                //                                     0xffff);
+                // }
             }
             break;
             case sl_bt_evt_connection_phy_status_id: {
@@ -304,6 +317,11 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             /* Software Timer event */
             case sl_bt_evt_system_soft_timer_id: {
                 sInstance.HandleSoftTimerEvent(bluetooth_evt);
+            }
+            break;
+
+            case sl_bt_evt_connection_remote_used_features_id: {
+                // ChipLogProgress(DeviceLayer, "link layer features supported by the remote device");
             }
             break;
 

@@ -43,7 +43,7 @@ static StaticSemaphore_t nvm3_SemStruct;
 void nvm3_lockBegin(void)
 {
     VerifyOrDie(nvm3_Sem != NULL);
-    xSemaphoreTake(nvm3_Sem, portMAX_DELAY);
+    xSemaphoreTake(nvm3_Sem, EFR32_SEM_TIMEOUT_ms);
 }
 
 void nvm3_lockEnd(void)

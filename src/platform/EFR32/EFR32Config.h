@@ -117,6 +117,7 @@ public:
     // Matter KVS storage Keys
     static constexpr Key kConfigKey_KvsStringKeyMap = EFR32ConfigKey(kMatterKvs_KeyBase, 0x00);
     static constexpr Key kConfigKey_KvsFirstKeySlot = EFR32ConfigKey(kMatterKvs_KeyBase, 0x01);
+    static constexpr Key kConfigKey_KvsLastKeySlot  = EFR32ConfigKey(kMatterKvs_KeyBase, 0x1E);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x00);

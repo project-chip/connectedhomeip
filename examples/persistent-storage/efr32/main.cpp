@@ -50,8 +50,8 @@ int main(void)
 {
     init_efrPlatform();
 
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     chip::DeviceLayer::Internal::EFR32Config::Init();
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-persitent-storage-example starting");
     EFR32_LOG("==================================================");

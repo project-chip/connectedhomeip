@@ -108,7 +108,6 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
