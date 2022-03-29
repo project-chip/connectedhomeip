@@ -85,7 +85,7 @@ private:
     ChipDeviceControllerPtr mController;
     AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
     // TODO: This may need to be injected as a GroupDataProvider*
-    GroupDataProviderImpl mGroupDataProvider;
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

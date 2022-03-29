@@ -76,6 +76,8 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEn
     Attributes::PHYRate::TypeInfo::Type pHYRate;
     PHYRateType value = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
 
+    pHYRate.SetNull();
+
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);

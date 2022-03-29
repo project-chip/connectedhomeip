@@ -25,6 +25,7 @@
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -132,7 +133,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // Initialize group data provider for local group key state and IPKs
         // TODO(songguo): Can you figure-out where we can setup group data here?
-        gGroupDataProvider.SetPersistentStorage(&gServerStorage);
+        gGroupDataProvider.SetStorageDelegate(&gServerStorage);
         err = gGroupDataProvider.Init();
         SuccessOrExit(err);
         factoryParams.groupDataProvider = &gGroupDataProvider;
@@ -155,9 +156,15 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
 
         {
+            chip::FabricInfo * fabricInfo = nullptr;
+            uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+            chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+            chip::ByteSpan defaultIpk;
+
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
             err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(
                 localDeviceId, /* fabricId = */ 1, { { localCommissionerCAT, chip::kUndefinedCAT, chip::kUndefinedCAT } },
                 ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
@@ -171,6 +178,17 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
             SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
             err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
+
+            fabricInfo = result->GetFabricInfo();
+            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            SuccessOrExit(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+            ChipLogProgress(Support, "Setting up group data with Compressed Fabric ID:");
+            ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+            defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                                   compressedFabricIdSpan));
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
