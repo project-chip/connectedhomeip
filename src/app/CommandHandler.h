@@ -203,7 +203,7 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        if (err != AddResponseData(aRequestCommandPath, aData))
+        if (CHIP_NO_ERROR != AddResponseData(aRequestCommandPath, aData))
         {
             CHIP_ERROR err = AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
             if (err != CHIP_NO_ERROR)
