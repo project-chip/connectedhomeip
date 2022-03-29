@@ -80,7 +80,8 @@ def main():
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=False, paaTrustStorePath=options.paaPath)
+    test = BaseTestHelper(nodeid=112233, testCommissioner=False,
+                          paaTrustStorePath=options.paaPath)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")

@@ -87,7 +87,8 @@ def main():
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=False, paaTrustStorePath=options.paaPath)
+    test = BaseTestHelper(nodeid=112233, testCommissioner=False,
+                          paaTrustStorePath=options.paaPath)
 
     # Test that we can re-establish PASE sessions with devices. Use two to ensure we can find PASE sessions from the pool.
 
