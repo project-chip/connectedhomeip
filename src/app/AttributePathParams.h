@@ -19,10 +19,13 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
+#include <set>
 
 namespace chip {
 namespace app {
+class ReadClient;
 struct AttributePathParams
 {
     //
@@ -81,10 +84,53 @@ struct AttributePathParams
         return true;
     }
 
-    ClusterId mClusterId     = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId = kInvalidAttributeId; // uint32
-    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
-    ListIndex mListIndex     = kInvalidListIndex;   // uint16
+    bool IsAttributePathIntersect(const DataVersionFilter & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    bool IsAttributePathIntersect(const ConcreteClusterPath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    bool IsWildcardRequest(const std::set<AttributePathParams> & aPathSet) const
+    {
+        for (auto path : aPathSet)
+        {
+            if (path.HasWildcardEndpointId())
+            {
+                return true;
+            }
+            if (path.HasWildcardClusterId())
+            {
+                return true;
+            }
+            if (mEndpointId == path.mEndpointId && mClusterId == path.mClusterId && HasWildcardAttributeId())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool operator<(const AttributePathParams & aOther) const
+    {
+        return mEndpointId < aOther.mEndpointId || mClusterId < aOther.mClusterId;
+    }
+
+    ClusterId mClusterId      = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId  = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId    = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex      = kInvalidListIndex;   // uint16
+    ReadClient * mpReadClient = nullptr;
 };
 
 } // namespace app

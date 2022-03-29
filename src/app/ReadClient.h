@@ -165,6 +165,27 @@ public:
          * SendAutoResubscribeRequest is not called, this function will not be called.
          */
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
+
+        /**
+         * This function is invoked when constructing read/subscribeRequest, where the ReadClient would use cached cluster data
+         * version to construct data version filter list. When the particular cached cluster data version does not intersect with
+         * user provided attribute paths, that cached one would be skipped. When encoded cluster data version filters exceeds the
+         * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
+         * return the number of successful encoded data version filters.
+         */
+        virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       const Span<AttributePathParams> & aAttributePaths)
+        {
+            return 0;
+        }
+
+        // This function is invoked when clients tries to add the wildcard attribute Paths in AttributeCaches when generating
+        // read/subscribe requests
+        virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) {}
+
+        // This function is invoked when Read/Subscribe is closed, and tries to clear up the corresponding wildcard attribute paths
+        // in AttributeCaches.
+        virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient){};
     };
 
     enum class InteractionType : uint8_t
@@ -301,12 +322,12 @@ private:
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
-                                  size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
-                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, const Span<EventPathParams> & aEventPaths);
+    CHIP_ERROR GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
+                                      const Span<AttributePathParams> & aAttributePaths);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize);
+                                             const Span<AttributePathParams> & aAttributePaths,
+                                             const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -361,6 +382,16 @@ private:
     InteractionModelEngine * mpImEngine = nullptr;
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
+
+    // End Of Container (0x18) uses one byte.
+    static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    static constexpr uint16_t kReservedSizeForIMRevision = 1 + 1 + 1;
+    // Reserved buffer for TLV level overhead (the overhead for data version filter IBs EndOfContainer, IM reversion end
+    // of RequestMessage (another end of container)).
+    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
+        kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
 }; // namespace app
