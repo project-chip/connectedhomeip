@@ -66,6 +66,18 @@ public:
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+    // Called by the commissioner when PASE establishment fails.
+    //
+    // May start a new PASE establishment.
+    //
+    // Will return whether we might in fact have more rendezvous parameters to
+    // try (e.g. because we started a new PASE establishment or are waiting on
+    // more device discovery).
+    //
+    // The commissioner can use the return value to decide whether pairing has
+    // actually failed or not.
+    bool TryNextRendezvousParameters();
+
 private:
     CHIP_ERROR Connect(SetupPayload & paload);
     CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
@@ -75,11 +87,22 @@ private:
     CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverSoftAP();
 
-    void OnDeviceDiscovered(RendezvousParameters & params);
+    // Returns whether we have kicked off a new connection attempt.
+    bool ConnectToDiscoveredDevice();
+
+    // Not an enum class because we use this for indexing into arrays.
+    enum TransportTypes
+    {
+        kBLETransport = 0,
+        kIPTransport,
+        kSoftAPTransport,
+        kTransportTypeCount,
+    };
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
     void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj);
+    void OnBLEDiscoveryError(CHIP_ERROR err);
     /////////// BLEConnectionDelegate Callbacks /////////
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
@@ -92,6 +115,22 @@ private:
     chip::NodeId mRemoteId;
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
+
+    // Boolean will be set to true if we currently have an async discovery
+    // process happening via the relevant transport.
+    bool mWaitingForDiscovery[kTransportTypeCount];
+
+    // HasPeerAddress() for a given transport type will test true if we have
+    // discovered an address for that transport and not tried connecting to it
+    // yet.  The general discovery/pairing process will terminate once all
+    // parameters test false for HasPeerAddress() and all the booleans in
+    // mWaitingForDiscovery are false.
+    RendezvousParameters mDiscoveredParameters[kTransportTypeCount];
+
+    // mWaitingForConnection is true if we have called either
+    // EstablishPASEConnection or PairDevice on mCommissioner and are now just
+    // waiting to see whether that works.
+    bool mWaitingForConnection = false;
 };
 
 } // namespace Controller

@@ -45,6 +45,16 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     mRemoteId     = remoteId;
     mSetUpPINCode = payload.setUpPINCode;
 
+    for (auto & waiting : mWaitingForDiscovery)
+    {
+        waiting = false;
+    }
+
+    for (auto & params : mDiscoveredParameters)
+    {
+        params = RendezvousParameters();
+    }
+
     return Connect(payload);
 }
 
@@ -91,8 +101,18 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
     mCommissioner->ConnectBleTransportToSelf();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    return mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,
-                                                      OnDiscoveredDeviceOverBleError);
+
+    ChipLogProgress(Controller, "Starting commissioning discovery over BLE");
+
+    // Handle possibly-sync callbacks.
+    mWaitingForDiscovery[kBLETransport] = true;
+    CHIP_ERROR err = mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,
+                                                                OnDiscoveredDeviceOverBleError);
+    if (err != CHIP_NO_ERROR)
+    {
+        mWaitingForDiscovery[kBLETransport] = false;
+    }
+    return err;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -100,8 +120,10 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 {
+    mWaitingForDiscovery[kBLETransport] = false;
 #if CONFIG_NETWORK_LAYER_BLE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    ChipLogDetail(Controller, "Stopping commissioning discovery over BLE");
     return mBleLayer->CancelBleIncompleteConnection();
 #else
     return CHIP_NO_ERROR;
@@ -110,16 +132,28 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
 {
+    ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
+
     currentFilter.type = payload.isShortDiscriminator ? Dnssd::DiscoveryFilterType::kShortDiscriminator
                                                       : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code =
         payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
-    return mCommissioner->DiscoverCommissionableNodes(currentFilter);
+    // Handle possibly-sync callbacks.
+    mWaitingForDiscovery[kIPTransport] = true;
+    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(currentFilter);
+    if (err != CHIP_NO_ERROR)
+    {
+        mWaitingForDiscovery[kIPTransport] = false;
+    }
+    return err;
 }
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
-    currentFilter.type = Dnssd::DiscoveryFilterType::kNone;
+    ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
+
+    mWaitingForDiscovery[kIPTransport] = false;
+    currentFilter.type                 = Dnssd::DiscoveryFilterType::kNone;
     return CHIP_NO_ERROR;
 }
 
@@ -130,30 +164,71 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverSoftAP(SetupPayload & payload)
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 {
+    mWaitingForDiscovery[kSoftAPTransport] = false;
     return CHIP_NO_ERROR;
 }
 
-void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
+bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
-    if (mConnectionType == SetupCodePairerBehaviour::kCommission)
+    if (mWaitingForConnection)
     {
-        LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+        // Nothing to do.  Just wait until we either succeed at that connection
+        // or fail and get asked to try another device.
+        return false;
     }
-    else
+
+    for (auto & storedParams : mDiscoveredParameters)
     {
-        LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+        if (!storedParams.HasPeerAddress())
+        {
+            continue;
+        }
+
+        // Clear out those params, since we will kick off a connection to them
+        // now.
+        RendezvousParameters params(storedParams);
+        storedParams = RendezvousParameters();
+
+        params.SetSetupPINCode(mSetUpPINCode);
+
+#if CHIP_PROGRESS_LOGGING
+        char buf[Transport::PeerAddress::kMaxToStringSize];
+        params.GetPeerAddress().ToString(buf);
+        ChipLogProgress(Controller, "Attempting PASE connection to %s", buf);
+#endif // CHIP_PROGRESS_LOGGING
+
+        CHIP_ERROR err;
+        if (mConnectionType == SetupCodePairerBehaviour::kCommission)
+        {
+            err = mCommissioner->PairDevice(mRemoteId, params);
+        }
+        else
+        {
+            err = mCommissioner->EstablishPASEConnection(mRemoteId, params);
+        }
+        LogErrorOnFailure(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            mWaitingForConnection = true;
+            return true;
+        }
     }
+
+    return false;
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
 void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 {
+    ChipLogProgress(Controller, "Discovered device to be commissioned over BLE");
+
+    // Probably safe to stop connections over other transports at this point?
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
 
-    Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
-    RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
-    OnDeviceDiscovered(params);
+    Transport::PeerAddress peerAddress   = Transport::PeerAddress::BLE();
+    mDiscoveredParameters[kBLETransport] = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
+    ConnectToDiscoveredDevice();
 }
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
@@ -163,6 +238,13 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONN
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err)
 {
+    static_cast<SetUpCodePairer *>(appState)->OnBLEDiscoveryError(err);
+}
+
+void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
+{
+    ChipLogError(Controller, "Commissioning discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
+    mWaitingForDiscovery[kBLETransport] = false;
     LogErrorOnFailure(err);
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -192,14 +274,46 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     {
         return;
     }
-    LogErrorOnFailure(StopConnectOverBle());
+
+    ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
+
+    mWaitingForDiscovery[kIPTransport] = false;
+
+    // Don't stop trying to connect over BLE, because we may be dealing with
+    // stale DNS-SD records.
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
 
     Inet::InterfaceId interfaceId      = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
-    RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
-    OnDeviceDiscovered(params);
+    mDiscoveredParameters[kIPTransport] = RendezvousParameters().SetPeerAddress(peerAddress);
+    ConnectToDiscoveredDevice();
+}
+
+bool SetUpCodePairer::TryNextRendezvousParameters()
+{
+    // Don't call PairDevice again; just do PASE as needed.  If we called
+    // PairDevice before and PASE succeeds, the commmissioning that's been
+    // queued up will happen.
+    mConnectionType       = SetupCodePairerBehaviour::kPaseOnly;
+    mWaitingForConnection = false;
+
+    if (ConnectToDiscoveredDevice())
+    {
+        ChipLogProgress(Controller, "Trying connection to commissionee over different transport");
+        return true;
+    }
+
+    for (const auto & waiting : mWaitingForDiscovery)
+    {
+        if (waiting)
+        {
+            ChipLogProgress(Controller, "Waiting to discover commissionees that match our filters");
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace Controller
