@@ -116,9 +116,9 @@ tests:
       command: "writeAttribute"
       attribute: "OnMode"
       arguments:
-        value: 2
+          value: 2
       response:
-        error: CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Change OnMode"
       command: "writeAttribute"
