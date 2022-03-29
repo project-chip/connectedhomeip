@@ -26,6 +26,7 @@
 
 #include <limits>
 #include <string>
+#include <stdint.h>
 
 using namespace ::chip;
 //#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -43,7 +44,7 @@ constexpr char blWiFiCredentialsKeyName[] = "bl-wifi-pass";
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
 } // namespace
 
-CHIP_ERROR BLWiFiDriver::Init()
+CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -67,12 +68,14 @@ CHIP_ERROR BLWiFiDriver::Init()
     mStagingNetwork   = mSavedNetwork;
     mpScanCallback    = nullptr;
     mpConnectCallback = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
 
     return err;
 }
 
 CHIP_ERROR BLWiFiDriver::Shutdown()
 {
+    mpStatusChangeCallback = nullptr;
     return CHIP_NO_ERROR;
 }
 

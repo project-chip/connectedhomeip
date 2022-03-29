@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/bouffalolab/BL602/BL602Config.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 //#include "esp_wifi.h"
 //#include "nvs.h"
