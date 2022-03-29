@@ -75,6 +75,7 @@ target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/cmd_ping.cpp
     ${APP_ROOT}/shell_common/cmd_send.cpp
     ${APP_ROOT}/nrfconnect/main.cpp
+    ${APP_ROOT}/common/stubs.cpp
     ${GEN_DIR}/callback-stub.cpp
     ${GEN_DIR}/IMClusterCommandHandler.cpp
     ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

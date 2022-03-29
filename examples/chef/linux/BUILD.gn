@@ -32,7 +32,10 @@ chip_data_model("chef-data-model") {
 }
 
 executable("${sample_name}") {
-  sources = [ "${project_dir}/linux/main.cpp" ]
+  sources = [
+    "${project_dir}/linux/main.cpp",
+    "${project_dir}/common/stubs.cpp"
+  ]
 
   deps = [
     ":chef-data-model",
