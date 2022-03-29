@@ -32,6 +32,15 @@ namespace {
 // CHIPIMDispatch.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
 
+class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        // We only allow access to the OTA software update provider.
+        return false;
+    }
+} gDeviceTypeResolver;
+
 // TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate {
     CHIP_ERROR Check(
@@ -68,7 +77,7 @@ AccessControlDelegate gDelegate;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        GetAccessControl().Init(&gDelegate);
+        GetAccessControl().Init(&gDelegate, gDeviceTypeResolver);
     });
 }
 
