@@ -279,6 +279,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
 
         commandObj->AddResponse(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
         iter->Release();
+        status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
 exit:

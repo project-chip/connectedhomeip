@@ -179,8 +179,8 @@ public:
         CHIP_ERROR err = TryAddResponseData(aRequestCommandPath, aData);
         if (err != CHIP_NO_ERROR)
         {
-            // We have verified the state above, so this call must succeed since we must be in one of the states required by
-            // RollbackResponse.
+            // The state guarantees that either we can rollback or we don't have to rollback the buffer, so we don't care about the
+            // return value of RollbackResponse.
             RollbackResponse();
         }
         return err;
@@ -193,8 +193,8 @@ public:
      * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
      * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
      *
-     * Since the function will call AddStatus when failed to encode the data, it cannot send any response when it failed to encode a
-     * status code since another AddStatus call will also fail. Users can check the log when thry failed to receive a response.
+     * Since the function will call AddStatus when it fails to encode the data, it cannot send any response when it fails to encode
+     * a status code since another AddStatus call will also fail. The error from AddStatus will just be logged.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
@@ -203,11 +203,13 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        LogErrorOnFailure(err = AddResponseData(aRequestCommandPath, aData));
-        if (err != CHIP_NO_ERROR)
+        if (err != AddResponseData(aRequestCommandPath, aData))
         {
-            LogErrorOnFailure(AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure));
+            CHIP_ERROR err = AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to encode status: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
 

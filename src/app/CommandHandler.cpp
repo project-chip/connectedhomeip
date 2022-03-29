@@ -556,8 +556,7 @@ CHIP_ERROR CommandHandler::FinishStatus()
 
 CHIP_ERROR CommandHandler::RollbackResponse()
 {
-    VerifyOrReturnError(mState == State::Idle || mState == State::Preparing || mState == State::AddingCommand,
-                        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     mInvokeResponseBuilder.Rollback(mBackupWriter);
     mInvokeResponseBuilder.ResetError();
     // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
