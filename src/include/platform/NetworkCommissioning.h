@@ -237,7 +237,8 @@ public:
      * be delivered. On success, the driver should set outNetworkIndex to the index of the network just removed. The value of
      * network index is discarded on failure.
      *
-     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 
@@ -246,7 +247,8 @@ public:
      * to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug text needs
      * to be delivered.
      *
-     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) = 0;
 
@@ -283,7 +285,8 @@ public:
      * text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just added or
      * updated. The value of network index is discarded on failure.
      *
-     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                       uint8_t & outNetworkIndex) = 0;
@@ -325,7 +328,8 @@ public:
      * when no debug text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just
      * added or updated. The value of the network index is discarded on failure.
      *
-     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 

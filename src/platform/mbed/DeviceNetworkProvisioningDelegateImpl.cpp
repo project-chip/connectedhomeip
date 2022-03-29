@@ -31,8 +31,8 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
     MutableCharSpan emptyBufferForDebugText;
     uint8_t outNetworkIndex;
     auto err = WiFiDriverImpl::GetInstance().AddOrUpdateNetwork(ByteSpan(Uint8::from_const_char(ssid), strlen(ssid)),
-                                                                ByteSpan(Uint8::from_const_char(key), strlen(key)), emptySpan,
-                                                                outNetworkIndex);
+                                                                ByteSpan(Uint8::from_const_char(key), strlen(key)),
+                                                                emptyBufferForDebugText, outNetworkIndex);
     if (err != Status::kSuccess)
     {
         ChipLogError(NetworkProvisioning, "Failed to add WiFi network: 0x%" PRIx16, int(err));
