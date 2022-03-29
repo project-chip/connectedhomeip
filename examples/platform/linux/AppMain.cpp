@@ -440,7 +440,8 @@ CHIP_ERROR InitCommissioner()
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     MutableByteSpan compressedFabricIdSpan(compressedFabricId);
     ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
-    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so

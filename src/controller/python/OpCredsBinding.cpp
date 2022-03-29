@@ -206,7 +206,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
-    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
