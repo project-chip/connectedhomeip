@@ -126,9 +126,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ ot-ctl> dataset active -x
 
--  Commissioning the Thread Lighting device(ESP32H2)
+-   Commissioning the Thread Lighting device(ESP32H2)
 
-        $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
+         $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
 
 ## Cluster Control
 
