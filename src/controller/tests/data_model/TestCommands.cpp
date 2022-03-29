@@ -106,7 +106,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             dataResponse.arg1 = nestedStructList;
             dataResponse.arg6 = true;
 
-            apCommandObj->AddResponseData(aCommandPath, dataResponse);
+            apCommandObj->AddResponse(aCommandPath, dataResponse);
         }
         else if (responseDirective == kSendSuccessStatusCode)
         {

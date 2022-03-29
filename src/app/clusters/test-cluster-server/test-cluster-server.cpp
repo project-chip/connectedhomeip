@@ -714,11 +714,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(CommandHandler * apCommandObj
 {
     TestSpecificResponse::Type responseData;
     responseData.returnValue = 7;
-    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    apCommandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -738,11 +734,7 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
 
     TestAddArgumentsResponse::Type responseData;
     responseData.returnValue = static_cast<uint8_t>(commandData.arg1 + commandData.arg2);
-    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestAddArguments response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    apCommandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -750,11 +742,7 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
 {
     Commands::BooleanResponse::Type response;
     response.value = value;
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -811,7 +799,7 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
-    commandObj->AddResponseData(commandPath, responseData);
+    commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -827,7 +815,7 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
-    commandObj->AddResponseData(commandPath, responseData);
+    commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -923,7 +911,7 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
         Commands::TestListInt8UReverseResponse::Type responseData;
         if (count == 0)
         {
-            SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+            commandObj->AddResponse(commandPath, responseData);
             return true;
         }
         size_t cur = count;
@@ -937,7 +925,7 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
         VerifyOrExit(cur == 0, );
         VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
         responseData.arg1 = DataModel::List<uint8_t>(responseBuf.Get(), count);
-        SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+        commandObj->AddResponse(commandPath, responseData);
         return true;
     }
 
@@ -953,11 +941,7 @@ bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandO
     response.arg1 = commandData.arg1;
     response.arg2 = commandData.arg2;
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -979,11 +963,7 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
         response.originalValue.Emplace(commandData.arg1.Value());
     }
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -1000,11 +980,7 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * c
     response.arg1.g = commandData.arg1.g;
     response.arg1.h = commandData.arg1.h;
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 

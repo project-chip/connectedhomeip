@@ -61,8 +61,8 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
-                           uint8_t index, const CharSpan & debug_text);
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+                     uint8_t index, const CharSpan & debug_text);
 OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 
 constexpr uint8_t kDACCertificate = 1;
@@ -519,8 +519,8 @@ namespace {
 // TODO: Manage ephemeral RCAC/ICAC/NOC storage to avoid a full FabricInfo being needed here.
 FabricInfo gFabricBeingCommissioned;
 
-CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
-                           uint8_t index, const CharSpan & debug_text)
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+                     uint8_t index, const CharSpan & debug_text)
 {
     Commands::NOCResponse::Type payload;
     payload.statusCode = status;
@@ -535,7 +535,7 @@ CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteComma
         payload.debugText.Emplace(to_send);
     }
 
-    return commandObj->AddResponseData(path, payload);
+    commandObj->AddResponse(path, payload);
 }
 
 OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
@@ -774,7 +774,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     }
 
     response.certificate = derBufSpan;
-    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+    commandObj->AddResponse(commandPath, response);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -834,7 +834,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         response.attestationElements = attestationElementsSpan;
         response.signature           = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        commandObj->AddResponse(commandPath, response);
     }
 
 exit:
@@ -922,7 +922,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         response.NOCSRElements        = nocsrElementsSpan;
         response.attestationSignature = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        commandObj->AddResponse(commandPath, response);
     }
 
 exit:
