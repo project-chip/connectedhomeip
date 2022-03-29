@@ -173,8 +173,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
         {
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
-                !onMode.IsNull())
+            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
             {
                 emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
@@ -248,7 +247,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         // null       Set the OnOff attribute to its previous value.
 
         bool onOffValueForStartUp = 0;
-        EmberAfStatus status = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
+        EmberAfStatus status      = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             status = setOnOffValue(endpoint, onOffValueForStartUp, false);
@@ -265,7 +264,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
  * @param endpoint   Ver.: always
  * @param onOffValueForStartUp Ver.: always
  */
-EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool& onOffValueForStartUp)
+EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp)
 {
     app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
     EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);

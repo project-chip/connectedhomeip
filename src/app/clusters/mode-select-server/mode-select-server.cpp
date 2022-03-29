@@ -136,7 +136,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             // Initialise currentMode to 0
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
-            #ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef EMBER_AF_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -150,13 +150,14 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    if (onOffValueForStartUp && !onMode.IsNull()) {
+                    if (onOffValueForStartUp && !onMode.IsNull())
+                    {
                         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: CurrentMode is overwritten by OnMode");
                         return;
                     }
                 }
             }
-            #endif //EMBER_AF_PLUGIN_ON_OFF
+#endif // EMBER_AF_PLUGIN_ON_OFF
             if (status == EMBER_ZCL_STATUS_SUCCESS && startUpMode.Value() != currentMode)
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
@@ -214,10 +215,8 @@ InteractionModel::Status MatterModeSelectClusterServerPreAttributeChangedCallbac
     const EndpointId endpointId = attributePath.mEndpointId;
     InteractionModel::Status result;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                  "ModeSelect: Checking attribute %u", attributePath.mAttributeId);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                  "ModeSelect: value = %u", *value);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Checking attribute %u", attributePath.mAttributeId);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: value = %u", *value);
     switch (attributePath.mAttributeId)
     {
     case ModeSelect::Attributes::StartUpMode::Id:
