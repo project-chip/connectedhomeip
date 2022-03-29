@@ -219,11 +219,8 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
 
-    // TODO: Provide a means to Python-configure the group data provider to update local IPK
     sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
     ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
-
-    // TODO: Set IPK from src/lib/support/TestGroupData.h:DefaultIpkValue::GetDefaultIpk()
 
     factoryParams.groupDataProvider        = &sGroupDataProvider;
     factoryParams.enableServerInteractions = true;

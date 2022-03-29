@@ -196,7 +196,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
-    // Setup IPK in Group Data Provider for controller
+    // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
     FabricInfo * fabricInfo = devCtrl->GetFabricInfo();
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL.AsInteger());
 

@@ -93,7 +93,6 @@ private:
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
-// TODO: Should this be injected?
 chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -132,7 +131,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         factoryParams.fabricIndependentStorage = &gServerStorage;
 
         // Initialize group data provider for local group key state and IPKs
-        // TODO(songguo): Can you figure-out where we can setup group data here?
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
         err = gGroupDataProvider.Init();
         SuccessOrExit(err);
