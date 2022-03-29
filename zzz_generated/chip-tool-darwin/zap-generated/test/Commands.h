@@ -53982,40 +53982,44 @@ public:
             err = TestKeySetRead_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Write Group Keys\n");
-            err = TestWriteGroupKeys_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write Group Keys (invalid)\n");
+            err = TestWriteGroupKeysInvalid_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read Group Keys\n");
-            err = TestReadGroupKeys_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write Group Keys\n");
+            err = TestWriteGroupKeys_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Read GroupTable\n");
-            err = TestReadGroupTable_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read Group Keys\n");
+            err = TestReadGroupKeys_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : KeySet Remove 1\n");
-            err = TestKeySetRemove1_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Read GroupTable\n");
+            err = TestReadGroupTable_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : KeySet Read (removed)\n");
-            err = TestKeySetReadRemoved_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : KeySet Remove 1\n");
+            err = TestKeySetRemove1_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : KeySet Read (not removed)\n");
-            err = TestKeySetReadNotRemoved_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : KeySet Read (removed)\n");
+            err = TestKeySetReadRemoved_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Remove All\n");
-            err = TestRemoveAll_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : KeySet Read (not removed)\n");
+            err = TestKeySetReadNotRemoved_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : KeySet Remove 2\n");
-            err = TestKeySetRemove2_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Remove All\n");
+            err = TestRemoveAll_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : KeySet Read (also removed)\n");
-            err = TestKeySetReadAlsoRemoved_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : KeySet Remove 2\n");
+            err = TestKeySetRemove2_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : KeySet Read (also removed)\n");
+            err = TestKeySetReadAlsoRemoved_17();
             break;
         }
 
@@ -54032,7 +54036,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 17;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -54282,7 +54286,36 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteGroupKeys_8()
+    CHIP_ERROR TestWriteGroupKeysInvalid_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
+                                                                                         endpoint:0
+                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id groupKeyMapArgument;
+        {
+            NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+            temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:258U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:0U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+
+            groupKeyMapArgument = temp_0;
+        }
+        [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Write Group Keys (invalid) Error: %@", err);
+
+                                      VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                      NextTest();
+                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWriteGroupKeys_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54317,7 +54350,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadGroupKeys_9()
+    CHIP_ERROR TestReadGroupKeys_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54357,7 +54390,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadGroupTable_10()
+    CHIP_ERROR TestReadGroupTable_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54398,7 +54431,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetRemove1_11()
+    CHIP_ERROR TestKeySetRemove1_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54420,7 +54453,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadRemoved_12()
+    CHIP_ERROR TestKeySetReadRemoved_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54442,7 +54475,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadNotRemoved_13()
+    CHIP_ERROR TestKeySetReadNotRemoved_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54492,7 +54525,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestRemoveAll_14()
+    CHIP_ERROR TestRemoveAll_15()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -54509,7 +54542,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetRemove2_15()
+    CHIP_ERROR TestKeySetRemove2_16()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -54531,7 +54564,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadAlsoRemoved_16()
+    CHIP_ERROR TestKeySetReadAlsoRemoved_17()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
