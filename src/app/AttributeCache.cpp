@@ -219,5 +219,67 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
+struct compare
+{
+    bool operator()(const ConcreteDataAttributePathWithSize & x, const ConcreteDataAttributePathWithSize & y) const
+    {
+        return x.mSize > y.mSize;
+    }
+};
+
+uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       DataVersionFilter * apDataVersionFilterList,
+                                                       size_t aDataVersionFilterListSize)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVWriter backup;
+    uint32_t number = 0;
+
+    std::set<ConcreteDataAttributePathWithSize, compare> clusterSet;
+    for (auto path = mChangedAttributeSet.begin(); path != mChangedAttributeSet.end(); path++)
+    {
+        ConcreteDataAttributePathWithSize cluster(*path);
+        UpdateClusterSize(cluster);
+        clusterSet.insert(cluster);
+    }
+
+    for (auto path1 = clusterSet.rbegin(); path1 != clusterSet.rend(); path1++)
+    {
+        DataVersionFilter dataVersionFilter(path1->mEndpointId, path1->mClusterId, path1->mDataVersion);
+        aDataVersionFilterIBsBuilder.Checkpoint(backup);
+        VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        for (size_t index = 0; index < aDataVersionFilterListSize; index++)
+        {
+            if (apDataVersionFilterList[index].IsSameCluster(*path1))
+            {
+                continue;
+            }
+        }
+
+        DataVersionFilterIB::Builder & filter = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
+        SuccessOrExit(err = aDataVersionFilterIBsBuilder.GetError());
+        ClusterPathIB::Builder & filterPath = filter.CreatePath();
+        SuccessOrExit(err = filter.GetError());
+        SuccessOrExit(err = filterPath.Endpoint(dataVersionFilter.mEndpointId)
+                                .Cluster(dataVersionFilter.mClusterId)
+                                .EndOfClusterPathIB()
+                                .GetError());
+        VerifyOrExit(dataVersionFilter.mDataVersion.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        SuccessOrExit(err = filter.DataVersion(dataVersionFilter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+        ChipLogProgress(
+            DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
+            dataVersionFilter.mEndpointId, ChipLogValueMEI(dataVersionFilter.mClusterId), dataVersionFilter.mDataVersion.Value());
+
+        number++;
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        aDataVersionFilterIBsBuilder.Rollback(backup);
+    }
+    return number;
+}
+
 } // namespace app
 } // namespace chip

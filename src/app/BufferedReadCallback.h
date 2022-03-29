@@ -84,6 +84,13 @@ private:
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
+    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                           DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize) override
+    {
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, apDataVersionFilterList,
+                                                       aDataVersionFilterListSize);
+    }
+
 private:
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
