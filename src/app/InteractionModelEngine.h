@@ -378,7 +378,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 
 /**
- * TODO: document
+ * Returns true if device type is on endpoint, false otherwise.
  */
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
 
