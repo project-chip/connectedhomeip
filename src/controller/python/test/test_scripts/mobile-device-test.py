@@ -76,15 +76,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                    nodeid=device_nodeid),
               "Failed to finish key exchange")
 
-    #
-    # Disable this test for now since it's exposing some bugs
-    # in the underlying minimal mDNS component on Linux and triggering crashes.
-    #
-    # Issue: #15688
-    #
-    # asyncio.run(test.TestMultiFabric(ip=address.decode("utf-8"),
-    #                                  setuppin=20202021,
-    #                                  nodeid=1))
+    asyncio.run(test.TestMultiFabric(ip=address,
+                                     setuppin=20202021,
+                                     nodeid=1))
     #
     # The server will crash if we are aborting / closing it too fast.
     # Issue: #15987
