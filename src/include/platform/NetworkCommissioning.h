@@ -232,21 +232,21 @@ public:
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
     /**
-     * @brief Remove a network from the device. The driver can fill the outDebugText field to pass any human-readable messages to
-     * the client. On success, the driver should set outNetworkIndex to the index of the network just removed. The value of network
-     * index is discarded on failure.
+     * @brief Remove a network from the device. The driver should fill the outDebugText field to pass any human-readable messages to
+     * the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug text needs to
+     * be delivered. On success, the driver should set outNetworkIndex to the index of the network just removed. The value of
+     * network index is discarded on failure.
      *
-     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
-     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 
     /**
-     * @brief Reorder the networks on the device. The driver can fill the outDebugText field to pass any human-readable messages to
-     * the client.
+     * @brief Reorder the networks on the device. The driver should fill the outDebugText field to pass any human-readable messages
+     * to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug text needs
+     * to be delivered.
      *
-     * Note: The driver only need to check if the index equals to 0 if they only support one network. The capacity of outDebugText
-     * can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) = 0;
 
@@ -278,12 +278,12 @@ public:
     };
 
     /**
-     * @brief Adds or updates a WiFi network on the device. The driver can fill the outDebugText field to pass any human-readable
-     * messages to the client. On success, the driver should set outNetworkIndex to the index of the network just added or updated.
-     * The value of network index is discarded on failure.
+     * @brief Adds or updates a WiFi network on the device. The driver should fill the outDebugText field to pass any human-readable
+     * messages to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug
+     * text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just added or
+     * updated. The value of network index is discarded on failure.
      *
-     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
-     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                       uint8_t & outNetworkIndex) = 0;
@@ -320,12 +320,12 @@ public:
     };
 
     /**
-     * @brief Adds or updates a Thread network on the device. The driver can fill the outDebugText field to pass any human-readable
-     * messages to the client. On success, the driver should set outNetworkIndex to the index of the network just added or updated.
-     * The value of network index is discarded on failure.
+     * @brief Adds or updates a Thread network on the device. The driver should fill the outDebugText field to pass any
+     * human-readable messages to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response
+     * when no debug text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just
+     * added or updated. The value of the network index is discarded on failure.
      *
-     * Note: The outNetworkIndex is 0 when calling this function, so the driver don't need to set the value if they only support one
-     * network. The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     * Note: The capacity of outDebugText can be configured via CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
      */
     virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 

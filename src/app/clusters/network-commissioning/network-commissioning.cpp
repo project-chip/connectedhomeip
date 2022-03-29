@@ -288,15 +288,15 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
 
 namespace {
 
-void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & resp, MutableCharSpan debugText, uint8_t networkIndex)
+void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & response, MutableCharSpan debugText, uint8_t networkIndex)
 {
-    if (debugTextLen > 0)
+    if (debugText.size() > 0)
     {
         response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
     }
     if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
     {
-        response.networkIndex.SetValue(outNetworkIndex);
+        response.networkIndex.SetValue(networkIndex);
     }
 }
 
@@ -314,7 +314,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     uint8_t outNetworkIndex   = 0;
     response.networkingStatus = ToClusterObjectEnum(
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
-    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -330,7 +330,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     uint8_t outNetworkIndex = 0;
     response.networkingStatus =
         ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
-    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -345,7 +345,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 #endif
     uint8_t outNetworkIndex   = 0;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
-    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
@@ -375,7 +375,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
-    FillDebugTextAndNetworkIndex(debugText, outNetworkIndex);
+    FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
 }
 
