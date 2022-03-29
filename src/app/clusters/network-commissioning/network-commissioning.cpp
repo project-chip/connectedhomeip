@@ -315,7 +315,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     response.networkingStatus = ToClusterObjectEnum(
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
@@ -331,7 +331,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     response.networkingStatus =
         ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
@@ -346,7 +346,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     uint8_t outNetworkIndex   = 0;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
@@ -376,7 +376,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
 #endif
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t interfaceStatus)
@@ -394,7 +394,7 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.networkingStatus = ToClusterObjectEnum(commissioningError);
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
-    commandHandle->AddResponseData(mPath, response);
+    commandHandle->AddResponse(mPath, response);
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);

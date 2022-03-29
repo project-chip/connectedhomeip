@@ -23,6 +23,7 @@ from chip.clusters.Attribute import AttributePath, AttributeReadResult, Attribut
 import chip.interaction_model
 import asyncio
 import time
+import sys
 
 import base
 
@@ -258,12 +259,10 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
 
-        #
-        # TODO: Enable this back once Issue #15688 has been resolved.
-        #
+        # Note: ListFabricScoped is an empty list for now. We should re-enable this test after we make it return expected data.
         # logger.info("8: Read without fabric filter")
         # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        # if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        # if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) == 1:
         #     raise AssertionError("Expect more elements in the response")
         # logger.info("9: Read with fabric filter")
         # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=True)

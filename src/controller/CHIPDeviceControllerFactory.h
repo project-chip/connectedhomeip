@@ -138,6 +138,19 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
+    //
+    // Retrieve a read-only pointer to the system state object that contains pointers to key stack
+    // singletons. If the pointer is null, it indicates that the DeviceControllerFactory has yet to
+    // be initialized properly, or has already been shut-down.
+    //
+    // This pointer ceases to be valid after a call to Shutdown has been made, or if all active
+    // DeviceController instances have gone to 0. Consequently, care has to be taken to correctly
+    // sequence the shutting down of active controllers with any entity that interacts with objects
+    // present in the system state object. If de-coupling is desired, RetainSystemState and
+    // ReleaseSystemState can be used to avoid this.
+    //
+    const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
+
     class ControllerFabricDelegate final : public FabricTableDelegate
     {
     public:

@@ -131,9 +131,12 @@ public:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+
+    // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
+    void ResetPathIterator();
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
     ObjectList<AttributePathParams> * GetAttributePathList() { return mpAttributePathList; }
@@ -149,22 +152,23 @@ public:
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
     bool IsChunkedReport() const { return mIsChunkedReport; }
+    // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
+    // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
+    bool IsReporting() const { return mIsChunkedReport; }
     bool IsPriming() const { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
-    void SetDirty()
-    {
-        mDirty = true;
-        // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
-        // we've sent up till now are no longer valid and need to be invalidated.
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
-        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
-    }
-    void ClearDirty() { mDirty = false; }
-    bool IsDirty() const { return mDirty; }
+
+    /**
+     * Notify the read handler that a set of attribute paths has been marked dirty.
+     */
+    void SetDirty(const AttributePathParams & aAttributeChanged);
+    bool IsDirty() const { return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mForceDirty; }
+    void ClearDirty() { mForceDirty = false; }
+
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
@@ -173,7 +177,7 @@ public:
     void UnblockUrgentEventDelivery()
     {
         mHoldReport = false;
-        mDirty      = true;
+        mForceDirty = true;
     }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
@@ -271,7 +275,6 @@ private:
     // report immediately due to an urgent event being queued,
     // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport         = false;
-    bool mDirty              = false;
     bool mActiveSubscription = false;
     // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
     // last chunked message.
@@ -283,7 +286,51 @@ private:
     // are waiting for the max reporting interval to elaps.  When mHoldSync
     // becomes false, we are allowed to send an empty report to keep the
     // subscription alive on the client.
-    bool mHoldSync                   = false;
+    bool mHoldSync = false;
+
+    // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
+    // marked dirty.
+    //
+    // This allows us to detemine whether any paths we care about might have
+    // been marked dirty after we had already sent reports for them, which would
+    // mean we should report those paths again, by comparing this generation to the
+    // current generation when we started sending the last set reports that we completed.
+    //
+    // This allows us to reset the iterator to the beginning of the current
+    // cluster instead of the beginning of the whole report in SetDirty, without
+    // permanently missing dirty any paths.
+    uint64_t mDirtyGeneration = 0;
+    // For subscriptions, we record the dirty set generation when we started to generate the last report.
+    // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
+    // has a meaningful value while IsReporting() is true.
+    //
+    // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
+    // chunk of the current report.  Anything that was dirty with a generation earlier than
+    // mPreviousReportsBeginGeneration has had its value sent to the client.
+    bool mForceDirty = false;
+    // For subscriptions, we record the timestamp when we started to generate the last report.
+    // The mCurrentReportsBeginGeneration records the timestamp for the current report, which won;t be used for checking if this
+    // ReadHandler is dirty.
+    // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we sent the last chunk of the current
+    // report.
+    uint64_t mPreviousReportsBeginGeneration = 0;
+    uint64_t mCurrentReportsBeginGeneration  = 0;
+    /*
+     *           (mDirtyGeneration = b > a, this is a dirty read handler)
+     *        +- Start Report -> mCurrentReportsBeginGeneration = c
+     *        |      +- SetDirty (Attribute Y) -> mDirtyGeneration = d
+     *        |      |     +- Last Chunk -> mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration = c
+     *        |      |     |   +- (mDirtyGeneration = d) > (mPreviousReportsBeginGeneration = c), this is a dirty read handler
+     *        |      |     |   |  Attribute X has a dirty generation less than c, Attribute Y has a dirty generation larger than c
+     *        |      |     |   |  So Y will be included in the report but X will not be inclued in this report.
+     * -a--b--c------d-----e---f---> Generation
+     *  |  |
+     *  |  +- SetDirty (Attribute X) (mDirtyGeneration = b)
+     *  +- mPreviousReportsBeginGeneration
+     * For read handler, if mDirtyGeneration > mPreviousReportsBeginGeneration, then we regard it as a dirty read handler, and it
+     * should generate report on timeout reached.
+     */
+
     uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.

@@ -277,6 +277,11 @@ public:
     CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
 
     /**
+     * @brief Encode ChipDN attributes in TLV form.
+     **/
+    CHIP_ERROR EncodeToTLV(chip::TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    /**
      * @brief Decode ChipDN attributes from TLV encoded format.
      *
      * @param reader  A TLVReader positioned at the ChipDN TLV list.
@@ -287,6 +292,13 @@ public:
      * @brief Encode ChipDN attributes in ASN1 form.
      **/
     CHIP_ERROR EncodeToASN1(ASN1::ASN1Writer & writer) const;
+
+    /**
+     * @brief Decode ChipDN attributes from ASN1 encoded format.
+     *
+     * @param reader  A ASN1Reader positioned at the ChipDN ASN1 list.
+     **/
+    CHIP_ERROR DecodeFromASN1(ASN1::ASN1Reader & reader);
 
     bool IsEqual(const ChipDN & other) const;
 
@@ -868,7 +880,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
 /**
  * Extract Public Key from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
@@ -877,11 +889,27 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 /**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan TLV-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan X509 DER-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from converting and parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
 
 } // namespace Credentials
 } // namespace chip

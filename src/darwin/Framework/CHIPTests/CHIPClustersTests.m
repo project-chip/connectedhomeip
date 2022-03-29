@@ -47621,6 +47621,35 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 }
 - (void)testSendClusterTestGroupKeyManagementCluster_000008_WriteAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write Group Keys (invalid)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id groupKeyMapArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:258U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:0U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+
+        groupKeyMapArgument = temp_0;
+    }
+    [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write Group Keys (invalid) Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000009_WriteAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write Group Keys"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -47654,7 +47683,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000009_ReadAttribute
+- (void)testSendClusterTestGroupKeyManagementCluster_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read Group Keys"];
 
@@ -47699,7 +47728,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000010_ReadAttribute
+- (void)testSendClusterTestGroupKeyManagementCluster_000011_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read GroupTable"];
 
@@ -47742,7 +47771,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000011_KeySetRemove
+- (void)testSendClusterTestGroupKeyManagementCluster_000012_KeySetRemove
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Remove 1"];
 
@@ -47764,7 +47793,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000012_KeySetRead
+- (void)testSendClusterTestGroupKeyManagementCluster_000013_KeySetRead
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (removed)"];
 
@@ -47786,7 +47815,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000013_KeySetRead
+- (void)testSendClusterTestGroupKeyManagementCluster_000014_KeySetRead
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (not removed)"];
 
@@ -47833,7 +47862,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000014_RemoveAllGroups
+- (void)testSendClusterTestGroupKeyManagementCluster_000015_RemoveAllGroups
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All"];
 
@@ -47852,7 +47881,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000015_KeySetRemove
+- (void)testSendClusterTestGroupKeyManagementCluster_000016_KeySetRemove
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Remove 2"];
 
@@ -47874,7 +47903,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000016_KeySetRead
+- (void)testSendClusterTestGroupKeyManagementCluster_000017_KeySetRead
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (also removed)"];
 

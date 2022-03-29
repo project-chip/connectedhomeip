@@ -146,8 +146,8 @@ public:
     }
 
     template <typename AttrType>
-    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, NodeId sourceNodeId, const AttrType & requestData,
-                              void * context, ClusterId clusterId, AttributeId attributeId, WriteResponseSuccessCallback successCb,
+    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, const AttrType & requestData, void * context,
+                              ClusterId clusterId, AttributeId attributeId, WriteResponseSuccessCallback successCb,
                               WriteResponseFailureCallback failureCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                               WriteResponseDoneCallback doneCb = nullptr, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
@@ -173,20 +173,19 @@ public:
             }
         };
 
-        Transport::OutgoingGroupSession groupSession(groupId, fabricIndex, sourceNodeId);
+        Transport::OutgoingGroupSession groupSession(groupId, fabricIndex);
         return chip::Controller::WriteAttribute<AttrType>(SessionHandle(groupSession), 0 /*Unused for Group*/, clusterId,
                                                           attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs,
                                                           onDoneCb, aDataVersion);
     }
 
     template <typename AttributeInfo>
-    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, NodeId sourceNodeId,
-                              const typename AttributeInfo::Type & requestData, void * context,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+    CHIP_ERROR WriteAttribute(GroupId groupId, FabricIndex fabricIndex, const typename AttributeInfo::Type & requestData,
+                              void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
                               WriteResponseDoneCallback doneCb = nullptr, const Optional<DataVersion> & aDataVersion = NullOptional,
                               const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional)
     {
-        return WriteAttribute(groupId, fabricIndex, sourceNodeId, requestData, context, AttributeInfo::GetClusterId(),
+        return WriteAttribute(groupId, fabricIndex, requestData, context, AttributeInfo::GetClusterId(),
                               AttributeInfo::GetAttributeId(), successCb, failureCb, aTimedWriteTimeoutMs, doneCb, aDataVersion);
     }
 
