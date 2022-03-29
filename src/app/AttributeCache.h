@@ -34,7 +34,6 @@
 
 namespace chip {
 namespace app {
-
 /*
  * This implements an attribute cache designed to aggregate attribute data received by a client
  * from either read or subscribe interactions and keep it resident and available for clients to
@@ -217,6 +216,10 @@ public:
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
+    CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
+
+    static void SortFilterMap(std::map<DataVersionFilter, size_t> & aMap,
+                              std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
     /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path
@@ -241,7 +244,7 @@ public:
         auto clusterState = GetClusterState(endpointId, clusterId, err);
         ReturnErrorOnFailure(err);
 
-        for (auto & attributeIter : *clusterState)
+        for (auto & attributeIter : clusterState->mState)
         {
             const ConcreteAttributePath path(endpointId, clusterId, attributeIter.first);
             ReturnErrorOnFailure(func(path));
@@ -272,7 +275,7 @@ public:
             {
                 if (clusterIter.first == clusterId)
                 {
-                    for (auto & attributeIter : clusterIter.second)
+                    for (auto & attributeIter : clusterIter.second.mState)
                     {
                         const ConcreteAttributePath path(endpointIter.first, clusterId, attributeIter.first);
                         ReturnErrorOnFailure(func(path));
@@ -312,9 +315,16 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    using ClusterState   = std::map<AttributeId, AttributeState>;
-    using EndpointState  = std::map<ClusterId, ClusterState>;
-    using NodeState      = std::map<EndpointId, EndpointState>;
+    // mPendingDataVersion is set when mRequestPathSet is intersecting with received attribute report
+    // mCommittedDataVersion is set when client receives the last reports and mPendingDataVersion has valid value.
+    struct ClusterState
+    {
+        std::map<AttributeId, AttributeState> mState;
+        Optional<DataVersion> mPendingDataVersion;
+        Optional<DataVersion> mCommittedDataVersion;
+    };
+    using EndpointState = std::map<ClusterId, ClusterState>;
+    using NodeState     = std::map<EndpointId, EndpointState>;
 
     /*
      * These functions provide a way to index into the cached state with different sub-sets of a path, returning
@@ -344,11 +354,11 @@ private:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
+    void OnError(CHIP_ERROR aError) override { mCallback.OnError(aError); }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
-        return mCallback.OnEventData(aEventHeader, apData, apStatus);
+        mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
     void OnDone() override { return mCallback.OnDone(); }
@@ -356,12 +366,20 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
-        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+        mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
+
+    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                           const Span<AttributePathParams> & aAttributePaths) override;
+    virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
+
+    virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override;
+    void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
     NodeState mCache;
-    std::set<ConcreteAttributePath> mChangedAttributeSet;
+    std::set<ConcreteDataAttributePath> mChangedAttributeSet;
+    std::set<AttributePathParams> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
 };

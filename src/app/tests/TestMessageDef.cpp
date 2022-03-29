@@ -1092,10 +1092,6 @@ void BuildReadRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrit
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathIBs);
 
-    DataVersionFilterIBs::Builder & dataVersionFilters = readRequestBuilder.CreateDataVersionFilters();
-    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
-
     EventPathIBs::Builder & eventPathList = readRequestBuilder.CreateEventRequests();
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -1107,6 +1103,10 @@ void BuildReadRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrit
 
     readRequestBuilder.IsFabricFiltered(true);
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dataVersionFilters = readRequestBuilder.CreateDataVersionFilters();
+    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
 
     readRequestBuilder.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -1254,10 +1254,6 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathIBs);
 
-    DataVersionFilterIBs::Builder & dataVersionFilters = subscribeRequestBuilder.CreateDataVersionFilters();
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
-
     EventPathIBs::Builder & eventPathList = subscribeRequestBuilder.CreateEventRequests();
 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -1272,6 +1268,10 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
 
     subscribeRequestBuilder.IsFabricFiltered(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dataVersionFilters = subscribeRequestBuilder.CreateDataVersionFilters();
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
 
     subscribeRequestBuilder.EndOfSubscribeRequestMessage();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
