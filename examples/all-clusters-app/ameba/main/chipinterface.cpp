@@ -62,7 +62,8 @@ constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
+                                      &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
 } // namespace
 
 void NetWorkCommissioningInstInit()
