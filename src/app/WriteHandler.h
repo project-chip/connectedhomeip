@@ -142,7 +142,8 @@ private:
     void Close();
 
     void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
-    void DeliverListWriteEnd(const ConcreteAttributePath & aPath, CHIP_ERROR aError);
+    void DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful);
+    void DeliverFinalListWriteEnd(bool writeWasSuccessful);
 
 private: // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -157,7 +158,7 @@ private:
     bool mSuppressResponse = false;
     bool mHasMoreChunks    = false;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
-    bool mLastAttributeIsList                     = false;
+    bool mProcessingAttributeIsList               = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app

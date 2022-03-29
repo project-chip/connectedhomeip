@@ -138,16 +138,16 @@ public:
         }
     }
 
-    void OnListWriteEnd(const app::ConcreteAttributePath & aPath, CHIP_ERROR aError) override
+    void OnListWriteEnd(const app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
     {
         if (mOnListWriteEnd)
         {
-            mOnListWriteEnd(aPath, aError);
+            mOnListWriteEnd(aPath, aWriteWasSuccessful);
         }
     }
 
     std::function<void(const app::ConcreteAttributePath & path)> mOnListWriteBegin;
-    std::function<void(const app::ConcreteAttributePath & path, CHIP_ERROR error)> mOnListWriteEnd;
+    std::function<void(const app::ConcreteAttributePath & path, bool wasSuccessful)> mOnListWriteEnd;
 } testServer;
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
@@ -480,15 +480,22 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
 
 namespace TestTransactionalListInstructions {
 
-using PathStatus = std::pair<app::ConcreteAttributePath, CHIP_ERROR>;
+using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
+
+enum class Operations : uint8_t
+{
+    kNoop                = 0,
+    kShutdownWriteClient = 1,
+};
+
 struct Instructions
 {
     // The paths used in write request
     std::vector<ConcreteAttributePath> paths;
-    // operations on OnListWriteBegin and OnListWriteEnd on the server side
-    std::function<void(std::unique_ptr<WriteClient> & writeClient, const app::ConcreteAttributePath & path)> onListWriteBegin;
+    // operations on OnListWriteBegin and OnListWriteEnd on the server side.
+    std::function<Operations(const app::ConcreteAttributePath & path)> onListWriteBeginActions;
     // The expected status when OnListWriteEnd is called. In the same order as paths
-    std::vector<CHIP_ERROR> expectedStatus;
+    std::vector<bool> expectedStatus;
 };
 
 void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions)
@@ -511,14 +518,21 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
         onGoingPath = aPath;
         ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
-        if (instructions.onListWriteBegin)
+        if (instructions.onListWriteBeginActions)
         {
-            instructions.onListWriteBegin(writeClient, aPath);
+            switch (instructions.onListWriteBeginActions(aPath))
+            {
+            case Operations::kNoop:
+                break;
+            case Operations::kShutdownWriteClient:
+                // By setting writeClient to nullptr, we actually shutdown the write interaction to simulate a timeout.
+                writeClient = nullptr;
+            }
         }
     };
-    testServer.mOnListWriteEnd = [&](const ConcreteAttributePath & aPath, CHIP_ERROR aError) {
+    testServer.mOnListWriteEnd = [&](const ConcreteAttributePath & aPath, bool aWasSuccessful) {
         NL_TEST_ASSERT(apSuite, onGoingPath == aPath);
-        status.push_back(PathStatus(aPath, aError));
+        status.push_back(PathStatus(aPath, aWasSuccessful));
         onGoingPath = ConcreteAttributePath();
         ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
@@ -573,24 +587,24 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
-                .expectedStatus = { CHIP_NO_ERROR },
+                .expectedStatus = { true },
             });
 
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
-    RunTest(apSuite, ctx,
-            Instructions{
-                .paths            = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
-                .onListWriteBegin = [&](std::unique_ptr<WriteClient> & writeClient,
-                                        const app::ConcreteAttributePath & aPath) { writeClient = nullptr; },
-                .expectedStatus   = { CHIP_ERROR_MESSAGE_INCOMPLETE },
-            });
+    RunTest(
+        apSuite, ctx,
+        Instructions{
+            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+            .expectedStatus          = { false },
+        });
 
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
-                .expectedStatus = { CHIP_NO_ERROR, CHIP_NO_ERROR },
+                .expectedStatus = { true, true },
             });
 
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications with the status of each list");
@@ -598,14 +612,15 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
             Instructions{
                 .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
-                .onListWriteBegin =
-                    [&](std::unique_ptr<WriteClient> & writeClient, const app::ConcreteAttributePath & aPath) {
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) {
                         if (aPath.mAttributeId == kTestListAttribute2)
                         {
-                            writeClient = nullptr;
+                            return Operations::kShutdownWriteClient;
                         }
+                        return Operations::kNoop;
                     },
-                .expectedStatus = { CHIP_NO_ERROR, CHIP_ERROR_MESSAGE_INCOMPLETE },
+                .expectedStatus = { true, false },
             });
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);

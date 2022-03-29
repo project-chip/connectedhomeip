@@ -426,13 +426,10 @@ public:
      * transaction is aborted with a possiblily incomplete list.
      *
      * @param [in] aPath indicates the path of the modified list
-     * @param [in] aErr indicates the status.
+     * @param [in] aWriteWasSuccessful indicates whether the delivered list is complete.
      *
-     * 1) CHIP_NO_ERROR All entries are delivered successfully.
-     * 2) CHIP_ERROR_MESSAGE_INCOMPLETE When the write transaction is aborted (timeout, one or more entries failed to pass some
-     * checks.)
      */
-    virtual void OnListWriteEnd(const ConcreteAttributePath & aPath, CHIP_ERROR aErr) {}
+    virtual void OnListWriteEnd(const ConcreteAttributePath & aPath, bool aWriteWasSuccessful) {}
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.
