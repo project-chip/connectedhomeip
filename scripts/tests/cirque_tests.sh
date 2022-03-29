@@ -42,6 +42,7 @@ CIRQUE_TESTS=(
     "InteractionModelTest"
     "SplitCommissioningTest"
     "CommissioningFailureTest"
+    "CommissioningFailureOnReportTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

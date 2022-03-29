@@ -561,7 +561,10 @@ public:
      *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
      * @return int  The max number of commissionable nodes supported
      */
-    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+    int GetMaxCommissionableNodesSupported()
+    {
+        return kMaxCommissionableNodes;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -580,7 +583,10 @@ public:
      *   Return the UDC Server instance
      *
      */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer()
+    {
+        return mUdcServer;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
@@ -592,7 +598,10 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate)
+    {
+        mPairingDelegate = pairingDelegate;
+    }
 
     // AttributeCache::Callback impl
     void OnDone() override;
@@ -715,6 +724,11 @@ private:
     static void OnCommissioningCompleteResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void
+    OnDisarmFailsafe(void * context,
+                     const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
+    void DisarmDone();
 
     /**
      * @brief
@@ -765,6 +779,7 @@ private:
 
     static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
     void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -778,6 +793,7 @@ private:
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+    CompletionStatus commissioningCompletionStatus;
 
     Platform::UniquePtr<app::AttributeCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;

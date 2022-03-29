@@ -140,7 +140,7 @@ public:
     bool SimulateFailAfter(chip::Controller::CommissioningStage stage)
     {
         ChipLogProgress(Controller, "setting simulate fail after stage %s", chip::Controller::StageToString(stage));
-        if (!ValidStage(stage))
+        if (!ValidStage(stage) && stage != chip::Controller::CommissioningStage::kError)
         {
             return false;
         }
@@ -149,7 +149,7 @@ public:
     }
     bool SimulateFailOnReport(chip::Controller::CommissioningStage stage)
     {
-        if (!ValidStage(stage))
+        if (!ValidStage(stage) && stage != chip::Controller::CommissioningStage::kError)
         {
             return false;
         }
@@ -175,7 +175,26 @@ public:
             successFailureOk = mReceivedCommissioningSuccess;
             updatesOk        = StatusUpdatesOk(chip::Controller::CommissioningStage::kError);
         }
+        ChipLogProgress(Controller, "Checking callbacks: success failure ok? %d updates ok? %d", successFailureOk, updatesOk);
         return successFailureOk && updatesOk;
+    }
+    bool CheckPaseConnection(NodeId nodeId)
+    {
+        bool paseShouldBeOpen = false;
+        if (chip::to_underlying(mFailOnReportAfterStage) >=
+                chip::to_underlying(chip::Controller::CommissioningStage::kWiFiNetworkSetup) ||
+            chip::to_underlying(mSimulateFailureOnStage) >=
+                chip::to_underlying(chip::Controller::CommissioningStage::kWiFiNetworkSetup))
+        {
+            // Pase should be open still
+            paseShouldBeOpen = true;
+        }
+        CommissioneeDeviceProxy * proxy;
+        bool paseIsOpen =
+            (chip::Controller::AutoCommissioner::GetCommissioner()->GetDeviceBeingCommissioned(nodeId, &proxy) == CHIP_NO_ERROR);
+        ChipLogProgress(Controller, "Checking pase connection state: Should be open? %d is open? %d", paseShouldBeOpen, paseIsOpen);
+
+        return paseShouldBeOpen == paseIsOpen;
     }
     void Reset()
     {
@@ -410,6 +429,11 @@ bool pychip_TestCommissionerUsed()
 bool pychip_TestCommissioningCallbacks()
 {
     return sTestCommissioner.CheckCallbacks();
+}
+
+bool pychip_TestPaseConnection(NodeId nodeId)
+{
+    return sTestCommissioner.CheckPaseConnection(nodeId);
 }
 
 void pychip_ResetCommissioningTests()

@@ -1330,8 +1330,69 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
+void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
+{
+    commissioningCompletionStatus = completionStatus;
+    if (completionStatus.err == CHIP_NO_ERROR ||
+        (completionStatus.failedStage.HasValue() &&
+         chip::to_underlying(completionStatus.failedStage.Value()) >= chip::to_underlying(kWiFiNetworkSetup)))
+    {
+        // If we Completed successfully, send the callbacks, we're done.
+        // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.
+        // We do not need to reset the failsafe here because we want to keep everything on the device up to this point, so just
+        // send the completion callbacks.
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
+    }
+    else
+    {
+        // If we've failed somewhere in the early stages (or we don't have a failedStage specified), we need to start from the
+        // beginning. However, because some of the commands can only be sent once per arm-failsafe, we also need to force a reset on
+        // the failsafe so we can start fresh on the next attempt.
+        GeneralCommissioning::Commands::ArmFailSafe::Type request;
+        request.expiryLengthSeconds = 0; // Expire immediately.
+        request.breadcrumb          = 0;
+        ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
+        mDeviceBeingCommissioned = proxy;
+        // We actually want to do the same thing on success or failure because we're already in a failure state
+        SendCommand<GeneralCommissioningCluster>(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure);
+    }
+}
+
+void DeviceCommissioner::OnDisarmFailsafe(void * context,
+                                          const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+{
+    ChipLogProgress(Controller, "Failsafe disarmed");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->DisarmDone();
+}
+
+void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "Received failure response  when disarming failsafe%s\n", chip::ErrorStr(error));
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->DisarmDone();
+}
+
+void DeviceCommissioner::DisarmDone()
+{
+    // At this point, we also want to close off the pase session so we need to re-establish
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
+
+    // Signal completion - this will reset mDeviceBeingCommissioned.
+    CommissioningStageComplete(CHIP_NO_ERROR);
+    SendCommissioningCompleteCallbacks(commissionee->GetDeviceId(), commissioningCompletionStatus);
+
+    // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
+    if (commissionee != nullptr)
+    {
+        ReleaseCommissioneeDevice(commissionee);
+    }
+}
+
 void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus)
 {
+    mCommissioningStage = CommissioningStage::kSecurePairing;
     if (mPairingDelegate == nullptr)
     {
         return;
@@ -1354,6 +1415,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
+    DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
 
     if (mPairingDelegate != nullptr)
@@ -1369,12 +1431,12 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     if (status != CHIP_NO_ERROR)
     {
         // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
-        // In this case, we should call back the commissioning complete and call session error
+        // In this case, we should complete the commissioning for it.
         CompletionStatus completionStatus;
         completionStatus.err         = status;
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
-        SendCommissioningCompleteCallbacks(nodeId, completionStatus);
-        mCommissioningStage = CommissioningStage::kSecurePairing;
+        mCommissioningStage          = CommissioningStage::kCleanup;
+        CleanupCommissioning(proxy, nodeId, completionStatus);
     }
 }
 
@@ -1969,9 +2031,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kCleanup:
-        SendCommissioningCompleteCallbacks(proxy->GetDeviceId(), params.GetCompletionStatus());
-        CommissioningStageComplete(CHIP_NO_ERROR);
-        mCommissioningStage = CommissioningStage::kSecurePairing;
+        CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;
     case CommissioningStage::kError:
         mCommissioningStage = CommissioningStage::kSecurePairing;

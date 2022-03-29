@@ -74,6 +74,13 @@ def main():
         type='str',
         help="Path that contains valid and trusted PAA Root Certificates."
     )
+    optParser.add_option(
+        '--fail-on-report',
+        action="store_true",
+        dest="report",
+        default=False,
+        help='Use this flag to simulate a failure handling the report. Without this flag, failure is simulated on the stage'
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
@@ -86,20 +93,40 @@ def main():
               "Failed to set network commissioning parameters")
 
     logger.info("Testing PASE connection to device")
+
+
+    # For now, only test failures up to enabling the network.
+    # TODO: remove once pase handling on case session is handled properly.
+    if options.report:
+        for testFailureStage in range(2,17):
+            FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
+                                        setuppin=20202021,
+                                        nodeid=1),
+                    "Failed to establish PASE connection with device")
+            FailIfNot(test.TestCommissionFailureOnReport(1, testFailureStage),
+                    "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
+
+    else:
+        for testFailureStage in range(2, 17):
+            FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
+                                        setuppin=20202021,
+                                        nodeid=1),
+                    "Failed to establish PASE connection with device")
+            FailIfNot(test.TestCommissionFailure(1, testFailureStage),
+                    "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
+
+
+    # Ensure we can still commission for real
     FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
-                                setuppin=20202021,
-                                nodeid=1),
-              "Failed to establish PASE connection with device")
+                                        setuppin=20202021,
+                                        nodeid=1),
+                    "Failed to establish PASE connection with device")
+    FailIfNot(test.TestCommissionFailure(1, 0),"Failed to commission device")
 
-    # For now, only test failures up to AddNoc - if we add the noc, we need to clear the failsafe, which is not yet implemented.
-    # TODO: remove once failsafe cleanup is implemented.
-    for testFailureStage in range(2, 9):
-        FailIfNot(test.TestCommissionFailure(1, testFailureStage),
-                "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
-
-    for testFailureStage in range(2,9):
-        FailIfNot(test.TestCommissionFailureOnReport(1, testFailureStage),
-                "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
+    logger.info("Testing on off cluster")
+    FailIfNot(test.TestOnOffCluster(nodeid=1,
+                                    endpoint=LIGHTING_ENDPOINT_ID,
+                                    group=GROUP_ID), "Failed to test on off cluster")
 
     timeoutTicker.stop()
 

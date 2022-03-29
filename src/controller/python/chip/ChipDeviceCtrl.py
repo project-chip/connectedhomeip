@@ -285,6 +285,9 @@ class ChipDeviceController():
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
         )
 
+    def CheckTestCommissionerPaseConnection(self, nodeid):
+        return self._dmLib.pychip_TestPaseConnection(nodeid)
+
     def CommissionIP(self, ipaddr, setupPinCode, nodeid):
         self.CheckIsActive()
 
@@ -956,6 +959,8 @@ class ChipDeviceController():
 
             self._dmLib.pychip_TestCommissioningCallbacks.argtypes = []
             self._dmLib.pychip_ResetCommissioningTests.argtypes = []
+            self._dmLib.pychip_TestPaseConnection.argtypes = [c_uint64]
+
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.restype = c_bool
