@@ -43,7 +43,7 @@
 #include <system/SystemConfig.h>
 
 /* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-//#include "InetConfig.h"
+// #include "InetConfig.h"
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"
@@ -1789,6 +1789,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 #define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
 #endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
+/*
+ * @def CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+ *
+ * @brief IM will not limit the number of ReadHandlers and related object used per fabric when they are allocated on heap. While we
+ * don't have real fabric support for now, we cannot do such checks in unit tests. To increase test coverage, we use this flag to
+ * limit the objects used when handling read and subscribe requests in integration tests.
+ *
+ */
+#ifndef CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+#define CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK 0
+#endif // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 
 /**
  * @}

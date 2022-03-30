@@ -83,10 +83,10 @@ public:
      * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
      * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
      */
-    static constexpr size_t kMinSupportedSubscriptionPerFabric = 3;
-    static constexpr size_t kMinSupportedPathPerSubscription   = 3;
-    static constexpr size_t kReservedPathInfoForReadRequests   = 9;
-    static constexpr size_t kReservedPathInfoForDirtyPaths     = 3;
+    static constexpr size_t kMinSupportedSubscriptionPerFabric  = 3;
+    static constexpr size_t kMinSupportedPathPerSubscription    = 3;
+    static constexpr size_t kReservedPathPoolForReadRequests    = 3;
+    static constexpr size_t kReservedReadHandlerForReadRequests = 1;
 
     InteractionModelEngine(void);
 
@@ -223,10 +223,7 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool()
-    {
-        return mReadHandlers;
-    }
+    auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -234,10 +231,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacity(int32_t sz)
-    {
-        mReadHandlerCapacityOverride = sz;
-    }
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -343,7 +337,7 @@ private:
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
                           (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric +
-                           kReservedPathInfoForReadRequests),
+                           kReservedPathPoolForReadRequests),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
 #endif
 

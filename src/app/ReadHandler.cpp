@@ -460,9 +460,8 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
-    TLV::Utilities::Count(reader, mDataVersionFilterCount, false);
-
     aDataVersionFilterListParser.GetReader(&reader);
+    TLV::Utilities::Count(reader, mDataVersionFilterCount, false);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {

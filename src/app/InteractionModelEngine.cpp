@@ -530,7 +530,9 @@ bool InteractionModelEngine::CheckResourceQuotaForCurrentFabric(const ReadHandle
     });
 
     // Ensure the total number of subscriptions and ongoing read requests don't exceed the limit per fabric.
-    VerifyOrReturnError((subscriptionsEstablishedByCurrentFabric + 1) * fabricCount <= CHIP_IM_MAX_NUM_READ_HANDLER, false);
+    VerifyOrReturnError((subscriptionsEstablishedByCurrentFabric + kReservedReadHandlerForReadRequests) * fabricCount <=
+                            CHIP_IM_MAX_NUM_READ_HANDLER,
+                        false);
     VerifyOrReturnError(activeReadHandlersByCurrentFabric * fabricCount <= CHIP_IM_MAX_NUM_READ_HANDLER, false);
 
     // For all transactions, ensure we won't use up the quota of paths assigned to current fabric.
@@ -551,11 +553,11 @@ bool InteractionModelEngine::CheckResourceQuotaForCurrentFabric(const ReadHandle
     }
 
     // Similar to the check above, but always ensure we can process a read request with 9 paths.
-    return (attributePathsSubscribedByCurrentFabric + kReservedPathInfoForReadRequests) * fabricCount <=
+    return (attributePathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
-        (eventPathsSubscribedByCurrentFabric + kReservedPathInfoForReadRequests) * fabricCount <=
+        (eventPathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
-        (dataVersionFiltersSubscribedByCurrentFabric + kReservedPathInfoForReadRequests) * fabricCount <=
+        (dataVersionFiltersSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
 #endif
 }
