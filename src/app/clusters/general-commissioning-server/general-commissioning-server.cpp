@@ -150,8 +150,17 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     if (!failSafeContext.IsFailSafeBusy() &&
         (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {
-        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                     Failure);
+        if (commandData.expiryLengthSeconds == 0)
+        {
+            // Force the timer to expire immediately.
+            failSafeContext.ForceFailSafeTimerExpiry();
+        }
+        else
+        {
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+        }
         response.errorCode = CommissioningError::kOk;
         commandObj->AddResponse(commandPath, response);
     }

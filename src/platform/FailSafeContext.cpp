@@ -183,5 +183,11 @@ CHIP_ERROR FailSafeContext::DeleteFromStorage()
     return PersistedStorage::KeyValueStoreMgr().Delete(keyAlloc.FailSafeContextKey());
 }
 
+void FailSafeContext::ForceFailSafeTimerExpiry()
+{
+    FailSafeTimerExpired();
+    DisarmFailSafe();
+}
+
 } // namespace DeviceLayer
 } // namespace chip
