@@ -1443,6 +1443,79 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
+struct BackoffComplianceTestVector
+{
+    uint8_t sendCount;
+    System::Clock::Timestamp backoffBase;
+    System::Clock::Timestamp backoffMin;
+    System::Clock::Timestamp backoffMax;
+};
+
+struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
+    {
+        .sendCount   = 0,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(300),
+        .backoffMax  = System::Clock::Timestamp(375),
+    },
+    {
+        .sendCount   = 1,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(300),
+        .backoffMax  = System::Clock::Timestamp(375),
+    },
+    {
+        .sendCount   = 2,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(480),
+        .backoffMax  = System::Clock::Timestamp(600),
+    },
+    {
+        .sendCount   = 3,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(768),
+        .backoffMax  = System::Clock::Timestamp(960),
+    },
+    {
+        .sendCount   = 4,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(1229),
+        .backoffMax  = System::Clock::Timestamp(1536),
+    },
+    {
+        .sendCount   = 5,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(1966),
+        .backoffMax  = System::Clock::Timestamp(2458),
+    },
+    {
+        .sendCount   = 6,
+        .backoffBase = System::Clock::Timestamp(300),
+        .backoffMin  = System::Clock::Timestamp(1966),
+        .backoffMax  = System::Clock::Timestamp(2458),
+    },
+};
+
+const unsigned theBackoffComplianceTestVectorLength =
+    sizeof(theBackoffComplianceTestVector) / sizeof(struct BackoffComplianceTestVector);
+
+void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
+{
+    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
+    for (uint32_t j = 0; j < 3; j++)
+    {
+        for (uint32_t i = 0; i < theBackoffComplianceTestVectorLength; i++)
+        {
+            struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
+            System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
+            ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
+
+            NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
+            NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
+        }
+    }
+}
+
 int InitializeTestCase(void * inContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(inContext);
@@ -1491,6 +1564,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption", CheckUnencryptedMessageReceiveFailure),
     NL_TEST_DEF("Test that dropping an application-level message with a piggyback ack works ok once both sides retransmit", CheckLostResponseWithPiggyback),
     NL_TEST_DEF("Test that an application-level response-to-response after a lost standalone ack to the initial message works", CheckLostStandaloneAck),
+    NL_TEST_DEF("Test MRP backoff algorithm", CheckGetBackoff),
 
     NL_TEST_SENTINEL()
 };
