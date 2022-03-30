@@ -42,6 +42,9 @@ public:
     const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
+    // FailSafeContext
+    const char * FailSafeContextKey() { return Format("g/fsc"); }
+
     // Access Control List
 
     const char * AccessControlList() { return Format("acl"); }

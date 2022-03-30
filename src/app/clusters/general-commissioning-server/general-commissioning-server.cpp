@@ -139,6 +139,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     Commands::ArmFailSafeResponse::Type response;
 
     /*
+     * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
      * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
@@ -146,7 +147,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
 
     FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
 
-    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
+    if (!failSafeContext.IsFailSafeBusy() &&
+        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {
         CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                      Failure);
