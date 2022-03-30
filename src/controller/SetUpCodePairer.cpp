@@ -222,6 +222,8 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 {
     ChipLogProgress(Controller, "Discovered device to be commissioned over BLE");
 
+    mWaitingForDiscovery[kBLETransport] = false;
+
     // Probably safe to stop connections over other transports at this point?
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
@@ -276,8 +278,6 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     }
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
-
-    mWaitingForDiscovery[kIPTransport] = false;
 
     // Don't stop trying to connect over BLE, because we may be dealing with
     // stale DNS-SD records.
