@@ -664,8 +664,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         if (mPairingDelegate)
         {
             mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-            return CHIP_NO_ERROR;
         }
+        return CHIP_NO_ERROR;
     }
 
     device = mCommissioneeDevicePool.CreateObject();
