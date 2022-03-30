@@ -106,7 +106,8 @@ public:
      *  Calculate the backoff timer for the retransmission.
      *
      *  @param[in]   backoffBase    The base interval to use for the backoff calculation, either the active or idle interval.
-     *  @param[in]   sendCount      Count of how many times this message has been sent, including the current attempt.
+     *  @param[in]   sendCount      Count of how many times this message has been sent, including the current retransmission attempt
+     * starting from `0`.
      *
      *  @retval  The backoff time value, including jitter.
      */
