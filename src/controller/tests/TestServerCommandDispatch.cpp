@@ -93,7 +93,7 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
                 dataResponse.arg1 = nestedStructList;
                 dataResponse.arg6 = true;
 
-                ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, dataResponse);
+                ctx.mCommandHandler.AddResponse(ctx.mRequestPath, dataResponse);
             }
 
             return CHIP_NO_ERROR;

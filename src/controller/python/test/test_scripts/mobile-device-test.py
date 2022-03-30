@@ -76,15 +76,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                    nodeid=device_nodeid),
               "Failed to finish key exchange")
 
-    #
-    # Disable this test for now since it's exposing some bugs
-    # in the underlying minimal mDNS component on Linux and triggering crashes.
-    #
-    # Issue: #15688
-    #
-    # asyncio.run(test.TestMultiFabric(ip=address.decode("utf-8"),
-    #                                  setuppin=20202021,
-    #                                  nodeid=1))
+    asyncio.run(test.TestMultiFabric(ip=address,
+                                     setuppin=20202021,
+                                     nodeid=1))
     #
     # The server will crash if we are aborting / closing it too fast.
     # Issue: #15987
@@ -149,8 +143,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
-    # logger.info("Testing writing/reading fabric sensitive data")
-    # asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
+    logger.info("Testing writing/reading fabric sensitive data")
+    asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
 
 
 def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, paa_trust_store_path):

@@ -269,13 +269,14 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(
+            fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
-        devCtrl2 = fabricAdmin2.NewController(
+        self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
@@ -320,15 +321,14 @@ class BaseTestHelper:
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
 
         # Read out current fabric from each fabric, and both should be different.
-        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
-        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        self.currentFabric1 = data1[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        self.currentFabric2 = data2[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
         if (self.currentFabric1 == self.currentFabric2):
             self.logger.error(
                 "Got back fabric indices that match for two different fabrics!")
             return False
-
-        # devCtrl2.Shutdown()
-        # fabricAdmin2.Shutdown()
 
         return True
 
