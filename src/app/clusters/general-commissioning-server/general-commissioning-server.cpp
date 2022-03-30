@@ -164,6 +164,13 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             response.errorCode = CommissioningError::kBusyWithOtherAdmin;
             commandObj->AddResponse(commandPath, response);
         }
+        else if (commandData.expiryLengthSeconds == 0)
+        {
+            // Force the timer to expire immediately.
+            failSafeContext.ForceFailSafeTimerExpiry();
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
         else
         {
             CheckSuccess(
