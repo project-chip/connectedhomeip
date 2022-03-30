@@ -24,8 +24,9 @@
 
 #include <app/data-model/Nullable.h>
 
-#define WC_PERCENT100THS_MIN_OPEN 0
+#define WC_PERCENT100THS_MIN_OPEN   0
 #define WC_PERCENT100THS_MAX_CLOSED 10000
+#define WC_PERCENT100THS_MIDDLE     5000
 
 namespace chip {
 namespace app {
@@ -125,6 +126,7 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
 
 void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type);
 EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint);

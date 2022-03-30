@@ -433,6 +433,43 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
     return OperationalState::Stall;
 }
 
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)
+{
+    Percent100ths percent100ths = previous;
+
+    switch (direction)
+    {
+    case OperationalState::MovingDownOrClose:
+        if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
+        {
+            percent100ths += delta;
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MAX_CLOSED;
+        }
+        break;
+    case OperationalState::MovingUpOrOpen:
+        if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
+        {
+            percent100ths -= delta;
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MIN_OPEN;
+        }
+        break;
+    default:
+        // nothing to do we keep previous value, simple passthrought
+        break;
+    }
+
+    if (percent100ths > WC_PERCENT100THS_MAX_CLOSED)
+        return WC_PERCENT100THS_MAX_CLOSED;
+
+    return percent100ths;
+}
+
 void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
 {
     NPercent100ths position;
