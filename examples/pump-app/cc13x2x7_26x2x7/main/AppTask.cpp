@@ -38,8 +38,8 @@
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 #endif
-#include <app/clusters/identify-server/identify-server.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -97,15 +97,10 @@ void InitializeOTARequestor(void)
 #endif
 
 static const chip::EndpointId sIdentifyEndpointId = 0;
-static const uint32_t sIdentifyBlinkRateMs = 500;
+static const uint32_t sIdentifyBlinkRateMs        = 500;
 
-::Identify stIdentify = { 
-    sIdentifyEndpointId, 
-    AppTask::IdentifyStartHandler, 
-    AppTask::IdentifyStopHandler, 
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    AppTask::TriggerIdentifyEffectHandler
-};
+::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, 
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
 {
@@ -400,10 +395,10 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         LED_startBlinking(sAppGreenHandle, sIdentifyBlinkRateMs, LED_BLINK_FOREVER);
         PLAT_LOG("Identify started");
         break;
-    
+
     case AppEvent::kEventType_IdentifyStop:
         LED_stopBlinking(sAppGreenHandle);
-        
+
         if (!PumpMgr().IsStopped())
         {
             LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
@@ -571,14 +566,14 @@ void AppTask::PostEvents()
 void AppTask::IdentifyStartHandler(::Identify *)
 {
     AppEvent event;
-    event.Type    = AppEvent::kEventType_IdentifyStart;
+    event.Type = AppEvent::kEventType_IdentifyStart;
     sAppTask.PostEvent(&event);
 }
 
 void AppTask::IdentifyStopHandler(::Identify *)
 {
     AppEvent event;
-    event.Type    = AppEvent::kEventType_IdentifyStop;
+    event.Type = AppEvent::kEventType_IdentifyStop;
     sAppTask.PostEvent(&event);
 }
 
