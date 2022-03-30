@@ -83,6 +83,11 @@ OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
 
+void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
+{
+    aShouldResubscribe = false;
+}
+
 class ReadClientCallback : public ReadClient::Callback
 {
 public:
@@ -223,6 +228,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     uint32_t maxInterval; // MaxInterval in subscription request
     bool isSubscription;
     bool isFabricFiltered;
+    bool keepSubscriptions;
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
@@ -425,6 +431,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         {
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
+            params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            params.mResubscribePolicy         = PythonResubscribePolicy;
             readPaths.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
@@ -450,7 +458,6 @@ exit:
 
 chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, ReadClient ** pReadClient,
                                                           ReadClientCallback ** pCallback, DeviceProxy * device,
-
                                                           uint8_t * readParamsBuf, size_t n, ...)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
@@ -493,6 +500,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Rea
         {
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
+            params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            params.mResubscribePolicy         = PythonResubscribePolicy;
             readPaths.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);

@@ -859,10 +859,11 @@ _ReadParams = construct.Struct(
     "MaxInterval" / construct.Int32ul,
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
+    "KeepSubscriptions" / construct.Flag,
 )
 
 
-def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], dataVersionFilters: List[DataVersionFilter] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], dataVersionFilters: List[DataVersionFilter] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, keepSubscriptions: bool = False, fabricFiltered: bool = True) -> int:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, TransactionType.READ_ATTRIBUTES, returnClusterObject)
@@ -918,6 +919,7 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
         params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
         params.IsSubscription = True
+        params.KeepSubscriptions = keepSubscriptions
     params.IsFabricFiltered = fabricFiltered
     params = _ReadParams.build(params)
 
@@ -938,7 +940,7 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
     return res
 
 
-def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], subscriptionParameters: SubscriptionParameters = None) -> int:
+def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], subscriptionParameters: SubscriptionParameters = None, keepSubscriptions: bool = False) -> int:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, TransactionType.READ_EVENTS, False)
@@ -971,6 +973,7 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
         params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
         params.IsSubscription = True
+        params.KeepSubscriptions = keepSubscriptions
     params = _ReadParams.build(params)
 
     res = handle.pychip_ReadClient_ReadEvents(

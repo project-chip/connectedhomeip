@@ -109,7 +109,7 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
 
     # Test experimental Python cluster objects API
     logger.info("Testing cluster objects API")
-    FailIfNot(asyncio.run(ClusterObjectTests.RunTest(test.devCtrl)),
+    FailIfNot(asyncio.run(ClusterObjectTests.RunTest([test.devCtrl, test.devCtrl2])),
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing attribute reading")

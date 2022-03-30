@@ -1776,32 +1776,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
 
-/*
- * @def CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
- *
- * @brief Enables usage of heap in the minmdns DNSSD implementation
- *        for tracking active operational responder lists.
- *
- *        When this is not set, CHIP_CONFIG_MAX_FABRICS is used to determine
- *        and statically allocate pointers needed to track active
- *        operational responder lists.
- */
-#ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
-#define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
-#endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
-
-/*
- * @def CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
- *
- * @brief IM will not limit the number of ReadHandlers and related object used per fabric when they are allocated on heap. While we
- * don't have real fabric support for now, we cannot do such checks in unit tests. To increase test coverage, we use this flag to
- * limit the objects used when handling read and subscribe requests in integration tests.
- *
- */
-#ifndef CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-#define CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK 0
-#endif // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-
 /**
  * @}
  */

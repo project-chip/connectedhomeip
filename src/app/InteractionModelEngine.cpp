@@ -494,7 +494,7 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 
 bool InteractionModelEngine::CheckResourceQuotaForCurrentFabric(const ReadHandler * apReadHandler)
 {
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
     // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
     return true;
 #else

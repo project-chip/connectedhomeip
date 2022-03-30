@@ -61,6 +61,20 @@
 namespace chip {
 namespace app {
 
+/*
+ * @def CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+ *
+ * @brief Enables usage of heap in the minmdns DNSSD implementation
+ *        for tracking active operational responder lists.
+ *
+ *        When this is not set, CHIP_CONFIG_MAX_FABRICS is used to determine
+ *        and statically allocate pointers needed to track active
+ *        operational responder lists.
+ */
+#ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+#define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
+#endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
 /**
  * @class InteractionModelEngine
  *

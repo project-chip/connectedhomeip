@@ -567,7 +567,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True, keepSubscriptions: bool = False):
         '''
         Read a list of attributes from a target node
 
@@ -645,7 +645,7 @@ class ChipDeviceController():
             else:
                 filters = None
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, filters, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, filters, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, keepSubscriptions=keepSubscriptions, fabricFiltered=fabricFiltered))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -662,7 +662,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], reportInterval: typing.Tuple[int, int] = None):
+    ]], reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
         '''
         Read a list of events from a target node
 
@@ -727,7 +727,7 @@ class ChipDeviceController():
             eves.append(ClusterAttribute.EventPath(
                 EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent))
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
+            lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, keepSubscriptions=keepSubscriptions))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         outcome = await future
