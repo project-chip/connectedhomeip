@@ -381,7 +381,7 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
     else
     {
         percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
+        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
         emberAfWindowCoveringClusterPrint("Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
     Attributes::CurrentPositionLift::Set(endpoint, rawpos);
