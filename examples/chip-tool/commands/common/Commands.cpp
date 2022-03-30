@@ -53,7 +53,13 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
+int Commands::RunInteractive(int argc, char ** argv)
+{
+    CHIP_ERROR err = RunCommand(argc, argv, true);
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
 {
     std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
@@ -131,7 +137,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return command->Run();
+    return interactive ? command->RunAsInteractive() : command->Run();
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)
