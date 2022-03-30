@@ -415,15 +415,17 @@ public:
     virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
-     * Indicates the start a a series of list operations, this function will be called before first Write to the list.
+     * Indicates the start of a series of list operations, this function will be called before first Write to the list.
      *
      * @param [in] aPath indicates the path of the modified list.
      */
     virtual void OnListWriteBegin(const ConcreteAttributePath & aPath) {}
 
     /**
-     * Indicates the end of a series of list operations, this function will be called after last Write to the list or the
-     * transaction is aborted with a possiblily incomplete list.
+     * Indicates the end of a series of list operations. This function will be called after last Write to the list or when the
+     * transaction is aborted with a possibly incomplete list.
+     *
+     * Note: The list might be untouched due to failed ACL checks.
      *
      * @param [in] aPath indicates the path of the modified list
      * @param [in] aWriteWasSuccessful indicates whether the delivered list is complete.

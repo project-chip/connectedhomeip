@@ -143,7 +143,17 @@ private:
 
     void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
     void DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful);
+
+    // Deliver the signal that we have delivered all list entries to the AttributeAccessInterface. This function will be called
+    // after handling the last chunk of a series of write requests. Or the write handler was shutdown (usually due to transport
+    // timeout).
     void DeliverFinalListWriteEnd(bool writeWasSuccessful);
+
+    // Deliver the signal that we have delivered all list entries to the AttributeAccessInterface. This function will be called
+    // after handling the last attribute in a group write request (since group writes will never be chunked writes). Or we failed to
+    // process the group write request (usually due to malformed messages). This function should only be called by
+    // ProcessGroupAttributeDataIBs. This function should only be called by ProcessGroupAttributeDataIBs.
+    CHIP_ERROR DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful);
 
 private: // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,

@@ -55,8 +55,6 @@ void WriteHandler::Close()
         mpExchangeCtx = nullptr;
     }
 
-    DeliverFinalListWriteEnd(false /* wasSuccessful */);
-
     ClearState();
 }
 
@@ -75,8 +73,6 @@ void WriteHandler::Abort()
         mpExchangeCtx->Abort();
         mpExchangeCtx = nullptr;
     }
-
-    DeliverFinalListWriteEnd(false /* wasSuccessful */);
 
     ClearState();
 }
@@ -230,16 +226,50 @@ void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
     }
     mProcessingAttributePath.ClearValue();
 }
+
+CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful)
+{
+    VerifyOrReturnError(mProcessingAttributePath.HasValue() && mProcessingAttributeIsList, CHIP_NO_ERROR);
+
+    Credentials::GroupDataProvider::GroupEndpoint mapping;
+    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider::EndpointIterator * iterator;
+
+    GroupId groupId         = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    FabricIndex fabricIndex = GetAccessingFabricIndex();
+
+    iterator = groupDataProvider->IterateEndpoints(fabricIndex);
+    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    while (iterator->Next(mapping))
+    {
+        if (groupId != mapping.group_id)
+        {
+            continue;
+        }
+
+        auto processingConcreteAttributePath        = mProcessingAttributePath.Value();
+        processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
+
+        if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
+        {
+            DeliverListWriteEnd(processingConcreteAttributePath, writeWasSuccessful);
+        }
+    }
+    iterator->Release();
+    mProcessingAttributePath.ClearValue();
+    return CHIP_NO_ERROR;
+}
 namespace {
 
 bool ShouldReportListWriteEnd(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,
-                              const ConcreteAttributePath nextAttribute)
+                              const ConcreteAttributePath & nextAttribute)
 {
     return previousProcessed.HasValue() && previousProcessedAttributeIsList && previousProcessed.Value() != nextAttribute;
 }
 
 bool ShouldReportListWriteBegin(const Optional<ConcreteAttributePath> & previousProcessed,
-                                const ConcreteDataAttributePath nextAttribute)
+                                const ConcreteDataAttributePath & nextAttribute)
 {
     return nextAttribute.IsListOperation() && (!previousProcessed.HasValue() || previousProcessed.Value() != nextAttribute);
 }
@@ -361,11 +391,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
     const Access::SubjectDescriptor subjectDescriptor =
         mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
-    GroupId groupId;
-    FabricIndex fabric;
-
-    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-    fabric  = GetAccessingFabricIndex();
+    GroupId groupId    = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    FabricIndex fabric = GetAccessingFabricIndex();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
@@ -483,37 +510,13 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = CHIP_NO_ERROR;
     }
 
-    {
-        bool needNotifyListWriteEnd = mProcessingAttributePath.HasValue() && mProcessingAttributeIsList;
+    err = DeliverFinalListWriteEndForGroupWrite(true);
 
-        Credentials::GroupDataProvider::GroupEndpoint mapping;
-        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-        Credentials::GroupDataProvider::EndpointIterator * iterator;
-
-        iterator = groupDataProvider->IterateEndpoints(fabric);
-        VerifyOrExit(needNotifyListWriteEnd, err = CHIP_NO_ERROR);
-        VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-        while (iterator->Next(mapping))
-        {
-            if (groupId != mapping.group_id)
-            {
-                continue;
-            }
-
-            auto processingConcreteAttributePath        = mProcessingAttributePath.Value();
-            processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
-
-            if (needNotifyListWriteEnd &&
-                !InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
-            {
-                DeliverListWriteEnd(processingConcreteAttributePath, true /* wasSuccessful */);
-            }
-        }
-        iterator->Release();
-    }
 exit:
-    mProcessingAttributePath.ClearValue();
+    // The DeliverFinalListWriteEndForGroupWrite above will deliver the successful state of the list write and clear the
+    // mProcessingAttributePath making the following call no-op. So we call it again after the exit label to deliver a failure state
+    // to the clusters. Ignore the error code since we need to deliver other more important failures.
+    DeliverFinalListWriteEndForGroupWrite(false);
     return err;
 }
 
@@ -663,6 +666,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 
 void WriteHandler::ClearState()
 {
+    DeliverFinalListWriteEnd(false /* wasSuccessful */);
     MoveToState(State::Uninitialized);
 }
 
