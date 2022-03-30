@@ -40,6 +40,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -147,6 +148,12 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
+    if (vendorId == chip::VendorId::Common) {
+        // Shouldn't be using the "standard" vendor ID for actual devices.
+        CHIP_LOG_ERROR("%d is not a valid vendorId to initialize a device controller with", vendorId);
+        return NO;
+    }
+
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
     __block BOOL commissionerInitialized = NO;

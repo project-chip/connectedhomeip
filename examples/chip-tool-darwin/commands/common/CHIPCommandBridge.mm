@@ -21,6 +21,7 @@
 #import "CHIPToolKeypair.h"
 #import <CHIP/CHIPDeviceController.h>
 #include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 
 const uint16_t kListenPort = 5541;
@@ -43,7 +44,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     [nocSigner createOrLoadKeys:storage];
 
-    if (![mController startup:storage vendorId:0 nocSigner:nocSigner]) {
+    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner]) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }
