@@ -45,10 +45,7 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
     FailSafeContext * this_ = reinterpret_cast<FailSafeContext *>(arg);
 
-    this_->mFailSafeBusy                   = false;
-    this_->mFailSafeArmed                  = false;
-    this_->mAddNocCommandHasBeenInvoked    = false;
-    this_->mUpdateNocCommandHasBeenInvoked = false;
+    this_->mFailSafeBusy = false;
 
     if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
     {
@@ -69,6 +66,10 @@ void FailSafeContext::FailSafeTimerExpired()
     event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
     event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
     CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
+
+    mFailSafeArmed                  = false;
+    mAddNocCommandHasBeenInvoked    = false;
+    mUpdateNocCommandHasBeenInvoked = false;
 
     if (status != CHIP_NO_ERROR)
     {
