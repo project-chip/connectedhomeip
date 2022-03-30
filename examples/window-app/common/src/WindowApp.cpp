@@ -537,10 +537,8 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     else /* CURRENT reached TARGET or crossed it */
     {
         /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
-
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, target);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        if (!target.IsNull())
+            LiftSchedulePositionSet(target.Value());
 
         mLiftOpState = OperationalState::Stall;
     }
@@ -643,10 +641,8 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     else /* CURRENT reached TARGET or crossed it */
     {
         /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
-
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, target);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        if (!target.IsNull())
+            TiltSchedulePositionSet(target.Value());
 
         mTiltOpState = OperationalState::Stall;
     }
