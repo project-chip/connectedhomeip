@@ -255,8 +255,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
-        if (onOffValueForStartUp &&
-            emberAfContainsServer(endpoint, ModeSelect::Id) &&
+        if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
             emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
         {
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
