@@ -1436,7 +1436,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
+
+        _networkIndex = nil;
     }
     return self;
 }
