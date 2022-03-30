@@ -44,6 +44,13 @@ public:
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
     CHIP_ERROR SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
 
+    /**
+     * @brief
+     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   has completed.
+     */
+    void ScheduleFailSafeCleanup();
+
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
@@ -54,8 +61,6 @@ public:
     inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
     inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
-
-    inline void SetFailSafeBusy(bool val) { mFailSafeBusy = val; }
 
     inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {

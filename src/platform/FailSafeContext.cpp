@@ -76,8 +76,12 @@ void FailSafeContext::FailSafeTimerExpired()
         ChipLogError(DeviceLayer, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
-    mFailSafeBusy = true;
+    ScheduleFailSafeCleanup();
+}
 
+void FailSafeContext::ScheduleFailSafeCleanup()
+{
+    mFailSafeBusy = true;
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 
