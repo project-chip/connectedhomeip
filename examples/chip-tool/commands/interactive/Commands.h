@@ -28,7 +28,9 @@ void registerCommandsInteractive(Commands & commands, CredentialIssuerCommands *
     const char * clusterName = "interactive";
 
     commands_list clusterCommands = {
+#if CONFIG_USE_INTERACTIVE_MODE
         make_unique<InteractiveStartCommand>(&commands, credsIssuerConfig),
+#endif // CONFIG_USE_INTERACTIVE_MODE
     };
 
     commands.Register(clusterName, clusterCommands);
