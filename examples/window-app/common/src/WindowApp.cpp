@@ -515,9 +515,6 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
     NPercent100ths current, target;
 
-    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftUpdate - Out of Memory for WorkData"));
-
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
@@ -562,10 +559,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     }
     opStatus.lift = mLiftOpState;
 
-    data->mEndpointId = mEndpoint;
-    data->opStatus    = opStatus;
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+    ScheduleOperationalStatusSetWithGlobalUpdate(opStatus);
 
     if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
     {
@@ -639,9 +633,6 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
     NPercent100ths current, target;
 
-    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltUpdate - Out of Memory for WorkData"));
-
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
@@ -686,10 +677,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     }
     opStatus.tilt = mTiltOpState;
 
-    data->mEndpointId = mEndpoint;
-    data->opStatus    = opStatus;
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+    ScheduleOperationalStatusSetWithGlobalUpdate(opStatus);
 
     if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
@@ -761,7 +749,18 @@ void WindowApp::Cover::ScheduleLiftPositionSet(intptr_t arg)
     chip::Platform::Delete(data);
 }
 
-void WindowApp::Cover::ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg)
+void WindowApp::Cover::ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus)
+{
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::OperationalStatusSet - Out of Memory for WorkData"));
+
+    data->mEndpointId = mEndpoint;
+    data->opStatus    = opStatus;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+}
+
+void WindowApp::Cover::CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg)
 {
     WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
     OperationalStatusSetWithGlobalUpdated(data->mEndpointId, data->opStatus);
