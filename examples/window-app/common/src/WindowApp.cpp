@@ -244,13 +244,9 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
             mUpSuppressed = mDownSuppressed = true;
             PostEvent(EventId::TiltModeChange);
         }
-        else if (mTiltMode)
-        {
-            GetCover().TiltUp();
-        }
         else
         {
-            GetCover().LiftUp();
+            GetCover().StepToward(OperationalState::MovingUpOrOpen, mTiltMode);
         }
         break;
 
@@ -282,13 +278,9 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
             mUpSuppressed = mDownSuppressed = true;
             PostEvent(EventId::TiltModeChange);
         }
-        else if (mTiltMode)
-        {
-            GetCover().TiltDown();
-        }
         else
         {
-            GetCover().LiftDown();
+            GetCover().StepToward(OperationalState::MovingDownOrClose, mTiltMode);
         }
         break;
     case EventId::AttributeChange:
@@ -447,52 +439,23 @@ void WindowApp::Cover::Finish()
     WindowApp::Instance().DestroyTimer(mTiltTimer);
 }
 
-void WindowApp::Cover::LiftDown()
+void WindowApp::Cover::LiftStepToward(OperationalState direction)
 {
     EmberAfStatus status;
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; // set at middle
-
+    chip::Percent100ths percent100ths;
+    NPercent100ths current;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
-        percent100ths = current.Value();
-
-    if (percent100ths < 9000)
     {
-        percent100ths += 1000;
+        percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
     }
     else
     {
-        percent100ths = 10000;
-    }
-
-}
-
-void WindowApp::Cover::LiftUp()
-{
-    EmberAfStatus status;
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; // set at middle
-
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
-        percent100ths = current.Value();
-
-    if (percent100ths > 1000)
-    {
-        percent100ths -= 1000;
-    }
-    else
-    {
-        percent100ths = 0;
+        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
     }
 
     LiftSchedulePositionSet(percent100ths);
@@ -522,17 +485,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     if (mLiftOpState == opState)
     {
         /* Actuator still need to move, not reached/crossed Target yet */
-        switch (mLiftOpState)
-        {
-        case OperationalState::MovingDownOrClose:
-            LiftDown();
-            break;
-        case OperationalState::MovingUpOrOpen:
-            LiftUp();
-            break;
-        default:
-            break;
-        }
+        LiftStepToward(mLiftOpState);
     }
     else /* CURRENT reached TARGET or crossed it */
     {
@@ -552,51 +505,24 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     }
 }
 
-void WindowApp::Cover::TiltDown()
+void WindowApp::Cover::TiltStepToward(OperationalState direction)
 {
     EmberAfStatus status;
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; // set at middle
-
+    chip::Percent100ths percent100ths;
+    NPercent100ths current;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
-        percent100ths = current.Value();
 
-    if (percent100ths < 9000)
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
     {
-        percent100ths += 1000;
+        percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
     }
     else
     {
-        percent100ths = 10000;
-    }
-
-}
-
-void WindowApp::Cover::TiltUp()
-{
-    EmberAfStatus status;
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; // set at middle
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
-        percent100ths = current.Value();
-
-    if (percent100ths > 1000)
-    {
-        percent100ths -= 1000;
-    }
-    else
-    {
-        percent100ths = 0;
+        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
     }
 
     TiltSchedulePositionSet(percent100ths);
@@ -626,17 +552,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     if (mTiltOpState == opState)
     {
         /* Actuator still need to move, not reached/crossed Target yet */
-        switch (mTiltOpState)
-        {
-        case OperationalState::MovingDownOrClose:
-            TiltDown();
-            break;
-        case OperationalState::MovingUpOrOpen:
-            TiltUp();
-            break;
-        default:
-            break;
-        }
+        TiltStepToward(mTiltOpState);
     }
     else /* CURRENT reached TARGET or crossed it */
     {
@@ -653,6 +569,19 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
         mTiltTimer->Start();
+    }
+}
+
+
+void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
+{
+    if (isTilt)
+    {
+        TiltStepToward(direction);
+    }
+    else
+    {
+        LiftStepToward(direction);
     }
 }
 
