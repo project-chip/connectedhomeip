@@ -141,6 +141,7 @@ public:
         struct CoverWorkData
         {
             chip::EndpointId mEndpointId;
+            bool isTilt;
 
             union
             {
@@ -149,8 +150,8 @@ public:
             };
         };
 
-        static void ScheduleTiltPositionSet(intptr_t arg);
-        static void ScheduleLiftPositionSet(intptr_t arg);
+        void SchedulePositionSet(chip::Percent100ths position, bool isTilt);
+        static void CallbackPositionSet(intptr_t arg);
         void ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus);
         static void CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg);
     };
