@@ -1786,5 +1786,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 
 /**
+ *  @def CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+ *
+ *  If 1, IM status codes, when logged, will be formatted as "0xNN (NameOfCode)"
+ *  If 0, IM status codes, when logged, will be formatted as "0xNN" In either
+ *  case, the macro ChipLogFormatIMStatus expands to a suitable printf format
+ *  string, which already includes the '%' in it, to be used with
+ *  ChipLogValueIMStatus(status).
+ */
+
+#ifndef CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+#define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 1
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+/**
  * @}
  */
