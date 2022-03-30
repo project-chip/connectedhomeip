@@ -1233,11 +1233,13 @@
  * Default time in seconds that a device will advertise commissionable node discovery
  * after commissioning mode ends. This value can be overridden by the user.
  *
- * Only valid when CCHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
+ * Only valid when CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
  */
 #define CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED 0
 #define CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT -1
+#ifndef CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS
 #define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE

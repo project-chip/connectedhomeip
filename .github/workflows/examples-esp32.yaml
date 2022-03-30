@@ -81,7 +81,7 @@ jobs:
                      out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example All Clusters App C3
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |

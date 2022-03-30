@@ -2562,7 +2562,7 @@ class OnOff(Cluster):
                 ClusterObjectFieldDescriptor(Label="globalSceneControl", Tag=0x00004000, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="onTime", Tag=0x00004001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="offWaitTime", Tag=0x00004002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2574,7 +2574,7 @@ class OnOff(Cluster):
     globalSceneControl: 'typing.Optional[bool]' = None
     onTime: 'typing.Optional[uint]' = None
     offWaitTime: 'typing.Optional[uint]' = None
-    startUpOnOff: 'typing.Union[None, Nullable, uint]' = None
+    startUpOnOff: 'typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -2593,6 +2593,11 @@ class OnOff(Cluster):
         class OnOffEffectIdentifier(IntEnum):
             kDelayedAllOff = 0x00
             kDyingLight = 0x01
+
+        class OnOffStartUpOnOff(IntEnum):
+            kOff = 0x00
+            kOn = 0x01
+            kTogglePreviousOnOff = 0x02
 
 
 
@@ -2763,9 +2768,9 @@ class OnOff(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -9701,11 +9706,13 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
-            debugText: 'str' = ""
+            debugText: 'typing.Optional[str]' = None
+            networkIndex: 'typing.Optional[uint]' = None
 
         @dataclass
         class ConnectNetwork(ClusterCommand):

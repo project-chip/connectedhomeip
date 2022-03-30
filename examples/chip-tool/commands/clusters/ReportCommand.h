@@ -376,7 +376,6 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
@@ -388,7 +387,6 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
@@ -402,7 +400,6 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
@@ -416,26 +413,23 @@ public:
                                               mDataVersion);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
 
     void OnAttributeSubscription() override
     {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnAttributeSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+        // The ReadClient instance can not be released directly into the OnAttributeSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -445,7 +439,6 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
-    bool mWait;
 };
 
 class ReadEvent : public ReportCommand
@@ -496,7 +489,6 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
         ReportCommand::AddArguments();
     }
 
@@ -506,7 +498,6 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
         ReportCommand::AddArguments();
     }
 
@@ -518,7 +509,6 @@ public:
         AddArgument("attr-name", eventName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
         ReportCommand::AddArguments();
     }
 
@@ -530,26 +520,23 @@ public:
                                           chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
 
     void OnEventSubscription() override
     {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnEventSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+        // The ReadClient instance can not be released directly into the OnEventSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -558,5 +545,4 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };

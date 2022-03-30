@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/FailSafeContext.h>
 #include <platform/PersistedStorage.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
@@ -134,6 +135,8 @@ public:
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
+    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
+    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
@@ -176,8 +179,6 @@ protected:
 
     virtual CHIP_ERROR Init()                                                                                   = 0;
     virtual bool CanFactoryReset()                                                                              = 0;
-    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                                             = 0;
-    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                                               = 0;
     virtual CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) = 0;
     virtual CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)  = 0;
 

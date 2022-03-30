@@ -30,6 +30,8 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
@@ -53,8 +55,13 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 }
 } // namespace
 
-CHIP_ERROR CHIPCommand::Run()
+CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 {
+    if (IsInteractive())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     StartTracing();
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -75,11 +82,13 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    const chip::Credentials::AttestationTrustStore * trustStore =
-        GetTestFileAttestationTrustStore(mPaaTrustStorePath.HasValue() ? mPaaTrustStorePath.Value() : ".");
-    if (trustStore == nullptr)
+    const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
+        ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
+        : chip::Credentials::GetTestAttestationTrustStore();
+    ;
+    if (mPaaTrustStorePath.HasValue() && trustStore == nullptr)
     {
-        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.HasValue() ? mPaaTrustStorePath.Value() : ".");
+        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
         ChipLogError(chipTool,
                      "Please specify a valid path containing trusted PAA certificates using [--paa-trust-store-path paa/file/path] "
                      "argument");
@@ -105,10 +114,16 @@ CHIP_ERROR CHIPCommand::Run()
             ReturnLogErrorOnFailure(chip::GroupTesting::InitData(fabric->GetFabricIndex(), compressed_fabric_id_span));
         }
     }
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
-    CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
-    Shutdown();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::MaybeTearDownStack()
+{
+    if (IsInteractive())
+    {
+        return CHIP_NO_ERROR;
+    }
 
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
@@ -121,6 +136,20 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
 
     StopTracing();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::Run()
+{
+    ReturnErrorOnFailure(MaybeSetUpStack());
+
+    CHIP_ERROR err = StartWaiting(GetWaitDuration());
+
+    Shutdown();
+
+    ReturnErrorOnFailure(MaybeTearDownStack());
+
     return err;
 }
 
@@ -133,7 +162,7 @@ void CHIPCommand::StartTracing()
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
-    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
     }
@@ -289,17 +318,38 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 {
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     // ServiceEvents() calls StartEventLoopTask(), which is paired with the StopEventLoopTask() below.
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().ServiceEvents());
-    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+    if (!IsInteractive())
     {
-        std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-        if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
+        ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().ServiceEvents());
+    }
+
+    if (duration.count() == 0)
+    {
+        mCommandExitStatus = RunCommand();
+    }
+    else
+    {
         {
-            mCommandExitStatus = CHIP_ERROR_TIMEOUT;
+            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+            mWaitingForResponse = true;
+        }
+
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+        {
+            std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+            if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
+            {
+                mCommandExitStatus = CHIP_ERROR_TIMEOUT;
+            }
         }
     }
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    if (!IsInteractive())
+    {
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    }
 #else
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP

@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -224,7 +225,7 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -249,7 +250,39 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     ReturnErrorOnFailure(err);
 
     err = StoreUniqueId(uniqueId, strlen(uniqueId));
+    ReturnErrorOnFailure(err);
 
+    bool failSafeArmed;
+
+    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
+    // which the fail-safe timer was armed.
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    {
+        FabricIndex fabricIndex;
+        bool addNocCommandInvoked;
+        bool updateNocCommandInvoked;
+
+        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
+
+        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        SuccessOrExit(err);
+
+        ChipDeviceEvent event;
+        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
+        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
+        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
+        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
+
+        err = PlatformMgr().PostEvent(&event);
+        SuccessOrExit(err);
+
+        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(true);
+
+        // Ensure HandleFailSafeContextCleanup runs after the timer-expired event has been processed.
+        PlatformMgr().ScheduleWork(HandleFailSafeContextCleanup);
+    }
+
+exit:
     return err;
 }
 
@@ -723,10 +756,6 @@ exit:
 template <class ConfigClass>
 bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
 {
-#if CHIP_BYPASS_RENDEZVOUS
-    return true;
-#else // CHIP_BYPASS_RENDEZVOUS
-
     return
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         ConnectivityMgr().IsWiFiStationProvisioned() &&
@@ -735,7 +764,6 @@ bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
         ConnectivityMgr().IsThreadProvisioned() &&
 #endif
         true;
-#endif // CHIP_BYPASS_RENDEZVOUS
 }
 
 template <class ConfigClass>
@@ -871,6 +899,22 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         }
         ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu32 " (0x%" PRIX32 ")", deviceType, deviceType);
     }
+}
+
+template <class ConfigClass>
+void GenericConfigurationManagerImpl<ConfigClass>::HandleFailSafeContextCleanup(intptr_t arg)
+{
+    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to set FailSafeArmed config to false");
+    }
+
+    if (FailSafeContext::DeleteFromStorage() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
+    }
+
+    DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(false);
 }
 
 } // namespace Internal

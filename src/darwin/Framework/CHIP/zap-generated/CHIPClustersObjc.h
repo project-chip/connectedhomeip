@@ -7249,6 +7249,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
@@ -14923,6 +14924,12 @@ typedef NS_ENUM(uint8_t, CHIPOnOffDyingLightEffectVariant) {
 typedef NS_ENUM(uint8_t, CHIPOnOffEffectIdentifier) {
     CHIPOnOffEffectIdentifierDelayedAllOff = 0x00,
     CHIPOnOffEffectIdentifierDyingLight = 0x01,
+};
+
+typedef NS_ENUM(uint8_t, CHIPOnOffStartUpOnOff) {
+    CHIPOnOffStartUpOnOffOff = 0x00,
+    CHIPOnOffStartUpOnOffOn = 0x01,
+    CHIPOnOffStartUpOnOffTogglePreviousOnOff = 0x02,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPOnOffControl) {

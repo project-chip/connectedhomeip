@@ -95,13 +95,19 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const GeneralCommissioning = [
+    'Test_TC_GC_1_1',
+  ];
+
   const Identify = [
     'Test_TC_I_1_1',
     'Test_TC_I_2_1',
+    'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
+    'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
@@ -156,6 +162,11 @@ function getTests()
     'Test_TC_MC_7_2',
     'Test_TC_MC_8_1',
     'Test_TC_MC_9_1',
+    'Test_TC_MC_10_1',
+  ];
+
+  const ModeSelect = [
+    'Test_TC_MOD_1_1',
   ];
 
   const OnOff = [
@@ -255,7 +266,6 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
-    'TestModeSelectCluster',
     'TestBinding',
   ];
 
@@ -280,10 +290,12 @@ function getTests()
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    GeneralCommissioning, //
     Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
+    ModeSelect, //
     OccupancySensing, //
     OnOff, //
     PowerSource, //

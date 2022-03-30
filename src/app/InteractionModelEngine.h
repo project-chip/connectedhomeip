@@ -40,12 +40,15 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/DataVersionFilter.h>
+#include <app/EventPathParams.h>
+#include <app/ObjectList.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
@@ -65,7 +68,9 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate,
+                               public CommandHandler::Callback,
+                               public ReadHandler::ManagementCallback
 {
 public:
     /**
@@ -133,14 +138,35 @@ public:
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
-    void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
-    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
-    bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
+    void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
+
+    CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
+                                          AttributePathParams & aAttributePath);
+
+    void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
+
+    CHIP_ERROR PushFrontEventPathParamsList(ObjectList<EventPathParams> *& aEventPathList, EventPathParams & aEventPath);
+
+    void ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList);
+
+    CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+                                              DataVersionFilter & aDataVersionFilter);
+
+    bool IsOverlappedAttributePath(AttributePathParams & aAttributePath);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
     CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
+
+    /*
+     * Register an application callback to be notified of notable events when handling reads/subscribes.
+     */
+    void RegisterReadHandlerAppCallback(ReadHandler::ApplicationCallback * mpApplicationCallback)
+    {
+        mpReadHandlerApplicationCallback = mpApplicationCallback;
+    }
+    void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
     /**
      * Called when a timed interaction has failed (i.e. the exchange it was
@@ -237,6 +263,8 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
      * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
@@ -291,6 +319,11 @@ private:
     CHIP_ERROR ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
                                                      System::PacketBufferHandle && aPayload);
 
+    template <typename T, size_t N>
+    void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
+    template <typename T, size_t N>
+    CHIP_ERROR PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
@@ -300,9 +333,12 @@ private:
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
-
+    ObjectPool<ObjectList<AttributePathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mAttributePathPool;
+    ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
+    ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
     ReadClient * mpActiveReadClientList = nullptr;
+
+    ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
@@ -328,13 +364,11 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
  *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
  * AttributeReportIB to the AttributeReportIBs::Builder.
- *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
- *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
- * into the TLVWriter. TLVWriter error will be returned if any error occurred during encoding
- * these values.
- *  This function is implemented by CHIP as a part of cluster data storage & management.
- * The apWriter and apDataExists can be nullptr.
+ *  When the endpoint / cluster / attribute data specified by aPath does not exist, corresponding interaction
+ * model error code will be put into aAttributeReports, and CHIP_NO_ERROR will be returned. If the data exists on the server, the
+ * data (with tag kData) and the data version (with tag kDataVersion) will be put into aAttributeReports. TLVWriter error will be
+ * returned if any error occurred while encoding these values. This function is implemented by CHIP as a part of cluster data
+ * storage & management.
  *
  *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
  *  @param[in]    aPath                 The concrete path of the data being read.

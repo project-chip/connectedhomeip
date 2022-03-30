@@ -21,12 +21,12 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <lib/dnssd/Advertiser.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <system/SystemClock.h>
 
 namespace chip {
-
-constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 
 enum class CommissioningWindowAdvertisement
 {
@@ -51,9 +51,19 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
+    static constexpr System::Clock::Seconds16 MaxCommissioningTimeout()
+    {
+        // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
+        return System::Clock::Seconds16(15 * 60);
+    }
 
-    void SetBLE(bool ble) { mIsBLE = ble; }
+    static constexpr System::Clock::Seconds16 MinCommissioningTimeout()
+    {
+        // Specification section 5.4.2.3. Announcement Duration says 3 minutes.
+        return System::Clock::Seconds16(3 * 60);
+    }
+
+    void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 
     void SetSessionIDAllocator(SessionIDAllocator * idAllocator) { mIDAllocator = idAllocator; }
 
@@ -62,10 +72,10 @@ public:
      */
     CHIP_ERROR
     OpenBasicCommissioningWindow(
-        uint16_t commissioningTimeoutSeconds               = kNoCommissioningTimeout,
+        System::Clock::Seconds16 commissioningTimeout      = System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
-    CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
+    CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds16 commissioningTimeout, uint16_t discriminator,
                                                Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
 
     void CloseCommissioningWindow();
@@ -85,7 +95,13 @@ public:
 
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
+    // For tests only, allow overriding the spec-defined minimum value of the
+    // commissioning window timeout.
+    void OverrideMinCommissioningTimeout(System::Clock::Seconds16 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
+
 private:
+    void SetBLE(bool ble) { mIsBLE = ble; }
+
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
 
     CHIP_ERROR RestoreDiscriminator();
@@ -94,12 +110,33 @@ private:
 
     CHIP_ERROR StopAdvertisement(bool aShuttingDown);
 
-    CHIP_ERROR OpenCommissioningWindow();
+    // Start a timer that will call HandleCommissioningWindowTimeout, and then
+    // start advertising and listen for PASE.
+    CHIP_ERROR OpenCommissioningWindow(System::Clock::Seconds16 commissioningTimeout);
+
+    // Start advertising and listening for PASE connections.  Should only be
+    // called when a commissioning window timeout timer is running.
+    CHIP_ERROR AdvertiseAndListenForPASE();
 
     // Helper for Shutdown and Cleanup.  Does not do anything with
     // advertisements, because Shutdown and Cleanup want to handle those
     // differently.
     void ResetState();
+
+    /**
+     * Function that gets called when our commissioning window timeout timer
+     * fires.
+     *
+     * This timer is started when a commissioning window is initially opened via
+     * OpenEnhancedCommissioningWindow or OpenBasicCommissioningWindow.
+     *
+     * The timer is canceled when a PASE connection is established, because it
+     * should not affect the actual commissioning process, and after a PASE
+     * connection is established we will not re-enter commissioning mode without
+     * a new call to OpenEnhancedCommissioningWindow or
+     * OpenBasicCommissioningWindow.
+     */
+    static void HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState);
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
@@ -112,8 +149,6 @@ private:
     SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
-    uint16_t mCommissioningTimeoutSeconds = 0;
-
     uint8_t mFailedCommissioningAttempts = 0;
 
     bool mUseECM = false;
@@ -121,10 +156,16 @@ private:
     uint16_t mECMDiscriminator = 0;
     // mListeningForPASE is true only when we are listening for
     // PBKDFParamRequest messages.
-    bool mListeningForPASE  = false;
-    uint32_t mECMIterations = 0;
-    uint32_t mECMSaltLength = 0;
+    bool mListeningForPASE = false;
+    // Boolean that tracks whether we have a live commissioning timeout timer.
+    bool mCommissioningTimeoutTimerArmed = false;
+    uint32_t mECMIterations              = 0;
+    uint32_t mECMSaltLength              = 0;
     uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
+
+    // For tests only, so that we can test the commissioning window timeout
+    // without having to wait 3 minutes.
+    Optional<System::Clock::Seconds16> mMinCommissioningTimeoutOverride;
 };
 
 } // namespace chip

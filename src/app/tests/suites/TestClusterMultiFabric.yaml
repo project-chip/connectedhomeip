@@ -41,7 +41,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from beta"
       identity: "beta"

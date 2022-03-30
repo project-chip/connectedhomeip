@@ -3897,6 +3897,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkIndex", indent + 1, value.networkIndex));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -7572,7 +7573,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OffWaitTime", 1, value);
         }
         case OnOff::Attributes::StartUpOnOff::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpOnOff", 1, value);
         }

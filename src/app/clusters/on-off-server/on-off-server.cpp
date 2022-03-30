@@ -248,8 +248,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         // 0xff      This value cannot happen.
         // null       Set the OnOff attribute to its previous value.
 
-        // Initialize startUpOnOff to No action value 0xFE
-        app::DataModel::Nullable<uint8_t> startUpOnOff;
+        app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
         EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -262,13 +261,13 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
                 {
                     switch (startUpOnOff.Value())
                     {
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_OFF:
+                    case OnOff::OnOffStartUpOnOff::kOff:
                         updatedOnOff = 0; // Off
                         break;
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_ON:
+                    case OnOff::OnOffStartUpOnOff::kOn:
                         updatedOnOff = 1; // On
                         break;
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE:
+                    case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
                         updatedOnOff = !updatedOnOff;
                         break;
                     default:

@@ -28,17 +28,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "reads CurrentLevel attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 254
-
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 254
+          saveAs: MaxlevelValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move up command"
       command: "Move"
@@ -47,11 +43,22 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 200
+                value: 32
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
                 value: 1
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the DUT moves at a rate of 32 units
+                    per second or as close as possible to this rate and
+                    completes moving to its maximum level"
 
     - label: "Wait 3000ms"
       cluster: "DelayCommands"
@@ -65,13 +72,15 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 254
+          value: MaxlevelValue
 
     - label: "reads min level attribute from DUT"
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 0
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move down command"
       command: "Move"
@@ -80,40 +89,48 @@ tests:
               - name: "moveMode"
                 value: 1
               - name: "rate"
-                value: 250
+                value: 64
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 3000ms"
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the DUT moves at a rate of 64 units
+                    per second or as close as possible to this rate and complete
+                    moving to its minimum level"
+
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 5000
 
     # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 1
-
-    - label: "Write default move rate attribute from DUT"
-      command: "writeAttribute"
-      attribute: "default move rate"
-      arguments:
-          value: 20
 
     - label: "reads default move rate attribute from DUT"
       command: "readAttribute"
       attribute: "default move rate"
       response:
-          value: 20
+          saveAs: DefaultMoveRateValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move up command at default move rate"
       command: "Move"
@@ -142,6 +159,17 @@ tests:
       response:
           constraints:
               notValue: 255
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the device moves at the rate
+                    recorded in step 3a and completes moving to its maximum
+                    level."
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

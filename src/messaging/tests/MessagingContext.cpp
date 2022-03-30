@@ -109,7 +109,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mBobFabricIndex, GetBobFabric()->GetNodeId());
+    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mBobFabricIndex);
     return CHIP_NO_ERROR;
 }
 

@@ -43,7 +43,7 @@
 #include <system/SystemConfig.h>
 
 /* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-//#include "InetConfig.h"
+// #include "InetConfig.h"
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"
@@ -1770,6 +1770,30 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 // attributes (1000 octets, leading to a 1003 octet buffer).
 #define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+
+/*
+ * @def CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+ *
+ * @brief Enables usage of heap in the minmdns DNSSD implementation
+ *        for tracking active operational responder lists.
+ *
+ *        When this is not set, CHIP_CONFIG_MAX_FABRICS is used to determine
+ *        and statically allocate pointers needed to track active
+ *        operational responder lists.
+ */
+#ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+#define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
+#endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
+/*
+ * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+ *
+ * @brief This buffer will used for holding debug text when handling synchronous invokes (AddOrUpdate / Reorder / Remove). Since we
+ * don't set this value for most cases and on most platforms, this value can be 0 to always ignore such field.
+ */
+#ifndef CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+#define CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE 64
+#endif // CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
 
 /**
  * @}

@@ -27,7 +27,7 @@
 #include <string>
 
 using namespace ::chip;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -59,14 +59,16 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork   = mSavedNetwork;
-    mpScanCallback    = nullptr;
-    mpConnectCallback = nullptr;
+    mStagingNetwork        = mSavedNetwork;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
     return err;
 }
 
 CHIP_ERROR ESPWiFiDriver::Shutdown()
 {
+    mpStatusChangeCallback = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -90,8 +92,11 @@ bool ESPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                         uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     // If device is already connected to WiFi, then disconnect the WiFi,
     // clear the WiFi configurations and add the newly provided WiFi configurations.
     if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
@@ -123,8 +128,10 @@ Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status ESPWiFiDriver::RemoveNetwork(ByteSpan networkId)
+Status ESPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -132,8 +139,10 @@ Status ESPWiFiDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status ESPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status ESPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
+
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -276,20 +285,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
     }
 }
 
-void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
-{
-    if (callback != nullptr)
-    {
-        mpScanCallback = callback;
-        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
-        {
-            mpScanCallback = nullptr;
-            callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-        }
-    }
-}
-
-CHIP_ERROR GetConnectedNetwork(Network & network)
+CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
     wifi_ap_record_t ap_info;
     esp_err_t err;
@@ -308,6 +304,57 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     return CHIP_NO_ERROR;
 }
 
+void ESPWiFiDriver::OnNetworkStatusChange()
+{
+    Network configuredNetwork;
+    bool staEnabled = false, staConnected = false;
+    VerifyOrReturn(ESP32Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
+    VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+    VerifyOrReturn(ESP32Utils::IsStationConnected(staConnected) == CHIP_NO_ERROR);
+    if (staConnected)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetLastDisconnectReason()));
+}
+
+void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
+{
+    if (callback != nullptr)
+    {
+        mpScanCallback = callback;
+        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
+        {
+            mpScanCallback = nullptr;
+            callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        }
+    }
+}
+
+CHIP_ERROR ESPWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    VerifyOrReturnError(event->Type == DeviceEventType::kESPSystemEvent && event->Platform.ESPSystemEvent.Base == WIFI_EVENT &&
+                            event->Platform.ESPSystemEvent.Id == WIFI_EVENT_STA_DISCONNECTED,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    mLastDisconnectedReason = event->Platform.ESPSystemEvent.Data.WiFiStaDisconnected.reason;
+    return CHIP_NO_ERROR;
+}
+
+int32_t ESPWiFiDriver::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
+}
+
 size_t ESPWiFiDriver::WiFiNetworkIterator::Count()
 {
     return mDriver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
@@ -324,12 +371,14 @@ bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.connected    = false;
     mExhausted        = true;
 
-    Network connectedNetwork;
-    CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
+    Network configuredNetwork;
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        if (connectedNetwork.networkIDLen == item.networkIDLen &&
-            memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        bool isConnected = false;
+        err              = ESP32Utils::IsStationConnected(isConnected);
+        if (err == CHIP_NO_ERROR && isConnected && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
             item.connected = true;
         }
@@ -340,4 +389,3 @@ bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

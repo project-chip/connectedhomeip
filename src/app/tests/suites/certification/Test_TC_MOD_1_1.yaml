@@ -16,45 +16,61 @@ name: 78.1.1. [TC-MOD-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Mode Select"
+    endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH reads the ClusterRevision attribute from the DUT"
-      verification:
-          "./chip-tool modeselect read cluster-revision 1 1
-          [1645775623.658997][3277:3282] CHIP:TOO: ClusterRevision: 1"
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: uint16
 
     - label: "TH reads the FeatureMap attribute from the DUT"
-      verification: "Not currently supported"
       disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map8
 
     - label: "TH reads the AttributeList attribute from the DUT"
-      verification:
-          "./chip-tool modeselect read attribute-list 1 1
-          [1645775832.872856][3304:3309] CHIP:TOO: AttributeList: 7 entries
-          [1645775832.872963][3304:3309] CHIP:TOO: [1]: 0
-          [1645775832.872990][3304:3309] CHIP:TOO: [2]: 1
-          [1645775832.873015][3304:3309] CHIP:TOO: [3]: 2
-          [1645775832.873040][3304:3309] CHIP:TOO: [4]: 3
-          [1645775832.873070][3304:3309] CHIP:TOO: [5]: 4
-          [1645775832.873101][3304:3309] CHIP:TOO: [6]: 65531
-          [1645775832.873132][3304:3309] CHIP:TOO: [7]: 65533 *NOTE* : This
-          sample attribute list reflects the currently implemented attributes on
-          the all-clusters-app."
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
 
-    - label: "TH reads the CommandList attribute from the DUT"
-      verification:
-          "./chip-tool modeselect read client-generated-command-list 1 1
-          [1645776597.295794][4635:4640] CHIP:TOO: AcceptedCommandList: 1
-          entries [1645776597.295853][4635:4640] CHIP:TOO: [1]: 0"
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: EventList"
       disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
 
-    - label: "TH reads the EventList attribute from the DUT"
-      verification:
-          "./chip-tool modeselect read server-generated-command-list 1 1
-          [1645776667.509100][4643:4648] CHIP:TOO: GeneratedCommandList: 0
-          entries"
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list

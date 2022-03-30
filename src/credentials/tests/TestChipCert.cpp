@@ -1421,6 +1421,99 @@ static void TestChipCert_ExtractCATsFromOpCert(nlTestSuite * inSuite, void * inC
     }
 }
 
+static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestCase
+    {
+        uint8_t Cert;
+        ChipDN ExpectedSubjectDN;
+    };
+
+    ChipDN expectedSubjectDN_Root01;
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Root01.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, 0xCACACACA00000001) ==
+                       CHIP_NO_ERROR);
+
+    ChipDN expectedSubjectDN_Root02;
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Root02.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, 0xCACACACA00000002) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Root02.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, 0xFAB000000000001D) ==
+                       CHIP_NO_ERROR);
+
+    ChipDN expectedSubjectDN_ICA02;
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_ICA02.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, 0xCACACACA00000004) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_ICA02.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, 0xFAB000000000001D) ==
+                       CHIP_NO_ERROR);
+
+    ChipDN expectedSubjectDN_Node01_01;
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node01_01.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, 0xDEDEDEDE00010001) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node01_01.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, 0xFAB000000000001D) ==
+                       CHIP_NO_ERROR);
+
+    const static char commonName_RDN[] = "TestCert02_03";
+
+    ChipDN expectedSubjectDN_Node02_03;
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node02_03.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, 0xDEDEDEDE00020003) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node02_03.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, 0xFAB000000000001D) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node02_03.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
+                                                            CharSpan(commonName_RDN, strlen(commonName_RDN)),
+                                                            false) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   expectedSubjectDN_Node02_03.AddAttribute(chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag, 0xABCD0001) ==
+                       CHIP_NO_ERROR);
+
+    // clang-format off
+    TestCase sTestCases[] = {
+        // Cert                  SubjectDN
+        // ============================================================================
+        {  TestCert::kRoot01,    expectedSubjectDN_Root01    },
+        {  TestCert::kRoot02,    expectedSubjectDN_Root02    },
+        {  TestCert::kICA02,     expectedSubjectDN_ICA02     },
+        {  TestCert::kNode01_01, expectedSubjectDN_Node01_01 },
+        {  TestCert::kNode02_03, expectedSubjectDN_Node02_03 },
+    };
+    // clang-format on
+
+    // Test extraction from the raw ByteSpan form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ChipDN subjectDN;
+        err = ExtractSubjectDNFromChipCert(cert, subjectDN);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+    }
+
+    // Test extraction from the X509 ByteSpan form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ChipDN subjectDN;
+        err = ExtractSubjectDNFromX509Cert(cert, subjectDN);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+    }
+}
+
 static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * inContext)
 {
     struct TestCase
@@ -1518,6 +1611,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test extracting Node ID and Fabric ID from node certificate", TestChipCert_ExtractNodeIdFabricId),
     NL_TEST_DEF("Test extracting Operational Discovery ID from node and root certificate", TestChipCert_ExtractOperationalDiscoveryId),
     NL_TEST_DEF("Test extracting CASE Authenticated Tags from node certificate", TestChipCert_ExtractCATsFromOpCert),
+    NL_TEST_DEF("Test extracting Subject DN from chip certificate", TestChipCert_ExtractSubjectDNFromChipCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
     NL_TEST_SENTINEL()
 };

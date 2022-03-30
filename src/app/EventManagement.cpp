@@ -22,6 +22,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <assert.h>
 #include <inttypes.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
@@ -608,10 +609,10 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
-        if (interestedPath->IsEventPathSupersetOf(path))
+        if (interestedPath->mValue.IsEventPathSupersetOf(path))
         {
             ret = CHIP_NO_ERROR;
-            if (!interestedPath->HasEventWildcard())
+            if (!interestedPath->mValue.HasEventWildcard())
             {
                 eventReadViaConcretePath = true;
                 break;
@@ -732,8 +733,9 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                             size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor)
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+                                             EventNumber & aEventMin, size_t & aEventCount,
+                                             const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -747,7 +749,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     context.mSubjectDescriptor     = aSubjectDescriptor;
-    context.mpInterestedEventPaths = apClusterInfolist;
+    context.mpInterestedEventPaths = apEventPathList;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
 
@@ -758,7 +760,16 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     }
 
 exit:
-    aEventMin = context.mCurrentEventNumber + 1;
+    if (err == CHIP_ERROR_BUFFER_TOO_SMALL || err == CHIP_ERROR_NO_MEMORY)
+    {
+        // We failed to fetch the current event because the buffer is too small, we will start from this one the next time.
+        aEventMin = context.mCurrentEventNumber;
+    }
+    else
+    {
+        // For all other cases, continue from the next event.
+        aEventMin = context.mCurrentEventNumber + 1;
+    }
     aEventCount += context.mEventCount;
     return err;
 }

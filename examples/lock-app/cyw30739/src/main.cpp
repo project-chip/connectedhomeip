@@ -170,15 +170,7 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-void HandleThreadStateChangeEvent(const ChipDeviceEvent * event)
-{
-#if CHIP_BYPASS_RENDEZVOUS
-    if (event->ThreadStateChange.NetDataChanged && !ConnectivityMgr().IsThreadProvisioned())
-    {
-        ThreadStackMgr().JoinerStart();
-    }
-#endif /* CHIP_BYPASS_RENDEZVOUS */
-}
+void HandleThreadStateChangeEvent(const ChipDeviceEvent * event) {}
 
 void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
 {

@@ -105,6 +105,20 @@ devices log when they start up) and try to pair with the first one it discovers.
 In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
 (which must be a decimal number or a 0x-prefixed hex number).
 
+#### Trust Store
+
+Trust store will be automatically created using the default Test Attestation
+PAA. To use a different set of PAAs, pass the path using the optional parameter
+--paa-trust-store-path while running the built executable. Trusted PAAs are
+available at credentials/development/paa-root-certs/.
+
+The command below will select a set of trusted PAAs to be used during
+Attestation Verification. It will also discover devices with long discriminator
+3840 and try to pair with the first one it discovers using the provided setup
+code.
+
+    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840 --paa-trust-store-path path/to/PAAs
+
 ### Forget the currently-commissioned device
 
     $ chip-tool pairing unpair

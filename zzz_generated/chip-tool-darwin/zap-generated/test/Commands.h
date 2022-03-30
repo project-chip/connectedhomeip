@@ -75,7 +75,12 @@ public:
         printf("Test_TC_FLW_1_1\n");
         printf("Test_TC_FLW_2_1\n");
         printf("Test_TC_FLW_2_2\n");
+        printf("Test_TC_GC_1_1\n");
         printf("Test_TC_ILL_1_1\n");
+        printf("Test_TC_ILL_2_1\n");
+        printf("Test_TC_I_1_1\n");
+        printf("Test_TC_I_2_1\n");
+        printf("Test_TC_I_2_3\n");
         printf("Test_TC_LVL_1_1\n");
         printf("Test_TC_LVL_2_1\n");
         printf("Test_TC_LVL_2_2\n");
@@ -84,6 +89,17 @@ public:
         printf("Test_TC_LVL_5_1\n");
         printf("Test_TC_LVL_6_1\n");
         printf("Test_TC_MC_1_1\n");
+        printf("Test_TC_MC_1_2\n");
+        printf("Test_TC_MC_1_3\n");
+        printf("Test_TC_MC_1_4\n");
+        printf("Test_TC_MC_1_5\n");
+        printf("Test_TC_MC_1_6\n");
+        printf("Test_TC_MC_1_7\n");
+        printf("Test_TC_MC_1_8\n");
+        printf("Test_TC_MC_1_9\n");
+        printf("Test_TC_MC_1_10\n");
+        printf("Test_TC_MC_1_11\n");
+        printf("Test_TC_MC_1_12\n");
         printf("Test_TC_MC_2_1\n");
         printf("Test_TC_MC_3_1\n");
         printf("Test_TC_MC_3_2\n");
@@ -107,6 +123,8 @@ public:
         printf("Test_TC_MC_7_2\n");
         printf("Test_TC_MC_8_1\n");
         printf("Test_TC_MC_9_1\n");
+        printf("Test_TC_MC_10_1\n");
+        printf("Test_TC_MOD_1_1\n");
         printf("Test_TC_OCC_1_1\n");
         printf("Test_TC_OCC_2_1\n");
         printf("Test_TC_OCC_2_2\n");
@@ -115,12 +133,14 @@ public:
         printf("Test_TC_OO_2_2\n");
         printf("Test_TC_OO_2_3\n");
         printf("Test_TC_PS_1_1\n");
+        printf("Test_TC_PS_2_1\n");
         printf("Test_TC_PRS_1_1\n");
         printf("Test_TC_PRS_2_1\n");
         printf("Test_TC_PCC_1_1\n");
         printf("Test_TC_PCC_2_1\n");
         printf("Test_TC_PCC_2_2\n");
         printf("Test_TC_PCC_2_3\n");
+        printf("Test_TC_PCC_2_4\n");
         printf("Test_TC_RH_1_1\n");
         printf("Test_TC_RH_2_1\n");
         printf("Test_TC_RH_2_2\n");
@@ -136,6 +156,7 @@ public:
         printf("Test_TC_TSUIC_2_1\n");
         printf("Test_TC_TSUIC_2_2\n");
         printf("Test_TC_DIAG_TH_NW_1_1\n");
+        printf("Test_TC_DIAG_TH_NW_1_2\n");
         printf("Test_TC_WIFIDIAG_1_1\n");
         printf("Test_TC_WIFIDIAG_3_1\n");
         printf("Test_TC_WNCV_1_1\n");
@@ -158,7 +179,6 @@ public:
         printf("TestIdentifyCluster\n");
         printf("TestLogCommands\n");
         printf("TestOperationalCredentialsCluster\n");
-        printf("TestModeSelectCluster\n");
         printf("TestBinding\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
@@ -2347,17 +2367,16 @@ public:
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_5();
             break;
         }
 
@@ -2427,50 +2446,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -2482,6 +2458,42 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
@@ -2537,15 +2549,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read mandatory non-global attribute constraints: StateValue\n");
             err = TestReadMandatoryNonGlobalAttributeConstraintsStateValue_2();
             break;
-        case 3:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 3 : Write the default value to mandatory non-global attribute: StateValue\n");
-            err = TestWriteTheDefaultValueToMandatoryNonGlobalAttributeStateValue_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads back the mandatory non-global attribute: StateValue\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeStateValue_4();
-            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -2561,7 +2564,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -2608,47 +2611,6 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("stateValue", "", "bool"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValueToMandatoryNonGlobalAttributeStateValue_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id stateValueArgument;
-        stateValueArgument = [NSNumber numberWithBool:1];
-        [cluster writeAttributeStateValueWithValue:stateValueArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write the default value to mandatory non-global attribute: StateValue Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStateValue_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStateValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads back the mandatory non-global attribute: StateValue Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("StateValue", actualValue, 0));
-            }
-
             NextTest();
         }];
 
@@ -2704,6 +2666,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -2719,7 +2693,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -2766,6 +2740,60 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBridgedActions * cluster = [[CHIPTestBridgedActions alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBridgedActions * cluster = [[CHIPTestBridgedActions alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBridgedActions * cluster = [[CHIPTestBridgedActions alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
@@ -3595,9 +3623,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current hue", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
             }
 
             NextTest();
@@ -3662,9 +3693,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current saturation", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
             }
 
             NextTest();
@@ -3728,9 +3762,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current x", actualValue, 24939U));
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -3794,9 +3831,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current y", actualValue, 24701U));
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -3964,11 +4004,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("enhanced current hue", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
             NextTest();
         }];
 
@@ -4041,11 +4077,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop active", actualValue, 0));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopActive", "", "uint8"));
             NextTest();
         }];
 
@@ -4101,11 +4133,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop direction", actualValue, 0));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopDirection", "", "uint8"));
             NextTest();
         }];
 
@@ -4160,11 +4188,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color loop time", actualValue, 25U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("colorLoopTime", "", "uint16"));
             NextTest();
         }];
 
@@ -4223,11 +4247,7 @@ private:
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("color loop start enhanced hue", actualValue, 8960U));
-                }
-
+                VerifyOrReturn(CheckConstraintType("colorLoopStartEnhancedHue", "", "uint16"));
                 NextTest();
             }];
 
@@ -4286,11 +4306,7 @@ private:
 
                 VerifyOrReturn(CheckValue("status", err, 0));
 
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("color loop stored enhanced hue", actualValue, 0U));
-                }
-
+                VerifyOrReturn(CheckConstraintType("colorLoopStoredEnhancedHue", "", "uint16"));
                 NextTest();
             }];
 
@@ -4353,9 +4369,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color capabilities", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorCapabilities", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", [value unsignedShortValue], 31U));
             }
 
             NextTest();
@@ -4421,9 +4440,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color temp physical min", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMin", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -4489,9 +4511,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("color temp physical max", actualValue, 65279U));
+            VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMax", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -4568,11 +4593,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("couple color temp to level min-mireds", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("coupleColorTempToLevelMinMireds", "", "uint16"));
             NextTest();
         }];
 
@@ -4729,11 +4750,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("remaining time", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
             NextTest();
         }];
 
@@ -4811,9 +4828,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("drift compensation", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("driftCompensation", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("driftCompensation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("driftCompensation", [value unsignedCharValue], 4));
             }
 
             NextTest();
@@ -4887,11 +4907,8 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueAsString("compensation text", actualValue, @""));
-            }
-
+            VerifyOrReturn(CheckConstraintType("compensationText", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("compensationText", [value length], 254));
             NextTest();
         }];
 
@@ -4953,9 +4970,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("number of primaries", actualValue, 0));
+            VerifyOrReturn(CheckConstraintType("numberOfPrimaries", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPrimaries", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("numberOfPrimaries", [value unsignedCharValue], 6));
             }
 
             NextTest();
@@ -5019,9 +5039,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 1 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5085,9 +5108,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 1 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5169,9 +5195,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 2 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5235,9 +5264,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 2 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5319,9 +5351,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 3 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5385,9 +5420,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 3 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5469,9 +5507,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 4 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5535,9 +5576,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 4 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5619,9 +5663,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 5 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5685,9 +5732,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 5 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5769,9 +5819,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 6 x", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6X", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -5835,9 +5888,12 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("primary 6 y", actualValue, 0U));
+            VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6Y", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", [value unsignedShortValue], 65279U));
             }
 
             NextTest();
@@ -13127,28 +13183,28 @@ public:
             err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET")) {
-                NextTest();
-                return;
-            }
-            err = TestColorLoopSetCommandSetAllAttributes_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE")) {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Read EnhancedCurrentHue attribute from DUT.\n");
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read EnhancedCurrentHue attribute from DUT.\n");
             if (ShouldSkip("A_ENHANCEDCURRENTHUE")) {
                 NextTest();
                 return;
             }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_10();
+            err = TestReadEnhancedCurrentHueAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Color Loop Set Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET")) {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandSetAllAttributes_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopActive attribute from DUT.\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopStoredEnhancedHue attribute from DUT.\n");
@@ -13395,8 +13451,31 @@ private:
 
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull EnhancedCurrentHueValue;
 
-    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_8()
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            {
+                EnhancedCurrentHueValue = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -13422,7 +13501,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -13436,29 +13515,6 @@ private:
             {
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("color loop active", actualValue, 1));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-    NSNumber * _Nonnull EnhancedCurrentHueValue;
-
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
-            {
-                EnhancedCurrentHueValue = value;
             }
 
             NextTest();
@@ -16380,6 +16436,217 @@ private:
     }
 };
 
+class Test_TC_GC_1_1 : public TestCommandBridge {
+public:
+    Test_TC_GC_1_1()
+        : TestCommandBridge("Test_TC_GC_1_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GC_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GC_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GC_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH1 reads the BreadCrumb Attribute from the DUT\n");
+            err = TestTh1ReadsTheBreadCrumbAttributeFromTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH1 writes the BreadCrumb attribute as 1 to the DUT\n");
+            err = TestTh1WritesTheBreadCrumbAttributeAs1ToTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH1 reads the BreadCrumb attribute from the DUT\n");
+            err = TestTh1ReadsTheBreadCrumbAttributeFromTheDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : TH1 reads the RegulatoryConfig attribute from the DUT\n");
+            err = TestTh1ReadsTheRegulatoryConfigAttributeFromTheDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : TH1 reads the LocationCapability attribute from the DUT\n");
+            err = TestTh1ReadsTheLocationCapabilityAttributeFromTheDut_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTh1ReadsTheBreadCrumbAttributeFromTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH1 reads the BreadCrumb Attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("Breadcrumb", actualValue, 0ULL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTh1WritesTheBreadCrumbAttributeAs1ToTheDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id breadcrumbArgument;
+        breadcrumbArgument = [NSNumber numberWithUnsignedLongLong:1ULL];
+        [cluster writeAttributeBreadcrumbWithValue:breadcrumbArgument
+                                 completionHandler:^(NSError * _Nullable err) {
+                                     NSLog(@"TH1 writes the BreadCrumb attribute as 1 to the DUT Error: %@", err);
+
+                                     VerifyOrReturn(CheckValue("status", err, 0));
+
+                                     NextTest();
+                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTh1ReadsTheBreadCrumbAttributeFromTheDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH1 reads the BreadCrumb attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("Breadcrumb", actualValue, 1ULL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTh1ReadsTheRegulatoryConfigAttributeFromTheDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRegulatoryConfigWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH1 reads the RegulatoryConfig attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("regulatoryConfig", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("regulatoryConfig", [value unsignedCharValue], 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTh1ReadsTheLocationCapabilityAttributeFromTheDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLocationCapabilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH1 reads the LocationCapability attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("locationCapability", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("locationCapability", [value unsignedCharValue], 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_ILL_1_1 : public TestCommandBridge {
 public:
     Test_TC_ILL_1_1()
@@ -16421,25 +16688,20 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         case 3:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_5();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
             break;
         }
 
@@ -16456,7 +16718,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -16469,31 +16731,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
-                                                                                                 endpoint:1
-                                                                                                    queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 2U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -16513,54 +16751,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
-                                                                                                 endpoint:1
-                                                                                                    queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
-                                                                                                 endpoint:1
-                                                                                                    queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 2U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -16577,6 +16768,980 @@ private:
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ILL_2_1 : public TestCommandBridge {
+public:
+    Test_TC_ILL_2_1()
+        : TestCommandBridge("Test_TC_ILL_2_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ILL_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ILL_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ILL_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH reads MinMeasuredValue attribute from DUT\n");
+            err = TestThReadsMinMeasuredValueAttributeFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH reads MaxMeasuredValue attribute from DUT\n");
+            err = TestThReadsMaxMeasuredValueAttributeFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH reads Tolerance attribute from DUT\n");
+            err = TestThReadsToleranceAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : TH reads LightSensorType attribute from DUT\n");
+            err = TestThReadsLightSensorTypeAttributeFromDut_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsMinMeasuredValueAttributeFromDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads MinMeasuredValue attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("minMeasuredValue", [value unsignedShortValue], 1U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", [value unsignedShortValue], 65533U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsMaxMeasuredValueAttributeFromDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads MaxMeasuredValue attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("maxMeasuredValue", [value unsignedShortValue], 2U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("maxMeasuredValue", [value unsignedShortValue], 65534U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsToleranceAttributeFromDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads Tolerance attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", [value unsignedShortValue], 2048U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsLightSensorTypeAttributeFromDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLightSensorTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads LightSensorType attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("lightSensorType", "", "enum8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_I_1_1 : public TestCommandBridge {
+public:
+    Test_TC_I_1_1()
+        : TestCommandBridge("Test_TC_I_1_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads constraints of ClusterRevision attribute\n");
+            err = TestReadsConstraintsOfClusterRevisionAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsConstraintsOfClusterRevisionAttribute_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads constraints of ClusterRevision attribute Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_I_2_1 : public TestCommandBridge {
+public:
+    Test_TC_I_2_1()
+        : TestCommandBridge("Test_TC_I_2_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH reads the IdentifyTime attribute from the DUT\n");
+            err = TestThReadsTheIdentifyTimeAttributeFromTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH reads the IdentifyType attribute from the DUT\n");
+            err = TestThReadsTheIdentifyTypeAttributeFromTheDut_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheIdentifyTimeAttributeFromTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeIdentifyTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the IdentifyTime attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("identifyTime", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheIdentifyTypeAttributeFromTheDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeIdentifyTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the IdentifyType attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("identifyType", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("identifyType", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("identifyType", [value unsignedCharValue], 5));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_I_2_3 : public TestCommandBridge {
+public:
+    Test_TC_I_2_3()
+        : TestCommandBridge("Test_TC_I_2_3")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 1.Wait for the commissioned device to be retrieved\n");
+            err = Test1WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 1 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and "
+                "the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x00BlinkAndTheEffectVariantFieldSetTo0x00Default_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Manually check DUT executes a blink effect\n");
+            err = TestManuallyCheckDutExecutesABlinkEffect_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 3 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe "
+                "and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : check DUT executes a breathe effect\n");
+            err = TestCheckDutExecutesABreatheEffect_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 5 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay and "
+                "the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x02OkayAndTheEffectVariantFieldSetTo0x00Default_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : check DUT executes an okay effect\n");
+            err = TestCheckDutExecutesAnOkayEffect_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b channel "
+                "change and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x0bChannelChangeAndTheEffectVariantFieldSetTo0x00Default_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : check DUT executes a channel change effect\n");
+            err = TestCheckDutExecutesAChannelChangeEffect_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 9 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe "
+                "and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : check DUT executes a breathe effect\n");
+            err = TestCheckDutExecutesABreatheEffect_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 11 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe finish "
+                "effect and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xfeFinishEffectAndTheEffectVariantFieldSetTo0x00Default_11();
+            break;
+        case 12:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 12 : Manually check DUT stops the breathe effect after the current effect sequence\n");
+            err = TestManuallyCheckDutStopsTheBreatheEffectAfterTheCurrentEffectSequence_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe "
+                "and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Manually check DUT executes a breathe effect\n");
+            err = TestManuallyCheckDutExecutesABreatheEffect_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 15 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop "
+                "effect and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xffStopEffectAndTheEffectVariantFieldSetTo0x00Default_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Check DUT stops the breathe effect as soon as possible.\n");
+            err = TestCheckDutStopsTheBreatheEffectAsSoonAsPossible_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 17 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink "
+                "and the effect variant field set to 0x42 unknown\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x00BlinkAndTheEffectVariantFieldSetTo0x42Unknown_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Check DUT executes a blink effect.\n");
+            err = TestCheckDutExecutesABlinkEffect_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 19 : TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop "
+                "effect and the effect variant field set to 0x00 default\n");
+            err = TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xffStopEffectAndTheEffectVariantFieldSetTo0x00Default_19();
+            break;
+        case 20:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 20 : Check DUT stops any effect that may be still running as soon as possible\n");
+            err = TestCheckDutStopsAnyEffectThatMayBeStillRunningAsSoonAsPossible_20();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 21;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR Test1WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x00BlinkAndTheEffectVariantFieldSetTo0x00Default_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:0];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and "
+                                 @"the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestManuallyCheckDutExecutesABlinkEffect_2()
+    {
+        UserPrompt(@"DUT executes a blink effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and "
+                                 @"the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutExecutesABreatheEffect_4()
+    {
+        UserPrompt(@"DUT executes a breathe effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x02OkayAndTheEffectVariantFieldSetTo0x00Default_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:2];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay and the "
+                                 @"effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutExecutesAnOkayEffect_6()
+    {
+        UserPrompt(@"DUT executes an okay effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x0bChannelChangeAndTheEffectVariantFieldSetTo0x00Default_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:11];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b channel "
+                                 @"change and the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutExecutesAChannelChangeEffect_8()
+    {
+        UserPrompt(@"DUT executes a channel change effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and "
+                                 @"the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutExecutesABreatheEffect_10()
+    {
+        UserPrompt(@"DUT executes a breathe effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xfeFinishEffectAndTheEffectVariantFieldSetTo0x00Default_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:254];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe finish "
+                                 @"effect and the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestManuallyCheckDutStopsTheBreatheEffectAfterTheCurrentEffectSequence_12()
+    {
+        UserPrompt(@"DUT stops the breathe effect after the current effect sequence");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x01BreatheAndTheEffectVariantFieldSetTo0x00Default_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:1];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and "
+                                 @"the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestManuallyCheckDutExecutesABreatheEffect_14()
+    {
+        UserPrompt(@"DUT executes a breathe effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xffStopEffectAndTheEffectVariantFieldSetTo0x00Default_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:255];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect "
+                                 @"and the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutStopsTheBreatheEffectAsSoonAsPossible_16()
+    {
+        UserPrompt(@"DUT stops the breathe effect as soon as possible");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0x00BlinkAndTheEffectVariantFieldSetTo0x42Unknown_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:0];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:66];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and "
+                                 @"the effect variant field set to 0x42 unknown Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutExecutesABlinkEffect_18()
+    {
+        UserPrompt(@"DUT executes a blink effect");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR
+    TestThSendsTriggerEffectCommandToDutWithTheEffectIdentifierFieldSetTo0xffStopEffectAndTheEffectVariantFieldSetTo0x00Default_19()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPIdentifyClusterTriggerEffectParams alloc] init];
+        params.effectIdentifier = [NSNumber numberWithUnsignedChar:255];
+        params.effectVariant = [NSNumber numberWithUnsignedChar:0];
+        [cluster triggerEffectWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect "
+                                 @"and the effect variant field set to 0x00 default Error: %@",
+                               err);
+
+                           VerifyOrReturn(CheckValue("status", err, 0));
+
+                           NextTest();
+                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckDutStopsAnyEffectThatMayBeStillRunningAsSoonAsPossible_20()
+    {
+        UserPrompt(@"DUT stops any effect that may be still running as soon as possible");
         return CHIP_NO_ERROR;
     }
 };
@@ -16643,12 +17808,28 @@ public:
             err = TestReadTheGlobalAttributeAttributeList_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the optional global attribute : FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : write the default values to optional global attribute: FeatureMap\n");
-            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read the optional global attribute : FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : write the default values to optional global attribute: FeatureMap\n");
+            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : reads back optional global attribute: FeatureMap\n");
+            err = TestReadsBackOptionalGlobalAttributeFeatureMap_11();
             break;
         }
 
@@ -16665,7 +17846,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 8;
+    const uint16_t mTestCount = 12;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -16779,7 +17960,65 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("FeatureMap", actualValue, 3UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -16797,7 +18036,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_7()
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -16812,6 +18051,24 @@ private:
                                      VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
                                      NextTest();
                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -17777,8 +19034,8 @@ public:
             err = TestSendsAMoveToLevelCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait a second\n");
-            err = TestWaitASecond_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 11000 second\n");
+            err = TestWait11000Second_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
@@ -17793,8 +19050,8 @@ public:
             err = TestSendsAMoveToLevelCommand_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 1000ms\n");
+            err = TestWait1000ms_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : reads CurrentLevel attribute from DUT\n");
@@ -17847,11 +19104,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 254));
-            }
-
+            VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
             NextTest();
         }];
 
@@ -17869,11 +19122,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min level", actualValue, 0));
-            }
-
+            VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
             NextTest();
         }];
 
@@ -17891,11 +19140,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max level", actualValue, 254));
-            }
-
+            VerifyOrReturn(CheckConstraintType("maxLevel", "", "uint8"));
             NextTest();
         }];
 
@@ -17910,7 +19155,7 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterMoveToLevelParams alloc] init];
         params.level = [NSNumber numberWithUnsignedChar:64];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:65535U];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
         [cluster moveToLevelWithParams:params
@@ -17960,8 +19205,8 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         __auto_type * params = [[CHIPLevelControlClusterMoveToLevelParams alloc] init];
-        params.level = [NSNumber numberWithUnsignedChar:128];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:1U];
+        params.level = [NSNumber numberWithUnsignedChar:100];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:100U];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
         [cluster moveToLevelWithParams:params
@@ -17976,9 +19221,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWaitASecond_8()
+    CHIP_ERROR TestWait11000Second_8()
     {
-        WaitForMs(1000);
+        WaitForMs(11000);
         return CHIP_NO_ERROR;
     }
 
@@ -17995,7 +19240,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 128));
+                VerifyOrReturn(CheckValue("current level", actualValue, 100));
             }
 
             NextTest();
@@ -18015,11 +19260,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("on off transition time", actualValue, 0U));
-            }
-
+            VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
             NextTest();
         }];
 
@@ -18033,7 +19274,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         __auto_type * params = [[CHIPLevelControlClusterMoveToLevelParams alloc] init];
-        params.level = [NSNumber numberWithUnsignedChar:254];
+        params.level = [NSNumber numberWithUnsignedChar:128];
         params.transitionTime = [NSNumber numberWithUnsignedShort:65535U];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
@@ -18049,9 +19290,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait10ms_12()
+    CHIP_ERROR TestWait1000ms_12()
     {
-        WaitForMs(100);
+        WaitForMs(1000);
         return CHIP_NO_ERROR;
     }
 
@@ -18068,7 +19309,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 254));
+                VerifyOrReturn(CheckValue("current level", actualValue, 128));
             }
 
             NextTest();
@@ -18148,16 +19389,16 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : reads CurrentLevel attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : reads max level attribute from DUT\n");
+            err = TestReadsMaxLevelAttributeFromDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : reads max level attribute from DUT\n");
-            err = TestReadsMaxLevelAttributeFromDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : sends a Move up command\n");
+            err = TestSendsAMoveUpCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : sends a Move up command\n");
-            err = TestSendsAMoveUpCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : user prompt message\n");
+            err = TestUserPromptMessage_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 3000ms\n");
@@ -18176,16 +19417,16 @@ public:
             err = TestSendsAMoveDownCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 3000ms\n");
-            err = TestWait3000ms_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : user prompt message\n");
+            err = TestUserPromptMessage_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 5000ms\n");
+            err = TestWait5000ms_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Write default move rate attribute from DUT\n");
-            err = TestWriteDefaultMoveRateAttributeFromDut_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : reads default move rate attribute from DUT\n");
@@ -18204,12 +19445,16 @@ public:
             err = TestReadsCurrentLevelAttributeFromDut_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Reset level to 254\n");
-            err = TestResetLevelTo254_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : user prompt message\n");
+            err = TestUserPromptMessage_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 100ms\n");
-            err = TestWait100ms_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Reset level to 254\n");
+            err = TestResetLevelTo254_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Wait 100ms\n");
+            err = TestWait100ms_17();
             break;
         }
 
@@ -18226,7 +19471,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 17;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -18238,30 +19483,9 @@ private:
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull MaxlevelValue;
 
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads CurrentLevel attribute from DUT Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 254));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMaxLevelAttributeFromDut_2()
+    CHIP_ERROR TestReadsMaxLevelAttributeFromDut_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18272,9 +19496,9 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            VerifyOrReturn(CheckConstraintType("maxLevel", "", "uint8"));
             {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max level", actualValue, 254));
+                MaxlevelValue = value;
             }
 
             NextTest();
@@ -18283,7 +19507,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestSendsAMoveUpCommand_3()
+    CHIP_ERROR TestSendsAMoveUpCommand_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18291,7 +19515,7 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterMoveParams alloc] init];
         params.moveMode = [NSNumber numberWithUnsignedChar:0];
-        params.rate = [NSNumber numberWithUnsignedChar:200];
+        params.rate = [NSNumber numberWithUnsignedChar:32];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
         [cluster moveWithParams:params
@@ -18303,6 +19527,13 @@ private:
                   NextTest();
               }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestUserPromptMessage_3()
+    {
+        UserPrompt(@"Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to this rate "
+                   @"and completes moving to its maximum level");
         return CHIP_NO_ERROR;
     }
 
@@ -18325,7 +19556,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 254));
+                VerifyOrReturn(CheckValue("current level", actualValue, MaxlevelValue));
             }
 
             NextTest();
@@ -18333,6 +19564,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull MinlevelValue;
 
     CHIP_ERROR TestReadsMinLevelAttributeFromDut_6()
     {
@@ -18345,9 +19577,9 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
             {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min level", actualValue, 0));
+                MinlevelValue = value;
             }
 
             NextTest();
@@ -18364,7 +19596,7 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterMoveParams alloc] init];
         params.moveMode = [NSNumber numberWithUnsignedChar:1];
-        params.rate = [NSNumber numberWithUnsignedChar:250];
+        params.rate = [NSNumber numberWithUnsignedChar:64];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
         [cluster moveWithParams:params
@@ -18379,13 +19611,20 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait3000ms_8()
+    CHIP_ERROR TestUserPromptMessage_8()
     {
-        WaitForMs(3000);
+        UserPrompt(@"Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to this rate "
+                   @"and complete moving to its minimum level");
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
+    CHIP_ERROR TestWait5000ms_9()
+    {
+        WaitForMs(5000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18395,6 +19634,11 @@ private:
             NSLog(@"reads CurrentLevel attribute from DUT Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("current level", actualValue, 1));
+            }
 
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 0));
@@ -18408,26 +19652,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-
-    CHIP_ERROR TestWriteDefaultMoveRateAttributeFromDut_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id defaultMoveRateArgument;
-        defaultMoveRateArgument = [NSNumber numberWithUnsignedChar:20];
-        [cluster writeAttributeDefaultMoveRateWithValue:defaultMoveRateArgument
-                                      completionHandler:^(NSError * _Nullable err) {
-                                          NSLog(@"Write default move rate attribute from DUT Error: %@", err);
-
-                                          VerifyOrReturn(CheckValue("status", err, 0));
-
-                                          NextTest();
-                                      }];
-
-        return CHIP_NO_ERROR;
-    }
+    NSNumber * _Nullable DefaultMoveRateValue;
 
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_11()
     {
@@ -18440,10 +19665,9 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
             {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("default move rate", actualValue));
-                VerifyOrReturn(CheckValue("default move rate", actualValue, 20));
+                DefaultMoveRateValue = value;
             }
 
             NextTest();
@@ -18502,7 +19726,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestResetLevelTo254_15()
+    CHIP_ERROR TestUserPromptMessage_15()
+    {
+        UserPrompt(
+            @"Physically verify that the device moves at the rate recorded in step 3a and completes moving to its maximum level.");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestResetLevelTo254_16()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18525,7 +19756,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait100ms_16()
+    CHIP_ERROR TestWait100ms_17()
     {
         WaitForMs(100);
         return CHIP_NO_ERROR;
@@ -18577,32 +19808,32 @@ public:
             err = TestSendingOnCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: DUT level is set to 0x80\n");
-            err = TestPreconditionDutLevelIsSetTo0x80_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: DUT level is set to its lowest point\n");
+            err = TestPreconditionDutLevelIsSetToItsLowestPoint_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 4000ms\n");
-            err = TestWait4000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
+            err = TestWait3000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads current level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Sends step down command to DUT\n");
-            err = TestSendsStepDownCommandToDut_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Sends step up command to DUT\n");
+            err = TestSendsStepUpCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 4000ms\n");
-            err = TestWait4000ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 5000ms\n");
+            err = TestWait5000ms_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads current level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Sends a Step up command\n");
-            err = TestSendsAStepUpCommand_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Sends a Step down command\n");
+            err = TestSendsAStepDownCommand_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 4000ms\n");
@@ -18669,7 +19900,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
+    CHIP_ERROR TestPreconditionDutLevelIsSetToItsLowestPoint_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18677,13 +19908,13 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
         params.stepMode = [NSNumber numberWithUnsignedChar:1];
-        params.stepSize = [NSNumber numberWithUnsignedChar:126];
+        params.stepSize = [NSNumber numberWithUnsignedChar:100];
         params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
+                  NSLog(@"Precondition: DUT level is set to its lowest point Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18693,11 +19924,12 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait4000ms_3()
+    CHIP_ERROR TestWait3000ms_3()
     {
-        WaitForMs(4000);
+        WaitForMs(3000);
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull CurrentlevelValue;
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -18710,9 +19942,9 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
             {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 128));
+                CurrentlevelValue = value;
             }
 
             NextTest();
@@ -18721,21 +19953,21 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestSendsStepDownCommandToDut_5()
+    CHIP_ERROR TestSendsStepUpCommandToDut_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
-        params.stepMode = [NSNumber numberWithUnsignedChar:1];
+        params.stepMode = [NSNumber numberWithUnsignedChar:0];
         params.stepSize = [NSNumber numberWithUnsignedChar:64];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Sends step down command to DUT Error: %@", err);
+                  NSLog(@"Sends step up command to DUT Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18745,9 +19977,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait4000ms_6()
+    CHIP_ERROR TestWait5000ms_6()
     {
-        WaitForMs(4000);
+        WaitForMs(5000);
         return CHIP_NO_ERROR;
     }
 
@@ -18762,9 +19994,8 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 64));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintNotValue("currentLevel", value, CurrentlevelValue));
             }
 
             NextTest();
@@ -18773,21 +20004,21 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestSendsAStepUpCommand_8()
+    CHIP_ERROR TestSendsAStepDownCommand_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
-        params.stepMode = [NSNumber numberWithUnsignedChar:0];
+        params.stepMode = [NSNumber numberWithUnsignedChar:1];
         params.stepSize = [NSNumber numberWithUnsignedChar:64];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Sends a Step up command Error: %@", err);
+                  NSLog(@"Sends a Step down command Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18816,7 +20047,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 128));
+                VerifyOrReturn(CheckValue("current level", actualValue, CurrentlevelValue));
             }
 
             NextTest();
@@ -19029,6 +20260,7 @@ private:
         WaitForMs(100);
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull CurrentLevelValue;
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -19046,6 +20278,9 @@ private:
             }
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", [value unsignedCharValue], 1));
+            }
+            {
+                CurrentLevelValue = value;
             }
 
             NextTest();
@@ -19116,10 +20351,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             if (value != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 2));
-            }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", [value unsignedCharValue], 3));
+                VerifyOrReturn(CheckConstraintNotValue("currentLevel", value, CurrentLevelValue));
             }
 
             NextTest();
@@ -19299,6 +20531,1547 @@ private:
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLowPower * cluster = [[CHIPTestLowPower alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_2 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_2()
+        : TestCommandBridge("Test_TC_MC_1_2")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestKeypadInput * cluster = [[CHIPTestKeypadInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestKeypadInput * cluster = [[CHIPTestKeypadInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestKeypadInput * cluster = [[CHIPTestKeypadInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_3 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_3()
+        : TestCommandBridge("Test_TC_MC_1_3")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_3\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationLauncher * cluster = [[CHIPTestApplicationLauncher alloc] initWithDevice:device
+                                                                                           endpoint:1
+                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationLauncher * cluster = [[CHIPTestApplicationLauncher alloc] initWithDevice:device
+                                                                                           endpoint:1
+                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationLauncher * cluster = [[CHIPTestApplicationLauncher alloc] initWithDevice:device
+                                                                                           endpoint:1
+                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_4 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_4()
+        : TestCommandBridge("Test_TC_MC_1_4")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_4\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_5 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_5()
+        : TestCommandBridge("Test_TC_MC_1_5")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWakeOnLan * cluster = [[CHIPTestWakeOnLan alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWakeOnLan * cluster = [[CHIPTestWakeOnLan alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWakeOnLan * cluster = [[CHIPTestWakeOnLan alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_6 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_6()
+        : TestCommandBridge("Test_TC_MC_1_6")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestChannel * cluster = [[CHIPTestChannel alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestChannel * cluster = [[CHIPTestChannel alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestChannel * cluster = [[CHIPTestChannel alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_7 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_7()
+        : TestCommandBridge("Test_TC_MC_1_7")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_8 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_8()
+        : TestCommandBridge("Test_TC_MC_1_8")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAudioOutput * cluster = [[CHIPTestAudioOutput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAudioOutput * cluster = [[CHIPTestAudioOutput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAudioOutput * cluster = [[CHIPTestAudioOutput alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_9 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_9()
+        : TestCommandBridge("Test_TC_MC_1_9")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_10 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_10()
+        : TestCommandBridge("Test_TC_MC_1_10")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_10() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_10\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_10\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_11 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_11()
+        : TestCommandBridge("Test_TC_MC_1_11")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_11() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_11\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_11\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_1_12 : public TestCommandBridge {
+public:
+    Test_TC_MC_1_12()
+        : TestCommandBridge("Test_TC_MC_1_12")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_1_12() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_1_12\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_1_12\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccountLogin * cluster = [[CHIPTestAccountLogin alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccountLogin * cluster = [[CHIPTestAccountLogin alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccountLogin * cluster = [[CHIPTestAccountLogin alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
@@ -21385,6 +24158,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("vendorName", [value length], 32));
             NextTest();
         }];
 
@@ -21403,11 +24177,6 @@ private:
             NSLog(@"Reads the VendorID attribute Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("VendorID", actualValue, 0U));
-            }
 
             VerifyOrReturn(CheckConstraintType("vendorID", "", "vendor-id"));
             NextTest();
@@ -21496,6 +24265,282 @@ private:
 
             VerifyOrReturn(CheckConstraintType("applicationVersion", "", "string"));
             VerifyOrReturn(CheckConstraintMaxLength("applicationVersion", [value length], 32));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_10_1 : public TestCommandBridge {
+public:
+    Test_TC_MC_10_1()
+        : TestCommandBridge("Test_TC_MC_10_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_10_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH reads the AcceptHeader attribute from the DUT\n");
+            err = TestThReadsTheAcceptHeaderAttributeFromTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH reads the SupportedStreamingProtocols attribute from the DUT\n");
+            err = TestThReadsTheSupportedStreamingProtocolsAttributeFromTheDut_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheAcceptHeaderAttributeFromTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptHeaderWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the AcceptHeader attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptHeader", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheSupportedStreamingProtocolsAttributeFromTheDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestContentLauncher * cluster = [[CHIPTestContentLauncher alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeSupportedStreamingProtocolsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"TH reads the SupportedStreamingProtocols attribute from the DUT Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                VerifyOrReturn(CheckConstraintType("supportedStreamingProtocols", "", "map32"));
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MOD_1_1 : public TestCommandBridge {
+public:
+    Test_TC_MOD_1_1()
+        : TestCommandBridge("Test_TC_MOD_1_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MOD_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MOD_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MOD_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH reads the ClusterRevision attribute from the DUT\n");
+            err = TestThReadsTheClusterRevisionAttributeFromTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH reads the AttributeList attribute from the DUT\n");
+            err = TestThReadsTheAttributeListAttributeFromTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheClusterRevisionAttributeFromTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the ClusterRevision attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
+            }
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheAttributeListAttributeFromTheDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the AttributeList attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
@@ -22027,12 +25072,12 @@ public:
             err = TestReadsOccupancyAttributeFromDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads Occupancy attribute from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads back Occupancy attribute from DUT after few seconds\n");
             if (ShouldSkip("A_OCCUPANCY")) {
                 NextTest();
                 return;
             }
-            err = TestReadsOccupancyAttributeFromDut_2();
+            err = TestReadsBackOccupancyAttributeFromDutAfterFewSeconds_2();
             break;
         }
 
@@ -22061,6 +25106,7 @@ private:
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
+    NSNumber * _Nonnull OccupancyValue;
 
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_1()
     {
@@ -22075,14 +25121,21 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            VerifyOrReturn(CheckConstraintType("occupancy", "", "map8"));
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("occupancy", actualValue, 0));
+            }
+            {
+                OccupancyValue = value;
+            }
+
             NextTest();
         }];
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsOccupancyAttributeFromDut_2()
+    CHIP_ERROR TestReadsBackOccupancyAttributeFromDutAfterFewSeconds_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
@@ -22091,11 +25144,10 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeOccupancyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads Occupancy attribute from DUT Error: %@", err);
+            NSLog(@"Reads back Occupancy attribute from DUT after few seconds Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            VerifyOrReturn(CheckConstraintType("occupancy", "", "map8"));
             NextTest();
         }];
 
@@ -24439,21 +27491,16 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         case 3:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_5();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
             break;
         }
 
@@ -24470,7 +27517,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -24505,68 +27552,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -24578,6 +27564,337 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_PS_2_1 : public TestCommandBridge {
+public:
+    Test_TC_PS_2_1()
+        : TestCommandBridge("Test_TC_PS_2_1")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PS_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PS_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PS_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Test Harness Client reads Status attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsStatusAttributeFromServerDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Test Harness Client reads Order attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsOrderAttributeFromServerDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Test Harness Client reads Description attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsDescriptionAttributeFromServerDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Test Harness Client reads BatVoltage from Server DUT\n");
+            err = TestTestHarnessClientReadsBatVoltageFromServerDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Test Harness Client reads BatPercentRemaining from Server DUT\n");
+            err = TestTestHarnessClientReadsBatPercentRemainingFromServerDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Test Harness Client reads BatTimeRemaining from Server DUT\n");
+            err = TestTestHarnessClientReadsBatTimeRemainingFromServerDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Test Harness Client reads BatChargeLevel from Server DUT\n");
+            err = TestTestHarnessClientReadsBatChargeLevelFromServerDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Test Harness Client reads ActiveBatFaults from Server DUT\n");
+            err = TestTestHarnessClientReadsActiveBatFaultsFromServerDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Test Harness Client reads BatChargeState from Server DUT\n");
+            err = TestTestHarnessClientReadsBatChargeStateFromServerDut_9();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsStatusAttributeFromServerDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads Status attribute from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("status", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("status", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("status", [value unsignedCharValue], 3));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsOrderAttributeFromServerDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOrderWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads Order attribute from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("order", "", "uint8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsDescriptionAttributeFromServerDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads Description attribute from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("description", "", "string"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsBatVoltageFromServerDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBatteryVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads BatVoltage from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("batteryVoltage", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsBatPercentRemainingFromServerDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBatteryPercentRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads BatPercentRemaining from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("batteryPercentRemaining", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryPercentRemaining", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryPercentRemaining", [value unsignedCharValue], 200));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsBatTimeRemainingFromServerDut_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBatteryTimeRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads BatTimeRemaining from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("batteryTimeRemaining", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsBatChargeLevelFromServerDut_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBatteryChargeLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads BatChargeLevel from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("batteryChargeLevel", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryChargeLevel", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryChargeLevel", [value unsignedCharValue], 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsActiveBatFaultsFromServerDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeActiveBatteryFaultsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads ActiveBatFaults from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("activeBatteryFaults", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTestHarnessClientReadsBatChargeStateFromServerDut_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBatteryChargeStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Test Harness Client reads BatChargeState from Server DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("batteryChargeState", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryChargeState", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryChargeState", [value unsignedCharValue], 3));
+            }
+
             NextTest();
         }];
 
@@ -25089,8 +28406,28 @@ public:
             err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read the optional global attribute: FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default values to optional global attribute: FeatureMap\n");
+            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : reads back optional global attribute: FeatureMap\n");
+            err = TestReadsBackOptionalGlobalAttributeFeatureMap_9();
             break;
         }
 
@@ -25107,7 +28444,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -25183,7 +28520,47 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_4()
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -25195,6 +28572,76 @@ private:
             NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("FeatureMap", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id featureMapArgument;
+        featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
+        [cluster writeAttributeFeatureMapWithValue:featureMapArgument
+                                 completionHandler:^(NSError * _Nullable err) {
+                                     NSLog(@"write the default values to optional global attribute: FeatureMap Error: %@", err);
+
+                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+                                     NextTest();
+                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("FeatureMap", actualValue, 0UL));
+            }
 
             VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
             NextTest();
@@ -26429,6 +29876,9 @@ private:
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", [value shortValue], -27315));
             }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minConstTemp", [value shortValue], 32767));
+            }
 
             NextTest();
         }];
@@ -26457,6 +29907,9 @@ private:
             VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", [value shortValue], -27315));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxConstTemp", [value shortValue], 32767));
             }
 
             NextTest();
@@ -27177,6 +30630,376 @@ private:
     }
 };
 
+class Test_TC_PCC_2_4 : public TestCommandBridge {
+public:
+    Test_TC_PCC_2_4()
+        : TestCommandBridge("Test_TC_PCC_2_4")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PCC_2_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PCC_2_4\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PCC_2_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write 1 to the LifetimeRunningHours attribute to DUT\n");
+            err = TestWrite1ToTheLifetimeRunningHoursAttributeToDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: LifetimeRunningHours\n");
+            err = TestReadsTheAttributeLifetimeRunningHours_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write 2 to the LifetimeRunningHours attribute to DUT\n");
+            err = TestWrite2ToTheLifetimeRunningHoursAttributeToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the attribute: LifetimeRunningHours\n");
+            err = TestReadsTheAttributeLifetimeRunningHours_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write 3 to the LifetimeRunningHours attribute to DUT\n");
+            err = TestWrite3ToTheLifetimeRunningHoursAttributeToDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the attribute: LifetimeRunningHours\n");
+            err = TestReadsTheAttributeLifetimeRunningHours_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 1 to the LifetimeEnergyConsumed attribute to DUT\n");
+            err = TestWrite1ToTheLifetimeEnergyConsumedAttributeToDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 2 to the LifetimeEnergyConsumed attribute to DUT\n");
+            err = TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Reads the attribute: LifetimeEnergyConsumed\n");
+            err = TestReadsTheAttributeLifetimeEnergyConsumed_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Write 3 to the LifetimeEnergyConsumed attribute to DUT\n");
+            err = TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reads the attribute: LifetimeEnergyConsumed\n");
+            err = TestReadsTheAttributeLifetimeEnergyConsumed_11();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 12;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite1ToTheLifetimeRunningHoursAttributeToDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeRunningHoursArgument;
+        lifetimeRunningHoursArgument = [NSNumber numberWithUnsignedInt:1UL];
+        [cluster writeAttributeLifetimeRunningHoursWithValue:lifetimeRunningHoursArgument
+                                           completionHandler:^(NSError * _Nullable err) {
+                                               NSLog(@"Write 1 to the LifetimeRunningHours attribute to DUT Error: %@", err);
+
+                                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                                               NextTest();
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeLifetimeRunningHours_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeRunningHours Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 1UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheLifetimeRunningHoursAttributeToDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeRunningHoursArgument;
+        lifetimeRunningHoursArgument = [NSNumber numberWithUnsignedInt:2UL];
+        [cluster writeAttributeLifetimeRunningHoursWithValue:lifetimeRunningHoursArgument
+                                           completionHandler:^(NSError * _Nullable err) {
+                                               NSLog(@"Write 2 to the LifetimeRunningHours attribute to DUT Error: %@", err);
+
+                                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                                               NextTest();
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeLifetimeRunningHours_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeRunningHours Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 2UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite3ToTheLifetimeRunningHoursAttributeToDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeRunningHoursArgument;
+        lifetimeRunningHoursArgument = [NSNumber numberWithUnsignedInt:3UL];
+        [cluster writeAttributeLifetimeRunningHoursWithValue:lifetimeRunningHoursArgument
+                                           completionHandler:^(NSError * _Nullable err) {
+                                               NSLog(@"Write 3 to the LifetimeRunningHours attribute to DUT Error: %@", err);
+
+                                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                                               NextTest();
+                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeLifetimeRunningHours_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeRunningHours Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 3UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite1ToTheLifetimeEnergyConsumedAttributeToDut_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeEnergyConsumedArgument;
+        lifetimeEnergyConsumedArgument = [NSNumber numberWithUnsignedInt:1UL];
+        [cluster writeAttributeLifetimeEnergyConsumedWithValue:lifetimeEnergyConsumedArgument
+                                             completionHandler:^(NSError * _Nullable err) {
+                                                 NSLog(@"Write 1 to the LifetimeEnergyConsumed attribute to DUT Error: %@", err);
+
+                                                 VerifyOrReturn(CheckValue("status", err, 0));
+
+                                                 NextTest();
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeEnergyConsumedArgument;
+        lifetimeEnergyConsumedArgument = [NSNumber numberWithUnsignedInt:2UL];
+        [cluster writeAttributeLifetimeEnergyConsumedWithValue:lifetimeEnergyConsumedArgument
+                                             completionHandler:^(NSError * _Nullable err) {
+                                                 NSLog(@"Write 2 to the LifetimeEnergyConsumed attribute to DUT Error: %@", err);
+
+                                                 VerifyOrReturn(CheckValue("status", err, 0));
+
+                                                 NextTest();
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeEnergyConsumed Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 2UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id lifetimeEnergyConsumedArgument;
+        lifetimeEnergyConsumedArgument = [NSNumber numberWithUnsignedInt:3UL];
+        [cluster writeAttributeLifetimeEnergyConsumedWithValue:lifetimeEnergyConsumedArgument
+                                             completionHandler:^(NSError * _Nullable err) {
+                                                 NSLog(@"Write 3 to the LifetimeEnergyConsumed attribute to DUT Error: %@", err);
+
+                                                 VerifyOrReturn(CheckValue("status", err, 0));
+
+                                                 NextTest();
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeEnergyConsumed Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 3UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_RH_1_1 : public TestCommandBridge {
 public:
     Test_TC_RH_1_1()
@@ -27222,13 +31045,16 @@ public:
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
             break;
         }
 
@@ -27245,7 +31071,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -27278,30 +31104,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
-                                                                                                           endpoint:1
-                                                                                                              queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
@@ -27315,6 +31118,46 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
@@ -27371,12 +31214,8 @@ public:
             err = TestReadsConstraintsOfAttributeMinMeasuredValue_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the optional attribute: Tolerance\n");
-            err = TestReadsTheOptionalAttributeTolerance_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads constraints of attribute: Tolerance\n");
-            err = TestReadsConstraintsOfAttributeTolerance_4();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads constraints of attribute: Tolerance\n");
+            err = TestReadsConstraintsOfAttributeTolerance_3();
             break;
         }
 
@@ -27393,7 +31232,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -27419,7 +31258,14 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
+            VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("measuredValue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("measuredValue", [value unsignedShortValue], 10000U));
+            }
+
             NextTest();
         }];
 
@@ -27439,7 +31285,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<uint16_t>("minMeasuredValue", [value unsignedShortValue], 0U));
             }
@@ -27453,36 +31299,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsTheOptionalAttributeTolerance_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
-                                                                                                           endpoint:1
-                                                                                                              queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads the optional attribute: Tolerance Error: %@", err);
-
-            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                NextTest();
-                return;
-            }
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("tolerance", actualValue, 0U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfAttributeTolerance_4()
+    CHIP_ERROR TestReadsConstraintsOfAttributeTolerance_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
@@ -27556,20 +31373,24 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            if (ShouldSkip("A_RELATIVEHUMIDITY")) {
-                NextTest();
-                return;
-            }
-            err = TestReadsMeasuredValueAttributeFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads constraints of attribute: MinMeasuredValue\n");
+            err = TestReadsConstraintsOfAttributeMinMeasuredValue_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads MeasuredValue attribute from DUT\n");
             if (ShouldSkip("A_RELATIVEHUMIDITY")) {
                 NextTest();
                 return;
             }
-            err = TestReadTheMandatoryAttributeMeasuredValue_2();
+            err = TestReadsMeasuredValueAttributeFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the mandatory attribute: MeasuredValue\n");
+            if (ShouldSkip("A_RELATIVEHUMIDITY")) {
+                NextTest();
+                return;
+            }
+            err = TestReadTheMandatoryAttributeMeasuredValue_3();
             break;
         }
 
@@ -27586,7 +31407,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -27599,7 +31420,34 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
+    CHIP_ERROR TestReadsConstraintsOfAttributeMinMeasuredValue_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads constraints of attribute: MinMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("minMeasuredValue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", [value unsignedShortValue], 9999U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
@@ -27612,14 +31460,21 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
+            VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("measuredValue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("measuredValue", [value unsignedShortValue], 10000U));
+            }
+
             NextTest();
         }];
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
@@ -28381,13 +32236,8 @@ public:
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         }
 
@@ -28404,7 +32254,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28437,30 +32287,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
-                                                                                                 endpoint:1
-                                                                                                    queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -28526,8 +32353,16 @@ public:
             err = TestReadTheMandatoryAttributeMeasuredValue_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : read the optional attribute: Tolerance\n");
-            err = TestReadTheOptionalAttributeTolerance_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMinMeasuredValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMaxMeasuredValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_4();
             break;
         }
 
@@ -28544,7 +32379,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28577,7 +32412,61 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheOptionalAttributeTolerance_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("minMeasuredValue", [value shortValue], -27315));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minMeasuredValue", [value shortValue], 32766));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxMeasuredValue", [value shortValue], -27314));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxMeasuredValue", [value shortValue], 32767));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -28651,20 +32540,28 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            if (ShouldSkip("A_TEMPERATURE")) {
-                NextTest();
-                return;
-            }
-            err = TestReadsMeasuredValueAttributeFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the mandatory attribute: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMinMeasuredValue_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMaxMeasuredValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads MeasuredValue attribute from DUT\n");
             if (ShouldSkip("A_TEMPERATURE")) {
                 NextTest();
                 return;
             }
-            err = TestReadTheMandatoryAttributeMeasuredValue_2();
+            err = TestReadsMeasuredValueAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the mandatory attribute: MeasuredValue\n");
+            if (ShouldSkip("A_TEMPERATURE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadTheMandatoryAttributeMeasuredValue_4();
             break;
         }
 
@@ -28681,7 +32578,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28694,7 +32591,61 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
+    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("minMeasuredValue", [value shortValue], -27315));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minMeasuredValue", [value shortValue], 32766));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxMeasuredValue", [value shortValue], -27314));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxMeasuredValue", [value shortValue], 32767));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -28714,7 +32665,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
@@ -28780,17 +32731,12 @@ public:
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the optional global attribute constraints: FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_4();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the optional global attribute constraints: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3();
             break;
         }
 
@@ -28807,7 +32753,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28838,28 +32784,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28877,7 +32802,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_4()
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28942,280 +32867,82 @@ public:
             err = TestReadsConstraintsOfMandatoryAttributesFromDutLocalTemperature_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads mandatory attributes from DUT: AbsMinHeatSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutAbsMinHeatSetpointLimit_2();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 2 : Reads constraints of mandatory attributes from DUT: AbsMinHeatSetpointLimit\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinHeatSetpointLimit_2();
             break;
         case 3:
             ChipLogProgress(
-                chipTool, " ***** Test Step 3 : Reads constraints of mandatory attributes from DUT: AbsMinHeatSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinHeatSetpointLimit_3();
+                chipTool, " ***** Test Step 3 : Reads constraints of mandatory attributes from DUT: AbsMaxHeatSetpointLimit\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_3();
             break;
         case 4:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 4 : Writes the respective default value to mandatory attributes to DUT: "
-                "AbsMinHeatSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinHeatSetpointLimit_4();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 4 : Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutAbsMinCoolSetpointLimit_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read back mandatory attributes from DUT: AbsMinHeatSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutAbsMinHeatSetpointLimit_5();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 5 : Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutAbsMaxCoolSetpointLimit_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads mandatory attributes from DUT: AbsMaxHeatSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_6();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutOccupiedCoolingSetpoint_6();
             break;
         case 7:
             ChipLogProgress(
-                chipTool, " ***** Test Step 7 : Reads constraints of mandatory attributes from DUT: AbsMaxHeatSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_7();
+                chipTool, " ***** Test Step 7 : Reads constraints of mandatory attributes from DUT: OccupiedHeatingSetpoint\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedHeatingSetpoint_7();
             break;
         case 8:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 8 : Writes the respective default value to mandatory attributes to DUT: "
-                "AbsMaxHeatSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxHeatSetpointLimit_8();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Reads constraints of mandatory attributes from DUT: MinHeatSetpointLimit\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutMinHeatSetpointLimit_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read back mandatory attributes from DUT: AbsMaxHeatSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_9();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 9 : Reads constraints of mandatory attributes from DUT: MaxHeatSetpointLimit\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutMaxHeatSetpointLimit_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads mandatory attributes from DUT: AbsMinCoolSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutAbsMinCoolSetpointLimit_10();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 10 : Reads constraints of optional attributes from DUT: MinCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutMinCoolSetpointLimit_10();
             break;
         case 11:
             ChipLogProgress(
-                chipTool, " ***** Test Step 11 : Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinCoolSetpointLimit_11();
+                chipTool, " ***** Test Step 11 : Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutMaxCoolSetpointLimit_11();
             break;
         case 12:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 12 : Writes the respective default value to mandatory attributes to DUT: "
-                "AbsMinCoolSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinCoolSetpointLimit_12();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 12 : Reads constraints of mandatory attributes from DUT: ControlSequenceOfOperation\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutControlSequenceOfOperation_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Read back mandatory attributes from DUT: AbsMinCoolSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutAbsMinCoolSetpointLimit_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Reads constraints of mandatory attributes from DUT: SystemMode\n");
+            err = TestReadsConstraintsOfMandatoryAttributesFromDutSystemMode_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Reads mandatory attributes from DUT: AbsMaxCoolSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_14();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 14 : Reads constraints of optional attributes from DUT: MinSetpointDeadBand\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutMinSetpointDeadBand_14();
             break;
         case 15:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 15 : Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Reads constraints of optional attributes from DUT: StartOfWeek\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutStartOfWeek_15();
             break;
         case 16:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 16 : Writes the respective default value to mandatory attributes to DUT: "
-                "AbsMaxCoolSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxCoolSetpointLimit_16();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 16 : Reads constraints of optional attributes from DUT: NumberOfWeeklyTransitions\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutNumberOfWeeklyTransitions_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Read back mandatory attributes from DUT: AbsMaxCoolSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_17();
-            break;
-        case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Reads mandatory attributes from DUT: OccupiedCoolingSetpoint\n");
-            err = TestReadsMandatoryAttributesFromDutOccupiedCoolingSetpoint_18();
-            break;
-        case 19:
             ChipLogProgress(
-                chipTool, " ***** Test Step 19 : Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedCoolingSetpoint_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 20 : Writes the respective default value to mandatory attributes to DUT: "
-                "OccupiedCoolingSetpoint\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedCoolingSetpoint_20();
-            break;
-        case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Read back mandatory attributes from DUT: OccupiedCoolingSetpoint\n");
-            err = TestReadBackMandatoryAttributesFromDutOccupiedCoolingSetpoint_21();
-            break;
-        case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Reads mandatory attributes from DUT: OccupiedHeatingSetpoint\n");
-            err = TestReadsMandatoryAttributesFromDutOccupiedHeatingSetpoint_22();
-            break;
-        case 23:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 23 : Reads constraints of mandatory attributes from DUT: OccupiedHeatingSetpoint\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedHeatingSetpoint_23();
-            break;
-        case 24:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 24 : Writes the respective default value to mandatory attributes to DUT: "
-                "OccupiedHeatingSetpoint\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedHeatingSetpoint_24();
-            break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : Read back mandatory attributes from DUT: OccupiedHeatingSetpoint\n");
-            err = TestReadBackMandatoryAttributesFromDutOccupiedHeatingSetpoint_25();
-            break;
-        case 26:
-            ChipLogProgress(chipTool, " ***** Test Step 26 : Reads mandatory attributes from DUT: MinHeatSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutMinHeatSetpointLimit_26();
-            break;
-        case 27:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 27 : Reads constraints of mandatory attributes from DUT: MinHeatSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMinHeatSetpointLimit_27();
-            break;
-        case 28:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 28 : Writes the respective default value to mandatory attributes to DUT: MinHeatSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinHeatSetpointLimit_28();
-            break;
-        case 29:
-            ChipLogProgress(chipTool, " ***** Test Step 29 : Read back mandatory attributes from DUT: MinHeatSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutMinHeatSetpointLimit_29();
-            break;
-        case 30:
-            ChipLogProgress(chipTool, " ***** Test Step 30 : Reads mandatory attributes from DUT: MaxHeatSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutMaxHeatSetpointLimit_30();
-            break;
-        case 31:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 31 : Reads constraints of mandatory attributes from DUT: MaxHeatSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMaxHeatSetpointLimit_31();
-            break;
-        case 32:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 32 : Writes the respective default value to mandatory attributes to DUT: MaxHeatSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxHeatSetpointLimit_32();
-            break;
-        case 33:
-            ChipLogProgress(chipTool, " ***** Test Step 33 : Read back mandatory attributes from DUT: MaxHeatSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutMaxHeatSetpointLimit_33();
-            break;
-        case 34:
-            ChipLogProgress(chipTool, " ***** Test Step 34 : Reads mandatory attributes from DUT: MinCoolSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutMinCoolSetpointLimit_34();
-            break;
-        case 35:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 35 : Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMinCoolSetpointLimit_35();
-            break;
-        case 36:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 36 : Writes the respective default value to mandatory attributes to DUT: MinCoolSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinCoolSetpointLimit_36();
-            break;
-        case 37:
-            ChipLogProgress(chipTool, " ***** Test Step 37 : Read back mandatory attributes from DUT: MinCoolSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutMinCoolSetpointLimit_37();
-            break;
-        case 38:
-            ChipLogProgress(chipTool, " ***** Test Step 38 : Reads mandatory attributes from DUT: MaxCoolSetpointLimit\n");
-            err = TestReadsMandatoryAttributesFromDutMaxCoolSetpointLimit_38();
-            break;
-        case 39:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 39 : Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutMaxCoolSetpointLimit_39();
-            break;
-        case 40:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 40 : Writes the respective default value to mandatory attributes to DUT: MaxCoolSetpointLimit\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxCoolSetpointLimit_40();
-            break;
-        case 41:
-            ChipLogProgress(chipTool, " ***** Test Step 41 : Read back mandatory attributes from DUT: MaxCoolSetpointLimit\n");
-            err = TestReadBackMandatoryAttributesFromDutMaxCoolSetpointLimit_41();
-            break;
-        case 42:
-            ChipLogProgress(chipTool, " ***** Test Step 42 : Reads mandatory attributes from DUT: ControlSequenceOfOperation\n");
-            err = TestReadsMandatoryAttributesFromDutControlSequenceOfOperation_42();
-            break;
-        case 43:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 43 : Reads constraints of mandatory attributes from DUT: ControlSequenceOfOperation\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutControlSequenceOfOperation_43();
-            break;
-        case 44:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 44 : Writes the respective default value to mandatory attributes to DUT: "
-                "ControlSequenceOfOperation\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutControlSequenceOfOperation_44();
-            break;
-        case 45:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 45 : Read back mandatory attributes from DUT: ControlSequenceOfOperation\n");
-            err = TestReadBackMandatoryAttributesFromDutControlSequenceOfOperation_45();
-            break;
-        case 46:
-            ChipLogProgress(chipTool, " ***** Test Step 46 : Reads mandatory attributes from DUT: SystemMode\n");
-            err = TestReadsMandatoryAttributesFromDutSystemMode_46();
-            break;
-        case 47:
-            ChipLogProgress(chipTool, " ***** Test Step 47 : Reads constraints of mandatory attributes from DUT: SystemMode\n");
-            err = TestReadsConstraintsOfMandatoryAttributesFromDutSystemMode_47();
-            break;
-        case 48:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 48 : Writes the respective default value to mandatory attributes to DUT: SystemMode\n");
-            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutSystemMode_48();
-            break;
-        case 49:
-            ChipLogProgress(chipTool, " ***** Test Step 49 : Read back mandatory attributes from DUT: SystemMode\n");
-            err = TestReadBackMandatoryAttributesFromDutSystemMode_49();
-            break;
-        case 50:
-            ChipLogProgress(chipTool, " ***** Test Step 50 : Reads optional attributes from DUT: MinSetpointDeadBand\n");
-            err = TestReadsOptionalAttributesFromDutMinSetpointDeadBand_50();
-            break;
-        case 51:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 51 : Reads constraints of optional attributes from DUT: MinSetpointDeadBand\n");
-            err = TestReadsConstraintsOfOptionalAttributesFromDutMinSetpointDeadBand_51();
-            break;
-        case 52:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 52 : Writes the respective default value to optional attributes to DUT: MinSetpointDeadBand\n");
-            err = TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutMinSetpointDeadBand_52();
-            break;
-        case 53:
-            ChipLogProgress(chipTool, " ***** Test Step 53 : Read back optional attributes from DUT: MinSetpointDeadBand\n");
-            err = TestReadBackOptionalAttributesFromDutMinSetpointDeadBand_53();
-            break;
-        case 54:
-            ChipLogProgress(chipTool, " ***** Test Step 54 : Reads constraints of optional attributes from DUT: StartOfWeek\n");
-            err = TestReadsConstraintsOfOptionalAttributesFromDutStartOfWeek_54();
-            break;
-        case 55:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 55 : Writes the respective default value to optional attributes to DUT: StartOfWeek\n");
-            err = TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutStartOfWeek_55();
-            break;
-        case 56:
-            ChipLogProgress(chipTool, " ***** Test Step 56 : Read back optional attributes from DUT: StartOfWeek\n");
-            err = TestReadBackOptionalAttributesFromDutStartOfWeek_56();
-            break;
-        case 57:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 57 : Reads constraints of optional attributes from DUT: NumberOfWeeklyTransitions\n");
-            err = TestReadsConstraintsOfOptionalAttributesFromDutNumberOfWeeklyTransitions_57();
-            break;
-        case 58:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 58 : Writes the respective default value to optional attributes to DUT: "
-                "NumberOfWeeklyTransitions\n");
-            err = TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfWeeklyTransitions_58();
-            break;
-        case 59:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 59 : Reads constraints of optional attributes from DUT: NumberOfDailyTransitions\n");
-            err = TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_59();
-            break;
-        case 60:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 60 : Writes the respective default value to optional attributes to DUT: "
-                "NumberOfDailyTransitions\n");
-            err = TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfDailyTransitions_60();
+                chipTool, " ***** Test Step 17 : Reads constraints of optional attributes from DUT: NumberOfDailyTransitions\n");
+            err = TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_17();
             break;
         }
 
@@ -29232,7 +32959,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 61;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -29263,29 +32990,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMinHeatSetpointLimit_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: AbsMinHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs min heat setpoint limit", actualValue, 700));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinHeatSetpointLimit_3()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinHeatSetpointLimit_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -29310,72 +33015,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinHeatSetpointLimit_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id absMinHeatSetpointLimitArgument;
-        absMinHeatSetpointLimitArgument = [NSNumber numberWithShort:700];
-        [cluster writeAttributeAbsMinHeatSetpointLimitWithValue:absMinHeatSetpointLimitArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"AbsMinHeatSetpointLimit Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinHeatSetpointLimit_5()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: AbsMinHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs min heat setpoint limit", actualValue, 700));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_6()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: AbsMaxHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs max heat setpoint limit", actualValue, 3000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_7()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -29400,79 +33040,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxHeatSetpointLimit_8()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id absMaxHeatSetpointLimitArgument;
-        absMaxHeatSetpointLimitArgument = [NSNumber numberWithShort:3000];
-        [cluster writeAttributeAbsMaxHeatSetpointLimitWithValue:absMaxHeatSetpointLimitArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"AbsMaxHeatSetpointLimit Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_9()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: AbsMaxHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs max heat setpoint limit", actualValue, 3000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMinCoolSetpointLimit_10()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutAbsMinCoolSetpointLimit_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
 
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs min cool setpoint limit", actualValue, 1600));
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
             }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinCoolSetpointLimit_11()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29490,79 +33070,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinCoolSetpointLimit_12()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id absMinCoolSetpointLimitArgument;
-        absMinCoolSetpointLimitArgument = [NSNumber numberWithShort:1600];
-        [cluster writeAttributeAbsMinCoolSetpointLimitWithValue:absMinCoolSetpointLimitArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"AbsMinCoolSetpointLimit Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinCoolSetpointLimit_13()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs min cool setpoint limit", actualValue, 1600));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_14()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutAbsMaxCoolSetpointLimit_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
 
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs max cool setpoint limit", actualValue, 3200));
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
             }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_15()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29580,79 +33100,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxCoolSetpointLimit_16()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id absMaxCoolSetpointLimitArgument;
-        absMaxCoolSetpointLimitArgument = [NSNumber numberWithShort:3200];
-        [cluster writeAttributeAbsMaxCoolSetpointLimitWithValue:absMaxCoolSetpointLimitArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"AbsMaxCoolSetpointLimit Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_17()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("abs max cool setpoint limit", actualValue, 3200));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutOccupiedCoolingSetpoint_18()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutOccupiedCoolingSetpoint_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
 
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("occupied cooling setpoint", actualValue, 2600));
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
             }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedCoolingSetpoint_19()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -29670,73 +33130,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedCoolingSetpoint_20()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id occupiedCoolingSetpointArgument;
-        occupiedCoolingSetpointArgument = [NSNumber numberWithShort:2600];
-        [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"OccupiedCoolingSetpoint Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, 0));
-
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedCoolingSetpoint_21()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("occupied cooling setpoint", actualValue, 2600));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutOccupiedHeatingSetpoint_22()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: OccupiedHeatingSetpoint Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("occupied heating setpoint", actualValue, 2000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedHeatingSetpoint_23()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedHeatingSetpoint_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -29761,73 +33155,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedHeatingSetpoint_24()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id occupiedHeatingSetpointArgument;
-        occupiedHeatingSetpointArgument = [NSNumber numberWithShort:2000];
-        [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
-                                              completionHandler:^(NSError * _Nullable err) {
-                                                  NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                        @"OccupiedHeatingSetpoint Error: %@",
-                                                      err);
-
-                                                  VerifyOrReturn(CheckValue("status", err, 0));
-
-                                                  NextTest();
-                                              }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedHeatingSetpoint_25()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: OccupiedHeatingSetpoint Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("occupied heating setpoint", actualValue, 2000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutMinHeatSetpointLimit_26()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: MinHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min heat setpoint limit", actualValue, 700));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinHeatSetpointLimit_27()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinHeatSetpointLimit_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -29852,73 +33180,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinHeatSetpointLimit_28()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id minHeatSetpointLimitArgument;
-        minHeatSetpointLimitArgument = [NSNumber numberWithShort:700];
-        [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
-                                           completionHandler:^(NSError * _Nullable err) {
-                                               NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                     @"MinHeatSetpointLimit Error: %@",
-                                                   err);
-
-                                               VerifyOrReturn(CheckValue("status", err, 0));
-
-                                               NextTest();
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinHeatSetpointLimit_29()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: MinHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min heat setpoint limit", actualValue, 700));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutMaxHeatSetpointLimit_30()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: MaxHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max heat setpoint limit", actualValue, 3000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxHeatSetpointLimit_31()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxHeatSetpointLimit_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -29943,80 +33205,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxHeatSetpointLimit_32()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id maxHeatSetpointLimitArgument;
-        maxHeatSetpointLimitArgument = [NSNumber numberWithShort:3000];
-        [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
-                                           completionHandler:^(NSError * _Nullable err) {
-                                               NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                     @"MaxHeatSetpointLimit Error: %@",
-                                                   err);
-
-                                               VerifyOrReturn(CheckValue("status", err, 0));
-
-                                               NextTest();
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxHeatSetpointLimit_33()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: MaxHeatSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max heat setpoint limit", actualValue, 3000));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutMinCoolSetpointLimit_34()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMinCoolSetpointLimit_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: MinCoolSetpointLimit Error: %@", err);
 
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min cool setpoint limit", actualValue, 1600));
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
             }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinCoolSetpointLimit_35()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30034,80 +33235,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinCoolSetpointLimit_36()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id minCoolSetpointLimitArgument;
-        minCoolSetpointLimitArgument = [NSNumber numberWithShort:1600];
-        [cluster writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
-                                           completionHandler:^(NSError * _Nullable err) {
-                                               NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                     @"MinCoolSetpointLimit Error: %@",
-                                                   err);
-
-                                               VerifyOrReturn(CheckValue("status", err, 0));
-
-                                               NextTest();
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinCoolSetpointLimit_37()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min cool setpoint limit", actualValue, 1600));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutMaxCoolSetpointLimit_38()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMaxCoolSetpointLimit_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
+            NSLog(@"Reads constraints of optional attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
 
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max cool setpoint limit", actualValue, 3200));
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
             }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxCoolSetpointLimit_39()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -30125,74 +33265,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxCoolSetpointLimit_40()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id maxCoolSetpointLimitArgument;
-        maxCoolSetpointLimitArgument = [NSNumber numberWithShort:3200];
-        [cluster writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
-                                           completionHandler:^(NSError * _Nullable err) {
-                                               NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                     @"MaxCoolSetpointLimit Error: %@",
-                                                   err);
-
-                                               VerifyOrReturn(CheckValue("status", err, 0));
-
-                                               NextTest();
-                                           }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxCoolSetpointLimit_41()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max cool setpoint limit", actualValue, 3200));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutControlSequenceOfOperation_42()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster
-            readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"Reads mandatory attributes from DUT: ControlSequenceOfOperation Error: %@", err);
-
-                VerifyOrReturn(CheckValue("status", err, 0));
-
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("control sequence of operation", actualValue, 4));
-                }
-
-                NextTest();
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutControlSequenceOfOperation_43()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutControlSequenceOfOperation_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30218,74 +33291,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutControlSequenceOfOperation_44()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id controlSequenceOfOperationArgument;
-        controlSequenceOfOperationArgument = [NSNumber numberWithUnsignedChar:4];
-        [cluster writeAttributeControlSequenceOfOperationWithValue:controlSequenceOfOperationArgument
-                                                 completionHandler:^(NSError * _Nullable err) {
-                                                     NSLog(@"Writes the respective default value to mandatory attributes to DUT: "
-                                                           @"ControlSequenceOfOperation Error: %@",
-                                                         err);
-
-                                                     VerifyOrReturn(CheckValue("status", err, 0));
-
-                                                     NextTest();
-                                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutControlSequenceOfOperation_45()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster
-            readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"Read back mandatory attributes from DUT: ControlSequenceOfOperation Error: %@", err);
-
-                VerifyOrReturn(CheckValue("status", err, 0));
-
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("control sequence of operation", actualValue, 4));
-                }
-
-                NextTest();
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsMandatoryAttributesFromDutSystemMode_46()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeSystemModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads mandatory attributes from DUT: SystemMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("system mode", actualValue, 1));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutSystemMode_47()
+    CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutSystemMode_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30310,78 +33316,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutSystemMode_48()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id systemModeArgument;
-        systemModeArgument = [NSNumber numberWithUnsignedChar:1];
-        [cluster
-            writeAttributeSystemModeWithValue:systemModeArgument
-                            completionHandler:^(NSError * _Nullable err) {
-                                NSLog(@"Writes the respective default value to mandatory attributes to DUT: SystemMode Error: %@",
-                                    err);
-
-                                VerifyOrReturn(CheckValue("status", err, 0));
-
-                                NextTest();
-                            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackMandatoryAttributesFromDutSystemMode_49()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeSystemModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back mandatory attributes from DUT: SystemMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("system mode", actualValue, 1));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsOptionalAttributesFromDutMinSetpointDeadBand_50()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
-
-            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                NextTest();
-                return;
-            }
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min setpoint dead band", actualValue, 25));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMinSetpointDeadBand_51()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMinSetpointDeadBand_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30411,61 +33346,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutMinSetpointDeadBand_52()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id minSetpointDeadBandArgument;
-        minSetpointDeadBandArgument = [NSNumber numberWithChar:25];
-        [cluster writeAttributeMinSetpointDeadBandWithValue:minSetpointDeadBandArgument
-                                          completionHandler:^(NSError * _Nullable err) {
-                                              NSLog(@"Writes the respective default value to optional attributes to DUT: "
-                                                    @"MinSetpointDeadBand Error: %@",
-                                                  err);
-
-                                              if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                                                  NextTest();
-                                                  return;
-                                              }
-
-                                              VerifyOrReturn(CheckValue("status", err, 0));
-
-                                              NextTest();
-                                          }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackOptionalAttributesFromDutMinSetpointDeadBand_53()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
-
-            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                NextTest();
-                return;
-            }
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("min setpoint dead band", actualValue, 25));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutStartOfWeek_54()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutStartOfWeek_15()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30495,60 +33376,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutStartOfWeek_55()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id startOfWeekArgument;
-        startOfWeekArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster
-            writeAttributeStartOfWeekWithValue:startOfWeekArgument
-                             completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"Writes the respective default value to optional attributes to DUT: StartOfWeek Error: %@",
-                                     err);
-
-                                 if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                                     NextTest();
-                                     return;
-                                 }
-
-                                 VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                 NextTest();
-                             }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackOptionalAttributesFromDutStartOfWeek_56()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back optional attributes from DUT: StartOfWeek Error: %@", err);
-
-            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                NextTest();
-                return;
-            }
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("start of week", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfWeeklyTransitions_57()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfWeeklyTransitions_16()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30572,33 +33400,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfWeeklyTransitions_58()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id numberOfWeeklyTransitionsArgument;
-        numberOfWeeklyTransitionsArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster writeAttributeNumberOfWeeklyTransitionsWithValue:numberOfWeeklyTransitionsArgument
-                                                completionHandler:^(NSError * _Nullable err) {
-                                                    NSLog(@"Writes the respective default value to optional attributes to DUT: "
-                                                          @"NumberOfWeeklyTransitions Error: %@",
-                                                        err);
-
-                                                    if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                                                        NextTest();
-                                                        return;
-                                                    }
-
-                                                    VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                    NextTest();
-                                                }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_59()
+    CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_17()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -30617,32 +33419,6 @@ private:
             VerifyOrReturn(CheckConstraintType("numberOfDailyTransitions", "", "uint8"));
             NextTest();
         }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfDailyTransitions_60()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id numberOfDailyTransitionsArgument;
-        numberOfDailyTransitionsArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster writeAttributeNumberOfDailyTransitionsWithValue:numberOfDailyTransitionsArgument
-                                               completionHandler:^(NSError * _Nullable err) {
-                                                   NSLog(@"Writes the respective default value to optional attributes to DUT: "
-                                                         @"NumberOfDailyTransitions Error: %@",
-                                                       err);
-
-                                                   if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-                                                       NextTest();
-                                                       return;
-                                                   }
-
-                                                   VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                                   NextTest();
-                                               }];
 
         return CHIP_NO_ERROR;
     }
@@ -31164,6 +33940,11 @@ private:
             NSLog(@"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@",
                 err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             {
@@ -31199,6 +33980,11 @@ private:
                                                         @"OccupiedCoolingSetpoint attribute Error: %@",
                                                       err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -31215,6 +34001,11 @@ private:
 
         [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31243,6 +34034,11 @@ private:
                                                         @"attribute Error: %@",
                                                       err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -31264,6 +34060,11 @@ private:
                                                   NSLog(@"Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint "
                                                         @"attribute Error: %@",
                                                       err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31640,6 +34441,11 @@ private:
             NSLog(
                 @"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             {
@@ -31675,6 +34481,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31691,6 +34502,11 @@ private:
 
         [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31719,6 +34535,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31741,6 +34562,11 @@ private:
                                                      @"Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31758,6 +34584,11 @@ private:
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(
                 @"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31794,6 +34625,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31810,6 +34646,11 @@ private:
 
         [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31838,6 +34679,11 @@ private:
                                                      @"attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31859,6 +34705,11 @@ private:
                                                NSLog(@"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute "
                                                      @"Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -31970,6 +34821,11 @@ private:
                                                      @"MinCoolSetpointLimit attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -31991,6 +34847,11 @@ private:
                                                NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to "
                                                      @"MinCoolSetpointLimit attribute Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -32014,6 +34875,11 @@ private:
                                                      @"MaxCoolSetpointLimit attribute Error: %@",
                                                    err);
 
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
+
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
                                                NextTest();
@@ -32035,6 +34901,11 @@ private:
                                                NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to "
                                                      @"MaxCoolSetpointLimit attribute Error: %@",
                                                    err);
+
+                                               if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                   NextTest();
+                                                   return;
+                                               }
 
                                                VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -32172,6 +35043,11 @@ private:
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -32192,6 +35068,11 @@ private:
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
+
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
                                                   NextTest();
@@ -32211,6 +35092,11 @@ private:
         [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -32251,6 +35137,11 @@ private:
         [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
                                               completionHandler:^(NSError * _Nullable err) {
                                                   NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                  if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                                                      NextTest();
+                                                      return;
+                                                  }
 
                                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -32326,13 +35217,16 @@ public:
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
             break;
         }
 
@@ -32349,7 +35243,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -32381,29 +35275,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -32416,6 +35288,44 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThermostatUserInterfaceConfiguration * cluster =
+            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThermostatUserInterfaceConfiguration * cluster =
+            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
@@ -32472,56 +35382,20 @@ public:
             err = TestReadTheMandatoryAttributeTemperatureDisplayMode_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : write to the mandatory attribute: TemperatureDisplayMode\n");
-            err = TestWriteToTheMandatoryAttributeTemperatureDisplayMode_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: KeypadLockout\n");
+            err = TestReadTheMandatoryAttributeKeypadLockout_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: TemperatureDisplayMode\n");
-            err = TestReadTheMandatoryAttributeTemperatureDisplayMode_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: KeypadLockout\n");
+            err = TestReadTheMandatoryAttributeKeypadLockout_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read the mandatory attribute: TemperatureDisplayMode\n");
-            err = TestReadTheMandatoryAttributeTemperatureDisplayMode_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read the optional attribute: ScheduleProgrammingVisibility\n");
+            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: KeypadLockout\n");
-            err = TestReadTheMandatoryAttributeKeypadLockout_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: KeypadLockout\n");
-            err = TestReadTheMandatoryAttributeKeypadLockout_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : write to the mandatory attribute: KeypadLockout\n");
-            err = TestWriteToTheMandatoryAttributeKeypadLockout_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : read the mandatory attribute: KeypadLockout\n");
-            err = TestReadTheMandatoryAttributeKeypadLockout_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : read the mandatory attribute: KeypadLockout\n");
-            err = TestReadTheMandatoryAttributeKeypadLockout_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : read the optional attribute: ScheduleProgrammingVisibility\n");
-            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : read the optional attribute: ScheduleProgrammingVisibility\n");
-            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : write to the mandatory attribute: ScheduleProgrammingVisibility\n");
-            err = TestWriteToTheMandatoryAttributeScheduleProgrammingVisibility_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : read the optional attribute: ScheduleProgrammingVisibility\n");
-            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : read the optional attribute: ScheduleProgrammingVisibility\n");
-            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_15();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the optional attribute: ScheduleProgrammingVisibility\n");
+            err = TestReadTheOptionalAttributeScheduleProgrammingVisibility_6();
             break;
         }
 
@@ -32538,7 +35412,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 16;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -32587,48 +35461,11 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("temperatureDisplayMode", "", "enum8"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteToTheMandatoryAttributeTemperatureDisplayMode_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id temperatureDisplayModeArgument;
-        temperatureDisplayModeArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster writeAttributeTemperatureDisplayModeWithValue:temperatureDisplayModeArgument
-                                             completionHandler:^(NSError * _Nullable err) {
-                                                 NSLog(@"write to the mandatory attribute: TemperatureDisplayMode Error: %@", err);
-
-                                                 VerifyOrReturn(CheckValue("status", err, 0));
-
-                                                 NextTest();
-                                             }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("temperature display mode", actualValue, 0));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("temperatureDisplayMode", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("temperatureDisplayMode", [value unsignedCharValue], 1));
             }
 
             NextTest();
@@ -32637,26 +35474,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_5()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("temperatureDisplayMode", "", "enum8"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_6()
+    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -32679,7 +35497,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_7()
+    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -32692,48 +35510,11 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("keypadLockout", "", "enum8"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteToTheMandatoryAttributeKeypadLockout_8()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id keypadLockoutArgument;
-        keypadLockoutArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster writeAttributeKeypadLockoutWithValue:keypadLockoutArgument
-                                    completionHandler:^(NSError * _Nullable err) {
-                                        NSLog(@"write to the mandatory attribute: KeypadLockout Error: %@", err);
-
-                                        VerifyOrReturn(CheckValue("status", err, 0));
-
-                                        NextTest();
-                                    }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_9()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("keypad lockout", actualValue, 0));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("keypadLockout", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("keypadLockout", [value unsignedCharValue], 5));
             }
 
             NextTest();
@@ -32742,26 +35523,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("keypadLockout", "", "enum8"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_11()
+    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -32785,7 +35547,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_12()
+    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -32799,74 +35561,13 @@ private:
                 VerifyOrReturn(CheckValue("status", err, 0));
 
                 VerifyOrReturn(CheckConstraintType("scheduleProgrammingVisibility", "", "enum8"));
-                NextTest();
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteToTheMandatoryAttributeScheduleProgrammingVisibility_13()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id scheduleProgrammingVisibilityArgument;
-        scheduleProgrammingVisibilityArgument = [NSNumber numberWithUnsignedChar:0];
-        [cluster
-            writeAttributeScheduleProgrammingVisibilityWithValue:scheduleProgrammingVisibilityArgument
-                                               completionHandler:^(NSError * _Nullable err) {
-                                                   NSLog(
-                                                       @"write to the mandatory attribute: ScheduleProgrammingVisibility Error: %@",
-                                                       err);
-
-                                                   VerifyOrReturn(CheckValue("status", err, 0));
-
-                                                   NextTest();
-                                               }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_14()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster
-            readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
-
-                VerifyOrReturn(CheckValue("status", err, 0));
-
-                {
-                    id actualValue = value;
-                    VerifyOrReturn(CheckValue("schedule programming visibility", actualValue, 0));
+                if (value != nil) {
+                    VerifyOrReturn(CheckConstraintMinValue<uint8_t>("scheduleProgrammingVisibility", [value unsignedCharValue], 0));
+                }
+                if (value != nil) {
+                    VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("scheduleProgrammingVisibility", [value unsignedCharValue], 1));
                 }
 
-                NextTest();
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_15()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestThermostatUserInterfaceConfiguration * cluster =
-            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster
-            readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
-
-                VerifyOrReturn(CheckValue("status", err, 0));
-
-                VerifyOrReturn(CheckConstraintType("scheduleProgrammingVisibility", "", "enum8"));
                 NextTest();
             }];
 
@@ -32931,70 +35632,96 @@ public:
             err = TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Writes a value of 0 to KeypadLockout attribute of DUT\n");
-            if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : Writes a value of greater than 1 to TemperatureDisplayMode attribute of DUT\n");
+            if (ShouldSkip("A_TEMPERATURE_DISPLAY_MODE")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3();
+            err = TestWritesAValueOfGreaterThan1ToTemperatureDisplayModeAttributeOfDut_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Writes a value of 1 to KeypadLockout attribute of DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Writes a value of 0 to KeypadLockout attribute of DUT\n");
             if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4();
+            err = TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Writes a value of 2 to KeypadLockout attribute of DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Writes a value of 1 to KeypadLockout attribute of DUT\n");
             if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5();
+            err = TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Writes a value of 3 to KeypadLockout attribute of DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Writes a value of 2 to KeypadLockout attribute of DUT\n");
             if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6();
+            err = TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Writes a value of 4 to KeypadLockout attribute of DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Writes a value of 3 to KeypadLockout attribute of DUT\n");
             if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7();
+            err = TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Writes a value of 5 to KeypadLockout attribute of DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Writes a value of 4 to KeypadLockout attribute of DUT\n");
             if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8();
+            err = TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_8();
             break;
         case 9:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 9 : Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT\n");
-            if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")) {
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Writes a value of 5 to KeypadLockout attribute of DUT\n");
+            if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9();
+            err = TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_9();
             break;
         case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Writes a value of greater than 5 to KeypadLockout attribute of DUT\n");
+            if (ShouldSkip("A_KEYPAD_LOCKOUT")) {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOfGreaterThan5ToKeypadLockoutAttributeOfDut_10();
+            break;
+        case 11:
             ChipLogProgress(
-                chipTool, " ***** Test Step 10 : Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT\n");
+                chipTool, " ***** Test Step 11 : Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT\n");
             if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")) {
                 NextTest();
                 return;
             }
-            err = TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10();
+            err = TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_11();
+            break;
+        case 12:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 12 : Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT\n");
+            if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")) {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : Writes a value of greater than 1 to ScheduleProgrammingVisibility attribute of DUT\n");
+            if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")) {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOfGreaterThan1ToScheduleProgrammingVisibilityAttributeOfDut_13();
             break;
         }
 
@@ -33011,7 +35738,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -33068,7 +35795,29 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3()
+    CHIP_ERROR TestWritesAValueOfGreaterThan1ToTemperatureDisplayModeAttributeOfDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThermostatUserInterfaceConfiguration * cluster =
+            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id temperatureDisplayModeArgument;
+        temperatureDisplayModeArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster writeAttributeTemperatureDisplayModeWithValue:temperatureDisplayModeArgument
+                                             completionHandler:^(NSError * _Nullable err) {
+                                                 NSLog(@"Writes a value of greater than 1 to TemperatureDisplayMode attribute of "
+                                                       @"DUT Error: %@",
+                                                     err);
+
+                                                 VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                                 NextTest();
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33089,7 +35838,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4()
+    CHIP_ERROR TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33110,7 +35859,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5()
+    CHIP_ERROR TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33131,7 +35880,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6()
+    CHIP_ERROR TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33152,7 +35901,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7()
+    CHIP_ERROR TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33173,7 +35922,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8()
+    CHIP_ERROR TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33194,7 +35943,27 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9()
+    CHIP_ERROR TestWritesAValueOfGreaterThan5ToKeypadLockoutAttributeOfDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThermostatUserInterfaceConfiguration * cluster =
+            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id keypadLockoutArgument;
+        keypadLockoutArgument = [NSNumber numberWithUnsignedChar:6];
+        [cluster writeAttributeKeypadLockoutWithValue:keypadLockoutArgument
+                                    completionHandler:^(NSError * _Nullable err) {
+                                        NSLog(@"Writes a value of greater than 5 to KeypadLockout attribute of DUT Error: %@", err);
+
+                                        VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                        NextTest();
+                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33217,7 +35986,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10()
+    CHIP_ERROR TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestThermostatUserInterfaceConfiguration * cluster =
@@ -33236,6 +36005,29 @@ private:
 
                                                         NextTest();
                                                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWritesAValueOfGreaterThan1ToScheduleProgrammingVisibilityAttributeOfDut_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThermostatUserInterfaceConfiguration * cluster =
+            [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id scheduleProgrammingVisibilityArgument;
+        scheduleProgrammingVisibilityArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster
+            writeAttributeScheduleProgrammingVisibilityWithValue:scheduleProgrammingVisibilityArgument
+                                               completionHandler:^(NSError * _Nullable err) {
+                                                   NSLog(@"Writes a value of greater than 1 to ScheduleProgrammingVisibility "
+                                                         @"attribute of DUT Error: %@",
+                                                       err);
+
+                                                   VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                                   NextTest();
+                                               }];
 
         return CHIP_NO_ERROR;
     }
@@ -33361,6 +36153,2701 @@ private:
     }
 };
 
+class Test_TC_DIAG_TH_NW_1_2 : public TestCommandBridge {
+public:
+    Test_TC_DIAG_TH_NW_1_2()
+        : TestCommandBridge("Test_TC_DIAG_TH_NW_1_2")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DIAG_TH_NW_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAG_TH_NW_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAG_TH_NW_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Validate constraints of attribute: Channel\n");
+            err = TestValidateConstraintsOfAttributeChannel_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Validate constraints of attribute: NetworkName\n");
+            err = TestValidateConstraintsOfAttributeNetworkName_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Validate constraints of attribute: PanId\n");
+            err = TestValidateConstraintsOfAttributePanId_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Validate constraints of attribute: ExtendedPanId\n");
+            err = TestValidateConstraintsOfAttributeExtendedPanId_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Validate constraints of attribute: OverrunCount\n");
+            err = TestValidateConstraintsOfAttributeOverrunCount_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read PartitionId attribute value\n");
+            err = TestReadPartitionIdAttributeValue_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Validate constraints of attribute: PartitionId\n");
+            err = TestValidateConstraintsOfAttributePartitionId_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read Weighting attribute value\n");
+            err = TestReadWeightingAttributeValue_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Validate constraints of attribute: weighting\n");
+            err = TestValidateConstraintsOfAttributeWeighting_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : read DataVersion attribute value\n");
+            err = TestReadDataVersionAttributeValue_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Validate constraints of attribute: DataVersion\n");
+            err = TestValidateConstraintsOfAttributeDataVersion_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : read StableDataVersion attribute value\n");
+            err = TestReadStableDataVersionAttributeValue_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Validate constraints of attribute: StableDataVersion\n");
+            err = TestValidateConstraintsOfAttributeStableDataVersion_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : read LeaderRouterId attribute value\n");
+            err = TestReadLeaderRouterIdAttributeValue_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Validate constraints of attribute: LeaderRouterId\n");
+            err = TestValidateConstraintsOfAttributeLeaderRouterId_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : read DetachedRoleCount attribute value\n");
+            err = TestReadDetachedRoleCountAttributeValue_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Validate constraints of attribute: DetachedRoleCount\n");
+            err = TestValidateConstraintsOfAttributeDetachedRoleCount_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : read ChildRoleCount attribute value\n");
+            err = TestReadChildRoleCountAttributeValue_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Validate constraints of attribute: ChildRoleCount\n");
+            err = TestValidateConstraintsOfAttributeChildRoleCount_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : read RouterRoleCount attribute value\n");
+            err = TestReadRouterRoleCountAttributeValue_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Validate constraints of attribute: RouterRoleCount\n");
+            err = TestValidateConstraintsOfAttributeRouterRoleCount_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : read LeaderRoleCount attribute value\n");
+            err = TestReadLeaderRoleCountAttributeValue_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Validate constraints of attribute: LeaderRoleCount\n");
+            err = TestValidateConstraintsOfAttributeLeaderRoleCount_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : read AttachAttemptCount attribute value\n");
+            err = TestReadAttachAttemptCountAttributeValue_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Validate constraints of attribute: AttachAttemptCount\n");
+            err = TestValidateConstraintsOfAttributeAttachAttemptCount_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : read PartitionIdChangeCount attribute value\n");
+            err = TestReadPartitionIdChangeCountAttributeValue_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Validate constraints of attribute: PartitionIdChangeCount\n");
+            err = TestValidateConstraintsOfAttributePartitionIdChangeCount_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : read BetterPartitionAttachAttemptCount attribute value\n");
+            err = TestReadBetterPartitionAttachAttemptCountAttributeValue_28();
+            break;
+        case 29:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 29 : Validate constraints of attribute: BetterPartitionAttachAttemptCount\n");
+            err = TestValidateConstraintsOfAttributeBetterPartitionAttachAttemptCount_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : read ParentChangeCount attribute value\n");
+            err = TestReadParentChangeCountAttributeValue_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Validate constraints of attribute: ParentChangeCount\n");
+            err = TestValidateConstraintsOfAttributeParentChangeCount_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : read TxTotalCount attribute value\n");
+            err = TestReadTxTotalCountAttributeValue_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Validate constraints of attribute: TxTotalCount\n");
+            err = TestValidateConstraintsOfAttributeTxTotalCount_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : read TxUnicastCount attribute value\n");
+            err = TestReadTxUnicastCountAttributeValue_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Validate constraints of attribute: TxUnicastCount\n");
+            err = TestValidateConstraintsOfAttributeTxUnicastCount_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : read TxBroadcastCount attribute value\n");
+            err = TestReadTxBroadcastCountAttributeValue_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Validate constraints of attribute: TxBroadcastCount\n");
+            err = TestValidateConstraintsOfAttributeTxBroadcastCount_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : read TxNoAckRequestedCount attribute value\n");
+            err = TestReadTxNoAckRequestedCountAttributeValue_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Validate constraints of attribute: TxNoAckRequestedCount\n");
+            err = TestValidateConstraintsOfAttributeTxNoAckRequestedCount_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : read TxDataCount attribute value\n");
+            err = TestReadTxDataCountAttributeValue_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Validate constraints of attribute: TxDataCount\n");
+            err = TestValidateConstraintsOfAttributeTxDataCount_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : read TxDataPollCount attribute value\n");
+            err = TestReadTxDataPollCountAttributeValue_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Validate constraints of attribute: TxDataPollCount\n");
+            err = TestValidateConstraintsOfAttributeTxDataPollCount_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : read TxBeaconCount attribute value\n");
+            err = TestReadTxBeaconCountAttributeValue_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Validate constraints of attribute: TxBeaconCount\n");
+            err = TestValidateConstraintsOfAttributeTxBeaconCount_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : read TxBeaconRequestCount attribute value\n");
+            err = TestReadTxBeaconRequestCountAttributeValue_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Validate constraints of attribute: TxBeaconRequestCount\n");
+            err = TestValidateConstraintsOfAttributeTxBeaconRequestCount_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : read TxOtherCount attribute value\n");
+            err = TestReadTxOtherCountAttributeValue_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Validate constraints of attribute: TxOtherCount\n");
+            err = TestValidateConstraintsOfAttributeTxOtherCount_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : read TxRetryCount attribute value\n");
+            err = TestReadTxRetryCountAttributeValue_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Validate constraints of attribute: TxRetryCount\n");
+            err = TestValidateConstraintsOfAttributeTxRetryCount_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : read TxDirectMaxRetryExpiryCount attribute value\n");
+            err = TestReadTxDirectMaxRetryExpiryCountAttributeValue_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Validate constraints of attribute: TxDirectMaxRetryExpiryCount\n");
+            err = TestValidateConstraintsOfAttributeTxDirectMaxRetryExpiryCount_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : read TxIndirectMaxRetryExpiryCount attribute value\n");
+            err = TestReadTxIndirectMaxRetryExpiryCountAttributeValue_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Validate constraints of attribute: TxIndirectMaxRetryExpiryCount\n");
+            err = TestValidateConstraintsOfAttributeTxIndirectMaxRetryExpiryCount_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : read TxErrCcaCount attribute value\n");
+            err = TestReadTxErrCcaCountAttributeValue_56();
+            break;
+        case 57:
+            ChipLogProgress(chipTool, " ***** Test Step 57 : Validate constraints of attribute: TxErrCcaCount\n");
+            err = TestValidateConstraintsOfAttributeTxErrCcaCount_57();
+            break;
+        case 58:
+            ChipLogProgress(chipTool, " ***** Test Step 58 : read TxErrAbortCount attribute value\n");
+            err = TestReadTxErrAbortCountAttributeValue_58();
+            break;
+        case 59:
+            ChipLogProgress(chipTool, " ***** Test Step 59 : Validate constraints of attribute: TxErrAbortCount\n");
+            err = TestValidateConstraintsOfAttributeTxErrAbortCount_59();
+            break;
+        case 60:
+            ChipLogProgress(chipTool, " ***** Test Step 60 : read TxErrBusyChannelCount attribute value\n");
+            err = TestReadTxErrBusyChannelCountAttributeValue_60();
+            break;
+        case 61:
+            ChipLogProgress(chipTool, " ***** Test Step 61 : Validate constraints of attribute: TxErrBusyChannelCount\n");
+            err = TestValidateConstraintsOfAttributeTxErrBusyChannelCount_61();
+            break;
+        case 62:
+            ChipLogProgress(chipTool, " ***** Test Step 62 : read RxTotalCount attribute value\n");
+            err = TestReadRxTotalCountAttributeValue_62();
+            break;
+        case 63:
+            ChipLogProgress(chipTool, " ***** Test Step 63 : Validate constraints of attribute: RxTotalCount\n");
+            err = TestValidateConstraintsOfAttributeRxTotalCount_63();
+            break;
+        case 64:
+            ChipLogProgress(chipTool, " ***** Test Step 64 : read RxUnicastCount attribute value\n");
+            err = TestReadRxUnicastCountAttributeValue_64();
+            break;
+        case 65:
+            ChipLogProgress(chipTool, " ***** Test Step 65 : Validate constraints of attribute: RxUnicastCount\n");
+            err = TestValidateConstraintsOfAttributeRxUnicastCount_65();
+            break;
+        case 66:
+            ChipLogProgress(chipTool, " ***** Test Step 66 : read RxBroadcastCount attribute value\n");
+            err = TestReadRxBroadcastCountAttributeValue_66();
+            break;
+        case 67:
+            ChipLogProgress(chipTool, " ***** Test Step 67 : Validate constraints of attribute: RxBroadcastCount\n");
+            err = TestValidateConstraintsOfAttributeRxBroadcastCount_67();
+            break;
+        case 68:
+            ChipLogProgress(chipTool, " ***** Test Step 68 : read RxDataCount attribute value\n");
+            err = TestReadRxDataCountAttributeValue_68();
+            break;
+        case 69:
+            ChipLogProgress(chipTool, " ***** Test Step 69 : Validate constraints of attribute: RxDataCount\n");
+            err = TestValidateConstraintsOfAttributeRxDataCount_69();
+            break;
+        case 70:
+            ChipLogProgress(chipTool, " ***** Test Step 70 : read RxDataPollCount attribute value\n");
+            err = TestReadRxDataPollCountAttributeValue_70();
+            break;
+        case 71:
+            ChipLogProgress(chipTool, " ***** Test Step 71 : Validate constraints of attribute: RxDataPollCount\n");
+            err = TestValidateConstraintsOfAttributeRxDataPollCount_71();
+            break;
+        case 72:
+            ChipLogProgress(chipTool, " ***** Test Step 72 : read RxBeaconCount attribute value\n");
+            err = TestReadRxBeaconCountAttributeValue_72();
+            break;
+        case 73:
+            ChipLogProgress(chipTool, " ***** Test Step 73 : Validate constraints of attribute: RxBeaconCount\n");
+            err = TestValidateConstraintsOfAttributeRxBeaconCount_73();
+            break;
+        case 74:
+            ChipLogProgress(chipTool, " ***** Test Step 74 : read RxBeaconRequestCount attribute value\n");
+            err = TestReadRxBeaconRequestCountAttributeValue_74();
+            break;
+        case 75:
+            ChipLogProgress(chipTool, " ***** Test Step 75 : Validate constraints of attribute: RxBeaconRequestCount\n");
+            err = TestValidateConstraintsOfAttributeRxBeaconRequestCount_75();
+            break;
+        case 76:
+            ChipLogProgress(chipTool, " ***** Test Step 76 : read RxOtherCount attribute value\n");
+            err = TestReadRxOtherCountAttributeValue_76();
+            break;
+        case 77:
+            ChipLogProgress(chipTool, " ***** Test Step 77 : Validate constraints of attribute: RxOtherCount\n");
+            err = TestValidateConstraintsOfAttributeRxOtherCount_77();
+            break;
+        case 78:
+            ChipLogProgress(chipTool, " ***** Test Step 78 : read RxAddressFilteredCount attribute value\n");
+            err = TestReadRxAddressFilteredCountAttributeValue_78();
+            break;
+        case 79:
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Validate constraints of attribute: RxAddressFilteredCount\n");
+            err = TestValidateConstraintsOfAttributeRxAddressFilteredCount_79();
+            break;
+        case 80:
+            ChipLogProgress(chipTool, " ***** Test Step 80 : read RxDestAddrFilteredCount attribute value\n");
+            err = TestReadRxDestAddrFilteredCountAttributeValue_80();
+            break;
+        case 81:
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Validate constraints of attribute: RxDestAddrFilteredCount\n");
+            err = TestValidateConstraintsOfAttributeRxDestAddrFilteredCount_81();
+            break;
+        case 82:
+            ChipLogProgress(chipTool, " ***** Test Step 82 : read RxDuplicatedCount attribute value\n");
+            err = TestReadRxDuplicatedCountAttributeValue_82();
+            break;
+        case 83:
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Validate constraints of attribute: RxDuplicatedCount\n");
+            err = TestValidateConstraintsOfAttributeRxDuplicatedCount_83();
+            break;
+        case 84:
+            ChipLogProgress(chipTool, " ***** Test Step 84 : read RxErrNoFrameCount attribute value\n");
+            err = TestReadRxErrNoFrameCountAttributeValue_84();
+            break;
+        case 85:
+            ChipLogProgress(chipTool, " ***** Test Step 85 : Validate constraints of attribute: RxErrNoFrameCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrNoFrameCount_85();
+            break;
+        case 86:
+            ChipLogProgress(chipTool, " ***** Test Step 86 : read RxErrUnknownNeighborCount attribute value\n");
+            err = TestReadRxErrUnknownNeighborCountAttributeValue_86();
+            break;
+        case 87:
+            ChipLogProgress(chipTool, " ***** Test Step 87 : Validate constraints of attribute: RxErrUnknownNeighborCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrUnknownNeighborCount_87();
+            break;
+        case 88:
+            ChipLogProgress(chipTool, " ***** Test Step 88 : read RxErrInvalidScrAddrCount attribute value\n");
+            err = TestReadRxErrInvalidScrAddrCountAttributeValue_88();
+            break;
+        case 89:
+            ChipLogProgress(chipTool, " ***** Test Step 89 : Validate constraints of attribute: RxErrInvalidSrcAddrCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrInvalidSrcAddrCount_89();
+            break;
+        case 90:
+            ChipLogProgress(chipTool, " ***** Test Step 90 : read RxErrSecCount attribute value\n");
+            err = TestReadRxErrSecCountAttributeValue_90();
+            break;
+        case 91:
+            ChipLogProgress(chipTool, " ***** Test Step 91 : Validate constraints of attribute: RxErrInvalidSrcAddrCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrInvalidSrcAddrCount_91();
+            break;
+        case 92:
+            ChipLogProgress(chipTool, " ***** Test Step 92 : read RxErrFcsCount attribute value\n");
+            err = TestReadRxErrFcsCountAttributeValue_92();
+            break;
+        case 93:
+            ChipLogProgress(chipTool, " ***** Test Step 93 : Validate constraints of attribute: RxErrFcsCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrFcsCount_93();
+            break;
+        case 94:
+            ChipLogProgress(chipTool, " ***** Test Step 94 : read RxErrOtherCount attribute value\n");
+            err = TestReadRxErrOtherCountAttributeValue_94();
+            break;
+        case 95:
+            ChipLogProgress(chipTool, " ***** Test Step 95 : Validate constraints of attribute: RxErrOtherCount\n");
+            err = TestValidateConstraintsOfAttributeRxErrOtherCount_95();
+            break;
+        case 96:
+            ChipLogProgress(chipTool, " ***** Test Step 96 : read ActiveTimestamp attribute value\n");
+            err = TestReadActiveTimestampAttributeValue_96();
+            break;
+        case 97:
+            ChipLogProgress(chipTool, " ***** Test Step 97 : Validate constraints of attribute: ActiveTimestamp\n");
+            err = TestValidateConstraintsOfAttributeActiveTimestamp_97();
+            break;
+        case 98:
+            ChipLogProgress(chipTool, " ***** Test Step 98 : read PendingTimestamp attribute value\n");
+            err = TestReadPendingTimestampAttributeValue_98();
+            break;
+        case 99:
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Validate constraints of attribute: PendingTimestamp\n");
+            err = TestValidateConstraintsOfAttributePendingTimestamp_99();
+            break;
+        case 100:
+            ChipLogProgress(chipTool, " ***** Test Step 100 : read Delay attribute value\n");
+            err = TestReadDelayAttributeValue_100();
+            break;
+        case 101:
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Validate constraints of attribute: delay\n");
+            err = TestValidateConstraintsOfAttributeDelay_101();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 102;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeChannel_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeChannelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: Channel Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("channel", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeNetworkName_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeNetworkNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: NetworkName Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("networkName", "", "string"));
+            VerifyOrReturn(CheckConstraintMaxLength("networkName", [value length], 16));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributePanId_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePanIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: PanId Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("panId", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeExtendedPanId_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeExtendedPanIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: ExtendedPanId Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("extendedPanId", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeOverrunCount_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOverrunCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: OverrunCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("overrunCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadPartitionIdAttributeValue_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePartitionIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read PartitionId attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("PartitionId", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributePartitionId_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePartitionIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: PartitionId Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("partitionId", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadWeightingAttributeValue_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeWeightingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read Weighting attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("weighting", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeWeighting_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeWeightingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: weighting Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("weighting", "", "uint8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadDataVersionAttributeValue_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDataVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read DataVersion attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("DataVersion", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeDataVersion_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDataVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: DataVersion Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("dataVersion", "", "uint8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadStableDataVersionAttributeValue_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStableDataVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read StableDataVersion attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("StableDataVersion", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeStableDataVersion_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStableDataVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: StableDataVersion Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("stableDataVersion", "", "uint8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadLeaderRouterIdAttributeValue_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLeaderRouterIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read LeaderRouterId attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("LeaderRouterId", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeLeaderRouterId_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLeaderRouterIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: LeaderRouterId Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("leaderRouterId", "", "uint8"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadDetachedRoleCountAttributeValue_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDetachedRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read DetachedRoleCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("DetachedRoleCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeDetachedRoleCount_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDetachedRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: DetachedRoleCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("detachedRoleCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadChildRoleCountAttributeValue_18()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeChildRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read ChildRoleCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ChildRoleCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeChildRoleCount_19()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeChildRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: ChildRoleCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("childRoleCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRouterRoleCountAttributeValue_20()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRouterRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RouterRoleCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RouterRoleCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRouterRoleCount_21()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRouterRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RouterRoleCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("routerRoleCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadLeaderRoleCountAttributeValue_22()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLeaderRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read LeaderRoleCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("LeaderRoleCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeLeaderRoleCount_23()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLeaderRoleCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: LeaderRoleCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("leaderRoleCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadAttachAttemptCountAttributeValue_24()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttachAttemptCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read AttachAttemptCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttachAttemptCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeAttachAttemptCount_25()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAttachAttemptCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: AttachAttemptCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("attachAttemptCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadPartitionIdChangeCountAttributeValue_26()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePartitionIdChangeCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read PartitionIdChangeCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("PartitionIdChangeCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributePartitionIdChangeCount_27()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePartitionIdChangeCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: PartitionIdChangeCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("partitionIdChangeCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadBetterPartitionAttachAttemptCountAttributeValue_28()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBetterPartitionAttachAttemptCountWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read BetterPartitionAttachAttemptCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("BetterPartitionAttachAttemptCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeBetterPartitionAttachAttemptCount_29()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeBetterPartitionAttachAttemptCountWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: BetterPartitionAttachAttemptCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("betterPartitionAttachAttemptCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadParentChangeCountAttributeValue_30()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeParentChangeCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read ParentChangeCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ParentChangeCount", actualValue, 0U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeParentChangeCount_31()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeParentChangeCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: ParentChangeCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("parentChangeCount", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxTotalCountAttributeValue_32()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxTotalCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxTotalCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxTotalCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxTotalCount_33()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxTotalCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxTotalCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txTotalCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxUnicastCountAttributeValue_34()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxUnicastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxUnicastCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxUnicastCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxUnicastCount_35()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxUnicastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxUnicastCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txUnicastCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxBroadcastCountAttributeValue_36()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBroadcastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxBroadcastCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxBroadcastCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxBroadcastCount_37()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBroadcastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxBroadcastCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txBroadcastCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxNoAckRequestedCountAttributeValue_38()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxNoAckRequestedCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxNoAckRequestedCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxNoAckRequestedCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxNoAckRequestedCount_39()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxNoAckRequestedCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxNoAckRequestedCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txNoAckRequestedCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxDataCountAttributeValue_40()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxDataCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxDataCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxDataCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxDataCount_41()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxDataCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxDataCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txDataCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxDataPollCountAttributeValue_42()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxDataPollCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxDataPollCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxDataPollCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxDataPollCount_43()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxDataPollCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxDataPollCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txDataPollCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxBeaconCountAttributeValue_44()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBeaconCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxBeaconCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxBeaconCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxBeaconCount_45()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBeaconCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxBeaconCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txBeaconCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxBeaconRequestCountAttributeValue_46()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBeaconRequestCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxBeaconRequestCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxBeaconRequestCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxBeaconRequestCount_47()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxBeaconRequestCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxBeaconRequestCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txBeaconRequestCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxOtherCountAttributeValue_48()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxOtherCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxOtherCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxOtherCount_49()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxOtherCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txOtherCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxRetryCountAttributeValue_50()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxRetryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxRetryCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxRetryCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxRetryCount_51()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxRetryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxRetryCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txRetryCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxDirectMaxRetryExpiryCountAttributeValue_52()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeTxDirectMaxRetryExpiryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"read TxDirectMaxRetryExpiryCount attribute value Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                {
+                    id actualValue = value;
+                    VerifyOrReturn(CheckValue("TxDirectMaxRetryExpiryCount", actualValue, 0UL));
+                }
+
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxDirectMaxRetryExpiryCount_53()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeTxDirectMaxRetryExpiryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"Validate constraints of attribute: TxDirectMaxRetryExpiryCount Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                VerifyOrReturn(CheckConstraintType("txDirectMaxRetryExpiryCount", "", "uint32"));
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxIndirectMaxRetryExpiryCountAttributeValue_54()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeTxIndirectMaxRetryExpiryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"read TxIndirectMaxRetryExpiryCount attribute value Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                {
+                    id actualValue = value;
+                    VerifyOrReturn(CheckValue("TxIndirectMaxRetryExpiryCount", actualValue, 0UL));
+                }
+
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxIndirectMaxRetryExpiryCount_55()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeTxIndirectMaxRetryExpiryCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"Validate constraints of attribute: TxIndirectMaxRetryExpiryCount Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                VerifyOrReturn(CheckConstraintType("txIndirectMaxRetryExpiryCount", "", "uint32"));
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxErrCcaCountAttributeValue_56()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrCcaCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxErrCcaCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxErrCcaCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxErrCcaCount_57()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrCcaCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxErrCcaCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txErrCcaCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxErrAbortCountAttributeValue_58()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrAbortCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxErrAbortCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxErrAbortCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxErrAbortCount_59()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrAbortCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxErrAbortCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txErrAbortCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxErrBusyChannelCountAttributeValue_60()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrBusyChannelCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read TxErrBusyChannelCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("TxErrBusyChannelCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeTxErrBusyChannelCount_61()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrBusyChannelCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: TxErrBusyChannelCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txErrBusyChannelCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxTotalCountAttributeValue_62()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxTotalCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxTotalCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxTotalCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxTotalCount_63()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxTotalCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxTotalCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxTotalCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxUnicastCountAttributeValue_64()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxUnicastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxUnicastCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxUnicastCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxUnicastCount_65()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxUnicastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxUnicastCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxUnicastCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxBroadcastCountAttributeValue_66()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBroadcastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxBroadcastCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxBroadcastCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxBroadcastCount_67()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBroadcastCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxBroadcastCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxBroadcastCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxDataCountAttributeValue_68()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDataCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxDataCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxDataCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxDataCount_69()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDataCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxDataCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxDataCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxDataPollCountAttributeValue_70()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDataPollCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxDataPollCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxDataPollCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxDataPollCount_71()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDataPollCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxDataPollCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxDataPollCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxBeaconCountAttributeValue_72()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBeaconCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxBeaconCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxBeaconCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxBeaconCount_73()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBeaconCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxBeaconCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxBeaconCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxBeaconRequestCountAttributeValue_74()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBeaconRequestCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxBeaconRequestCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxBeaconRequestCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxBeaconRequestCount_75()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxBeaconRequestCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxBeaconRequestCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxBeaconRequestCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxOtherCountAttributeValue_76()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxOtherCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxOtherCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxOtherCount_77()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxOtherCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxOtherCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxAddressFilteredCountAttributeValue_78()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxAddressFilteredCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxAddressFilteredCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxAddressFilteredCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxAddressFilteredCount_79()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxAddressFilteredCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxAddressFilteredCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxAddressFilteredCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxDestAddrFilteredCountAttributeValue_80()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDestAddrFilteredCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxDestAddrFilteredCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxDestAddrFilteredCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxDestAddrFilteredCount_81()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDestAddrFilteredCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxDestAddrFilteredCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxDestAddrFilteredCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxDuplicatedCountAttributeValue_82()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDuplicatedCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxDuplicatedCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxDuplicatedCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxDuplicatedCount_83()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxDuplicatedCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxDuplicatedCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxDuplicatedCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrNoFrameCountAttributeValue_84()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrNoFrameCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxErrNoFrameCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxErrNoFrameCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrNoFrameCount_85()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrNoFrameCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxErrNoFrameCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxErrNoFrameCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrUnknownNeighborCountAttributeValue_86()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeRxErrUnknownNeighborCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"read RxErrUnknownNeighborCount attribute value Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                {
+                    id actualValue = value;
+                    VerifyOrReturn(CheckValue("RxErrUnknownNeighborCount", actualValue, 0UL));
+                }
+
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrUnknownNeighborCount_87()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster
+            readAttributeRxErrUnknownNeighborCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                NSLog(@"Validate constraints of attribute: RxErrUnknownNeighborCount Error: %@", err);
+
+                VerifyOrReturn(CheckValue("status", err, 0));
+
+                VerifyOrReturn(CheckConstraintType("rxErrUnknownNeighborCount", "", "uint32"));
+                NextTest();
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrInvalidScrAddrCountAttributeValue_88()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrInvalidSrcAddrCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxErrInvalidScrAddrCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxErrInvalidSrcAddrCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrInvalidSrcAddrCount_89()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrInvalidSrcAddrCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxErrInvalidSrcAddrCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxErrInvalidSrcAddrCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrSecCountAttributeValue_90()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrSecCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxErrSecCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxErrSecCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrInvalidSrcAddrCount_91()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrSecCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxErrInvalidSrcAddrCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxErrSecCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrFcsCountAttributeValue_92()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrFcsCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxErrFcsCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxErrFcsCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrFcsCount_93()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrFcsCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxErrFcsCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxErrFcsCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadRxErrOtherCountAttributeValue_94()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read RxErrOtherCount attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("RxErrOtherCount", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRxErrOtherCount_95()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRxErrOtherCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: RxErrOtherCount Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rxErrOtherCount", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadActiveTimestampAttributeValue_96()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeActiveTimestampWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read ActiveTimestamp attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ActiveTimestamp", actualValue, 0ULL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeActiveTimestamp_97()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeActiveTimestampWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: ActiveTimestamp Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("activeTimestamp", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadPendingTimestampAttributeValue_98()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePendingTimestampWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read PendingTimestamp attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("PendingTimestamp", actualValue, 0ULL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributePendingTimestamp_99()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePendingTimestampWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: PendingTimestamp Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("pendingTimestamp", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadDelayAttributeValue_100()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDelayWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read Delay attribute value Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("delay", actualValue, 0UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeDelay_101()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeDelayWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate constraints of attribute: delay Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("delay", "", "uint32"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_WIFIDIAG_1_1 : public TestCommandBridge {
 public:
     Test_TC_WIFIDIAG_1_1()
@@ -33405,6 +38892,22 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads NetworkInterface structure attribute from DUT\n");
             err = TestReadsNetworkInterfaceStructureAttributeFromDut_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads SecurityType attribute constraints\n");
+            err = TestReadsSecurityTypeAttributeConstraints_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads WiFiVersion attribute constraints\n");
+            err = TestReadsWiFiVersionAttributeConstraints_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads ChannelNumber attribute constraints\n");
+            err = TestReadsChannelNumberAttributeConstraints_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads RSSI attribute constraints\n");
+            err = TestReadsRssiAttributeConstraints_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -33420,7 +38923,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -33447,6 +38950,93 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("networkInterfaces", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsSecurityTypeAttributeConstraints_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeSecurityTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads SecurityType attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("securityType", "", "enum"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsWiFiVersionAttributeConstraints_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeWiFiVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads WiFiVersion attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("wiFiVersion", "", "enum"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsChannelNumberAttributeConstraints_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeChannelNumberWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads ChannelNumber attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("channelNumber", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsRssiAttributeConstraints_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeRssiWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads RSSI attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("rssi", "", "int8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<int8_t>("rssi", [value charValue], -120));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<int8_t>("rssi", [value charValue], 0));
+            }
+
             NextTest();
         }];
 
@@ -54735,40 +60325,44 @@ public:
             err = TestKeySetRead_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Write Group Keys\n");
-            err = TestWriteGroupKeys_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write Group Keys (invalid)\n");
+            err = TestWriteGroupKeysInvalid_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read Group Keys\n");
-            err = TestReadGroupKeys_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write Group Keys\n");
+            err = TestWriteGroupKeys_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Read GroupTable\n");
-            err = TestReadGroupTable_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read Group Keys\n");
+            err = TestReadGroupKeys_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : KeySet Remove 1\n");
-            err = TestKeySetRemove1_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Read GroupTable\n");
+            err = TestReadGroupTable_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : KeySet Read (removed)\n");
-            err = TestKeySetReadRemoved_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : KeySet Remove 1\n");
+            err = TestKeySetRemove1_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : KeySet Read (not removed)\n");
-            err = TestKeySetReadNotRemoved_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : KeySet Read (removed)\n");
+            err = TestKeySetReadRemoved_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Remove All\n");
-            err = TestRemoveAll_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : KeySet Read (not removed)\n");
+            err = TestKeySetReadNotRemoved_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : KeySet Remove 2\n");
-            err = TestKeySetRemove2_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Remove All\n");
+            err = TestRemoveAll_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : KeySet Read (also removed)\n");
-            err = TestKeySetReadAlsoRemoved_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : KeySet Remove 2\n");
+            err = TestKeySetRemove2_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : KeySet Read (also removed)\n");
+            err = TestKeySetReadAlsoRemoved_17();
             break;
         }
 
@@ -54785,7 +60379,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 17;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -55035,7 +60629,36 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteGroupKeys_8()
+    CHIP_ERROR TestWriteGroupKeysInvalid_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
+                                                                                         endpoint:0
+                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id groupKeyMapArgument;
+        {
+            NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+            temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:258U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:0U];
+            ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+
+            groupKeyMapArgument = temp_0;
+        }
+        [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Write Group Keys (invalid) Error: %@", err);
+
+                                      VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                      NextTest();
+                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWriteGroupKeys_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55070,7 +60693,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadGroupKeys_9()
+    CHIP_ERROR TestReadGroupKeys_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55110,7 +60733,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadGroupTable_10()
+    CHIP_ERROR TestReadGroupTable_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55151,7 +60774,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetRemove1_11()
+    CHIP_ERROR TestKeySetRemove1_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55173,7 +60796,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadRemoved_12()
+    CHIP_ERROR TestKeySetReadRemoved_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55195,7 +60818,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadNotRemoved_13()
+    CHIP_ERROR TestKeySetReadNotRemoved_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55245,7 +60868,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestRemoveAll_14()
+    CHIP_ERROR TestRemoveAll_15()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -55262,7 +60885,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetRemove2_15()
+    CHIP_ERROR TestKeySetRemove2_16()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55284,7 +60907,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestKeySetReadAlsoRemoved_16()
+    CHIP_ERROR TestKeySetReadAlsoRemoved_17()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device
@@ -55783,516 +61406,6 @@ private:
 
                              NextTest();
                          }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-class TestModeSelectCluster : public TestCommandBridge {
-public:
-    TestModeSelectCluster()
-        : TestCommandBridge("TestModeSelectCluster")
-        , mTestIndex(0)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~TestModeSelectCluster() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Start: TestModeSelectCluster\n");
-        }
-
-        if (mTestCount == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Complete: TestModeSelectCluster\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++) {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read Description\n");
-            err = TestReadDescription_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read StandardNamespace\n");
-            err = TestReadStandardNamespace_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read SupportedModes\n");
-            err = TestReadSupportedModes_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read CurrentMode\n");
-            err = TestReadCurrentMode_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read StartUpMode\n");
-            err = TestReadStartUpMode_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read OnMode\n");
-            err = TestReadOnMode_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Change to Supported Mode\n");
-            err = TestChangeToSupportedMode_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Verify Current Mode Change\n");
-            err = TestVerifyCurrentModeChange_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Change to Unsupported Mode\n");
-            err = TestChangeToUnsupportedMode_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Toggle OnOff\n");
-            err = TestToggleOnOff_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Toggle OnOff\n");
-            err = TestToggleOnOff_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Verify Current Mode does not change when OnMode is null\n");
-            err = TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Change OnMode\n");
-            err = TestChangeOnMode_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Verify OnMode\n");
-            err = TestVerifyOnMode_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Toggle OnOff\n");
-            err = TestToggleOnOff_15();
-            break;
-        case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Toggle OnOff\n");
-            err = TestToggleOnOff_16();
-            break;
-        case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Verify Current Mode Changes if OnMode is not null\n");
-            err = TestVerifyCurrentModeChangesIfOnModeIsNotNull_17();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err) {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
-
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadDescription_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read Description Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueAsString("Description", actualValue, @"Coffee"));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadStandardNamespace_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStandardNamespaceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read StandardNamespace Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("StandardNamespace", actualValue));
-                VerifyOrReturn(CheckValue("StandardNamespace", actualValue, 0U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadSupportedModes_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read SupportedModes Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("SupportedModes", [actualValue count], static_cast<uint32_t>(3)));
-                VerifyOrReturn(
-                    CheckValueAsString("Label", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).label, @"Black"));
-                VerifyOrReturn(CheckValue("Mode", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).mode, 0));
-                VerifyOrReturn(
-                    CheckValue("SemanticTag", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).semanticTag, 0UL));
-                VerifyOrReturn(
-                    CheckValueAsString("Label", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).label, @"Cappuccino"));
-                VerifyOrReturn(CheckValue("Mode", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).mode, 4));
-                VerifyOrReturn(
-                    CheckValue("SemanticTag", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).semanticTag, 0UL));
-                VerifyOrReturn(
-                    CheckValueAsString("Label", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).label, @"Espresso"));
-                VerifyOrReturn(CheckValue("Mode", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).mode, 7));
-                VerifyOrReturn(
-                    CheckValue("SemanticTag", ((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).semanticTag, 0UL));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadCurrentMode_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read CurrentMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadStartUpMode_5()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read StartUpMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("StartUpMode", actualValue));
-                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadOnMode_6()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read OnMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNull("OnMode", actualValue));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestChangeToSupportedMode_7()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        __auto_type * params = [[CHIPModeSelectClusterChangeToModeParams alloc] init];
-        params.newMode = [NSNumber numberWithUnsignedChar:4];
-        [cluster changeToModeWithParams:params
-                      completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Change to Supported Mode Error: %@", err);
-
-                          VerifyOrReturn(CheckValue("status", err, 0));
-
-                          NextTest();
-                      }];
-
-        return CHIP_NO_ERROR;
-    }
-    NSNumber * _Nonnull currentModeBeforeToggle;
-
-    CHIP_ERROR TestVerifyCurrentModeChange_8()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Verify Current Mode Change Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, 4));
-            }
-            {
-                currentModeBeforeToggle = value;
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestChangeToUnsupportedMode_9()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        __auto_type * params = [[CHIPModeSelectClusterChangeToModeParams alloc] init];
-        params.newMode = [NSNumber numberWithUnsignedChar:2];
-        [cluster changeToModeWithParams:params
-                      completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Change to Unsupported Mode Error: %@", err);
-
-                          VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-                          NextTest();
-                      }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestToggleOnOff_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
-            NSLog(@"Toggle OnOff Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestToggleOnOff_11()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
-            NSLog(@"Toggle OnOff Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestVerifyCurrentModeDoesNotChangeWhenOnModeIsNull_12()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Verify Current Mode does not change when OnMode is null Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, currentModeBeforeToggle));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestChangeOnMode_13()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id onModeArgument;
-        onModeArgument = [NSNumber numberWithUnsignedChar:7];
-        [cluster writeAttributeOnModeWithValue:onModeArgument
-                             completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"Change OnMode Error: %@", err);
-
-                                 VerifyOrReturn(CheckValue("status", err, 0));
-
-                                 NextTest();
-                             }];
-
-        return CHIP_NO_ERROR;
-    }
-    NSNumber * _Nullable OnModeValue;
-
-    CHIP_ERROR TestVerifyOnMode_14()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Verify OnMode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("OnMode", actualValue));
-                VerifyOrReturn(CheckValue("OnMode", actualValue, 7));
-            }
-            {
-                OnModeValue = value;
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestToggleOnOff_15()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
-            NSLog(@"Toggle OnOff Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestToggleOnOff_16()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
-            NSLog(@"Toggle OnOff Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestVerifyCurrentModeChangesIfOnModeIsNotNull_17()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Verify Current Mode Changes if OnMode is not null Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("CurrentMode", actualValue, OnModeValue));
-            }
-
-            NextTest();
-        }];
 
         return CHIP_NO_ERROR;
     }
@@ -57369,7 +62482,12 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
         make_unique<Test_TC_FLW_2_2>(),
+        make_unique<Test_TC_GC_1_1>(),
         make_unique<Test_TC_ILL_1_1>(),
+        make_unique<Test_TC_ILL_2_1>(),
+        make_unique<Test_TC_I_1_1>(),
+        make_unique<Test_TC_I_2_1>(),
+        make_unique<Test_TC_I_2_3>(),
         make_unique<Test_TC_LVL_1_1>(),
         make_unique<Test_TC_LVL_2_1>(),
         make_unique<Test_TC_LVL_2_2>(),
@@ -57378,6 +62496,17 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_LVL_5_1>(),
         make_unique<Test_TC_LVL_6_1>(),
         make_unique<Test_TC_MC_1_1>(),
+        make_unique<Test_TC_MC_1_2>(),
+        make_unique<Test_TC_MC_1_3>(),
+        make_unique<Test_TC_MC_1_4>(),
+        make_unique<Test_TC_MC_1_5>(),
+        make_unique<Test_TC_MC_1_6>(),
+        make_unique<Test_TC_MC_1_7>(),
+        make_unique<Test_TC_MC_1_8>(),
+        make_unique<Test_TC_MC_1_9>(),
+        make_unique<Test_TC_MC_1_10>(),
+        make_unique<Test_TC_MC_1_11>(),
+        make_unique<Test_TC_MC_1_12>(),
         make_unique<Test_TC_MC_2_1>(),
         make_unique<Test_TC_MC_3_1>(),
         make_unique<Test_TC_MC_3_2>(),
@@ -57401,6 +62530,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_MC_7_2>(),
         make_unique<Test_TC_MC_8_1>(),
         make_unique<Test_TC_MC_9_1>(),
+        make_unique<Test_TC_MC_10_1>(),
+        make_unique<Test_TC_MOD_1_1>(),
         make_unique<Test_TC_OCC_1_1>(),
         make_unique<Test_TC_OCC_2_1>(),
         make_unique<Test_TC_OCC_2_2>(),
@@ -57409,12 +62540,14 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_OO_2_2>(),
         make_unique<Test_TC_OO_2_3>(),
         make_unique<Test_TC_PS_1_1>(),
+        make_unique<Test_TC_PS_2_1>(),
         make_unique<Test_TC_PRS_1_1>(),
         make_unique<Test_TC_PRS_2_1>(),
         make_unique<Test_TC_PCC_1_1>(),
         make_unique<Test_TC_PCC_2_1>(),
         make_unique<Test_TC_PCC_2_2>(),
         make_unique<Test_TC_PCC_2_3>(),
+        make_unique<Test_TC_PCC_2_4>(),
         make_unique<Test_TC_RH_1_1>(),
         make_unique<Test_TC_RH_2_1>(),
         make_unique<Test_TC_RH_2_2>(),
@@ -57430,6 +62563,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_TSUIC_2_1>(),
         make_unique<Test_TC_TSUIC_2_2>(),
         make_unique<Test_TC_DIAG_TH_NW_1_1>(),
+        make_unique<Test_TC_DIAG_TH_NW_1_2>(),
         make_unique<Test_TC_WIFIDIAG_1_1>(),
         make_unique<Test_TC_WIFIDIAG_3_1>(),
         make_unique<Test_TC_WNCV_1_1>(),
@@ -57452,7 +62586,6 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestIdentifyCluster>(),
         make_unique<TestLogCommands>(),
         make_unique<TestOperationalCredentialsCluster>(),
-        make_unique<TestModeSelectCluster>(),
         make_unique<TestBinding>(),
         make_unique<Test_TC_SWDIAG_1_1>(),
         make_unique<Test_TC_SWDIAG_2_1>(),

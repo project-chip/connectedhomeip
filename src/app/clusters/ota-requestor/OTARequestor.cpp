@@ -157,8 +157,8 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 
         if (update.softwareVersion > requestorCore->mCurrentVersion)
         {
-            ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
-                          requestorCore->mCurrentVersion, update.softwareVersion);
+            ChipLogDetail(SoftwareUpdate, "Update available from version %" PRIu32 " to %" PRIu32, requestorCore->mCurrentVersion,
+                          update.softwareVersion);
             MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
             // This function copies the bytespan to mutablebytespan only if size of mutablebytespan buffer is greater or equal to
             // bytespan otherwise we are copying data upto available size.
@@ -188,7 +188,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         }
         else
         {
-            ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
+            ChipLogDetail(SoftwareUpdate, "Available update version %" PRIu32 " is <= current version %" PRIu32 ", update ignored",
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -400,7 +400,7 @@ void OTARequestor::CancelImageUpdate()
 
     mOtaRequestorDriver->UpdateCancelled();
 
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+    Reset();
 }
 
 CHIP_ERROR OTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -658,12 +658,17 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
+    // Issue#16151 tracks re-factoring error and state transitioning handling.
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the OTARequestor has entered the Idle state
         mOtaRequestorDriver->HandleIdleState(idleStateReason);
+    }
+    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
+    {
+        mOtaRequestorDriver->HandleIdleStateExit();
     }
 
     mCurrentUpdateState = newState;

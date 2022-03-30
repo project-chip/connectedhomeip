@@ -299,3 +299,6 @@ PICS:
     - label:
           "The optional key PI MAY provide additional information for pairing."
       id: PI_KEY
+
+    - label: "Prompts user for input. Unable to run in CI"
+      id: PICS_USER_PROMPT

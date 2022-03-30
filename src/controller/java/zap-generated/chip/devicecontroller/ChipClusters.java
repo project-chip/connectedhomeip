@@ -11149,6 +11149,15 @@ public class ChipClusters {
       readStartUpModeAttribute(chipClusterPtr, callback);
     }
 
+    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeStartUpModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
     public void subscribeStartUpModeAttribute(
         StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -11252,6 +11261,12 @@ public class ChipClusters {
 
     private native void readStartUpModeAttribute(
         long chipClusterPtr, StartUpModeAttributeCallback callback);
+
+    private native void writeStartUpModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpModeAttribute(
         long chipClusterPtr,
@@ -11456,7 +11471,8 @@ public class ChipClusters {
     }
 
     public interface NetworkConfigResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex);
 
       void onError(Exception error);
     }

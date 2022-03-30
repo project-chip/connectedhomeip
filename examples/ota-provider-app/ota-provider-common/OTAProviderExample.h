@@ -32,6 +32,9 @@
 class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
 {
 public:
+    using OTAQueryStatus       = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
+
     OTAProviderExample();
 
     void SetOTAFilePath(const char * path);
@@ -48,15 +51,10 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
-    enum QueryImageBehaviorType
-    {
-        kRespondWithUnknown,
-        kRespondWithUpdateAvailable,
-        kRespondWithBusy,
-        kRespondWithNotAvailable
-    };
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
+    static constexpr size_t kFilepathBufLen      = 256;
+
     typedef struct DeviceSoftwareVersionModel
     {
         chip::VendorId vendorId;
@@ -69,10 +67,11 @@ public:
         uint32_t maxApplicableSoftwareVersion;
         char otaURL[OTA_URL_MAX_LEN];
     } DeviceSoftwareVersionModel;
+
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
-    void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
+    void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -94,16 +93,21 @@ private:
 
     bool ParseOTAHeader(const char * otaFilePath, chip::OTAImageHeader & header);
 
+    CHIP_ERROR
+    SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
-    static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
-    QueryImageBehaviorType mQueryImageBehavior;
-    uint32_t mIgnoreQueryImageCount  = 0;
-    uint32_t mIgnoreApplyUpdateCount = 0;
-    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
-    uint32_t mDelayedApplyActionTimeSec                   = 0;
-    uint32_t mDelayedQueryActionTimeSec                   = 0;
-    chip::ota::UserConsentDelegate * mUserConsentDelegate = nullptr;
-    bool mUserConsentNeeded                               = false;
+    OTAQueryStatus mQueryImageStatus;
+    OTAApplyUpdateAction mUpdateAction;
+    uint32_t mIgnoreQueryImageCount;
+    uint32_t mIgnoreApplyUpdateCount;
+    uint32_t mDelayedQueryActionTimeSec;
+    uint32_t mDelayedApplyActionTimeSec;
+    chip::ota::UserConsentDelegate * mUserConsentDelegate;
+    bool mUserConsentNeeded;
+    uint32_t mSoftwareVersion;
+    char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
 };

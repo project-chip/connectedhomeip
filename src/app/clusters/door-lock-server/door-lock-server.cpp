@@ -2169,11 +2169,10 @@ DlStatus DoorLockServer::clearSchedules(chip::EndpointId endpointId, uint16_t us
     return DlStatus::kSuccess;
 }
 
-CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
-                                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
-                                                          uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask,
-                                                          uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                                          uint8_t endMinute)
+void DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                                    const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
+                                                    uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask, uint8_t startHour,
+                                                    uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     VerifyOrDie(nullptr != commandObj);
 
@@ -2190,7 +2189,7 @@ CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHand
         response.endMinute   = Optional<uint8_t>(endMinute);
     }
 
-    return commandObj->AddResponseData(commandPath, response);
+    commandObj->AddResponse(commandPath, response);
 }
 
 bool DoorLockServer::yearDayIndexValid(chip::EndpointId endpointId, uint8_t yearDayIndex)
@@ -2242,10 +2241,10 @@ DlStatus DoorLockServer::clearYearDaySchedules(chip::EndpointId endpointId, uint
     return DlStatus::kSuccess;
 }
 
-CHIP_ERROR DoorLockServer::sendGetYearDayScheduleResponse(chip::app::CommandHandler * commandObj,
-                                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
-                                                          uint16_t userIndex, DlStatus status, uint32_t localStartTime,
-                                                          uint32_t localEndTime)
+void DoorLockServer::sendGetYearDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                                    const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                                    uint16_t userIndex, DlStatus status, uint32_t localStartTime,
+                                                    uint32_t localEndTime)
 {
     VerifyOrDie(nullptr != commandObj);
 
@@ -2259,7 +2258,7 @@ CHIP_ERROR DoorLockServer::sendGetYearDayScheduleResponse(chip::app::CommandHand
         response.localEndTime   = Optional<uint32_t>(localEndTime);
     }
 
-    return commandObj->AddResponseData(commandPath, response);
+    commandObj->AddResponse(commandPath, response);
 }
 
 EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,

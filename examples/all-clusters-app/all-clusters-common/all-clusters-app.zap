@@ -79,7 +79,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -144,7 +144,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7418,7 +7418,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7483,7 +7483,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -8033,7 +8033,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8048,7 +8048,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -8935,7 +8935,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -8950,7 +8950,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -10531,7 +10531,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -10571,7 +10571,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -10586,7 +10586,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -14842,7 +14842,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerGeneratedCommandList",
+              "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
               "side": "server",
@@ -14857,7 +14857,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientGeneratedCommandList",
+              "name": "AcceptedCommandList",
               "code": 65529,
               "mfgCode": null,
               "side": "server",
@@ -17992,7 +17992,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -18042,7 +18042,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

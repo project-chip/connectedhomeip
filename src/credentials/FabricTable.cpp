@@ -54,6 +54,10 @@ constexpr TLV::Tag kOpKeyDataTag    = TLV::ContextTag(1);
 // If this version grows beyond UINT16_MAX, adjust OpKeypairTLVMaxSize
 // accordingly.
 constexpr uint16_t kOpKeyVersion = 1;
+
+// Tags for our index list storage.
+constexpr TLV::Tag kNextAvailableFabricIndexTag = TLV::ContextTag(0);
+constexpr TLV::Tag kFabricIndicesTag            = TLV::ContextTag(1);
 } // anonymous namespace
 
 CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
@@ -66,7 +70,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
     static_assert(kMaxCHIPCertLength <= UINT16_MAX, "Casting to uint16_t won't be safe");
 
     ReturnErrorOnFailure(
-        storage->SyncSetKeyValue(keyAlloc.FabricRCAC(mFabric), mRootCert.data(), static_cast<uint16_t>(mRootCert.size())));
+        storage->SyncSetKeyValue(keyAlloc.FabricRCAC(mFabricIndex), mRootCert.data(), static_cast<uint16_t>(mRootCert.size())));
 
     // Workaround for the fact that some storage backends do not allow storing
     // a nullptr with 0 length.  See
@@ -74,12 +78,12 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
     if (!mICACert.empty())
     {
         ReturnErrorOnFailure(
-            storage->SyncSetKeyValue(keyAlloc.FabricICAC(mFabric), mICACert.data(), static_cast<uint16_t>(mICACert.size())));
+            storage->SyncSetKeyValue(keyAlloc.FabricICAC(mFabricIndex), mICACert.data(), static_cast<uint16_t>(mICACert.size())));
     }
     else
     {
         // Make sure there is no stale data.
-        CHIP_ERROR err = storage->SyncDeleteKeyValue(keyAlloc.FabricICAC(mFabric));
+        CHIP_ERROR err = storage->SyncDeleteKeyValue(keyAlloc.FabricICAC(mFabricIndex));
         if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             ReturnErrorOnFailure(err);
@@ -87,7 +91,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
     }
 
     ReturnErrorOnFailure(
-        storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabric), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
+        storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabricIndex), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
 
     {
         Crypto::P256SerializedKeypair serializedOpKey;
@@ -119,7 +123,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 
         const auto opKeyLength = writer.GetLengthWritten();
         VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(storage->SyncSetKeyValue(keyAlloc.FabricOpKey(mFabric), buf, static_cast<uint16_t>(opKeyLength)));
+        ReturnErrorOnFailure(storage->SyncSetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf, static_cast<uint16_t>(opKeyLength)));
     }
 
     {
@@ -139,7 +143,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
         const auto metadataLength = writer.GetLengthWritten();
         VerifyOrReturnError(CanCastTo<uint16_t>(metadataLength), CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(
-            storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabric), buf, static_cast<uint16_t>(metadataLength)));
+            storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabricIndex), buf, static_cast<uint16_t>(metadataLength)));
     }
 
     return CHIP_NO_ERROR;
@@ -149,21 +153,21 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    ChipLogProgress(Inet, "Loading from storage for fabric index %u", mFabric);
+    ChipLogProgress(Inet, "Loading from storage for fabric index %u", mFabricIndex);
 
     // Scopes for "size" so we don't forget to re-initialize it between gets,
     // since each get modifies it.
     {
         uint8_t buf[Credentials::kMaxCHIPCertLength];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricRCAC(mFabric), buf, size));
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricRCAC(mFabricIndex), buf, size));
         ReturnErrorOnFailure(SetRootCert(ByteSpan(buf, size)));
     }
 
     {
         uint8_t buf[Credentials::kMaxCHIPCertLength];
         uint16_t size  = sizeof(buf);
-        CHIP_ERROR err = storage->SyncGetKeyValue(keyAlloc.FabricICAC(mFabric), buf, size);
+        CHIP_ERROR err = storage->SyncGetKeyValue(keyAlloc.FabricICAC(mFabricIndex), buf, size);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             // That's OK; that just means no ICAC.
@@ -179,7 +183,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     {
         uint8_t buf[Credentials::kMaxCHIPCertLength];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricNOC(mFabric), buf, size));
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricNOC(mFabricIndex), buf, size));
         ByteSpan nocCert(buf, size);
         NodeId nodeId;
         ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocCert, &nodeId, &mFabricId));
@@ -193,7 +197,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     {
         uint8_t buf[OpKeyTLVMaxSize()];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabric), buf, size));
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf, size));
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
@@ -240,7 +244,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     {
         uint8_t buf[MetadataTLVMaxSize()];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricMetadata(mFabric), buf, size));
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricMetadata(mFabricIndex), buf, size));
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
@@ -479,7 +483,7 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
 }
 
 CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, const ByteSpan & initiatorRandom,
-                                          const ByteSpan * ipkList, size_t ipkListEntries)
+                                          const ByteSpan * ipkList, size_t ipkListEntries) const
 {
     uint8_t localDestID[kSHA256_Hash_Length] = { 0 };
     MutableByteSpan localDestIDSpan(localDestID);
@@ -509,34 +513,22 @@ FabricTable::~FabricTable()
     }
 }
 
-void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
-{
-    FabricInfo * fabric = FindFabricWithIndex(fabricIndex);
-    if (fabric != nullptr)
-    {
-        fabric->Reset();
-    }
-}
-
 FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
 {
-    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    for (auto & fabric : mStates)
     {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-        if (fabric == nullptr)
+        if (!fabric.IsInitialized())
         {
             continue;
         }
         P256PublicKeySpan candidatePubKey;
-        if (fabric->GetRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
+        if (fabric.GetRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
         {
             continue;
         }
-        if (rootPubKey.data_equal(candidatePubKey) && fabricId == fabric->GetFabricId())
+        if (rootPubKey.data_equal(candidatePubKey) && fabricId == fabric.GetFabricId())
         {
-            LoadFromStorage(fabric);
-            return fabric;
+            return &fabric;
         }
     }
     return nullptr;
@@ -544,11 +536,17 @@ FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabr
 
 FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
-    if (fabricIndex >= kMinValidFabricIndex && fabricIndex <= kMaxValidFabricIndex)
+    for (auto & fabric : mStates)
     {
-        FabricInfo * fabric = &mStates[fabricIndex - kMinValidFabricIndex];
-        LoadFromStorage(fabric);
-        return fabric;
+        if (!fabric.IsInitialized())
+        {
+            continue;
+        }
+
+        if (fabric.GetFabricIndex() == fabricIndex)
+        {
+            return &fabric;
+        }
     }
 
     return nullptr;
@@ -556,34 +554,19 @@ FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 
 FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId)
 {
-    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    for (auto & fabric : mStates)
     {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-
-        if (fabric != nullptr && fabricId == fabric->GetPeerId().GetCompressedFabricId())
+        if (!fabric.IsInitialized())
         {
-            LoadFromStorage(fabric);
-            return fabric;
+            continue;
+        }
+
+        if (fabricId == fabric.GetPeerId().GetCompressedFabricId())
+        {
+            return &fabric;
         }
     }
     return nullptr;
-}
-
-void FabricTable::Reset()
-{
-    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
-    {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-
-        if (fabric != nullptr)
-        {
-            fabric->Reset();
-
-            fabric->mFabric = i;
-        }
-    }
 }
 
 CHIP_ERROR FabricTable::Store(FabricIndex index)
@@ -618,15 +601,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
     if (!fabric->IsInitialized())
     {
         ReturnErrorOnFailure(fabric->LoadFromStorage(mStorage));
-    }
 
-    FabricTableDelegate * delegate = mDelegate;
-    while (delegate)
-    {
-        ChipLogProgress(Discovery, "Fabric (%d) loaded from storage. Calling OnFabricRetrievedFromStorage",
-                        fabric->GetFabricIndex());
-        delegate->OnFabricRetrievedFromStorage(fabric);
-        delegate = delegate->mNext;
+        FabricTableDelegate * delegate = mDelegate;
+        while (delegate)
+        {
+            ChipLogProgress(Discovery, "Fabric (%d) loaded from storage", fabric->GetFabricIndex());
+            delegate->OnFabricRetrievedFromStorage(fabric);
+            delegate = delegate->mNext;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -659,14 +641,11 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
 FabricIndex FabricTable::FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
                                                     const ByteSpan * ipkList, size_t ipkListEntries)
 {
-    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    for (auto & fabric : *this)
     {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-        if (fabric != nullptr &&
-            fabric->MatchDestinationID(destinationId, initiatorRandom, ipkList, ipkListEntries) == CHIP_NO_ERROR)
+        if (fabric.MatchDestinationID(destinationId, initiatorRandom, ipkList, ipkListEntries) == CHIP_NO_ERROR)
         {
-            return i;
+            return fabric.GetFabricIndex();
         }
     }
 
@@ -702,31 +681,49 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
         }
     }
 
-    for (FabricIndex i = mNextAvailableFabricIndex; i <= kMaxValidFabricIndex; i++)
+    if (!mNextAvailableFabricIndex.HasValue())
     {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-        if (fabric != nullptr && !fabric->IsInitialized())
-        {
-            ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
-            ReturnErrorOnFailure(Store(i));
-            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
-            *outputIndex              = i;
-            mFabricCount++;
-            return CHIP_NO_ERROR;
-        }
+        // No more indices available.  Bail out.
+        return CHIP_ERROR_NO_MEMORY;
     }
 
-    for (FabricIndex i = kMinValidFabricIndex; i < kMaxValidFabricIndex; i++)
+    // Find an available slot.
+    for (auto & fabric : mStates)
     {
-        FabricInfo * fabric = FindFabricWithIndex(i);
-        if (fabric != nullptr && !fabric->IsInitialized())
+        if (!fabric.IsInitialized())
         {
-            ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
-            ReturnErrorOnFailure(Store(i));
-            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
-            *outputIndex              = i;
-            mFabricCount++;
-            return CHIP_NO_ERROR;
+            FabricIndex newFabricIndex = mNextAvailableFabricIndex.Value();
+            fabric.mFabricIndex        = newFabricIndex;
+            CHIP_ERROR err             = fabric.SetFabricInfo(newFabric);
+            if (err != CHIP_NO_ERROR)
+            {
+                fabric.Reset();
+                return err;
+            }
+
+            err = Store(newFabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                fabric.Reset();
+                FabricInfo::DeleteFromStorage(mStorage, newFabricIndex);
+                return err;
+            }
+
+            UpdateNextAvailableFabricIndex();
+            err = StoreFabricIndexInfo();
+            if (err != CHIP_NO_ERROR)
+            {
+                // Roll everything back.
+                mNextAvailableFabricIndex.SetValue(newFabricIndex);
+                fabric.Reset();
+                FabricInfo::DeleteFromStorage(mStorage, newFabricIndex);
+            }
+            else
+            {
+                *outputIndex = newFabricIndex;
+                mFabricCount++;
+            }
+            return err;
         }
     }
 
@@ -750,7 +747,25 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     }
     ReturnErrorOnFailure(err);
 
-    ReleaseFabricIndex(index);
+    // Since fabricIsInitialized was true, fabric is not null.
+    fabric->Reset();
+
+    // If we ever start moving the FabricInfo entries around in the array on
+    // delete, we should update DeleteAllFabrics to handle that.
+
+    if (!mNextAvailableFabricIndex.HasValue())
+    {
+        // We must have been in a situation where CHIP_CONFIG_MAX_FABRICS is 254
+        // and our fabric table was full, so there was no valid next index.  We
+        // have a single available index now, though; use it as
+        // mNextAvailableFabricIndex.
+        mNextAvailableFabricIndex.SetValue(index);
+    }
+    // If StoreFabricIndexInfo fails here, that's probably OK.  When we try to
+    // read things from storage later we will realize there is nothing for this
+    // index.
+    StoreFabricIndexInfo();
+
     if (mDelegate != nullptr)
     {
         if (mFabricCount == 0)
@@ -776,9 +791,9 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
 void FabricTable::DeleteAllFabrics()
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    for (auto & fabric : *this)
     {
-        Delete(i);
+        Delete(fabric.GetFabricIndex());
     }
 }
 
@@ -793,13 +808,29 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     // iterator doesn't have mechanism to load fabric info from storage on demand.
     // TODO - Update ConstFabricIterator to load fabric info from storage
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+
+    mFabricCount = 0;
+    for (auto & fabric : mStates)
     {
-        FabricInfo * fabric = &mStates[i - kMinValidFabricIndex];
-        if (LoadFromStorage(fabric) == CHIP_NO_ERROR)
-        {
-            mFabricCount++;
-        }
+        fabric.Reset();
+    }
+    mNextAvailableFabricIndex.SetValue(kMinValidFabricIndex);
+
+    uint8_t buf[IndexInfoTLVMaxSize()];
+    uint16_t size = sizeof(buf);
+    DefaultStorageKeyAllocator keyAlloc;
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyAlloc.FabricIndexInfo(), buf, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // No fabrics yet.  Nothing to be done here.
+    }
+    else
+    {
+        ReturnErrorOnFailure(err);
+        TLV::ContiguousBufferTLVReader reader;
+        reader.Init(buf, size);
+
+        ReturnErrorOnFailure(ReadFabricInfo(reader));
     }
 
     return CHIP_NO_ERROR;
@@ -821,17 +852,142 @@ CHIP_ERROR FabricTable::AddFabricDelegate(FabricTableDelegate * delegate)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, const char * key)
+namespace {
+// Increment a fabric index in a way that ensures that it stays in the valid
+// range [kMinValidFabricIndex, kMaxValidFabricIndex].
+FabricIndex NextFabricIndex(FabricIndex index)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    int res = snprintf(formattedKey.data(), formattedKey.size(), "F%02X/%s", fabricIndex, key);
-    if (res < 0 || (size_t) res >= formattedKey.size())
+    if (index == kMaxValidFabricIndex)
     {
-        ChipLogError(Discovery, "Failed to format Key %s. snprintf error: %d", key, res);
-        return CHIP_ERROR_NO_MEMORY;
+        return kMinValidFabricIndex;
     }
-    return err;
+
+    return static_cast<FabricIndex>(index + 1);
+}
+} // anonymous namespace
+
+void FabricTable::UpdateNextAvailableFabricIndex()
+{
+    // Only called when mNextAvailableFabricIndex.HasValue()
+    for (FabricIndex candidate = NextFabricIndex(mNextAvailableFabricIndex.Value()); candidate != mNextAvailableFabricIndex.Value();
+         candidate             = NextFabricIndex(candidate))
+    {
+        if (!FindFabricWithIndex(candidate))
+        {
+            mNextAvailableFabricIndex.SetValue(candidate);
+            return;
+        }
+    }
+
+    mNextAvailableFabricIndex.ClearValue();
+    return;
+}
+
+CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
+{
+    uint8_t buf[IndexInfoTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(buf);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+
+    if (mNextAvailableFabricIndex.HasValue())
+    {
+        writer.Put(kNextAvailableFabricIndexTag, mNextAvailableFabricIndex.Value());
+    }
+    else
+    {
+        writer.PutNull(kNextAvailableFabricIndexTag);
+    }
+
+    TLV::TLVType innerContainerType;
+    ReturnErrorOnFailure(writer.StartContainer(kFabricIndicesTag, TLV::kTLVType_Array, innerContainerType));
+    // Only enumerate the fabrics that are initialized.
+    for (const auto & fabric : *this)
+    {
+        writer.Put(TLV::AnonymousTag(), fabric.GetFabricIndex());
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(innerContainerType));
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+    const auto indexInfoLength = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(indexInfoLength), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    DefaultStorageKeyAllocator keyAlloc;
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(keyAlloc.FabricIndexInfo(), buf, static_cast<uint16_t>(indexInfoLength)));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
+{
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(reader.Next(kNextAvailableFabricIndexTag));
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        mNextAvailableFabricIndex.ClearValue();
+    }
+    else
+    {
+        ReturnErrorOnFailure(reader.Get(mNextAvailableFabricIndex.Emplace()));
+    }
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, kFabricIndicesTag));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    CHIP_ERROR err;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (mFabricCount >= ArraySize(mStates))
+        {
+            // We have nowhere to deserialize this fabric info into.
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        auto & fabric = mStates[mFabricCount];
+        ReturnErrorOnFailure(reader.Get(fabric.mFabricIndex));
+
+        err = LoadFromStorage(&fabric);
+        if (err == CHIP_NO_ERROR)
+        {
+            ++mFabricCount;
+        }
+        else
+        {
+            // This could happen if we failed to store our fabric index info
+            // after we deleted the fabric from storage.  Just ignore this
+            // fabric index and keep going.
+        }
+    }
+
+    if (err != CHIP_END_OF_TLV)
+    {
+        return err;
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+
+    if (!mNextAvailableFabricIndex.HasValue() && mFabricCount < kMaxValidFabricIndex)
+    {
+        // We must have a fabric index available here. This situation could
+        // happen if we fail to store fabric index info when deleting a
+        // fabric.
+        mNextAvailableFabricIndex.SetValue(kMinValidFabricIndex);
+        if (FindFabricWithIndex(kMinValidFabricIndex))
+        {
+            UpdateNextAvailableFabricIndex();
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,

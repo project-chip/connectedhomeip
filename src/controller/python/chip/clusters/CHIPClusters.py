@@ -3499,6 +3499,7 @@ class ChipClusters:
                     "attributeId": 0x00000004,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000005: {
                     "attributeName": "OnMode",
