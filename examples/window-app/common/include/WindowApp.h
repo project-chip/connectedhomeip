@@ -112,12 +112,14 @@ public:
         void LiftContinueToTarget() { LiftUpdate(false); }
         void LiftUp();
         void LiftDown();
+        void LiftSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, false); }
 
         void TiltUpdate(bool newTarget);
         void TiltGoToTarget() { TiltUpdate(true); }
         void TiltContinueToTarget() { TiltUpdate(false); }
         void TiltUp();
         void TiltDown();
+        void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
 
         EmberAfWcType CycleType();
 
