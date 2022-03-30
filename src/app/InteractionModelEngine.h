@@ -383,7 +383,7 @@ Protocols::InteractionModel::Status CheckPreconditionsForWrite(const Access::Sub
 /**
  *  Get the registered attribute access override. nullptr when attribute access override is not found.
  *
- * TODO: This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
+ * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
  */
 AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
 

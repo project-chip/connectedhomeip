@@ -160,8 +160,8 @@ namespace app {
         return aWriteHandler->AddStatus(aPath, status);
     }
 
-    // No attribute access override on iOS for now.
-    // NOTE: This function will be moved to InteractionModelEngine.
+    // No attribute access overrides on iOS for now.
+    // TODO (#16806): This function can be moved to InteractionModelEngine.
     AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId) { return nullptr; }
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
