@@ -50,7 +50,7 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList,
+bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
                                        const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;
@@ -296,11 +296,11 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
     TLV::TLVWriter backup;
-    bool eventClean                         = true;
-    ObjectList<EventPathParams> * eventList = apReadHandler->GetEventPathList();
-    EventNumber & eventMin                  = apReadHandler->GetEventMin();
-    EventManagement & eventManager          = EventManagement::GetInstance();
-    bool hasMoreChunks                      = false;
+    bool eventClean                = true;
+    const auto * eventList         = apReadHandler->GetEventPathList();
+    auto & eventMin                = apReadHandler->GetEventMin();
+    EventManagement & eventManager = EventManagement::GetInstance();
+    bool hasMoreChunks             = false;
 
     aReportDataBuilder.Checkpoint(backup);
 

@@ -68,7 +68,9 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate,
+                               public CommandHandler::Callback,
+                               public ReadHandler::ManagementCallback
 {
 public:
     /**
@@ -156,6 +158,15 @@ public:
     CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
+
+    /*
+     * Register an application callback to be notified of notable events when handling reads/subscribes.
+     */
+    void RegisterReadHandlerAppCallback(ReadHandler::ApplicationCallback * mpApplicationCallback)
+    {
+        mpReadHandlerApplicationCallback = mpApplicationCallback;
+    }
+    void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
     /**
      * Called when a timed interaction has failed (i.e. the exchange it was
@@ -252,6 +263,8 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
      * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
@@ -324,6 +337,8 @@ private:
     ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
     ReadClient * mpActiveReadClientList = nullptr;
+
+    ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;

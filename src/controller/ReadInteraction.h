@@ -164,6 +164,10 @@ CHIP_ERROR SubscribeAttribute(
  * A typed way to subscribe to the value of a single attribute.  See
  * documentation for ReadAttribute above for details on how AttributeTypeInfo
  * works.
+ *
+ * A const view-only reference to the underlying ReadClient is passed in through the OnSubscriptionEstablishedCallbackType
+ * argument. This reference is valid until the error callback is invoked at which point, this reference is no longer valid
+ * and should not be used any more.
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR SubscribeAttribute(
