@@ -55,6 +55,7 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "TH reads the EventList attribute from the DUT"
       disabled: true
       command: "readAttribute"
