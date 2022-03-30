@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,11 +42,11 @@ public:
         return CHIP_NO_ERROR;
     }
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
-    CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, chip::Crypto::P256Keypair & keypair,
-                                          chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-                                          chip::MutableByteSpan & noc) override
+    CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+                                          chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                          chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) override
     {
-        return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, keypair.Pubkey(), rcac, icac, noc);
+        return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
     }
 
 private:

@@ -15,33 +15,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/logging/CHIPLogging.h>
 #include <ota-provider-common/DefaultUserConsentProvider.h>
 
 namespace chip {
 namespace ota {
 
-void DefaultUserConsentProvider::LogUserConsentSubject(const UserConsentSubject & subject)
-{
-    ChipLogDetail(SoftwareUpdate, "User consent request for:");
-    ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %u", subject.fabricIndex);
-    ChipLogDetail(SoftwareUpdate, ":  RequestorNodeId: " ChipLogFormatX64, ChipLogValueX64(subject.requestorNodeId));
-    ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %" PRIu16, subject.providerEndpointId);
-    ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %" PRIu16, subject.requestorVendorId);
-    ChipLogDetail(SoftwareUpdate, ":  RequestorProductId: %" PRIu16, subject.requestorProductId);
-    ChipLogDetail(SoftwareUpdate, ":  RequestorCurrentVersion: %" PRIu32, subject.requestorCurrentVersion);
-    ChipLogDetail(SoftwareUpdate, ":  RequestorTargetVersion: %" PRIu32, subject.requestorTargetVersion);
-    ChipLogDetail(SoftwareUpdate, ":  Metadata:");
-    ChipLogByteSpan(SoftwareUpdate, subject.metadata);
-}
-
 UserConsentState DefaultUserConsentProvider::GetUserConsentState(const UserConsentSubject & subject)
 {
-    LogUserConsentSubject(subject);
+    subject.Log();
 
     if (mUseGlobalConsent)
     {
-        return mGlobalConsentState;
+        // Reset mGlobalConsentState to success case after returning other possible values once.
+        UserConsentState curGlobalConsentState = mGlobalConsentState;
+        mGlobalConsentState                    = UserConsentState::kGranted;
+        return curGlobalConsentState;
     }
 
     return UserConsentState::kGranted;

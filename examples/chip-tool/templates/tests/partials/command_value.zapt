@@ -48,7 +48,7 @@
       chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral definedValue}}garbage: not in length on purpose"), {{definedValue.length}});
     {{else}}
       {{#if_is_bitmap type}}
-      static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
+      static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral definedValue type}});
       {{else if (chip_tests_config_has definedValue)}}
       m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}};
       {{else}}

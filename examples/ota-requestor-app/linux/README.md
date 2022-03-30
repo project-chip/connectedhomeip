@@ -4,7 +4,7 @@ This is a reference application that is both a server for the OTA Requestor
 Cluster, as well as a client of the OTA Provider Cluster. It can initiate a
 software update with a given OTA Provider node, and download a file.
 
-## Building
+## Build
 
 Suggest doing the following:
 
@@ -17,20 +17,78 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug 
 In addition to the general options available to all Linux applications, the
 following command line options are available for the OTA Requestor application.
 
-| Directory                         | Description                                                                                                                                                                                                                                          |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -q/--delayQuery <Time in seconds> | From boot up, the amount of time to wait before triggering the QueryImage command. If none or zero is supplied, QueryImage will not be triggered automatically. At least one provider location must be written to the DefaultOTAProviders attribute. |
-| -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
+| Directory                                             | Description                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -p/--periodicQueryTimeout <Time in seconds>           | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.                                                                                                                                                    |
+| -c/--requestorCanConsent                              | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                                                                         |
+| -f/--otaDownloadPath <file path>                      | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.                                                                                                                                                               |
+| -u/--userConsentState <granted \| denied \| deferred> | The user consent state for the first QueryImage command. For all subsequent commands, the value of granted will be used. <li> granted: Authorize OTA requestor to download an OTA image <li> denied: Forbid OTA requestor to download an OTA image <li> deferred: Defer obtaining user consent |
+| -a/--autoApplyImage                                   | If supplied, apply the image immediately after download. Otherwise, the OTA update is complete after image download.                                                                                                                                                                           |
 
-## Software Image Header
+## Software Image Version
 
-All Matter software images must contain a header as defined in section 11.21.1
-of the specification. The
-[ota_image_tool](https://github.com/project-chip/connectedhomeip/blob/master/src/app/ota_image_tool.py)
-is available for generating the required header on a software image. Any
-software images that the OTA Requestor application receives must contain the
-required header. If the header is missing, the software download will not
-succeed.
+The current software version of the OTA Requestor application is defined by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` in
+[CHIPProjectConfig.h](https://github.com/project-chip/connectedhomeip/blob/master/config/standalone/CHIPProjectConfig.h).
+This value can be confirmed by reading the `SoftwareVersion` attribute of the
+Basic Information cluster:
+
+```
+out/chip-tool basic read software-version 0x1234567890 0
+```
+
+### Validations
+
+On receiving the QueryImageResponse from the OTA Provider application, the OTA
+Requestor application will verify that the software version specified in the
+`SoftwareVersion` field of the response contains a value newer than the current
+running version. If the update supplied does not pass this version check, the
+following log message should be expected, indicating the update will not
+proceed:
+
+```
+[1648233572232] [48462:7613274] CHIP: [SWU] Available update version 1 is <= current version 1, update ignored
+```
+
+If the OTA update progresses to downloading, the process will abort if the
+software image
+[header](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#software-image-header)
+is missing. The following log messages should be expected:
+
+```
+[1648246917398] [71786:7874994] CHIP: [SWU] Image does not contain a valid header
+[1648246917399] [71786:7874994] CHIP: [BDX] TransferSession error
+```
+
+On booting into the new image, if the running version does not match the version
+specified in the QueryImageResponse, the following log message should be
+expected:
+
+```
+[1648244159295] [58606:7774255] CHIP: [SWU] Failed to confirm image: ../../examples/ota-requestor-app/linux/third_party/connectedhomeip/src/platform/Linux/OTAImageProcessorImpl.cpp:110: CHIP Error 0x00000003: Incorrect state
+```
+
+This message serves as a warning that the new image is not expected. However,
+the OTA Requestor application will recover gracefully and return to a state
+where another OTA update may be initiated.
+
+### Generate Images
+
+To validate booting into a newer OTA Requestor image on the Linux platform, the
+following must be performed:
+
+1. Modify `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` to a value greater than
+   the current running version
+2. [Build](https://github.com/project-chip/connectedhomeip/blob/master/examples/ota-requestor-app/linux/README.md#build)
+   an OTA Requestor application with the new version
+3. Using the executable created in step 2, generate an image with a software
+   image
+   [header](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#software-image-header)
+   that matches the version in step 1
+4. Use this generated binary when supplying the image file to the OTA Provider
+   application
+5. Launch the original application (an OTA Requestor application generated prior
+   to step 1) with the command line option `--autoApplyImage`
 
 ## Common Instructions
 
@@ -44,7 +102,7 @@ are some common instructions for building and commissioning the applications.
 #### Build the OTA Provider application
 
 Follow instructions
-[here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#building)
+[here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#build)
 
 #### Run the OTA Provider application
 
@@ -78,15 +136,16 @@ out/chip-tool pairing onnetwork-long ${PROVIDER_NODE_ID} 20202021 ${PROVIDER_LON
 
 ### OTA Requestor application
 
-#### Build the OTA Provider application
+#### Build the OTA Requestor application
 
 Follow instructions
-[here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-requestor-app/linux#building)
+[here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-requestor-app/linux#build)
 
 #### Run the OTA Requestor application:
 
 ```
-out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS}
+out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} --autoApplyImage
+
 ```
 
 -   `${REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for
@@ -99,8 +158,12 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
     the value used by the OTA Provider application.
--   `${TIME_IN_SECONDS}` is the amount of time to wait before triggering the
-    QueryImage command specified by the DefaultOTAProviders attribute
+-   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the
+    default OTA provider list. If none or zero is supplied the timeout is set to
+    every 24 hours.
+-   `--autoApplyImage` is supplied to indicate the image should be immediately
+    applied after download. If not supplied, the OTA update is complete after
+    image download.
 
 #### Commission the OTA Requestor application
 
@@ -119,10 +182,18 @@ There are two methods for this reference application to connect to a device
 running OTA Provider server and download a software image.
 
 If the ACL entry on the provider has not been properly installed, the QueryImage
-command will be denied. Follow instructions
+command will be denied. Logs similar to the following may be observed on the OTA
+Provider application:
+
+```
+[1648244658368] [59686:7786439] CHIP: [DMG] AccessControl: checking f=1 a=c s=0x000000000000FACE t= c=0x0000_0029 e=0 p=o
+[1648244658368] [59686:7786439] CHIP: [DMG] AccessControl: denied
+```
+
+If this is encountered, follow instructions
 [here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#access-control-requirements)
-to install. Note that this only needs to be done once. There is no need to write
-this ACL entry again unless the KVS store has been removed.
+to install. Note that this only needs to be performed once. There is no need to
+write this ACL entry again unless the KVS store has been removed.
 
 ### Trigger using AnnounceOTAProvider Command
 
@@ -140,7 +211,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out chip_c
 **Run the OTA Provider application**
 
 ```
-out/chip-ota-provider-app --discriminator 22 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
+out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
 ```
 
 #### In terminal 2:
@@ -198,7 +269,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out chip_c
 **Run the OTA Provider application**
 
 ```
-out/chip-ota-provider-app --discriminator 22 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
+out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
 ```
 
 #### In terminal 2:
@@ -212,7 +283,7 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_
 **Run the OTA Requestor application**
 
 ```
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --delayQuery 30
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60 --otaDownloadPath /tmp/test.bin
 ```
 
 #### In terminal 3:
@@ -231,14 +302,11 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 
 **Write to the DefaultOTAProviders attribute**
 
-Note that this must be done within 30 seconds (as specified by the
-`--delayQuery 30`) from when the OTA Requestor application was launched
-
 ```
 out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
 ```
 
-After 30 seconds from when the OTA Requestor application has launched, the OTA
+Every 60 seconds from when the OTA Requestor application has launched, the OTA
 Requestor application with node ID 0x1234567890 will send a QueryImage command
 to the OTA Provider with node ID 0xDEADBEEF, as specified in the
 `DefaultOTAProviders` attribute.
@@ -257,7 +325,7 @@ specified below:
 
 ```
 scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_config_network_layer_ble=false
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --otaDownloadPath /tmp/test.bin
 ```
 
 **Commission to the first fabric**
@@ -275,7 +343,7 @@ out/chip-tool administratorcommissioning open-basic-commissioning-window 600 0x1
 **Commission to the second fabric**
 
 ```
-out/chip-tool pairing onnetwork-long 0x858 20202021 10 --commissioner-name beta
+out/chip-tool pairing onnetwork-long 0x858 20202021 18 --commissioner-name beta
 ```
 
 For all operations, specify which fabric to use by passing in
@@ -292,11 +360,6 @@ out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890
 **Write/Read DefaultOTAProviders on second fabric**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
 out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
 ```
-
-## Limitations
-
--   Stores the downloaded file in the directory this reference app is launched
-    from

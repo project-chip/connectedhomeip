@@ -28,6 +28,32 @@ using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
 using chip::bdx::TransferSession;
 
+CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+{
+    if (mInitialized)
+    {
+        // Reset stale connection from the Same Node if exists
+        if ((mFabricIndex.HasValue() && mFabricIndex.Value() == fabricIndex) && (mNodeId.HasValue() && mNodeId.Value() == nodeId))
+        {
+            Reset();
+        }
+        // Prevent a new node connection since another is active
+        else if ((mFabricIndex.HasValue() && mFabricIndex.Value() != fabricIndex) ||
+                 (mNodeId.HasValue() && mNodeId.Value() != nodeId))
+        {
+            return CHIP_ERROR_BUSY;
+        }
+        else
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    mFabricIndex.SetValue(fabricIndex);
+    mNodeId.SetValue(nodeId);
+    mInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
 void BdxOtaSender::SetCallbacks(BdxOtaSenderCallbacks callbacks)
 {
     mOnBlockQueryCallback       = callbacks.onBlockQuery;
@@ -174,11 +200,16 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
 void BdxOtaSender::Reset()
 {
+    mFabricIndex.ClearValue();
+    mNodeId.ClearValue();
     mTransfer.Reset();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();
+        mExchangeCtx = nullptr;
     }
+
+    mInitialized  = false;
     mNumBytesSent = 0;
 }
 

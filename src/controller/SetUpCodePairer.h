@@ -38,27 +38,29 @@
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceDiscoveryDelegate.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 namespace chip {
 namespace Controller {
 
 class DeviceCommissioner;
 
+enum class SetupCodePairerBehaviour : uint8_t
+{
+    kCommission,
+    kPaseOnly,
+};
 class DLL_EXPORT SetUpCodePairer
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}
 
-    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode);
+    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
+                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission);
 
-// Called by the DeviceCommissioner to notify that we have discovered a new device.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
@@ -83,14 +85,13 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData);
+    bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     Dnssd::DiscoveryFilter currentFilter;
-#endif
 
     DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mRemoteId;
-    uint32_t mSetUpPINCode = 0;
+    uint32_t mSetUpPINCode                   = 0;
+    SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
 };
 
 } // namespace Controller

@@ -7,30 +7,22 @@ import java.util.Objects;
 public final class PaseVerifierParams {
 
   private final long setupPincode;
-  private final int passcodeId;
   private final byte[] pakeVerifier;
 
   /**
    * Constructor
    *
    * @param setupPincode the PIN code associated with this verifier
-   * @param passcodeId the passcode ID for this generated verifier
    * @param pakeVerifier the encoded verifier (concatenation of w0 and L)
    */
-  public PaseVerifierParams(long setupPincode, int passcodeId, byte[] pakeVerifier) {
+  public PaseVerifierParams(long setupPincode, byte[] pakeVerifier) {
     this.setupPincode = setupPincode;
-    this.passcodeId = passcodeId;
     this.pakeVerifier = pakeVerifier.clone();
   }
 
   /** Returns the PIN code associated with this verifier. */
   public long getSetupPincode() {
     return setupPincode;
-  }
-
-  /** Returns the passcode ID for this generated verifier. */
-  public int getPasscodeId() {
-    return passcodeId;
   }
 
   /**
@@ -49,21 +41,14 @@ public final class PaseVerifierParams {
       return false;
     } else {
       PaseVerifierParams that = (PaseVerifierParams) other;
-      return setupPincode == that.setupPincode
-          && passcodeId == that.passcodeId
-          && Arrays.equals(pakeVerifier, that.pakeVerifier);
+      return setupPincode == that.setupPincode && Arrays.equals(pakeVerifier, that.pakeVerifier);
     }
   }
 
   @Override
   public int hashCode() {
-    int result = Objects.hash(setupPincode, passcodeId);
+    int result = Objects.hash(setupPincode);
     result = 31 * result + Arrays.hashCode(pakeVerifier);
     return result;
-  }
-
-  @Override
-  public String toString() {
-    return "PaseVerifierParams{ passcodeId=" + passcodeId + " }";
   }
 }

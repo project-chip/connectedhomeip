@@ -60,7 +60,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,adjustedIndex=%hu,name=\"%*.s\",credentialsCount=%zu,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%zu,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
                   mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
                   user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
@@ -75,7 +75,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 {
     ChipLogProgress(Zcl,
                     "Door Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%*.s\",uniqueId=%" PRIx32
+                    "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
                     ",userStatus=%u,userType=%u,"
                     "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
                     mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,

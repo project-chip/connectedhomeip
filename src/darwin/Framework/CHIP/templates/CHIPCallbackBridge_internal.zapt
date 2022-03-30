@@ -33,6 +33,9 @@ typedef void (*Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase
 {{#if_is_struct type}}
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}StructAttributeCallback)(void *, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}});
 {{/if_is_struct}}
+{{#if_is_bitmap type}}
+typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback)(void *, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}});
+{{/if_is_bitmap}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -76,6 +79,9 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}StructAt
   {{#if_is_struct type}}
   {{#>CHIPCallbackBridge header="1" ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/CHIPCallbackBridge}}
   {{/if_is_struct}}
+  {{#if_is_bitmap type}}
+  {{#>CHIPCallbackBridge header="1" ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/CHIPCallbackBridge}}
+  {{/if_is_bitmap}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

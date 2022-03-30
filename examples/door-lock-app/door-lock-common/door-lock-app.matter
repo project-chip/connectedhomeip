@@ -28,11 +28,11 @@ server cluster AccessControl = 31 {
   }
 
   struct AccessControlEntry {
-    fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
     nullable INT64U subjects[] = 3;
     nullable Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   struct Target {
@@ -42,24 +42,24 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<254> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   info event AccessControlEntryChanged = 0 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   info event AccessControlExtensionChanged = 1 {
-    fabric_idx adminFabricIndex = 0;
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
+    fabric_idx adminFabricIndex = 254;
   }
 
   attribute AccessControlEntry acl[] = 0;
@@ -86,21 +86,20 @@ server cluster AdministratorCommissioning = 60 {
   readonly attribute int16u adminVendorId = 2;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct OpenBasicCommissioningWindowRequest {
-    INT16U commissioningTimeout = 0;
-  }
-
   request struct OpenCommissioningWindowRequest {
     INT16U commissioningTimeout = 0;
     OCTET_STRING PAKEVerifier = 1;
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
-  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+  }
+
   timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -383,6 +382,12 @@ server cluster DoorLock = 257 {
     kForcedDoorOpenUnderDoorLockedCondition = 0x40;
   }
 
+  bitmap DlCredentialRuleMask : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
   bitmap DlCredentialRulesSupport : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -570,12 +575,12 @@ server cluster DoorLock = 257 {
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
-  readonly attribute bitmap8 credentialRulesSupport = 27;
+  readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
   attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
   attribute int8u soundVolume = 36;
   attribute DlOperatingMode operatingMode = 37;
-  readonly attribute bitmap16 supportedOperatingModes = 38;
+  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
   attribute boolean enableOneTouchLocking = 41;
   attribute boolean enablePrivacyModeButton = 43;
   attribute int8u wrongCodeEntryLimit = 48;
@@ -584,63 +589,12 @@ server cluster DoorLock = 257 {
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct ClearCredentialRequest {
-    nullable DlCredential credential = 0;
-  }
-
-  request struct ClearUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct ClearWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct ClearYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct GetCredentialStatusRequest {
-    DlCredential credential = 0;
-  }
-
-  request struct GetUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct GetWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct GetYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
   request struct LockDoorRequest {
     optional OCTET_STRING pinCode = 0;
   }
 
-  request struct SetCredentialRequest {
-    DlDataOperationType operationType = 0;
-    DlCredential credential = 1;
-    LONG_OCTET_STRING credentialData = 2;
-    nullable INT16U userIndex = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-  }
-
-  request struct SetUserRequest {
-    DlDataOperationType operationType = 0;
-    INT16U userIndex = 1;
-    nullable CHAR_STRING userName = 2;
-    nullable INT32U userUniqueId = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-    nullable DlCredentialRule credentialRule = 6;
+  request struct UnlockDoorRequest {
+    optional OCTET_STRING pinCode = 0;
   }
 
   request struct SetWeekDayScheduleRequest {
@@ -653,6 +607,16 @@ server cluster DoorLock = 257 {
     INT8U endMinute = 6;
   }
 
+  request struct GetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
   request struct SetYearDayScheduleRequest {
     INT8U yearDayIndex = 0;
     INT16U userIndex = 1;
@@ -660,27 +624,49 @@ server cluster DoorLock = 257 {
     epoch_s localEndTime = 3;
   }
 
-  request struct UnlockDoorRequest {
-    optional OCTET_STRING pinCode = 0;
+  request struct GetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
   }
 
-  response struct GetCredentialStatusResponse {
-    boolean credentialExists = 0;
-    nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
   }
 
-  response struct GetUserResponse {
+  request struct SetUserRequest {
+    DlDataOperationType operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueId = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+    nullable DlCredentialRule credentialRule = 6;
+  }
+
+  request struct GetUserRequest {
     INT16U userIndex = 0;
-    nullable CHAR_STRING userName = 1;
-    nullable INT32U userUniqueId = 2;
-    nullable DlUserStatus userStatus = 3;
-    nullable DlUserType userType = 4;
-    nullable DlCredentialRule credentialRule = 5;
-    nullable DlCredential credentials[] = 6;
-    nullable fabric_idx creatorFabricIndex = 7;
-    nullable fabric_idx lastModifiedFabricIndex = 8;
-    nullable INT16U nextUserIndex = 9;
+  }
+
+  request struct ClearUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct SetCredentialRequest {
+    DlDataOperationType operationType = 0;
+    DlCredential credential = 1;
+    LONG_OCTET_STRING credentialData = 2;
+    nullable INT16U userIndex = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+  }
+
+  request struct GetCredentialStatusRequest {
+    DlCredential credential = 0;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable DlCredential credential = 0;
   }
 
   response struct GetWeekDayScheduleResponse {
@@ -702,26 +688,45 @@ server cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
+  response struct GetUserResponse {
+    INT16U userIndex = 0;
+    nullable CHAR_STRING userName = 1;
+    nullable INT32U userUniqueId = 2;
+    nullable DlUserStatus userStatus = 3;
+    nullable DlUserType userType = 4;
+    nullable DlCredentialRule credentialRule = 5;
+    nullable DlCredential credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    nullable INT16U nextUserIndex = 9;
+  }
+
   response struct SetCredentialResponse {
     DlStatus status = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  command ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
-  command ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
-  command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
-  command GetUser(GetUserRequest): GetUserResponse = 27;
-  command GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
-  command GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  response struct GetCredentialStatusResponse {
+    boolean credentialExists = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  timed command SetUser(SetUserRequest): DefaultSuccess = 26;
-  command SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
-  command SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  command SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  command ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  command GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  command ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  timed command SetUser(SetUserRequest): DefaultSuccess = 26;
+  command GetUser(GetUserRequest): GetUserResponse = 27;
+  timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -800,19 +805,19 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
-    CommissioningError errorCode = 0;
-    CHAR_STRING debugText = 1;
-  }
-
   response struct SetRegulatoryConfigResponse {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
+  response struct CommissioningCompleteResponse {
+    CommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command CommissioningComplete(): CommissioningCompleteResponse = 4;
   command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -979,8 +984,8 @@ server cluster NetworkCommissioning = 49 {
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING operationalDataset = 0;
+  request struct ScanNetworksRequest {
+    OCTET_STRING ssid = 0;
     INT64U breadcrumb = 1;
   }
 
@@ -990,12 +995,17 @@ server cluster NetworkCommissioning = 49 {
     INT64U breadcrumb = 2;
   }
 
-  request struct ConnectNetworkRequest {
-    OCTET_STRING networkID = 0;
+  request struct AddOrUpdateThreadNetworkRequest {
+    OCTET_STRING operationalDataset = 0;
     INT64U breadcrumb = 1;
   }
 
   request struct RemoveNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct ConnectNetworkRequest {
     OCTET_STRING networkID = 0;
     INT64U breadcrumb = 1;
   }
@@ -1006,9 +1016,16 @@ server cluster NetworkCommissioning = 49 {
     INT64U breadcrumb = 2;
   }
 
-  request struct ScanNetworksRequest {
-    OCTET_STRING ssid = 0;
-    INT64U breadcrumb = 1;
+  response struct ScanNetworksResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+  }
+
+  response struct NetworkConfigResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
   }
 
   response struct ConnectNetworkResponse {
@@ -1017,24 +1034,12 @@ server cluster NetworkCommissioning = 49 {
     INT32S errorValue = 2;
   }
 
-  response struct NetworkConfigResponse {
-    NetworkCommissioningStatus networkingStatus = 0;
-    CHAR_STRING debugText = 1;
-  }
-
-  response struct ScanNetworksResponse {
-    NetworkCommissioningStatus networkingStatus = 0;
-    CHAR_STRING debugText = 1;
-    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
-    optional ThreadInterfaceScanResult threadScanResults[] = 3;
-  }
-
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
   command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -1052,18 +1057,18 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
     nullable OCTET_STRING icac = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    fabric_idx fabricIndex = 0;
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -1074,6 +1079,18 @@ server cluster OperationalCredentials = 62 {
   readonly attribute fabric_idx currentFabricIndex = 5;
   readonly global attribute int16u clusterRevision = 65533;
 
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
@@ -1082,37 +1099,25 @@ server cluster OperationalCredentials = 62 {
     INT16U adminVendorId = 4;
   }
 
-  request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct AttestationRequestRequest {
-    OCTET_STRING attestationNonce = 0;
-  }
-
-  request struct CSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
-  request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
-  }
-
-  request struct RemoveFabricRequest {
-    fabric_idx fabricIndex = 0;
-  }
-
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
+  request struct UpdateNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
   }
 
   request struct UpdateFabricLabelRequest {
     CHAR_STRING label = 0;
   }
 
-  request struct UpdateNOCRequest {
-    OCTET_STRING NOCValue = 0;
-    optional OCTET_STRING ICACValue = 1;
+  request struct RemoveFabricRequest {
+    fabric_idx fabricIndex = 0;
+  }
+
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
+  }
+
+  request struct RemoveTrustedRootCertificateRequest {
+    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   response struct AttestationResponse {
@@ -1120,13 +1125,13 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CertificateChainResponse {
+    OCTET_STRING certificate = 0;
+  }
+
   response struct CSRResponse {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
-  }
-
-  response struct CertificateChainResponse {
-    OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
@@ -1135,15 +1140,15 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  command AddNOC(AddNOCRequest): NOCResponse = 6;
-  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
   command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {

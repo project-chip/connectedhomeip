@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +39,8 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
 private:
     CHIP_ERROR PrepareDownloadImpl();
@@ -49,6 +50,30 @@ private:
     OTAImageHeaderParser mHeaderParser;
     OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
+};
+
+class ExtFlashHandler
+{
+public:
+    enum class Action : uint8_t
+    {
+        WAKE_UP,
+        SLEEP
+    };
+    virtual ~ExtFlashHandler() {}
+    virtual void DoAction(Action action);
+};
+
+class OTAImageProcessorImplPMDevice : public OTAImageProcessorImpl
+{
+public:
+    explicit OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler);
+    CHIP_ERROR PrepareDownload() override;
+    CHIP_ERROR Abort() override;
+    CHIP_ERROR Apply() override;
+
+private:
+    ExtFlashHandler & mHandler;
 };
 
 } // namespace DeviceLayer

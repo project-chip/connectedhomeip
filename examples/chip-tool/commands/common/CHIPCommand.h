@@ -91,7 +91,6 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
-    chip::SimpleFabricStorage mFabricStorage;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

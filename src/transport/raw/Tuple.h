@@ -281,6 +281,8 @@ public:
     {
         return std::get<i>(mTransports);
     }
+
+    std::tuple<TransportTypes...> & GetTransports() { return mTransports; }
 };
 
 } // namespace Transport

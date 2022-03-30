@@ -49,6 +49,8 @@ private:
 
     CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
+    void _HandleServerStarted() {}
+    void _HandleServerShuttingDown() {}
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
 
     void _RunEventLoop()

@@ -8,13 +8,13 @@ This example supports compilation with libfuzzer enabled.
 
 To compile with libfuzzer enabled on Mac, run:
 
-    $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan-libfuzzer build"
+    $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang build"
 
 at the top level of the Matter tree.
 
 Similarly, to compile on Linux run:
 
-    $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-no-ble-asan-libfuzzer build"
+    $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-no-ble-asan-libfuzzer-clang build"
 
 ### Running libfuzzer-enabled binaries
 
@@ -22,11 +22,11 @@ Similarly, to compile on Linux run:
 
 To run the resulting binary with no particular inputs do:
 
-    $ ./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer/chip-all-clusters-app-fuzzing
+    $ ./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing
 
 or
 
-    $ ./out/linux-x64-all-clusters-no-ble-asan-libfuzzer/chip-all-clusters-app-fuzzing
+    $ ./out/linux-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing
 
 If this crashes, it will output the input that caused the crash in a variety of
 formats, looking something like this:
@@ -44,11 +44,11 @@ To run the binary with a specific input, place the input bytes in a file (which
 a crashing run of the fuzzer does automatically). If `$(INPUT_FILE)` is the name
 of that file, then run:
 
-    $ ./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer/chip-all-clusters-app-fuzzing $(INPUT_FILE)
+    $ ./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing $(INPUT_FILE)
 
 or
 
-    $ ./out/linux-x64-all-clusters-no-ble-asan-libfuzzer/chip-all-clusters-app-fuzzing $(INPUT_FILE)
+    $ ./out/linux-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing $(INPUT_FILE)
 
 #### Additional execution options.
 

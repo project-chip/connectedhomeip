@@ -20,25 +20,25 @@ config:
     endpoint: 0
 
 tests:
-    - label: "1: Rename a bridged device"
-      disabled: true
-
     - label:
           "Get the name of a bridged device: Read the NodeLabel attribute of the
           Bridged Device Basic Information cluster on the applicable endpoint"
+      verification: |
+          read EP  n . Bridged Device Basic Information . NodeLabel
       disabled: true
 
     - label:
           "Using manufacturer provided means (i.e. NOT using Matter protocol),
           update the name of this bridged device"
+      verification: |
+          no Matter messages for this step
       disabled: true
 
     - label:
           "Read the NodeLabel attribute of the Bridged Device Basic Information
           cluster on the same endpoint as in 1a"
-      disabled: true
-
-    - label: "2: Change the state of a bridged device by other means"
+      verification: |
+          read EP  n . Bridged Device Basic Information . NodeLabel
       disabled: true
 
     - label:
@@ -46,15 +46,23 @@ tests:
           non-Matter interface (example: bridge manufacturer provides an app
           which can change the state of the bridged devices, e.g. change a
           lights brightness)"
+      verification: |
+          no Matter messages for this step
       disabled: true
 
     - label: "Read the state (e.g. on/off, brightness) of that bridged device"
+      verification: |
+          read device state
       disabled: true
 
     - label:
           "Change the state (e.g. on/off, brightness) of that bridged device
           with this 'other' interface."
+      verification: |
+          no Matter messages for this step
       disabled: true
 
     - label: "Read the state of that bridged device again (as in 2b)"
+      verification: |
+          read device state
       disabled: true

@@ -19,7 +19,6 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/DecodableList.h>

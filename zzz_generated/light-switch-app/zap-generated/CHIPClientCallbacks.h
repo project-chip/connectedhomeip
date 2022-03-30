@@ -31,10 +31,6 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-void GroupsClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                   chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GroupsAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 void IdentifyClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                      chip::Callback::Cancelable * onFailureCallback);
 typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,

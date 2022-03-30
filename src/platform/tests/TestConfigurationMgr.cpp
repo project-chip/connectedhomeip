@@ -147,38 +147,6 @@ static void TestConfigurationMgr_HardwareVersion(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, hardwareVer == 1234);
 }
 
-static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const uint32_t setSetupPinCode = 34567890;
-    uint32_t getSetupPinCode       = 0;
-
-    err = ConfigurationMgr().StoreSetupPinCode(setSetupPinCode);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetSetupPinCode(getSetupPinCode);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, getSetupPinCode == setSetupPinCode);
-}
-
-static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const uint16_t setSetupDiscriminator = 0xBA0;
-    uint16_t getSetupDiscriminator       = 0;
-
-    err = ConfigurationMgr().StoreSetupDiscriminator(setSetupDiscriminator);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetSetupDiscriminator(getSetupDiscriminator);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, getSetupDiscriminator == setSetupDiscriminator);
-}
-
 static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -250,8 +218,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::UniqueId", TestConfigurationMgr_UniqueId),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
-    NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
-    NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),

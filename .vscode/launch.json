@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Attach to running process",
+            "type": "lldb",
+            "request": "attach",
+            "pid": "${command:pickProcess}"
+        },
+        {
             "name": "QRCode Tests",
             "type": "cppdbg",
             "request": "launch",
@@ -349,6 +355,38 @@
             ],
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "OTA Requestor App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/ota-requestor/chip-ota-requestor-app",
+            "args": [
+                "--discriminator",
+                "18",
+                "--secured-device-port",
+                "5560",
+                "--KVS",
+                "/tmp/chip_kvs_requestor"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "OTA Provider App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/ota-provider/chip-ota-provider-app",
+            "args": [
+                "--discriminator",
+                "22",
+                "--KVS",
+                "/tmp/chip_kvs_provider",
+                "--filepath",
+                "/tmp/ota-image.bin"
+            ],
+            "cwd": "${workspaceFolder}"
         }
     ],
     "inputs": [

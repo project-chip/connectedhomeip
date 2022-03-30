@@ -62,10 +62,13 @@ public:
     // Used in case of MCSP failure
     CHIP_ERROR RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl);
 
+    CHIP_ERROR FabricRemoved(FabricIndex fabricIndex);
+
     // Protected for Unit Tests inheritance
 protected:
     bool RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size);
     void CompactPeers(GroupSender * list, uint32_t size);
+    void RemoveAndCompactFabric(uint32_t tableIndex);
 
     GroupFabric mGroupFabrics[CHIP_CONFIG_MAX_FABRICS];
 };

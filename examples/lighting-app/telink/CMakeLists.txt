@@ -15,6 +15,8 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
+set(BOARD tlsr9518adk80d)
+
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
@@ -39,6 +41,11 @@ target_include_directories(app PRIVATE
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
+
+add_definitions(
+    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
+
 # TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -63,6 +70,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
+               ${CHIP_ROOT}/src/app/util/privilege-storage.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
                ${CHIP_ROOT}/src/app/server/Dnssd.cpp
@@ -99,5 +107,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
                ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
                )

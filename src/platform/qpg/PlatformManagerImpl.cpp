@@ -25,7 +25,7 @@
 
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>

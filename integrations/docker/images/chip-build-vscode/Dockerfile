@@ -66,7 +66,7 @@ ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.0
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 ENV TIZEN_HOME /opt/tizen_sdk
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA

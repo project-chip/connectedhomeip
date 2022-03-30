@@ -25,16 +25,10 @@ tests:
     - label:
           "OTA-R/TH on completion of image download sends an
           ApplyUpdateRequestCommand to the DUT."
-      disabled: true
+      verification: |
+          Verify on the OTA Requestor logs
 
-    - label:
-          "OTA-R/TH on completion of image download sends an
-          ApplyUpdateRequestCommand to the DUT. Force the DUT to send an
-          AwaitNextAction in the response"
-      disabled: true
-
-    - label:
-          "OTA-R/TH on completion of image download sends an
-          ApplyUpdateRequestCommand to the DUT. Force the DUT to send an
-          Discontinue in the response"
+          [1645743059328] [97809:20280957] CHIP: [SWU] ApplyUpdateResponse:
+          [1645743059328] [97809:20280957] CHIP: [SWU]   action: 0
+          [1645743059328] [97809:20280957] CHIP: [SWU]   delayedActionTime: 0 seconds
       disabled: true

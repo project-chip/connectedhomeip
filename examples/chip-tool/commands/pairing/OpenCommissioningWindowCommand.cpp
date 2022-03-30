@@ -18,26 +18,29 @@
 
 #include "OpenCommissioningWindowCommand.h"
 
+#include <system/SystemClock.h>
+
 using namespace ::chip;
 
 CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 {
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-}
+    mWindowOpener = Platform::MakeUnique<Controller::CommissioningWindowOpener>(&CurrentCommissioner());
+    if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
+    {
+        return mWindowOpener->OpenBasicCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout),
+                                                           &mOnOpenBasicCommissioningWindowCallback);
+    }
 
-void OpenCommissioningWindowCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
-{
-    OpenCommissioningWindowCommand * command = reinterpret_cast<OpenCommissioningWindowCommand *>(context);
-    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
-    command->OpenCommissioningWindow();
-}
-void OpenCommissioningWindowCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
-{
-    LogErrorOnFailure(err);
+    if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
+    {
+        SetupPayload ignored;
+        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout), mIteration, mDiscriminator,
+                                                      NullOptional, NullOptional, &mOnOpenCommissioningWindowCallback, ignored,
+                                                      /* readVIDPIDAttributes */ true);
+    }
 
-    OpenCommissioningWindowCommand * command = reinterpret_cast<OpenCommissioningWindowCommand *>(context);
-    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
-    command->SetCommandExitStatus(err);
+    ChipLogError(chipTool, "Unknown commissioning window option: %d", to_underlying(mCommissioningWindowOption));
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err,
@@ -45,14 +48,14 @@ void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * co
 {
     LogErrorOnFailure(err);
 
+    OnOpenBasicCommissioningWindowResponse(context, remoteId, err);
+}
+
+void OpenCommissioningWindowCommand::OnOpenBasicCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err)
+{
+    LogErrorOnFailure(err);
+
     OpenCommissioningWindowCommand * command = reinterpret_cast<OpenCommissioningWindowCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnOpenCommissioningWindowCommand: context is null"));
     command->SetCommandExitStatus(err);
-}
-
-CHIP_ERROR OpenCommissioningWindowCommand::OpenCommissioningWindow()
-{
-    return CurrentCommissioner().OpenCommissioningWindowWithCallback(
-        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback,
-        /* readVIDPIDAttributes */ true);
 }

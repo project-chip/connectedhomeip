@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
+#include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 
@@ -416,10 +417,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
 
-    bool isEventReportsPresent       = false;
-    bool isAttributeReportIBsPresent = false;
-    bool suppressResponse            = true;
-    uint64_t subscriptionId          = 0;
+    bool suppressResponse   = true;
+    uint64_t subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
@@ -474,33 +473,28 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err                   = report.GetEventReports(&eventReportIBs);
-    isEventReportsPresent = (err == CHIP_NO_ERROR);
+    err = report.GetEventReports(&eventReportIBs);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    if (isEventReportsPresent)
+    else if (err == CHIP_NO_ERROR)
     {
         chip::TLV::TLVReader EventReportsReader;
         eventReportIBs.GetReader(&EventReportsReader);
         err = ProcessEventReportIBs(EventReportsReader);
-        SuccessOrExit(err);
     }
+    SuccessOrExit(err);
 
-    err                         = report.GetAttributeReportIBs(&attributeReportIBs);
-    isAttributeReportIBsPresent = (err == CHIP_NO_ERROR);
+    err = report.GetAttributeReportIBs(&attributeReportIBs);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    if (isAttributeReportIBsPresent)
+    else if (err == CHIP_NO_ERROR)
     {
         TLV::TLVReader attributeReportIBsReader;
+        mSawAttributeReportsInCurrentReport = true;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
         if (mIsInitialReport)
@@ -510,13 +504,14 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
-        SuccessOrExit(err);
+    }
+    SuccessOrExit(err);
 
-        if (!mPendingMoreChunks)
-        {
-            mpCallback.OnReportEnd();
-            mIsInitialReport = true;
-        }
+    if (mSawAttributeReportsInCurrentReport && !mPendingMoreChunks)
+    {
+        mpCallback.OnReportEnd();
+        mIsInitialReport                    = true;
+        mSawAttributeReportsInCurrentReport = false;
     }
 
     SuccessOrExit(err = report.ExitContainer());
@@ -553,8 +548,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
     Close(CHIP_ERROR_TIMEOUT);
 }
 
@@ -643,19 +638,36 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         EventReportIB::Parser report;
         EventDataIB::Parser data;
         EventHeader header;
+        StatusIB statusIB; // Default value for statusIB is success.
 
         TLV::TLVReader reader = aEventReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        ReturnErrorOnFailure(report.GetEventData(&data));
+        err = report.GetEventData(&data);
 
-        header.mTimestamp = mEventTimestamp;
-        ReturnErrorOnFailure(data.DecodeEventHeader(header));
-        mEventTimestamp = header.mTimestamp;
-        mEventMin       = header.mEventNumber + 1;
-        ReturnErrorOnFailure(data.GetData(&dataReader));
+        if (err == CHIP_NO_ERROR)
+        {
+            header.mTimestamp = mEventTimestamp;
+            ReturnErrorOnFailure(data.DecodeEventHeader(header));
+            mEventTimestamp = header.mTimestamp;
+            mEventMin       = header.mEventNumber + 1;
+            ReturnErrorOnFailure(data.GetData(&dataReader));
 
-        mpCallback.OnEventData(header, &dataReader, nullptr);
+            mpCallback.OnEventData(header, &dataReader, nullptr);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            EventStatusIB::Parser status;
+            EventPathIB::Parser pathIB;
+            StatusIB::Parser statusIBParser;
+            ReturnErrorOnFailure(report.GetEventStatus(&status));
+            ReturnErrorOnFailure(status.GetPath(&pathIB));
+            ReturnErrorOnFailure(pathIB.GetEventPath(&header.mPath));
+            ReturnErrorOnFailure(status.GetErrorStatus(&statusIBParser));
+            ReturnErrorOnFailure(statusIBParser.DecodeStatusIB(statusIB));
+
+            mpCallback.OnEventData(header, nullptr, &statusIB);
+        }
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -676,7 +688,10 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     System::Clock::Timeout timeout =
         System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
-    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
+    ChipLogProgress(
+        DataManagement,
+        "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x" ChipLogFormatX64 " Peer = %02x:" ChipLogFormatX64,
+        static_cast<long unsigned>(timeout.count()), ChipLogValueX64(mSubscriptionId), mFabricIndex, ChipLogValueX64(mPeerNodeId));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
 
@@ -711,8 +726,9 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     //
     VerifyOrDie(_this->mpImEngine->InActiveReadClientList(_this));
 
-    ChipLogError(DataManagement, "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer node 0x%" PRIx64,
-                 _this->mSubscriptionId, _this->mPeerNodeId);
+    ChipLogError(DataManagement,
+                 "Subscription Liveness timeout with SubscriptionID = 0x" ChipLogFormatX64 ", Peer = %02x:" ChipLogFormatX64,
+                 ChipLogValueX64(_this->mSubscriptionId), _this->mFabricIndex, ChipLogValueX64(_this->mPeerNodeId));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -736,10 +752,23 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
+
+    ChipLogProgress(DataManagement,
+                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %" PRIu16
+                    "s MaxInterval = %" PRIu16 "s Peer = %02x:" ChipLogFormatX64,
+                    ChipLogValueX64(mSubscriptionId), mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
+                    ChipLogValueX64(mPeerNodeId));
+
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
-    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);
+
+    mpCallback.OnSubscriptionEstablished(subscriptionId);
+
+    if (mReadPrepareParams.mResubscribePolicy != nullptr)
+    {
+        mNumRetries = 0;
+    }
 
     RefreshLivenessCheckTimer();
 
@@ -855,7 +884,7 @@ bool ReadClient::ResubscribeIfNeeded()
     uint32_t intervalMsec  = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
-        ChipLogProgress(DataManagement, "mResubscribePolicy is null");
+        ChipLogDetail(DataManagement, "mResubscribePolicy is null");
         return false;
     }
     mReadPrepareParams.mResubscribePolicy(mNumRetries, intervalMsec, shouldResubscribe);
@@ -868,14 +897,14 @@ bool ReadClient::ResubscribeIfNeeded()
         System::Clock::Milliseconds32(intervalMsec), OnResubscribeTimerCallback, this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    else
-    {
-        ChipLogProgress(DataManagement, "Will try to Resubscribe at retry index %" PRIu32 " after %" PRIu32 "ms", mNumRetries,
-                        intervalMsec);
-    }
+
+    ChipLogProgress(DataManagement,
+                    "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
+                    mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
+
     return true;
 }
 

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
@@ -126,14 +127,14 @@ public:
         }
 
         uint32_t code;
-        if (DeviceLayer::ConfigurationMgr().GetSetupPinCode(code) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(code) == CHIP_NO_ERROR)
         {
             response.pairing_info.code = code;
             response.has_pairing_info  = true;
         }
 
         uint16_t discriminator;
-        if (DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
         {
             response.pairing_info.discriminator = static_cast<uint32_t>(discriminator);
             response.has_pairing_info           = true;
@@ -158,8 +159,8 @@ public:
 
     virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
-        if (DeviceLayer::ConfigurationMgr().StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
-            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->SetSetupPasscode(request.code) != CHIP_NO_ERROR ||
+            DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
         {
             return pw::Status::Unknown();
         }

@@ -192,10 +192,8 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::
     {
         return connection->mEndPoint->Send(std::move(msgBuf));
     }
-    else
-    {
-        return SendAfterConnect(address, std::move(msgBuf));
-    }
+
+    return SendAfterConnect(address, std::move(msgBuf));
 }
 
 CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle && msg)
@@ -272,7 +270,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // We don't have enough data to read the message size. Wait until there's more.
             return CHIP_NO_ERROR;
         }
-        else if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
         {
             return err;
         }

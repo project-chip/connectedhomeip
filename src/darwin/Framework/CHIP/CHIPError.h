@@ -49,6 +49,7 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
     CHIPErrorCodeInvalidState         = 6,
     CHIPErrorCodeWrongAddressType     = 7,
     CHIPErrorCodeIntegrityCheckFailed = 8,
+    CHIPErrorCodeTimeout              = 9,
 };
 // clang-format on
 

@@ -59,7 +59,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~CommandSender() { Abort(); }
+    ~CommandSender() override { Abort(); }
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -135,6 +135,8 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
+     * If used in a groups setting, callbacks do not need to be passed.
+     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
@@ -179,8 +181,9 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
     {
+        mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST

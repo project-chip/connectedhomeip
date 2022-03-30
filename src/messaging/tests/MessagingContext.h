@@ -71,10 +71,13 @@ class MessagingContext : public PlatformMemoryUser
 public:
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
-        mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(kBobKeyId, kAliceKeyId),
+        mPairingBobToAlice(kAliceKeyId, kBobKeyId)
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
+
+    // Whether Alice and Bob are initialized, must be called before Init
+    void ConfigInitializeNodes(bool initializeNodes) { mInitializeNodes = initializeNodes; }
 
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
@@ -96,29 +99,21 @@ public:
         Inet::IPAddress::FromString("::1", addr);
         return addr;
     }
-    NodeId GetBobNodeId() const { return mBobNodeId; }
-    NodeId GetAliceNodeId() const { return mAliceNodeId; }
 
-    void SetBobNodeId(NodeId nodeId) { mBobNodeId = nodeId; }
-    void SetAliceNodeId(NodeId nodeId) { mAliceNodeId = nodeId; }
-
-    uint16_t GetBobKeyId() const { return mBobKeyId; }
-    uint16_t GetAliceKeyId() const { return mAliceKeyId; }
+    static const uint16_t kBobKeyId   = 1;
+    static const uint16_t kAliceKeyId = 2;
+    NodeId GetBobNodeId() const;
+    NodeId GetAliceNodeId() const;
     GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
-
-    void SetBobKeyId(uint16_t id) { mBobKeyId = id; }
-    void SetAliceKeyId(uint16_t id) { mAliceKeyId = id; }
-
-    FabricIndex GetFabricIndex() const { return mSrcFabricIndex; }
-    void SetFabricIndex(FabricIndex id)
-    {
-        mSrcFabricIndex  = id;
-        mDestFabricIndex = id;
-    }
 
     SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+
+    FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
+    FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
+    FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
+    FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice();
     CHIP_ERROR CreateSessionAliceToBob();
@@ -141,7 +136,9 @@ public:
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
 private:
+    bool mInitializeNodes = true;
     bool mInitialized;
+    FabricTable mFabricTable;
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
@@ -149,20 +146,16 @@ private:
     TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
 
-    NodeId mBobNodeId       = 123654;
-    NodeId mAliceNodeId     = 111222333;
-    uint16_t mBobKeyId      = 1;
-    uint16_t mAliceKeyId    = 2;
-    GroupId mFriendsGroupId = 0x0101;
+    FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
+    GroupId mFriendsGroupId       = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
-    SessionHolder mSessionBobToFriends;
-    FabricIndex mSrcFabricIndex  = 1;
-    FabricIndex mDestFabricIndex = 1;
+    Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
 };
 
 template <typename Transport = LoopbackTransport>

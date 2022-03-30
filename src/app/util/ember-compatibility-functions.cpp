@@ -22,7 +22,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
@@ -146,33 +145,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPath & commandPath)
-{
-    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
-
-    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
-    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
-    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
-    imCompatibilityEmberApsFrame.sequence =
-        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
-
-    if (commandExchangeCtx->IsGroupExchangeContext())
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
-    }
-    else
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_UNICAST;
-    }
-
-    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
-    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
-    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
-    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
-
-    emAfCurrentCommand = &imCompatibilityEmberAfCluster;
-}
-
 void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
@@ -265,7 +237,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    for (const CommandId * cmd = cluster->clientGeneratedCommandList; cmd != nullptr; cmd++)
+    for (const CommandId * cmd = cluster->acceptedCommandList; cmd != nullptr; cmd++)
     {
         if (*cmd == aCommandPath.mCommandId)
         {
@@ -384,17 +356,17 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
-    case ClientGeneratedCommandList::Id:
+    case AcceptedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (const CommandId * cmd = mCluster->clientGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
+            for (const CommandId * cmd = mCluster->acceptedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
             {
                 ReturnErrorOnFailure(encoder.Encode(*cmd));
             }
             return CHIP_NO_ERROR;
         });
-    case ServerGeneratedCommandList::Id:
+    case GeneratedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (const CommandId * cmd = mCluster->serverGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
+            for (const CommandId * cmd = mCluster->generatedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
             {
                 ReturnErrorOnFailure(encoder.Encode(*cmd));
             }
@@ -480,9 +452,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     {
     case Clusters::Globals::Attributes::AttributeList::Id:
         FALLTHROUGH;
-    case Clusters::Globals::Attributes::ClientGeneratedCommandList::Id:
+    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
         FALLTHROUGH;
-    case Clusters::Globals::Attributes::ServerGeneratedCommandList::Id:
+    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
         attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
         break;
     default:
@@ -509,10 +481,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
-            }
+
+            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
         }
     }
 
@@ -996,10 +966,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
         return false;
     }
-    else
-    {
-        return (*(version)) == aRequiredVersion;
-    }
+
+    return (*(version)) == aRequiredVersion;
 }
 
 } // namespace app
@@ -1021,7 +989,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    ClusterInfo info;
+    AttributePathParams info;
     info.mClusterId   = clusterId;
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
@@ -1041,7 +1009,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    ClusterInfo info;
+    AttributePathParams info;
     info.mEndpointId = endpoint;
 
     // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.

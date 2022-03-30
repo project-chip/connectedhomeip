@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,10 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -35,7 +37,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
@@ -58,6 +62,7 @@
 #include <signal.h>
 
 #include "AppMain.h"
+#include "LinuxCommissionableDataProvider.h"
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -99,26 +104,26 @@ void OnSignalHandler(int signum)
     // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
     // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
     // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::Unspecified;
+    BootReasonType bootReason = BootReasonType::kUnspecified;
     switch (signum)
     {
     case SIGVTALRM:
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
         break;
     case SIGALRM:
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
         break;
     case SIGILL:
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         break;
     case SIGTRAP:
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
         break;
     case SIGIO:
-        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        bootReason = BootReasonType::kSoftwareUpdateCompleted;
         break;
     case SIGINT:
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -142,6 +147,68 @@ void SetupSignalHandlers()
     signal(SIGIO, OnSignalHandler);
     signal(SIGINT, OnSignalHandler);
 }
+
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
+{
+    chip::Optional<uint32_t> setupPasscode;
+
+    if (options.payload.setUpPINCode != 0)
+    {
+        setupPasscode.SetValue(options.payload.setUpPINCode);
+    }
+    else if (!options.spake2pVerifier.HasValue())
+    {
+        uint32_t defaultTestPasscode = 0;
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure onboarding credentials. ***",
+                     static_cast<unsigned>(defaultTestPasscode));
+        setupPasscode.SetValue(defaultTestPasscode);
+        options.payload.setUpPINCode = defaultTestPasscode;
+    }
+    else
+    {
+        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
+        // printed for debug will be invalid, but if the onboarding payload had been given
+        // properly to the commissioner later, PASE will succeed.
+    }
+
+    if (options.discriminator.HasValue())
+    {
+        options.payload.discriminator = options.discriminator.Value();
+    }
+    else
+    {
+        uint16_t defaultTestDiscriminator = 0;
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
+
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
+                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "to explicitly configure discriminator. ***",
+                     static_cast<unsigned>(defaultTestDiscriminator));
+        options.payload.discriminator = defaultTestDiscriminator;
+    }
+
+    // Default to minimum PBKDF iterations
+    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    if (options.spake2pIterations != 0)
+    {
+        spake2pIterationCount = options.spake2pIterations;
+    }
+    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
+
+    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
+                         options.payload.discriminator);
+}
+
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -195,17 +262,24 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
-    {
-        uint16_t discriminator = LinuxDeviceOptions::GetInstance().payload.discriminator;
-        err                    = DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
-        SuccessOrExit(err);
-    }
+    // Init the commissionable data provider based on command line options
+    // to handle custom verifiers, discriminators, etc.
+    err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+    DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
+
+    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+
+    // For testing of manual pairing code with custom commissioning flow
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    SuccessOrExit(err);
+
+    LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
@@ -265,8 +339,16 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        ChipLogProgress(AppServer, "Retrieved value from server storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        ChipLogProgress(AppServer, "Retrieving value from server storage.");
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        }
+        size = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -294,7 +376,6 @@ DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
-SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 
@@ -303,15 +384,11 @@ CHIP_ERROR InitCommissioner()
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
 
-    ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
-
-    factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
 
     params.storageDelegate                = &gServerStorage;
-    params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
@@ -339,8 +416,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
-                                                                        rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
+                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -368,7 +445,7 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
-class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
+class PairingCommand : public Controller::DevicePairingDelegate
 {
 public:
     PairingCommand() :
@@ -380,9 +457,6 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
 
     CHIP_ERROR UpdateNetworkAddress();
 
@@ -403,11 +477,6 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
     return gCommissioner.UpdateDevice(gRemoteId);
-}
-
-void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -519,7 +588,6 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport:
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
-    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
     gCommissioner.PairDevice(gRemoteId, params);
 

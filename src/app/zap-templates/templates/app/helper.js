@@ -39,8 +39,8 @@ zclHelper['isEvent'] = function(db, event_name, packageId) {
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
 const kGlobalAttributes = [
-  0xfff8, // ServerGeneratedCommandList
-  0xfff9, // ClientGeneratedCommandList
+  0xfff8, // GeneratedCommandList
+  0xfff9, // AcceptedCommandList
   0xfffb, // AttributeList
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
@@ -120,6 +120,7 @@ var endpointClusterWithInit = [
   'Scenes',
   'Time Format Localization',
   'Thermostat',
+  'Mode Select',
 ];
 var endpointClusterWithAttributeChanged = [
   'Bridged Device Basic',
@@ -129,7 +130,12 @@ var endpointClusterWithAttributeChanged = [
   'Window Covering',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
+  'IAS Zone',
+  'Door Lock',
+  'Thermostat User Interface Configuration',
+  'Time Format Localization',
+  'Localization Configuration',
+  'Mode Select',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
@@ -190,28 +196,28 @@ function chip_endpoint_generated_commands_list(options)
 {
   let ret = [];
   this.clusterList.forEach((c) => {
-    let clientGeneratedCommands = [];
-    let serverGeneratedCommands = [];
+    let acceptedCommands  = [];
+    let generatedCommands = [];
 
     c.commands.forEach((cmd) => {
       if (cmd.mask.includes('incoming_server')) {
-        clientGeneratedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+        acceptedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
       }
       if (cmd.mask.includes('incoming_client')) {
-        serverGeneratedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+        generatedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
       }
     });
 
-    if (clientGeneratedCommands.length > 0 || serverGeneratedCommands.length > 0) {
+    if (acceptedCommands.length > 0 || generatedCommands.length > 0) {
       ret.push({ text : `  /* ${c.comment} */\\` });
     }
-    if (clientGeneratedCommands.length > 0) {
-      clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\` });
+    if (acceptedCommands.length > 0) {
+      acceptedCommands.push('chip::kInvalidCommandId /* end of list */')
+      ret.push({ text : `  /*   client_generated */ \\\n  ${acceptedCommands.join(', \\\n  ')}, \\` });
     }
-    if (serverGeneratedCommands.length > 0) {
-      serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\` });
+    if (generatedCommands.length > 0) {
+      generatedCommands.push('chip::kInvalidCommandId /* end of list */')
+      ret.push({ text : `  /*   server_generated */ \\\n  ${generatedCommands.join(', \\\n  ')}, \\` });
     }
   })
   return templateUtil.collectBlocks(ret, options, this);
@@ -264,20 +270,20 @@ function chip_endpoint_cluster_list()
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
 
-    let clientGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
-    let serverGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
+    let acceptedCommands  = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
+    let generatedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
 
-    let clientGeneratedCommandsListVal = "nullptr";
-    let serverGeneratedCommandsListVal = "nullptr";
+    let acceptedCommandsListVal  = "nullptr";
+    let generatedCommandsListVal = "nullptr";
 
-    if (clientGeneratedCommands > 0) {
-      clientGeneratedCommands++; // Leaves space for the terminator
-      clientGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
+    if (acceptedCommands > 0) {
+      acceptedCommands++; // Leaves space for the terminator
+      acceptedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
     }
 
-    if (serverGeneratedCommands > 0) {
-      serverGeneratedCommands++; // Leaves space for the terminator
-      serverGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + clientGeneratedCommands} )`;
+    if (generatedCommands > 0) {
+      generatedCommands++; // Leaves space for the terminator
+      generatedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + acceptedCommands} )`;
     }
 
     ret = ret.concat(`  { \\
@@ -288,11 +294,11 @@ function chip_endpoint_cluster_list()
       .clusterSize = ${c.attributeSize}, \\
       .mask = ${mask}, \\
       .functions = ${functionArray}, \\
-      .clientGeneratedCommandList = ${clientGeneratedCommandsListVal} ,\\
-      .serverGeneratedCommandList = ${serverGeneratedCommandsListVal} ,\\
+      .acceptedCommandList = ${acceptedCommandsListVal} ,\\
+      .generatedCommandList = ${generatedCommandsListVal} ,\\
     },\\\n`)
 
-    totalCommands = totalCommands + clientGeneratedCommands + serverGeneratedCommands;
+    totalCommands = totalCommands + acceptedCommands + generatedCommands;
   })
   return ret.concat('}\n');
 }
@@ -438,13 +444,13 @@ function asLowerCamelCase(label)
       && label.toUpperCase() != label) {
     str = str[0].toUpperCase() + str.substring(1);
   }
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asUpperCamelCase(label)
 {
   let str = string.toCamelCase(label, false);
-  return str.replace(/[\.:]/g, '');
+  return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 function asMEI(prefix, suffix)
@@ -603,7 +609,11 @@ async function _zapTypeToPythonClusterObjectType(type, options)
       return 'bytes';
     }
 
-    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    if (type.toLowerCase() == 'single') {
+      return 'float32';
+    }
+
+    if (type.toLowerCase() == 'double') {
       return 'float';
     }
 
@@ -744,22 +754,12 @@ function isWeaklyTypedEnum(label)
     "AttributeWritePermission",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
-    "BootReasonType",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
     "ColorMode",
     "ContentLaunchStatus",
     "ContentLaunchStreamingType",
-    "DoorLockEventSource",
-    "DoorLockEventType",
-    "DoorLockOperatingMode",
-    "DoorLockOperationEventCode",
-    "DoorLockProgrammingEventCode",
-    "DoorLockState",
-    "DoorLockUserStatus",
-    "DoorLockUserType",
-    "DoorState",
     "EnhancedColorMode",
     "HardwareFaultType",
     "HueDirection",
@@ -790,9 +790,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "ThermostatControlSequence",
-    "ThermostatRunningMode",
-    "ThermostatSystemMode",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",

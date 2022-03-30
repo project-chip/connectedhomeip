@@ -17,8 +17,8 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/OTARequestorInterface.h>
 
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 
@@ -374,8 +374,9 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        // TODO: Use software version from Configuration Manager
-        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
+        // TODO: Implement restarting into new image instead of changing the version
+        DeviceLayer::ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
+        requestor->NotifyUpdateApplied();
     }
 
     // Reboot

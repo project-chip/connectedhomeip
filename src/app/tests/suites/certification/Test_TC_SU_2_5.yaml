@@ -25,31 +25,26 @@ tests:
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
           field is set to 'Proceed' DelayedActionTime is set to 0."
+      verification: |
+          Verify that the DUT starts updating its software.
+          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
+          Verify on the OTA-P/TH that there is no other ApplyUpdateRequest from the DUT.
       disabled: true
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'Proceed' DelayedActionTime is set to 5 minutes."
-      disabled: true
+          field is set to 'Proceed' DelayedActionTime is set to 5 minutes"
+      verification: |
+          Run the OTA Provider App using the command:
+          ./chip-ota-provider-app -f sw_image.txt -t 300
 
-    - label:
-          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'AwaitNextAction', DelayedActionTime is set to 1
-          minute."
-      disabled: true
-
-    - label:
-          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'AwaitNextAction', DelayedActionTime is set to 12
-          minutes."
-      disabled: true
-
-    - label:
-          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'Discontinue', DelayedActionTime is set to 0 minutes."
+          Verify that the DUT starts updating its software after 5 minutes. Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
       disabled: true
 
     - label:
           "IF (PICS_DT_Vendor_Specific) Apply the OTA Update on DUT using vendor
           specific mechanism."
+      verification: |
+          Use vendor specific steps to apply OTA Update and verify that the DUT starts updating its software.
+          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
       disabled: true

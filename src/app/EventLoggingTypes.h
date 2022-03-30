@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include <app/ClusterInfo.h>
+#include <access/SubjectDescriptor.h>
+#include <app/EventPathParams.h>
+#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -126,21 +128,11 @@ struct Timestamp
 class EventOptions
 {
 public:
-    enum class Type
-    {
-        kUrgent = 0,
-        kNotUrgent,
-    };
-    EventOptions() : mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
-
-    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(aUrgent)
-    {}
+    EventOptions() : mPriority(PriorityLevel::Invalid) {}
+    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
     ConcreteEventPath mPath;
     Timestamp mTimestamp;
     PriorityLevel mPriority = PriorityLevel::Invalid;
-    Type mUrgent            = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
-                                                       the event log to be flushed. */
     // kUndefinedFabricIndex 0 means not fabric associated at all
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
@@ -152,8 +144,7 @@ public:
 struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
-        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true),
-        mFabricIndex(0)
+        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
@@ -161,11 +152,11 @@ struct EventLoadOutContext
     EventNumber mStartingEventNumber = 0;
     Timestamp mPreviousTime;
     Timestamp mCurrentTime;
-    EventNumber mCurrentEventNumber      = 0;
-    size_t mEventCount                   = 0;
-    ClusterInfo * mpInterestedEventPaths = nullptr;
-    bool mFirst                          = true;
-    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
+    EventNumber mCurrentEventNumber                            = 0;
+    size_t mEventCount                                         = 0;
+    const ObjectList<EventPathParams> * mpInterestedEventPaths = nullptr;
+    bool mFirst                                                = true;
+    Access::SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app
 } // namespace chip

@@ -18,6 +18,8 @@
  */
 #include <ChipShellCollection.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -26,7 +28,6 @@
 #include <mbedtls/platform.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CYW30739/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -42,6 +43,7 @@ using namespace chip::Shell;
 static void InitApp(intptr_t args);
 
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
@@ -129,7 +131,8 @@ void InitApp(intptr_t args)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTADownloader(&gDownloader);

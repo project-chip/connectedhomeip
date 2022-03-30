@@ -37,11 +37,17 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     // indicate the error occurred during getting time.
     gettimeofday(&tv, nullptr);
 
+    // Lock standard output, so a single log line will not be corrupted in case
+    // where multiple threads are using logging subsystem at the same time.
+    flockfile(stdout);
+
     printf("[%" PRIu64 ".%06" PRIu64 "][%lld:%lld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
            static_cast<long long>(syscall(SYS_getpid)), static_cast<long long>(syscall(SYS_gettid)), module);
     vprintf(msg, v);
     printf("\n");
     fflush(stdout);
+
+    funlockfile(stdout);
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();

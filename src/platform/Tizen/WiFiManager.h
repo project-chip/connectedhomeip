@@ -18,6 +18,7 @@
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/NetworkCommissioning.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 #include <glib.h>
@@ -26,6 +27,8 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+using namespace chip::DeviceLayer::NetworkCommissioning::Internal;
 
 class WiFiManager
 {
@@ -38,7 +41,7 @@ public:
     CHIP_ERROR IsActivated(bool * isWiFiActivated);
     CHIP_ERROR Activate(void);
     CHIP_ERROR Deactivate(void);
-    CHIP_ERROR Connect(const char * ssid, const char * key);
+    CHIP_ERROR Connect(const char * ssid, const char * key, WirelessDriver::ConnectCallback * apCallback = nullptr);
     CHIP_ERROR Disconnect(const char * ssid);
     CHIP_ERROR RemoveAllConfigs(void);
 
@@ -88,6 +91,8 @@ private:
 
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
+
+    WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 inline WiFiManager & WiFiMgr()

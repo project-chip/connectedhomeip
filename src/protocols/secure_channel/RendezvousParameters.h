@@ -80,7 +80,7 @@ public:
         return *this;
     }
 
-    bool HasConnectionObject() const { return mConnectionObject != 0; }
+    bool HasConnectionObject() const { return mConnectionObject != BLE_CONNECTION_UNINITIALIZED; }
     BLE_CONNECTION_OBJECT GetConnectionObject() const { return mConnectionObject; }
     RendezvousParameters & SetConnectionObject(BLE_CONNECTION_OBJECT connObj)
     {
@@ -101,7 +101,7 @@ private:
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;
-    BLE_CONNECTION_OBJECT mConnectionObject = 0;
+    BLE_CONNECTION_OBJECT mConnectionObject = BLE_CONNECTION_UNINITIALIZED;
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 

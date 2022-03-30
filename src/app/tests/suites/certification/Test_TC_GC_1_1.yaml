@@ -18,24 +18,58 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "General Commissioning"
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH1 reads the BreadCrumb Attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 0
 
     - label: "TH1 writes the BreadCrumb attribute as 1 to the DUT"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "Breadcrumb"
+      arguments:
+          value: 1
 
     - label: "TH1 reads the BreadCrumb attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 1
 
     - label: "TH1 reads the RegulatoryConfig attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "RegulatoryConfig"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
 
     - label: "TH1 reads the LocationCapability attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "LocationCapability"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
 
     - label: "TH1 reads BasicCommissioningInfo attribute from DUT"
       disabled: true
+      command: "readAttribute"
+      attribute: "BasicCommissioningInfo"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535

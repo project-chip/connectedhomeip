@@ -17,18 +17,44 @@
  */
 
 #include "PairingDelegateBridge.h"
+#import <CHIP/CHIPCommissioningParameters.h>
 #import <CHIP/CHIPError_Internal.h>
 
 @interface CHIPToolPairingDelegate ()
 @end
 
 @implementation CHIPToolPairingDelegate
+- (void)onStatusUpdate:(CHIPPairingStatus)status
+{
+    NSLog(@"Pairing Status Update: %lu", status);
+    switch (status) {
+    case kSecurePairingSuccess:
+        ChipLogProgress(chipTool, "Secure Pairing Success");
+        break;
+    case kSecurePairingFailed:
+        ChipLogError(chipTool, "Secure Pairing Failed");
+        break;
+    case kUnknownStatus:
+        ChipLogError(chipTool, "Uknown Pairing Status");
+        break;
+    }
+}
+
 - (void)onPairingComplete:(NSError *)error
 {
+    NSError * __block commissionError;
     CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    if (err != CHIP_NO_ERROR) {
+        _commandBridge->SetCommandExitStatus(err);
+        return;
+    }
     ChipLogProgress(chipTool, "Pairing Complete: %s", chip::ErrorStr(err));
-
-    _commandBridge->SetCommandExitStatus(err);
+    [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
+    err = [CHIPError errorToCHIPErrorCode:commissionError];
+    if (err != CHIP_NO_ERROR) {
+        _commandBridge->SetCommandExitStatus(err);
+        return;
+    }
 }
 
 - (void)onPairingDeleted:(NSError *)error

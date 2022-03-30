@@ -109,9 +109,3 @@ void CHIPDevicePairingDelegateBridge::OnCommissioningComplete(chip::NodeId nodeI
         }
     }
 }
-
-void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
-{
-    // Todo, is there any benefit of exposing this anymore?
-    NSLog(@"OnAddressUpdateComplete. Status %s", chip::ErrorStr(error));
-}

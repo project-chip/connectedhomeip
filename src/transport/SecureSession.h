@@ -71,7 +71,7 @@ public:
     {
         SetFabricIndex(fabric);
     }
-    ~SecureSession() { NotifySessionReleased(); }
+    ~SecureSession() override { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
@@ -83,6 +83,7 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
+    ScopedNodeId GetPeer() const override;
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }

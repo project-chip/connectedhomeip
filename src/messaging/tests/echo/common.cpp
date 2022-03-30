@@ -30,6 +30,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 
+chip::FabricTable gFabricTable;
 chip::SessionManager gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;

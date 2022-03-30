@@ -107,7 +107,7 @@ public:
     }
 
     CHIP_ERROR InvokeGroupCommand(Messaging::ExchangeManager * exchangeManager, FabricIndex fabric, GroupId groupId,
-                                  NodeId sourceNodeId, const RequestType & aRequestData)
+                                  const RequestType & aRequestData)
     {
         app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kGroupIdValid) };
@@ -117,19 +117,14 @@ public:
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
-        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabric, sourceNodeId);
-        if (!session.HasValue())
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        Transport::OutgoingGroupSession session(groupId, fabric);
 
         // this (invoker) and commandSender will be deleted by the onDone call before the return of SendGroupCommandRequest
         // this (invoker) should not be used after the SendGroupCommandRequest call
-        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(SessionHandle(session)));
 
         // this (invoker) and commandSender are already deleted and are not to be used
         commandSender.release();
-        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
         return CHIP_NO_ERROR;
     }
@@ -235,8 +230,7 @@ CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
     //
     //  We assume the aDevice already has a Case session which is way we can use he established Secure Session
     ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(),
-                                                     aDevice->GetSecureSession().Value()->GetFabricIndex(), groupId,
-                                                     aDevice->GetDeviceId(), aRequestData));
+                                                     aDevice->GetSecureSession().Value()->GetFabricIndex(), groupId, aRequestData));
 
     //  invoker is already deleted and is not to be used
     invoker.release();

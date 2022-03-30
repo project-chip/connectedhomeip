@@ -14,16 +14,10 @@
 #    limitations under the License.
 #
 
-from pathlib import Path
-import os
-import logging
 import subprocess
-import re
 
-import chiptest.linux
-import chiptest.runner
-
-from .test_definition import TestTarget, TestDefinition, ApplicationPaths
+from . import linux, runner
+from .test_definition import ApplicationPaths, TestDefinition, TestTarget
 
 
 def AllTests(chip_tool: str):
@@ -46,4 +40,7 @@ def AllTests(chip_tool: str):
         yield TestDefinition(run_name=name, name=name, target=target)
 
 
-__all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths']
+__all__ = [
+    'TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths',
+    'linux', 'runner',
+]

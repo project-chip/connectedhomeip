@@ -77,6 +77,12 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
     }
 
+    if (errorCode == CHIP_ERROR_TIMEOUT) {
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeTimeout
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
+    }
+
     return [NSError errorWithDomain:CHIPErrorDomain
                                code:CHIPErrorCodeGeneralError
                            userInfo:@{
@@ -237,6 +243,8 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
         return CHIP_ERROR_INCORRECT_STATE;
     case CHIPErrorCodeIntegrityCheckFailed:
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    case CHIPErrorCodeTimeout:
+        return CHIP_ERROR_TIMEOUT;
     default:
         return CHIP_ERROR_INTERNAL;
     }

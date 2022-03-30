@@ -87,14 +87,14 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    char issuerIdString[16];
-    uint16_t idStringLen = sizeof(issuerIdString);
-    if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
+    uint16_t issuerIdLen = sizeof(mIssuerId);
+    if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, issuerIdLen)) {
         mIssuerId = arc4random();
-        CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
+        mIssuerId = mIssuerId << 32 | arc4random();
+        CHIP_LOG_ERROR("Assigned %llx certificate issuer ID to the commissioner", mIssuerId);
         storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, sizeof(mIssuerId));
     } else {
-        CHIP_LOG_ERROR("Found %d certificate issuer ID for the commissioner", mIssuerId);
+        CHIP_LOG_ERROR("Found %llx certificate issuer ID for the commissioner", mIssuerId);
     }
 
     return CHIP_NO_ERROR;
@@ -188,7 +188,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
-    const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
+    const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
+    MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
 
@@ -202,39 +203,37 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipDN noc_dn;
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
-    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
     ChipDN rcac_dn;
-    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
-    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
-
-    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc));
-    icac.reduce_size(0);
-
-    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (!mGenerateRootCert) {
+        uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
-        if (err == CHIP_NO_ERROR) {
-            // Found root certificate in the storage.
-            rcac.reduce_size(rcacBufLen);
-            return CHIP_NO_ERROR;
-        }
+            ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen)));
+        rcac.reduce_size(rcacBufLen);
+        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+    } else {
+        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+
+        NSLog(@"Generating RCAC");
+        X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
+        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, *mIssuerKey, rcac));
+
+        VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+            ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
+
+        mGenerateRootCert = false;
     }
 
-    X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, *mIssuerKey, rcac));
+    icac.reduce_size(0);
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-        err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+    ChipDN noc_dn;
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
-    mGenerateRootCert = false;
-
-    return err;
+    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
+    return NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc);
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
@@ -280,7 +279,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
 
     MutableByteSpan icac;
 
-    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcac, icac, noc));
+    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcac, icac, noc));
 
     onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac, Optional<AesCcm128KeySpan>(), Optional<NodeId>());
 

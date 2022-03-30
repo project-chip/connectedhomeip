@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-idf_component_register(PRIV_INCLUDE_DIRS 
+idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/.."
                       SRC_DIRS

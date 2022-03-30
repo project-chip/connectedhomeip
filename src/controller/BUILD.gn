@@ -46,7 +46,9 @@ static_library("controller") {
       "CommissioneeDeviceProxy.h",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
-      "DeviceAddressUpdateDelegate.h",
+      "CommissioningDelegate.cpp",
+      "CommissioningWindowOpener.cpp",
+      "CommissioningWindowOpener.h",
       "DeviceDiscoveryDelegate.h",
       "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
@@ -68,8 +70,11 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/trace",
     "${chip_root}/src/transport",
   ]
+
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
 
   public_configs = [ ":config" ]
 

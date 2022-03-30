@@ -31,6 +31,10 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTAUtil.h"
+#endif
+
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 #include <zephyr.h>
@@ -63,6 +67,7 @@ constexpr uint32_t kOff_ms{ 950 };
 } // namespace StatusLed
 } // namespace LedConsts
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -126,9 +131,11 @@ CHIP_ERROR AppTask::Init()
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    InitOTARequestor();
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
@@ -141,17 +148,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
-}
-
-void AppTask::InitOTARequestor()
-{
-#if CONFIG_CHIP_OTA_REQUESTOR
-    mOTAImageProcessor.SetOTADownloader(&mBDXDownloader);
-    mBDXDownloader.SetImageProcessorDelegate(&mOTAImageProcessor);
-    mOTARequestorDriver.Init(&mOTARequestor, &mOTAImageProcessor);
-    mOTARequestor.Init(&chip::Server::GetInstance(), &mOTARequestorDriver, &mBDXDownloader);
-    chip::SetRequestorInstance(&mOTARequestor);
-#endif
 }
 
 CHIP_ERROR AppTask::StartApp()
@@ -276,17 +272,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
+void AppTask::StartBLEAdvertisementHandler(AppEvent *)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
-        return;
-
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is already commissioned");
         return;
     }
 
@@ -296,7 +286,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }

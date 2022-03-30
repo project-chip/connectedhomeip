@@ -182,7 +182,8 @@ class DeviceMgrCmd(Cmd):
         self.chipStack = ChipStack.ChipStack(
             bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
         self.fabricAdmin = FabricAdmin.FabricAdmin()
-        self.devCtrl = self.fabricAdmin.NewController(controllerNodeId, True)
+        self.devCtrl = self.fabricAdmin.NewController(
+            nodeId=controllerNodeId, useTestCommissioner=True)
 
         self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController(
             self.chipStack)

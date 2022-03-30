@@ -171,6 +171,13 @@ public:
     ~EthernetNetworkDiagnosticsClusterTest() {}
 };
 
+class DLL_EXPORT FanControlClusterTest : public FanControlCluster
+{
+public:
+    FanControlClusterTest() : FanControlCluster() {}
+    ~FanControlClusterTest() {}
+};
+
 class DLL_EXPORT FixedLabelClusterTest : public FixedLabelCluster
 {
 public:

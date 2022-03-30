@@ -33,7 +33,7 @@ using Entry         = AccessControl::Entry;
 using EntryIterator = AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
-AccessControl accessControl(Examples::GetAccessControlDelegate(nullptr));
+AccessControl accessControl;
 
 constexpr ClusterId kOnOffCluster         = 0x0000'0006;
 constexpr ClusterId kLevelControlCluster  = 0x0000'0008;
@@ -146,11 +146,6 @@ constexpr NodeId validPaseSubjects[] = {
     NodeIdFromPAKEKeyId(0x0001),
     NodeIdFromPAKEKeyId(0xFFFE),
     NodeIdFromPAKEKeyId(0xFFFF), // end
-
-    // Debatable whether these are valid or not,
-    // since they have bits in the unused part
-    // of the range set. Code currently treats
-    // them as valid (ignoring the unused bits).
 };
 // clang-format on
 
@@ -2138,8 +2133,9 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
+    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
     SetAccessControl(accessControl);
-    GetAccessControl().Init();
+    VerifyOrDie(GetAccessControl().Init(delegate) == CHIP_NO_ERROR);
     return SUCCESS;
 }
 

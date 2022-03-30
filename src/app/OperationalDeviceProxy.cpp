@@ -30,6 +30,7 @@
 #include "CommandSender.h"
 #include "ReadPrepareParams.h"
 
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
@@ -39,12 +40,25 @@
 #include <system/SystemLayer.h>
 
 using namespace chip::Callback;
+using chip::AddressResolve::NodeLookupRequest;
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 namespace chip {
 
+void OperationalDeviceProxy::MoveToState(State aTargetState)
+{
+    if (mState != aTargetState)
+    {
+        ChipLogDetail(Controller, "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64 "]: State change %d --> %d",
+                      ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
+                      to_underlying(aTargetState));
+        mState = aTargetState;
+    }
+}
+
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                           Dnssd::ResolverProxy * resolver)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,15 +69,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        if (resolver->ResolveNodeIdFromInternalCache(mPeerId, Inet::IPAddressType::kAny))
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
-        }
+        err = LookupPeerAddress();
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
@@ -87,7 +93,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
-    };
+    }
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
@@ -101,6 +107,13 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
                                                     const ReliableMessageProtocolConfig & config)
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
+
+#if CHIP_DETAIL_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    addr.ToString(peerAddrBuff);
+
+    ChipLogDetail(Controller, "Updating device address to %s while in state %d", peerAddrBuff, static_cast<int>(mState));
+#endif
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
@@ -116,8 +129,8 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 
     if (mState == State::NeedsAddress)
     {
-        mState = State::Initialized;
-        err    = EstablishConnection();
+        MoveToState(State::Initialized);
+        err = EstablishConnection();
         if (err != CHIP_NO_ERROR)
         {
             OnSessionEstablishmentError(err);
@@ -161,7 +174,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
     ReturnErrorOnFailure(err);
 
-    mState = State::Connecting;
+    MoveToState(State::Connecting);
 
     return CHIP_NO_ERROR;
 }
@@ -220,11 +233,13 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
     VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnectionFailure for unknown CASEClient"));
 
-    device->mState = State::Initialized;
+    device->MoveToState(State::Initialized);
 
+    device->CloseCASESession();
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
-    device->CloseCASESession();
+    // Do not touch device anymore; it might have been destroyed by a failure
+    // callback.
 }
 
 void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
@@ -238,14 +253,18 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     if (err != CHIP_NO_ERROR)
     {
         device->HandleCASEConnectionFailure(context, client, err);
+        // Do not touch device anymore; it might have been destroyed by a
+        // HandleCASEConnectionFailure.
     }
     else
     {
-        device->mState = State::SecureConnected;
+        device->MoveToState(State::SecureConnected);
 
+        device->CloseCASESession();
         device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
         device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
-        device->CloseCASESession();
+        // Do not touch device anymore; it might have been destroyed by a
+        // success callback.
     }
 }
 
@@ -256,7 +275,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     {
         mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
     }
-    mState = State::Initialized;
+    MoveToState(State::Initialized);
     if (mCASEClient)
     {
         mInitParams.clientPool->Release(mCASEClient);
@@ -268,7 +287,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
 void OperationalDeviceProxy::SetConnectedSession(const SessionHandle & handle)
 {
     mSecureSession.Grab(handle);
-    mState = State::SecureConnected;
+    MoveToState(State::SecureConnected);
 }
 
 void OperationalDeviceProxy::Clear()
@@ -279,7 +298,7 @@ void OperationalDeviceProxy::Clear()
         mCASEClient = nullptr;
     }
 
-    mState      = State::Uninitialized;
+    MoveToState(State::Uninitialized);
     mInitParams = DeviceProxyInitParams();
 }
 
@@ -294,7 +313,7 @@ void OperationalDeviceProxy::CloseCASESession()
 
 void OperationalDeviceProxy::OnSessionReleased()
 {
-    mState = State::Initialized;
+    MoveToState(State::Initialized);
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
@@ -302,6 +321,53 @@ CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
     return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
 }
 
-OperationalDeviceProxy::~OperationalDeviceProxy() {}
+OperationalDeviceProxy::~OperationalDeviceProxy()
+{
+    if (mAddressLookupHandle.IsActive())
+    {
+        ChipLogProgress(Discovery, "Cancelling incomplete address resolution as device is being deleted.");
+
+        // Skip cancel callback since the destructor is being called, so we assume that this object is
+        // obviously not used anymore
+        CHIP_ERROR err = Resolver::Instance().CancelLookup(mAddressLookupHandle, Resolver::FailureCallback::Skip);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Lookup cancel failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    if (mCASEClient)
+    {
+        // Make sure we don't leak it.
+        mInitParams.clientPool->Release(mCASEClient);
+    }
+}
+
+CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
+{
+    if (mAddressLookupHandle.IsActive())
+    {
+        ChipLogProgress(Discovery, "Operational node lookup already in progress. Will NOT start a new one.");
+        return CHIP_NO_ERROR;
+    }
+
+    NodeLookupRequest request(mPeerId);
+
+    return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
+{
+    UpdateDeviceData(result.address, result.mrpConfig);
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
+{
+    ChipLogError(Discovery, "Operational discovery failed for 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueX64(peerId.GetNodeId()), reason.Format());
+
+    DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+    DequeueConnectionFailureCallbacks(reason, /* executeCallback */ true);
+}
 
 } // namespace chip

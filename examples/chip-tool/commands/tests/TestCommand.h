@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/commands/commissioner/CommissionerCommands.h>
 #include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
@@ -36,6 +37,7 @@ class TestCommand : public CHIPCommand,
                     public ConstraintsChecker,
                     public PICSChecker,
                     public LogCommands,
+                    public CommissionerCommands,
                     public DiscoveryCommands,
                     public SystemCommands,
                     public DelayCommands
@@ -53,8 +55,6 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
-
     virtual void NextTest() = 0;
 
 protected:
@@ -76,6 +76,8 @@ protected:
         Exit(chip::ErrorStr(err));
         return CHIP_NO_ERROR;
     }
+
+    chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
 
     void Exit(std::string message) override;
     void ThrowFailureResponse();

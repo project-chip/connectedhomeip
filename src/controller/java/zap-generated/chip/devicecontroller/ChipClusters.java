@@ -138,7 +138,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -146,7 +146,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -206,26 +206,22 @@ public class ChipClusters {
       subscribeExtensionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -269,21 +265,21 @@ public class ChipClusters {
     private native void subscribeExtensionAttribute(
         long chipClusterPtr, ExtensionAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -357,7 +353,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -365,7 +361,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -381,26 +377,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -421,21 +413,21 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -478,7 +470,6 @@ public class ChipClusters {
         Integer discriminator,
         Long iterations,
         byte[] salt,
-        Integer passcodeID,
         int timedInvokeTimeoutMs) {
       openCommissioningWindow(
           chipClusterPtr,
@@ -488,7 +479,6 @@ public class ChipClusters {
           discriminator,
           iterations,
           salt,
-          passcodeID,
           timedInvokeTimeoutMs);
     }
 
@@ -511,7 +501,6 @@ public class ChipClusters {
         Integer discriminator,
         Long iterations,
         byte[] salt,
-        Integer passcodeID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void revokeCommissioning(
@@ -527,7 +516,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -535,7 +524,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -578,26 +567,22 @@ public class ChipClusters {
       subscribeAdminVendorIdAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -639,21 +624,21 @@ public class ChipClusters {
     private native void subscribeAdminVendorIdAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -691,7 +676,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -699,7 +684,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -778,26 +763,22 @@ public class ChipClusters {
       subscribeAllowedVendorListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -871,21 +852,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -989,7 +970,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -997,7 +978,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1022,26 +1003,22 @@ public class ChipClusters {
       subscribeCatalogListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -1071,21 +1048,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -1154,7 +1131,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1162,7 +1139,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1196,26 +1173,22 @@ public class ChipClusters {
       subscribeCurrentOutputAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -1251,21 +1224,21 @@ public class ChipClusters {
     private native void subscribeCurrentOutputAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -1324,7 +1297,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1332,7 +1305,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1384,26 +1357,22 @@ public class ChipClusters {
       subscribeBarrierPositionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -1448,21 +1417,21 @@ public class ChipClusters {
     private native void subscribeBarrierPositionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -1500,7 +1469,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1508,7 +1477,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1722,26 +1691,22 @@ public class ChipClusters {
       subscribeUniqueIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -1930,21 +1895,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -1974,7 +1939,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -1982,7 +1947,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2043,26 +2008,22 @@ public class ChipClusters {
       subscribeStatusFlagsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -2113,21 +2074,21 @@ public class ChipClusters {
     private native void subscribeStatusFlagsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -2165,7 +2126,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2173,7 +2134,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2210,26 +2171,22 @@ public class ChipClusters {
       subscribeBindingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -2262,21 +2219,21 @@ public class ChipClusters {
     private native void subscribeBindingAttribute(
         long chipClusterPtr, BindingAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -2306,7 +2263,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2314,7 +2271,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2339,26 +2296,22 @@ public class ChipClusters {
       subscribeStateValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -2385,21 +2338,21 @@ public class ChipClusters {
     private native void subscribeStateValueAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -2704,7 +2657,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2712,7 +2665,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2755,26 +2708,22 @@ public class ChipClusters {
       subscribeSetupUrlAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -2822,21 +2771,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -2874,7 +2823,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -2882,7 +2831,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -3042,26 +2991,22 @@ public class ChipClusters {
       subscribeUniqueIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -3211,21 +3156,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -3307,7 +3252,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ChangeChannelResponseCallback {
-      void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
@@ -3320,7 +3265,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -3328,7 +3273,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -3353,26 +3298,22 @@ public class ChipClusters {
       subscribeChannelListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -3402,21 +3343,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -4273,7 +4214,7 @@ public class ChipClusters {
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -4281,7 +4222,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -4888,26 +4829,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -5321,21 +5258,21 @@ public class ChipClusters {
     private native void subscribeStartUpColorTemperatureMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -5435,7 +5372,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5443,7 +5380,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5489,26 +5426,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -5550,21 +5483,21 @@ public class ChipClusters {
     private native void subscribeSupportedStreamingProtocolsAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -5626,7 +5559,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5634,7 +5567,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5686,26 +5619,22 @@ public class ChipClusters {
       subscribePartsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -5759,21 +5688,21 @@ public class ChipClusters {
     private native void subscribePartsListAttribute(
         long chipClusterPtr, PartsListAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -5841,7 +5770,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5849,7 +5778,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -5865,26 +5794,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -5896,21 +5821,21 @@ public class ChipClusters {
       subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -6342,7 +6267,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -6350,7 +6275,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -6627,26 +6552,22 @@ public class ChipClusters {
       subscribeWrongCodeEntryLimitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -6838,21 +6759,21 @@ public class ChipClusters {
     private native void subscribeWrongCodeEntryLimitAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -6882,7 +6803,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -6890,7 +6811,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7005,26 +6926,22 @@ public class ChipClusters {
       subscribeActivePowerMaxAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -7111,21 +7028,21 @@ public class ChipClusters {
     private native void subscribeActivePowerMaxAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -7193,7 +7110,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7201,7 +7118,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7298,26 +7215,22 @@ public class ChipClusters {
       subscribeTimeSinceResetAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -7407,21 +7320,200 @@ public class ChipClusters {
     private native void subscribeTimeSinceResetAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class FanControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 514L;
+
+    public FanControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readFanModeAttribute(IntegerAttributeCallback callback) {
+      readFanModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFanModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeFanModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeFanModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeFanModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFanModeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFanModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFanModeSequenceAttribute(IntegerAttributeCallback callback) {
+      readFanModeSequenceAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value) {
+      writeFanModeSequenceAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeFanModeSequenceAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeFanModeSequenceAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFanModeSequenceAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFanModeSequenceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readFanModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeFanModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeFanModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readFanModeSequenceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeFanModeSequenceAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeFanModeSequenceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -7465,7 +7557,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7473,7 +7565,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7498,26 +7590,22 @@ public class ChipClusters {
       subscribeLabelListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -7544,21 +7632,21 @@ public class ChipClusters {
     private native void subscribeLabelListAttribute(
         long chipClusterPtr, LabelListAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -7612,7 +7700,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7620,7 +7708,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7672,26 +7760,22 @@ public class ChipClusters {
       subscribeToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -7745,21 +7829,21 @@ public class ChipClusters {
     private native void subscribeToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -7889,7 +7973,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7897,7 +7981,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -7949,26 +8033,22 @@ public class ChipClusters {
       subscribeLocationCapabilityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -8013,21 +8093,21 @@ public class ChipClusters {
     private native void subscribeLocationCapabilityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -8089,7 +8169,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8097,7 +8177,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8185,26 +8265,22 @@ public class ChipClusters {
       subscribeActiveNetworkFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -8284,21 +8360,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -8423,7 +8499,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8431,7 +8507,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8496,26 +8572,22 @@ public class ChipClusters {
       subscribeMaxGroupKeysPerFabricAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -8572,21 +8644,21 @@ public class ChipClusters {
     private native void subscribeMaxGroupKeysPerFabricAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -8741,7 +8813,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8749,7 +8821,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8774,26 +8846,22 @@ public class ChipClusters {
       subscribeNameSupportAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -8820,21 +8888,21 @@ public class ChipClusters {
     private native void subscribeNameSupportAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -8920,7 +8988,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8928,7 +8996,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -8971,26 +9039,22 @@ public class ChipClusters {
       subscribeIdentifyTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -9029,21 +9093,21 @@ public class ChipClusters {
     private native void subscribeIdentifyTypeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -9105,7 +9169,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9113,7 +9177,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9174,26 +9238,22 @@ public class ChipClusters {
       subscribeLightSensorTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -9256,21 +9316,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -9321,7 +9381,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9329,7 +9389,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9345,26 +9405,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -9385,21 +9441,21 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -9682,7 +9738,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9690,7 +9746,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -9895,26 +9951,22 @@ public class ChipClusters {
       subscribeStartUpCurrentLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -10082,21 +10134,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -10140,7 +10192,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10148,7 +10200,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10183,26 +10235,22 @@ public class ChipClusters {
       subscribeSupportedLocalesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
@@ -10238,21 +10286,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -10287,7 +10335,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10295,7 +10343,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10311,26 +10359,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -10351,21 +10395,21 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -10462,7 +10506,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10470,7 +10514,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10504,26 +10548,22 @@ public class ChipClusters {
       subscribeCurrentInputAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -10556,21 +10596,21 @@ public class ChipClusters {
     private native void subscribeCurrentInputAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -10761,7 +10801,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface PlaybackResponseCallback {
-      void onSuccess(Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
@@ -10798,7 +10838,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10806,7 +10846,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -10876,26 +10916,22 @@ public class ChipClusters {
       subscribeSeekRangeStartAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -10958,21 +10994,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -11017,6 +11053,14 @@ public class ChipClusters {
         Integer newMode,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface StandardNamespaceAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.ModeSelectClusterModeOptionStruct> valueList);
 
@@ -11025,7 +11069,23 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface StartUpModeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface OnModeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -11033,7 +11093,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -11049,13 +11109,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readCurrentModeAttribute(IntegerAttributeCallback callback) {
-      readCurrentModeAttribute(chipClusterPtr, callback);
+    public void readDescriptionAttribute(CharStringAttributeCallback callback) {
+      readDescriptionAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeCurrentModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeCurrentModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeDescriptionAttribute(
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
+      readStandardNamespaceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStandardNamespaceAttribute(
+        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -11067,7 +11136,34 @@ public class ChipClusters {
       subscribeSupportedModesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readOnModeAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentModeAttribute(IntegerAttributeCallback callback) {
+      readCurrentModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeCurrentModeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeCurrentModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStartUpModeAttribute(StartUpModeAttributeCallback callback) {
+      readStartUpModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeStartUpModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeStartUpModeAttribute(
+        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readOnModeAttribute(OnModeAttributeCallback callback) {
       readOnModeAttribute(chipClusterPtr, callback);
     }
 
@@ -11081,48 +11177,26 @@ public class ChipClusters {
     }
 
     public void subscribeOnModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeOnModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpModeAttribute(IntegerAttributeCallback callback) {
-      readStartUpModeAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeStartUpModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readDescriptionAttribute(CharStringAttributeCallback callback) {
-      readDescriptionAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -11134,6 +11208,15 @@ public class ChipClusters {
       subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -11142,38 +11225,6 @@ public class ChipClusters {
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readCurrentModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeCurrentModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readSupportedModesAttribute(
-        long chipClusterPtr, SupportedModesAttributeCallback callback);
-
-    private native void subscribeSupportedModesAttribute(
-        long chipClusterPtr,
-        SupportedModesAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readOnModeAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void writeOnModeAttribute(
-        long chipClusterPtr,
-        DefaultClusterCallback callback,
-        Integer value,
-        @Nullable Integer timedWriteTimeoutMs);
-
-    private native void subscribeOnModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readDescriptionAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
@@ -11184,21 +11235,71 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readStandardNamespaceAttribute(
+        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeStandardNamespaceAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readSupportedModesAttribute(
+        long chipClusterPtr, SupportedModesAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeSupportedModesAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        SupportedModesAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readCurrentModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeCurrentModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readStartUpModeAttribute(
+        long chipClusterPtr, StartUpModeAttributeCallback callback);
+
+    private native void writeStartUpModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeStartUpModeAttribute(
+        long chipClusterPtr,
+        StartUpModeAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readOnModeAttribute(long chipClusterPtr, OnModeAttributeCallback callback);
+
+    private native void writeOnModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeOnModeAttribute(
+        long chipClusterPtr, OnModeAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -11210,6 +11311,12 @@ public class ChipClusters {
         AttributeListAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -11413,7 +11520,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -11421,7 +11528,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -11511,26 +11618,22 @@ public class ChipClusters {
       subscribeLastConnectErrorValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readFeatureMapAttribute(LongAttributeCallback callback) {
@@ -11614,21 +11717,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -12030,7 +12133,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12038,7 +12141,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12082,26 +12185,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -12140,21 +12239,21 @@ public class ChipClusters {
     private native void subscribeOccupancySensorTypeBitmapAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -12286,7 +12385,15 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface StartUpOnOffAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12294,7 +12401,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12364,7 +12471,7 @@ public class ChipClusters {
       subscribeOffWaitTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpOnOffAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpOnOffAttribute(StartUpOnOffAttributeCallback callback) {
       readStartUpOnOffAttribute(chipClusterPtr, callback);
     }
 
@@ -12378,30 +12485,26 @@ public class ChipClusters {
     }
 
     public void subscribeStartUpOnOffAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpOnOffAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpOnOffAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -12466,7 +12569,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpOnOffAttributeCallback callback);
 
     private native void writeStartUpOnOffAttribute(
         long chipClusterPtr,
@@ -12475,23 +12578,26 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
-
-    private native void subscribeServerGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        StartUpOnOffAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -12527,7 +12633,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12535,7 +12641,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12578,26 +12684,22 @@ public class ChipClusters {
       subscribeSwitchActionsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -12636,21 +12738,21 @@ public class ChipClusters {
     private native void subscribeSwitchActionsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -12913,7 +13015,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12921,7 +13023,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -12992,26 +13094,22 @@ public class ChipClusters {
       subscribeCurrentFabricIndexAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -13073,21 +13171,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13125,7 +13223,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13133,7 +13231,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13230,26 +13328,22 @@ public class ChipClusters {
       subscribeBatteryChargeStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -13337,21 +13431,21 @@ public class ChipClusters {
     private native void subscribeBatteryChargeStateAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13395,7 +13489,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13403,7 +13497,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13428,26 +13522,22 @@ public class ChipClusters {
       subscribeSourcesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -13474,21 +13564,21 @@ public class ChipClusters {
     private native void subscribeSourcesAttribute(
         long chipClusterPtr, SourcesAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13664,7 +13754,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13672,7 +13762,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -13941,26 +14031,22 @@ public class ChipClusters {
       subscribeAlarmMaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -14162,21 +14248,21 @@ public class ChipClusters {
     private native void subscribeAlarmMaskAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14212,7 +14298,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14220,7 +14306,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14272,26 +14358,22 @@ public class ChipClusters {
       subscribeToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -14336,21 +14418,21 @@ public class ChipClusters {
     private native void subscribeToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14584,7 +14666,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14592,7 +14674,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14653,26 +14735,22 @@ public class ChipClusters {
       subscribeNameSupportAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -14723,21 +14801,21 @@ public class ChipClusters {
     private native void subscribeNameSupportAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14789,7 +14867,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14797,7 +14875,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14850,26 +14928,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -14926,21 +15000,21 @@ public class ChipClusters {
     private native void subscribeCurrentHeapHighWatermarkAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14976,7 +15050,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -14984,7 +15058,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -15027,26 +15101,22 @@ public class ChipClusters {
       subscribeMultiPressMaxAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -15094,21 +15164,21 @@ public class ChipClusters {
     private native void subscribeMultiPressMaxAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -15178,7 +15248,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -15186,7 +15256,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -15220,26 +15290,22 @@ public class ChipClusters {
       subscribeCurrentTargetAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -15275,21 +15341,21 @@ public class ChipClusters {
     private native void subscribeCurrentTargetAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -15319,6 +15385,30 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -15327,30 +15417,30 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readMeasuredValueAttribute(IntegerAttributeCallback callback) {
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
       readMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeMeasuredValueAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readMinMeasuredValueAttribute(IntegerAttributeCallback callback) {
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
       readMinMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeMinMeasuredValueAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readMaxMeasuredValueAttribute(IntegerAttributeCallback callback) {
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeMaxMeasuredValueAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -15382,22 +15472,31 @@ public class ChipClusters {
     }
 
     private native void readMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
 
     private native void subscribeMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readMinMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
 
     private native void subscribeMinMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readMaxMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
 
     private native void subscribeMaxMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -15833,6 +15932,14 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface ListFabricScopedAttributeCallback {
+      void onSuccess(List<ChipStructs.TestClusterClusterTestFabricScoped> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface NullableBooleanAttributeCallback {
       void onSuccess(@Nullable Boolean value);
 
@@ -16089,7 +16196,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -16097,7 +16204,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -16887,6 +16994,28 @@ public class ChipClusters {
       subscribeListLongOctetStringAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readListFabricScopedAttribute(ListFabricScopedAttributeCallback callback) {
+      readListFabricScopedAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeListFabricScopedAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value) {
+      writeListFabricScopedAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeListFabricScopedAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value,
+        int timedWriteTimeoutMs) {
+      writeListFabricScopedAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeListFabricScopedAttribute(
+        ListFabricScopedAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeListFabricScopedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readTimedWriteBooleanAttribute(BooleanAttributeCallback callback) {
       readTimedWriteBooleanAttribute(chipClusterPtr, callback);
     }
@@ -17547,26 +17676,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -18090,6 +18215,21 @@ public class ChipClusters {
     private native void subscribeListLongOctetStringAttribute(
         long chipClusterPtr,
         ListLongOctetStringAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readListFabricScopedAttribute(
+        long chipClusterPtr, ListFabricScopedAttributeCallback callback);
+
+    private native void writeListFabricScopedAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeListFabricScopedAttribute(
+        long chipClusterPtr,
+        ListFabricScopedAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -18621,21 +18761,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -19258,7 +19398,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -19266,7 +19406,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -19340,26 +19480,22 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -19416,21 +19552,21 @@ public class ChipClusters {
     private native void subscribeScheduleProgrammingVisibilityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -19515,7 +19651,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -19523,7 +19659,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -20114,26 +20250,22 @@ public class ChipClusters {
       subscribeActiveNetworkFaultsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -20563,21 +20695,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -20621,7 +20753,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -20629,7 +20761,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -20683,26 +20815,22 @@ public class ChipClusters {
       subscribeSupportedCalendarTypesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
@@ -20747,21 +20875,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -20887,7 +21015,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -20895,7 +21023,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -20924,26 +21052,22 @@ public class ChipClusters {
       subscribeLabelListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
@@ -20967,21 +21091,21 @@ public class ChipClusters {
     private native void subscribeLabelListAttribute(
         long chipClusterPtr, LabelListAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -21002,7 +21126,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21010,7 +21134,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21035,26 +21159,22 @@ public class ChipClusters {
       subscribeMACAddressAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -21084,21 +21204,21 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -21182,7 +21302,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21190,7 +21310,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21323,26 +21443,22 @@ public class ChipClusters {
       subscribeOverrunCountAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -21457,21 +21573,21 @@ public class ChipClusters {
     private native void subscribeOverrunCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -21699,7 +21815,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ServerGeneratedCommandListAttributeCallback {
+    public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21707,7 +21823,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ClientGeneratedCommandListAttributeCallback {
+    public interface AcceptedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
       void onError(Exception ex);
@@ -21916,26 +22032,22 @@ public class ChipClusters {
       subscribeSafetyStatusAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback) {
-      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeServerGeneratedCommandListAttribute(
-        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeServerGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback) {
-      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClientGeneratedCommandListAttribute(
-        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClientGeneratedCommandListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -22101,21 +22213,21 @@ public class ChipClusters {
     private native void subscribeSafetyStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readServerGeneratedCommandListAttribute(
-        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
-    private native void subscribeServerGeneratedCommandListAttribute(
+    private native void subscribeGeneratedCommandListAttribute(
         long chipClusterPtr,
-        ServerGeneratedCommandListAttributeCallback callback,
+        GeneratedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readClientGeneratedCommandListAttribute(
-        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
 
-    private native void subscribeClientGeneratedCommandListAttribute(
+    private native void subscribeAcceptedCommandListAttribute(
         long chipClusterPtr,
-        ClientGeneratedCommandListAttributeCallback callback,
+        AcceptedCommandListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

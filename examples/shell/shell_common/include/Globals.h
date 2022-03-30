@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -32,6 +33,7 @@ constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
 constexpr chip::System::Clock::Timeout kResponseTimeOut = chip::System::Clock::Seconds16(1);
 
+extern chip::FabricTable gFabricTable;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SessionManager gSessionManager;

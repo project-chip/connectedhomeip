@@ -22,12 +22,23 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT sends a QueryImage command to the TH/OTA-P"
-      disabled: true
-
     - label:
-          "DUT sends a QueryImage command to the TH/OTA-P. Wait for 1 minute."
-      disabled: true
+          "TH2/Administrator sends an AnnounceOTAProvider command to the DUT."
+      verification: |
+          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
 
-    - label: "DUT sends a QueryImage command to the TH/OTA-P. + Reboot the DUT."
+          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Verify on the OTA Provider logs:
+
+          [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
+          [1645743053317] [97806:20280749] CHIP: [ZCL]     0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   HardwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   Location: XX
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   RequestorCanConsent: 0
       disabled: true

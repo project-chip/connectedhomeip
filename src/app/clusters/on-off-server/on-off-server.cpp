@@ -41,6 +41,7 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -166,6 +167,21 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
 #endif
+#ifdef EMBER_AF_PLUGIN_MODE_SELECT
+        // If OnMode is not a null value, then change the current mode to it.
+        ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+        status = ModeSelect::Attributes::OnMode::Get(endpoint, onMode);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfOnOffClusterPrintln("ERR: reading onMode %x", status);
+            return status;
+        }
+        if (!onMode.IsNull())
+        {
+            emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+            status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+        }
+#endif
     }
     else // Set Off
     {
@@ -229,11 +245,11 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         //            set the OnOff attribute to 1.If the previous value of the OnOff
         //            attribute is equal to 1, set the OnOff attribute to 0 (toggle).
         // 0x03-0xfe  These values are reserved.  No action.
-        // 0xff       Set the OnOff attribute to its previous value.
+        // 0xff      This value cannot happen.
+        // null       Set the OnOff attribute to its previous value.
 
-        // Initialize startUpOnOff to No action value 0xFE
-        uint8_t startUpOnOff = 0xFE;
-        EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, &startUpOnOff);
+        app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
+        EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             // Initialise updated value to 0
@@ -241,25 +257,25 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
-                switch (startUpOnOff)
+                if (!startUpOnOff.IsNull())
                 {
-                case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_OFF:
-                    updatedOnOff = 0; // Off
-                    break;
-                case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_ON:
-                    updatedOnOff = 1; // On
-                    break;
-                case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE:
-                    updatedOnOff = !updatedOnOff;
-                    break;
-                case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_PREVIOUS:
-                default:
-                    // All other values 0x03- 0xFE are reserved - no action.
-                    // When value is 0xFF - update with last value - that is as good as
-                    // no action.
-                    break;
+                    switch (startUpOnOff.Value())
+                    {
+                    case OnOff::OnOffStartUpOnOff::kOff:
+                        updatedOnOff = 0; // Off
+                        break;
+                    case OnOff::OnOffStartUpOnOff::kOn:
+                        updatedOnOff = 1; // On
+                        break;
+                    case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
+                        updatedOnOff = !updatedOnOff;
+                        break;
+                    default:
+                        // All other values 0x03- 0xFE are reserved - no action.
+                        break;
+                    }
                 }
-                status = Attributes::OnOff::Set(endpoint, updatedOnOff);
+                status = setOnOffValue(endpoint, updatedOnOff, false);
             }
         }
     }
@@ -316,7 +332,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
             if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
             {
-                groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+                groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
             }
 
             emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
@@ -383,7 +399,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
     if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
     {
-        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
     emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
@@ -526,7 +542,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
 {
     if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id, true))
     {
-        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true);
+        return emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, true);
     }
 
     return false;

@@ -79,7 +79,7 @@ struct ControllerDeviceInitParams
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
 {
 public:
-    ~CommissioneeDeviceProxy();
+    ~CommissioneeDeviceProxy() override;
     CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
@@ -225,6 +225,8 @@ public:
         bool loadedSecureSession = false;
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
+
+    Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
 private:
     enum class ConnectionState

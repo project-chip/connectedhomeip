@@ -27,6 +27,8 @@
 #include "freertos/task.h"
 #include "freertos/timers.h"
 
+#define STATUS_LED_GPIO_NUM ((gpio_num_t) CONFIG_STATUS_LED_GPIO_NUM)
+
 class LEDWidget
 {
 public:

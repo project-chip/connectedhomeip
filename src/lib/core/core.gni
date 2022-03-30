@@ -33,6 +33,9 @@ declare_args() {
   # Enable automation logging.
   chip_automation_logging = chip_logging
 
+  # Enable pigweed tokenizer logging.
+  chip_pw_tokenizer_logging = false
+
   # Enable short error strings.
   chip_config_short_error_str = false
 
@@ -50,6 +53,14 @@ declare_args() {
 
   # When enabled traces messages using pw_trace.
   chip_enable_transport_trace = false
+
+  # Enables using dynamic memory for minmdns tracking of operational
+  # responders.
+  #
+  # When not set, CHIP_CONFIG_MAX_FABRICS is used for static allocation
+  # of tracking information for operational advertisement.
+  chip_config_minmdns_dynamic_operational_responder_list =
+      current_os == "linux" || current_os == "android" || current_os == "darwin"
 }
 
 if (chip_target_style == "") {

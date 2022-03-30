@@ -37,6 +37,20 @@ struct CommandPathParams
         mEndpointId(aEndpointId),
         mGroupId(aGroupId), mClusterId(aClusterId), mCommandId(aCommandId), mFlags(aFlags)
     {}
+
+    CommandPathParams(uint16_t aId, ClusterId aClusterId, CommandId aCommandId, const BitFlags<CommandPathFlags> & aFlags) :
+        mClusterId(aClusterId), mCommandId(aCommandId), mFlags(aFlags)
+    {
+        if (aFlags == CommandPathFlags::kEndpointIdValid)
+        {
+            mEndpointId = aId;
+        }
+        else if (aFlags == CommandPathFlags::kGroupIdValid)
+        {
+            mGroupId = aId;
+        }
+    }
+
     bool IsSamePath(const CommandPathParams & other) const
     {
         if (other.mClusterId != mClusterId || other.mCommandId != mCommandId)

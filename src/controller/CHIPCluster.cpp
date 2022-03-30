@@ -42,39 +42,6 @@ CHIP_ERROR ClusterBase::Associate(DeviceProxy * device, EndpointId endpoint)
     return err;
 }
 
-CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId)
-{
-    // TODO Update this function to work in all possible conditions Issue #11850
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    mDevice = device;
-    if (mDevice->GetSecureSession().HasValue())
-    {
-        // Local copy to preserve original SessionHandle for future Unicast communication.
-        Optional<SessionHandle> session = mDevice->GetExchangeManager()->GetSessionManager()->CreateGroupSession(
-            groupId, mDevice->GetSecureSession().Value()->GetFabricIndex(), mDevice->GetDeviceId());
-
-        // Sanity check
-        if (!session.HasValue() || !session.Value()->IsGroupSession())
-        {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        mGroupSession.Grab(session.Value());
-    }
-    else
-    {
-        // something fishy is going on
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // Set to 0 for now.
-    mEndpoint = 0;
-
-    return err;
-}
-
 void ClusterBase::Dissociate()
 {
     mDevice = nullptr;

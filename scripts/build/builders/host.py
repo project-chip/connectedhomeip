@@ -32,6 +32,8 @@ class HostApp(Enum):
     TESTS = auto()
     SHELL = auto()
     CERT_TOOL = auto()
+    OTA_PROVIDER = auto()
+    OTA_REQUESTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -56,6 +58,10 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.CERT_TOOL:
             return '..'
+        elif self == HostApp.OTA_PROVIDER:
+            return 'ota-provider-app/linux'
+        elif self == HostApp.OTA_REQUESTOR:
+            return 'ota-requestor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -95,6 +101,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.OTA_PROVIDER:
+            yield 'chip-ota-provider-app'
+            yield 'chip-ota-provider-app.map'
+        elif self == HostApp.OTA_REQUESTOR:
+            yield 'chip-ota-requestor-app'
+            yield 'chip-ota-requestor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -142,10 +154,9 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
+                 enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
                  test_group=False, use_libfuzzer=False, use_clang=False,
-                 use_platform_mdns=False
-                 ):
+                 use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -159,6 +170,9 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+
+        if not enable_wifi:
+            self.extra_gn_options.append('chip_enable_wifi=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')

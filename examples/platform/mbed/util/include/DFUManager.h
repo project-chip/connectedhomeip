@@ -28,6 +28,7 @@
 
 #ifdef CHIP_OTA_REQUESTOR
 #include <BDXDownloader.h>
+#include <DefaultOTARequestorStorage.h>
 #include <OTAImageProcessorImpl.h>
 #include <OTARequestor.h>
 #include <OTARequestorDriverImpl.h>
@@ -54,6 +55,7 @@ private:
 
 #ifdef CHIP_OTA_REQUESTOR
     chip::OTARequestor mRequestorCore;
+    chip::DefaultOTARequestorStorage mRequestorStorage;
     chip::DeviceLayer::OTARequestorDriverImpl mRequestorDriver;
     chip::BDXDownloader mDownloader;
     chip::OTAImageProcessorImpl mImageProcessor;

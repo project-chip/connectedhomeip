@@ -35,7 +35,7 @@ constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 } // namespace
 
-CHIP_ERROR AmebaWiFiDriver::Init()
+CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback *)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;

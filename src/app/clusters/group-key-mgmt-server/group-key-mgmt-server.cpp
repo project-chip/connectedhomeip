@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>
@@ -165,9 +166,11 @@ private:
             GroupDataProvider::GroupKey mapping;
             while (iter->Next(mapping))
             {
-                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = { .fabricIndex   = fabric_index,
-                                                                             .groupId       = mapping.group_id,
-                                                                             .groupKeySetID = mapping.keyset_id };
+                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
+                    .groupId       = mapping.group_id,
+                    .groupKeySetID = mapping.keyset_id,
+                    .fabricIndex   = fabric_index,
+                };
                 encoder.Encode(key);
             }
             iter->Release();
@@ -200,6 +203,9 @@ private:
             {
                 const auto & value = iter.GetValue();
                 VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+                // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
+                VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
                 ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, i++,
                                                              GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
             }
@@ -212,6 +218,8 @@ private:
             VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
             ReturnErrorOnFailure(aDecoder.Decode(value));
             VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+            // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
+            VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             {
                 auto iter     = provider->IterateGroupKeys(fabric_index);
@@ -285,10 +293,19 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    auto fabric     = commandObj->GetAccessingFabricIndex();
-    auto * provider = GetGroupDataProvider();
+    auto provider = GetGroupDataProvider();
+    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
-    if (nullptr == provider)
+    if (nullptr == provider || nullptr == fabric)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+
+    uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
+    MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
+    CHIP_ERROR err = fabric->GetCompressedId(compressed_fabric_id);
+    if (CHIP_NO_ERROR != err)
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
@@ -347,7 +364,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Set KeySet
-    CHIP_ERROR err = provider->SetKeySet(fabric, keyset);
+    err = provider->SetKeySet(fabric->GetFabricIndex(), compressed_fabric_id, keyset);
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite OK");
@@ -426,12 +443,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     }
     response.groupKeySet.epochKey2.SetNull();
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRead failed: %s", ErrorStr(err));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -518,11 +530,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
         return true;
     }
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, KeySetReadAllIndicesResponse(keysIt));
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetReadAllIndices failed: %s", ErrorStr(err));
-    }
+    commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(keysIt));
     keysIt->Release();
     return true;
 }

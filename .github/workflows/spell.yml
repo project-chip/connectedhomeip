@@ -17,23 +17,37 @@ name: Run misspell
 on:
     push:
         paths:
-            - '**.md'
-            - '!.github/*'
+            - "**.md"
+            - ".github/.wordlist.txt"
     pull_request:
         paths:
-            - '**.md'
-            - '!.github/*'
+            - "**.md"
+            - ".github/.wordlist.txt"
 
 jobs:
     check-reviewdog:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - uses: reviewdog/action-misspell@v1
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
     check-spellcheck:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - uses: igsekor/pyspelling-any@v0.0.2

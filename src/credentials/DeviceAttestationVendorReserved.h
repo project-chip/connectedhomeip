@@ -72,7 +72,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    size_t GetNumberOfElements() { return mNumVendorReservedData; }
+    size_t GetNumberOfElements() const { return mNumVendorReservedData; }
 
     /**
      *  @brief Return next VendorReserved element. PrepareToReadVendorReservedElements must be called first.
@@ -169,7 +169,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    size_t GetNumberOfElements() { return mNumEntriesUsed; }
+    size_t GetNumberOfElements() const { return mNumEntriesUsed; }
 
 private:
     /*

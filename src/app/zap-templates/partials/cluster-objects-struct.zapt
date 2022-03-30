@@ -78,15 +78,22 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    {{#if struct_has_fabric_sensitive_fields}}
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == {{ asLowerCamelCase struct_fabric_idx_field }});
+    {{/if}}
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
     {{#if (isStrEqual label ../struct_fabric_idx_field)}}
-      if (accessingFabricIndex.HasValue()) {
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
-      }
+    if (accessingFabricIndex.HasValue()) {
+      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    }
+    {{else if isFabricSensitive}}
+    if (includeSensitive) {
+       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    }
     {{else}}
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
     {{/if}}
     {{/zcl_struct_items}}
     ReturnErrorOnFailure(writer.EndContainer(outer));

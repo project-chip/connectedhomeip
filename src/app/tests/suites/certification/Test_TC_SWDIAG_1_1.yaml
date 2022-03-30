@@ -28,6 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #issue 873
     - label:
           "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       command: "readAttribute"
@@ -35,7 +36,7 @@ tests:
       PICS: A_THREADMETRICS
       response:
           constraints:
-              value: 0
+              type: list
 
     - label: "Reads CurrentHeapFree non-global attribute value from DUT"
       optional: true

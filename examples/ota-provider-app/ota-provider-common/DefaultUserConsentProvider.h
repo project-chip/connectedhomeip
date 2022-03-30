@@ -18,7 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <ota-provider-common/UserConsentDelegate.h>
+#include <platform/UserConsentDelegate.h>
 
 namespace chip {
 namespace ota {
@@ -30,7 +30,7 @@ public:
 
     ~DefaultUserConsentProvider() = default;
 
-    // This method returns kGranted unless explicitly denied by the user by calling RevokeUserConsent()
+    // This method returns kGranted unless explicitly set by the user by calling SetGlobalUserConsentState()
     UserConsentState GetUserConsentState(const UserConsentSubject & subject) override;
 
     // If this is set to true, all the user consent requests will be replied with global consent.
@@ -54,8 +54,6 @@ private:
     bool mUseGlobalConsent = false;
 
     UserConsentState mGlobalConsentState = UserConsentState::kGranted;
-
-    void LogUserConsentSubject(const UserConsentSubject & subject);
 };
 
 } // namespace ota

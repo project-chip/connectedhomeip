@@ -35,10 +35,15 @@ jobs:
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -55,14 +60,14 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build example CYW30739 Apps
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
-                      --target-glob 'cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor}' \
+                      --target-glob 'cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor-no-progress-logging}' \
                       build \
                       --copy-artifacts-to out/artifacts \
                     "
@@ -84,8 +89,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 ota-requestor \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor/chip-cyw30739-ota-requestor-example.elf \
+                    cyw30739 cyw930739m2evb_01 ota-requestor-no-progress-logging \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging/chip-cyw30739-ota-requestor-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

@@ -62,7 +62,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 
 AndroidDeviceControllerWrapper *
 AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                            chip::System::Layer * systemLayer,
+                                            const chip::CATValues & cats, chip::System::Layer * systemLayer,
                                             chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
                                             chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
                                             AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
@@ -118,7 +118,6 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.systemLayer        = systemLayer;
     initParams.tcpEndPointManager = tcpEndPointManager;
     initParams.udpEndPointManager = udpEndPointManager;
-    initParams.fabricStorage      = wrapper.get();
 
     // move bleLayer into platform/android to share with app server
 #if CONFIG_NETWORK_LAYER_BLE
@@ -164,8 +163,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcacSpan,
-                                                                       icacSpan, nocSpan);
+    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
+                                                                       rcacSpan, icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -329,19 +328,3 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer,
-                                                     uint16_t size)
-{
-    return SyncSetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
-{
-    return SyncGetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(chip::FabricIndex fabricIndex, const char * key)
-{
-    return SyncDeleteKeyValue(key);
-};

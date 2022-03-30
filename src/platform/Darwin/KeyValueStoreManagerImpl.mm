@@ -222,22 +222,28 @@ namespace DeviceLayer {
                 return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
             }
 
+            __block NSData * itemValue = nil;
+            // can only access this object on the managed queue
+            [gContext performBlockAndWait:^{
+                itemValue = item.value;
+            }];
+
             if (read_bytes_size != nullptr) {
-                *read_bytes_size = item.value.length;
+                *read_bytes_size = itemValue.length;
             }
 
             if (value != nullptr) {
-                memcpy(value, item.value.bytes, std::min<size_t>((item.value.length), value_size));
+                memcpy(value, itemValue.bytes, std::min<size_t>((itemValue.length), value_size));
 #if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
                 fprintf(stderr, "GETTING VALUE FOR: '%s': ", key);
-                for (size_t i = 0; i < std::min<size_t>((item.value.length), value_size); ++i) {
+                for (size_t i = 0; i < std::min<size_t>((itemValue.length), value_size); ++i) {
                     fprintf(stderr, "%02x ", static_cast<uint8_t *>(value)[i]);
                 }
                 fprintf(stderr, "\n");
 #endif
             }
 
-            if (item.value.length > value_size) {
+            if (itemValue.length > value_size) {
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
 
@@ -281,12 +287,13 @@ namespace DeviceLayer {
 
             KeyValueItem * item = FindItemForKey(itemKey, nil);
             if (!item) {
-                item = [[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data];
                 [gContext performBlockAndWait:^{
-                    [gContext insertObject:item];
+                    [gContext insertObject:[[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data]];
                 }];
             } else {
-                item.value = data;
+                [gContext performBlockAndWait:^{
+                    item.value = data;
+                }];
             }
 
             __block BOOL success = NO;

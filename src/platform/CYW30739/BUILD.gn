@@ -71,6 +71,9 @@ static_library("CYW30739") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    public_configs = [
+      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
+    ]
 
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",

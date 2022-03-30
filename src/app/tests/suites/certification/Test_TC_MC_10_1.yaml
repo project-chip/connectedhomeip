@@ -16,12 +16,28 @@ name: 18.12.1. [TC-MC-10.1] Read Content Launcher Attributes (DUT as Server)
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Content Launcher"
+    endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH reads the AcceptHeader attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptHeader"
+      response:
+          constraints:
+              type: list
 
     - label: "TH reads the SupportedStreamingProtocols attribute from the DUT"
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedStreamingProtocols"
+      response:
+          constraints:
+              type: map32

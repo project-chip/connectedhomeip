@@ -28,12 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads mandatory attribute: CurrentHue"
-      command: "readAttribute"
-      attribute: "current hue"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: current hue"
       command: "readAttribute"
       attribute: "current hue"
@@ -55,13 +49,10 @@ tests:
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: 0
-
-    - label: "Reads mandatory attribute: CurrentSaturation"
-      command: "readAttribute"
-      attribute: "current saturation"
-      response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Validate constraints of attribute: CurrentSaturation"
       command: "readAttribute"
@@ -84,13 +75,10 @@ tests:
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: CurrentX"
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: 24939
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Validate constraints of attribute: CurrentX"
       command: "readAttribute"
@@ -113,13 +101,10 @@ tests:
       command: "readAttribute"
       attribute: "current x"
       response:
-          value: 24939
-
-    - label: "Read the mandatory attribute: CurrentY"
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: 24701
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Validate constraints of attribute: CurrentY"
       command: "readAttribute"
@@ -142,14 +127,10 @@ tests:
       command: "readAttribute"
       attribute: "current y"
       response:
-          value: 24701
-
-    - label: "Read the mandatory attribute: ColorTemperatureMireds"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: 250
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Validate constraints of attribute: ColorTemperatureMireds"
       command: "readAttribute"
@@ -176,14 +157,10 @@ tests:
       command: "readAttribute"
       attribute: "color temperature"
       response:
-          value: 250
-
-    - label: "Read the mandatory attribute: ColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color mode"
-      response:
-          value: 1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Validate constraints of attribute: ColorMode"
       command: "readAttribute"
@@ -208,13 +185,10 @@ tests:
       command: "readAttribute"
       attribute: "color mode"
       response:
-          value: 1
-
-    - label: "Read the mandatory attribute: Options"
-      command: "readAttribute"
-      attribute: "color control options"
-      response:
-          value: 0
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
 
     - label: "Validate constraints of attribute: Options"
       command: "readAttribute"
@@ -232,12 +206,6 @@ tests:
     - label: "Reads back mandatory attribute: Options"
       command: "readAttribute"
       attribute: "color control options"
-      response:
-          value: 0
-
-    - label: "Read the mandatory attribute: EnhancedCurrentHue"
-      command: "readAttribute"
-      attribute: "enhanced current hue"
       response:
           value: 0
 
@@ -261,14 +229,8 @@ tests:
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: EnhancedColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced color mode"
-      response:
-          value: 1
+          constraints:
+              type: uint16
 
     - label: "Validate constraints of attribute: EnhancedColorMode"
       command: "readAttribute"
@@ -292,13 +254,8 @@ tests:
       command: "readAttribute"
       attribute: "enhanced color mode"
       response:
-          value: 1
-
-    - label: "Read the mandatory attribute: ColorLoopActive"
-      command: "readAttribute"
-      attribute: "color loop active"
-      response:
-          value: 0
+          constraints:
+              type: enum8
 
     - label: "Validate constraints of attribute: ColorLoopActive"
       command: "readAttribute"
@@ -319,13 +276,8 @@ tests:
       command: "readAttribute"
       attribute: "color loop active"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorLoopDirection"
-      command: "readAttribute"
-      attribute: "color loop direction"
-      response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Validate constraints of attribute: ColorLoopDirection"
       command: "readAttribute"
@@ -347,13 +299,8 @@ tests:
       command: "readAttribute"
       attribute: "color loop direction"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorLoopTime"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          value: 25
+          constraints:
+              type: uint8
 
     - label: "Validate constraints of attribute: ColorLoopTime"
       command: "readAttribute"
@@ -374,13 +321,8 @@ tests:
       command: "readAttribute"
       attribute: "color loop time"
       response:
-          value: 25
-
-    - label: "Read the mandatory attribute: ColorLoopStartEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop start enhanced hue"
-      response:
-          value: 8960
+          constraints:
+              type: uint16
 
     - label: "Validate constraints of attribute: ColorLoopStartEnhancedHue"
       command: "readAttribute"
@@ -403,13 +345,8 @@ tests:
       command: "readAttribute"
       attribute: "color loop start enhanced hue"
       response:
-          value: 8960
-
-    - label: "Read the mandatory attribute: ColorLoopStoredEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop stored enhanced hue"
-      response:
-          value: 0
+          constraints:
+              type: uint16
 
     - label: "Validate constraints of attribute: ColorLoopStoredEnhancedHue"
       command: "readAttribute"
@@ -432,13 +369,8 @@ tests:
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorCapabilities"
-      command: "readAttribute"
-      attribute: "color capabilities"
-      response:
-          value: 0
+          constraints:
+              type: uint16
 
     - label: "Validate constraints of attribute: ColorCapabilities"
       command: "readAttribute"
@@ -447,7 +379,7 @@ tests:
           constraints:
               type: map16
               minValue: 0
-              maxValue: 65279
+              maxValue: 31
 
     - label:
           "Write the default values to mandatory attribute: ColorCapabilities"
@@ -462,13 +394,10 @@ tests:
       command: "readAttribute"
       attribute: "color capabilities"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorTempPhysicalMinMireds"
-      command: "readAttribute"
-      attribute: "color temp physical min"
-      response:
-          value: 0
+          constraints:
+              type: map16
+              minValue: 0
+              maxValue: 31
 
     - label: "Validate constraints of attribute: ColorTempPhysicalMinMireds"
       command: "readAttribute"
@@ -493,13 +422,10 @@ tests:
       command: "readAttribute"
       attribute: "color temp physical min"
       response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorTempPhysicalMaxMireds"
-      command: "readAttribute"
-      attribute: "color temp physical max"
-      response:
-          value: 65279
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Validate constraints of attribute: ColorTempPhysicalMaxMireds"
       command: "readAttribute"
@@ -524,7 +450,10 @@ tests:
       command: "readAttribute"
       attribute: "color temp physical max"
       response:
-          value: 65279
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the optional attribute: CoupleColorTempToLevelMinMireds"
       optional: true
@@ -550,7 +479,8 @@ tests:
       command: "readAttribute"
       attribute: "couple color temp to level min-mireds"
       response:
-          value: 0
+          constraints:
+              type: uint16
 
     - label: "Read the optional attribute: StartUpColorTemperatureMireds"
       optional: true
@@ -578,13 +508,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the Optional attribute: RemainingTime"
-      optional: true
-      command: "readAttribute"
-      attribute: "remaining time"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: RemainingTime"
       optional: true
       command: "readAttribute"
@@ -592,8 +515,6 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 254
 
     - label: "Write the default values to optional attribute: RemainingTime"
       optional: true
@@ -609,7 +530,8 @@ tests:
       command: "readAttribute"
       attribute: "remaining time"
       response:
-          value: 0
+          constraints:
+              type: uint16
 
     - label: "Read the optional attribute: DriftCompensation"
       optional: true
@@ -635,7 +557,10 @@ tests:
       command: "readAttribute"
       attribute: "drift compensation"
       response:
-          value: 0
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
 
     - label: "Read the optional attribute: CompensationText"
       optional: true
@@ -660,7 +585,9 @@ tests:
       command: "readAttribute"
       attribute: "compensation text"
       response:
-          value: ""
+          constraints:
+              type: string
+              maxLength: 254
 
     #Defined Primaries Information Attribute Set
 
@@ -685,7 +612,10 @@ tests:
       command: "readAttribute"
       attribute: "number of primaries"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 6
 
     - label: "Read the mandatory attribute: Primary1X"
       command: "readAttribute"
@@ -708,7 +638,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 1 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary1Y"
       command: "readAttribute"
@@ -731,7 +664,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 1 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary1Intensity"
       command: "readAttribute"
@@ -754,7 +690,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 1 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Read the mandatory attribute: Primary2X"
       command: "readAttribute"
@@ -777,7 +714,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 2 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary2Y"
       command: "readAttribute"
@@ -800,7 +740,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 2 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Validate constraints of attribute: Primary2Intensity"
       command: "readAttribute"
@@ -823,7 +766,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 2 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Read the mandatory attribute: Primary3X"
       command: "readAttribute"
@@ -846,7 +790,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 3 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary3Y"
       command: "readAttribute"
@@ -869,7 +816,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 3 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary3Intensity"
       command: "readAttribute"
@@ -892,7 +842,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 3 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     #Additional Defined Primaries Information Attribute Set
     - label: "Read the mandatory attribute: Primary4X"
@@ -916,7 +867,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 4 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary4Y"
       command: "readAttribute"
@@ -939,7 +893,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 4 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary4Intensity"
       command: "readAttribute"
@@ -962,7 +919,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 4 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Read the mandatory attribute: Primary5X"
       command: "readAttribute"
@@ -985,7 +943,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 5 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary5Y"
       command: "readAttribute"
@@ -1008,7 +969,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 5 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary5Intensity"
       command: "readAttribute"
@@ -1031,7 +995,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 5 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     - label: "Read the mandatory attribute: Primary6X"
       command: "readAttribute"
@@ -1054,7 +1019,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 6 x"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary6Y"
       command: "readAttribute"
@@ -1077,7 +1045,10 @@ tests:
       command: "readAttribute"
       attribute: "primary 6 y"
       response:
-          value: 0
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Read the mandatory attribute: Primary6Intensity"
       command: "readAttribute"
@@ -1100,7 +1071,8 @@ tests:
       command: "readAttribute"
       attribute: "primary 6 intensity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
     #Defined Color Points Settings Attribute Set
     - label: "Read the optional attribute: WhitePointX"

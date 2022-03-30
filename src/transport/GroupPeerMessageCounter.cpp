@@ -151,24 +151,33 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
     {
         if (mGroupFabrics[fabricIt].mDataPeerCount == 0 && mGroupFabrics[fabricIt].mControlPeerCount == 0)
         {
-            mGroupFabrics[fabricIt].mFabricIndex = kUndefinedFabricIndex;
-            // To maintain logic integrity Fabric array cannot have empty slot in between data
-            // Find the last non empty element
-            for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > fabricIt; i--)
-            {
-                if (mGroupFabrics[i].mFabricIndex != kUndefinedFabricIndex)
-                {
-                    // Logic works since all buffer are static
-                    // move it up front
-                    new (&mGroupFabrics[fabricIt]) GroupFabric(mGroupFabrics[i]);
-                    new (&mGroupFabrics[i]) GroupFabric();
-                    break;
-                }
-            }
+            RemoveAndCompactFabric(fabricIt);
         }
     }
 
     // Cannot find Peer to remove
+    return err;
+}
+
+CHIP_ERROR GroupPeerTable::FabricRemoved(FabricIndex fabricIndex)
+{
+    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    for (uint32_t it = 0; it < CHIP_CONFIG_MAX_FABRICS; it++)
+    {
+        if (fabricIndex == mGroupFabrics[it].mFabricIndex)
+        {
+            RemoveAndCompactFabric(it);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // Cannot find Fabric to remove
     return err;
 }
 
@@ -218,6 +227,30 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
                 new (&list[i]) GroupSender();
                 break;
             }
+        }
+    }
+}
+
+void GroupPeerTable::RemoveAndCompactFabric(uint32_t tableIndex)
+{
+    if (tableIndex >= CHIP_CONFIG_MAX_FABRICS)
+    {
+        return;
+    }
+    mGroupFabrics[tableIndex].mFabricIndex = kUndefinedFabricIndex;
+    new (&mGroupFabrics[tableIndex]) GroupFabric();
+
+    // To maintain logic integrity Fabric array cannot have empty slot in between data
+    // Find the last non empty element
+    for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > tableIndex; i--)
+    {
+        if (mGroupFabrics[i].mFabricIndex != kUndefinedFabricIndex)
+        {
+            // Logic works since all buffer are static
+            // move it up front
+            new (&mGroupFabrics[tableIndex]) GroupFabric(mGroupFabrics[i]);
+            new (&mGroupFabrics[i]) GroupFabric();
+            break;
         }
     }
 }
@@ -275,6 +308,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     }
 
     temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
+    size = static_cast<uint16_t>(sizeof(temp));
     ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;

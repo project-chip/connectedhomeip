@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <cstdlib>
 #include <string.h>
@@ -44,6 +45,10 @@ public:
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
     template <size_t N>
     constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
+    {}
+
+    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <size_t N>
@@ -168,6 +173,10 @@ public:
     {
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
+
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
+    {}
 
     // Allow implicit construction from a FixedSpan of sufficient size over a
     // type that matches our type, up to const-ness.

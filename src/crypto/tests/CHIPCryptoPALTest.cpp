@@ -179,7 +179,7 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, vector->iv_len, out_ct_ptr, out_tag.Get(), vector->tag_len);
+                                             vector->nonce, vector->nonce_len, out_ct_ptr, out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)
@@ -223,7 +223,7 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
                 out_pt_ptr = out_pt.Get();
             }
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt_ptr);
+                                             vector->key, vector->key_len, vector->nonce, vector->nonce_len, out_pt_ptr);
 
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
@@ -259,8 +259,8 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
             out_tag.Alloc(vector->tag_len);
             NL_TEST_ASSERT(inSuite, out_tag);
 
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 32, vector->iv,
-                                             vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 32, vector->nonce,
+                                             vector->nonce_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -268,7 +268,7 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+static void TestAES_CCM_256EncryptInvalidNonceLen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
@@ -287,7 +287,7 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, 0, out_ct.Get(), out_tag.Get(), vector->tag_len);
+                                             vector->nonce, 0, out_ct.Get(), out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -314,7 +314,7 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, vector->iv_len, out_ct.Get(), out_tag.Get(), 13);
+                                             vector->nonce, vector->nonce_len, out_ct.Get(), out_tag.Get(), 13);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -337,7 +337,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             nullptr, 32, vector->iv, vector->iv_len, out_pt.Get());
+                                             nullptr, 32, vector->nonce, vector->nonce_len, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -345,7 +345,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+static void TestAES_CCM_256DecryptInvalidNonceLen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
@@ -360,7 +360,7 @@ static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, 0, out_pt.Get());
+                                             vector->key, vector->key_len, vector->nonce, 0, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -383,7 +383,7 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
+                                             vector->key, vector->key_len, vector->nonce, vector->nonce_len, out_pt.Get());
 
             bool arePTsEqual = memcmp(vector->pt, out_pt.Get(), vector->pt_len) == 0;
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INTERNAL);
@@ -412,7 +412,7 @@ static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inCo
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
+                                             vector->nonce, vector->nonce_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)
@@ -450,7 +450,7 @@ static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inCo
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
+                                             vector->key, vector->key_len, vector->nonce, vector->nonce_len, out_pt.Get());
 
             NL_TEST_ASSERT(inSuite, err == vector->result);
             if (vector->result == CHIP_NO_ERROR)
@@ -485,8 +485,8 @@ static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext
             out_tag.Alloc(vector->tag_len);
             NL_TEST_ASSERT(inSuite, out_tag);
 
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 0, vector->iv,
-                                             vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 0, vector->nonce,
+                                             vector->nonce_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -494,7 +494,7 @@ static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+static void TestAES_CCM_128EncryptInvalidNonceLen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
@@ -513,7 +513,7 @@ static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, 0, out_ct.Get(), out_tag.Get(), vector->tag_len);
+                                             vector->nonce, 0, out_ct.Get(), out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -540,7 +540,7 @@ static void TestAES_CCM_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, vector->iv_len, out_ct.Get(), out_tag.Get(), 13);
+                                             vector->nonce, vector->nonce_len, out_ct.Get(), out_tag.Get(), 13);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -563,7 +563,7 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             nullptr, 0, vector->iv, vector->iv_len, out_pt.Get());
+                                             nullptr, 0, vector->nonce, vector->nonce_len, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -571,7 +571,7 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+static void TestAES_CCM_128DecryptInvalidNonceLen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
@@ -586,7 +586,7 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
             out_pt.Alloc(vector->pt_len);
             NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, 0, out_pt.Get());
+                                             vector->key, vector->key_len, vector->nonce, 0, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -2158,35 +2158,39 @@ static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
+
 const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
                                                                                    0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
 const uint8_t kEpochKeyBuffer2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
                                                                                    0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf };
-const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x9d, 0xe1, 0x07, 0xde, 0x33, 0x11,
-                                                                                        0x2c, 0x52, 0x11, 0x0b, 0x7e, 0xc1,
-                                                                                        0x20, 0x9e, 0x6f, 0x0c };
-const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x7a, 0x33, 0xdb, 0x90, 0x5c, 0x7b,
-                                                                                        0x7e, 0x14, 0xa9, 0x20, 0xf8, 0x40,
-                                                                                        0xae, 0x48, 0xd3, 0xfe };
-const uint16_t kGroupSessionId1                                                     = 0xbc66;
-const uint16_t kGroupSessionId2                                                     = 0x038d;
+const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x1f, 0x19, 0xed, 0x3c, 0xef, 0x8a,
+                                                                                        0x21, 0x1b, 0xaf, 0x30, 0x6f, 0xae,
+                                                                                        0xee, 0xe7, 0xaa, 0xc6 };
+const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xaa, 0x97, 0x9a, 0x48, 0xbd, 0x8c,
+                                                                                        0xdf, 0x29, 0x3a, 0x07, 0x09, 0xb9,
+                                                                                        0xc1, 0xeb, 0x19, 0x30 };
+const uint16_t kGroupSessionId1                                                     = 0x6c80;
+const uint16_t kGroupSessionId2                                                     = 0x0c48;
 
 static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t key_buffer[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
     ByteSpan epoch_key(kEpochKeyBuffer1, sizeof(kEpochKeyBuffer1));
     MutableByteSpan operational_key(key_buffer, sizeof(key_buffer));
+    ByteSpan compressed_fabric_id(kCompressedFabricId);
 
     // Invalid Epoch Key
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupOperationalKey(ByteSpan(), operational_key));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupOperationalKey(ByteSpan(), compressed_fabric_id, operational_key));
 
     // Epoch Key 1
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, operational_key));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey1, sizeof(kGroupOperationalKey1)));
 
     // Epoch Key 2
     epoch_key = ByteSpan(kEpochKeyBuffer2, sizeof(kEpochKeyBuffer2));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, operational_key));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey2, sizeof(kGroupOperationalKey2)));
 }
 
@@ -2217,18 +2221,18 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test encrypting AES-CCM-128 test vectors", TestAES_CCM_128EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-128 test vectors", TestAES_CCM_128DecryptTestVectors),
     NL_TEST_DEF("Test encrypting AES-CCM-128 using nil key", TestAES_CCM_128EncryptNilKey),
-    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid IV", TestAES_CCM_128EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid nonce", TestAES_CCM_128EncryptInvalidNonceLen),
     NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag", TestAES_CCM_128EncryptInvalidTagLen),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
-    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV", TestAES_CCM_128DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid nonce", TestAES_CCM_128DecryptInvalidNonceLen),
     NL_TEST_DEF("Test decrypting AES-CCM-128 Containers", TestAES_CCM_128Containers),
     NL_TEST_DEF("Test encrypting AES-CCM-256 test vectors", TestAES_CCM_256EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-256 test vectors", TestAES_CCM_256DecryptTestVectors),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using nil key", TestAES_CCM_256EncryptNilKey),
-    NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid nonce", TestAES_CCM_256EncryptInvalidNonceLen),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid key", TestAES_CCM_256DecryptInvalidKey),
-    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid nonce", TestAES_CCM_256DecryptInvalidNonceLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),

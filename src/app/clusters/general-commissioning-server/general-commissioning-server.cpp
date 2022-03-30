@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
+#include <trace/trace.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,6 +40,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using namespace chip::DeviceLayer;
+using Transport::SecureSession;
+using Transport::Session;
 
 #define CheckSuccess(expr, code)                                                                                                   \
     do                                                                                                                             \
@@ -131,6 +134,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
+    MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
     FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
@@ -147,12 +151,12 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                      Failure);
         response.errorCode = CommissioningError::kOk;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        commandObj->AddResponse(commandPath, response);
     }
     else
     {
         response.errorCode = CommissioningError::kBusyWithOtherAdmin;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        commandObj->AddResponse(commandPath, response);
     }
 
     return true;
@@ -162,20 +166,42 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
+    MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
+
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-
-    /*
-     * Pass fabric of commissioner to DeviceControlSvr.
-     * This allows device to send messages back to commissioner.
-     * Once bindings are implemented, this may no longer be needed.
-     */
-    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-
-    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()), Failure);
+    const auto & failSafe        = server->GetFailSafeContext();
 
     Commands::CommissioningCompleteResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    if (!failSafe.IsFailSafeArmed())
+    {
+        response.errorCode = CommissioningError::kNoFailSafe;
+    }
+    else
+    {
+        SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+        // If not a CASE session, or the fabric does not match the fail-safe,
+        // error out.
+        if (handle->GetSessionType() != Session::SessionType::kSecure ||
+            handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
+            !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
+        {
+            response.errorCode = CommissioningError::kInvalidAuthentication;
+        }
+        else
+        {
+            /*
+             * Pass fabric of commissioner to DeviceControlSvr.
+             * This allows device to send messages back to commissioner.
+             * Once bindings are implemented, this may no longer be needed.
+             */
+            CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                         Failure);
+
+            response.errorCode = CommissioningError::kOk;
+        }
+    }
+
+    commandObj->AddResponse(commandPath, response);
 
     return true;
 }
@@ -184,6 +210,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
+    MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
     CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
@@ -191,7 +218,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    commandObj->AddResponse(commandPath, response);
 
     return true;
 }

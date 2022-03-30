@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
@@ -24,19 +23,17 @@ import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 assert(current_os == "freertos")
 
+qpg_project_dir = "${chip_root}/examples/shell/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg",
-    "${examples_plat_dir}/project_include",
+    "${qpg_project_dir}/include",
     "${examples_plat_dir}",
   ]
 
-  defines = [
-    "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
-    "ENABLE_CHIP_SHELL",
-  ]
+  defines = [ "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE" ]
 }
 
 qpg_executable("shell_app") {
@@ -57,10 +54,7 @@ qpg_executable("shell_app") {
     "${examples_plat_dir}:qpg-matter-shell",
   ]
 
-  include_dirs = [
-    "include",
-    "${examples_plat_dir}/shell_common",
-  ]
+  include_dirs = [ "include" ]
 
   defines = []
 

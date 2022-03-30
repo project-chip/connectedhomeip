@@ -20,7 +20,13 @@ import("${k32w0_sdk_build_root}/k32w0_executable.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+
+if (chip_pw_tokenizer_logging) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_tokenizer/database.gni")
+}
 
 assert(current_os == "freertos")
 
@@ -105,8 +111,20 @@ k32w0_executable("light_app") {
   output_dir = root_out_dir
 }
 
+if (chip_pw_tokenizer_logging) {
+  pw_tokenizer_database("light_app.database") {
+    database = "$root_build_dir/chip-k32w061-light-example-database.bin"
+    create = "binary"
+    deps = [ ":light_app" ]
+    optional_paths = [ "$root_build_dir/chip-k32w061-light-example" ]
+  }
+}
+
 group("k32w0") {
   deps = [ ":light_app" ]
+  if (chip_pw_tokenizer_logging) {
+    deps += [ ":light_app.database" ]
+  }
 }
 
 group("default") {

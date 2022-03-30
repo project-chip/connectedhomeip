@@ -40,7 +40,7 @@ source "../scripts/activate.sh"
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 
 # Use toolchain from Pigweed CIPD
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR"
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR"
 
 # Set ccache base directory to improve the cache hit ratio
 export CCACHE_BASEDIR="$PWD/$APP/nrfconnect"

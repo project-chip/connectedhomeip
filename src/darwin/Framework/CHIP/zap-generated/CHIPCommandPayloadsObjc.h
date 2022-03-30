@@ -727,7 +727,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull discriminator;
 @property (strong, nonatomic) NSNumber * _Nonnull iterations;
 @property (strong, nonatomic) NSData * _Nonnull salt;
-@property (strong, nonatomic) NSNumber * _Nonnull passcodeID;
 - (instancetype)init;
 @end
 
@@ -1525,8 +1524,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
-@property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
@@ -1565,6 +1564,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPMediaPlaybackClusterPlaybackResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 

@@ -60,6 +60,7 @@ EventPathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "EventId" / Int32ul,
+    "Urgent" / Int8ul,
 )
 
 DataVersionFilterIBstruct = Struct(
@@ -83,6 +84,7 @@ class EventPath:
     endpointId: int
     clusterId: int
     eventId: int
+    urgent: int
 
 
 @dataclass

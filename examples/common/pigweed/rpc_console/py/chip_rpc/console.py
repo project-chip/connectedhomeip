@@ -36,24 +36,31 @@ An example RPC command:
   rpcs.chip.rpc.DeviceCommon.GetDeviceInfo()
 """
 
-import json
 import argparse
+from typing import Callable
 from collections import namedtuple
-import logging
-import functools
-import sys
-from typing import Any, BinaryIO
-import socket
 from inspect import cleandoc
-import serial  # type: ignore
+import logging
 import re
+import socket
+from concurrent.futures import ThreadPoolExecutor
+import sys
+import threading
+from typing import Any, BinaryIO, Collection
+
+from chip_rpc.plugins.device_toolbar import DeviceToolbar
+from chip_rpc.plugins.helper_scripts import HelperScripts
 import pw_cli.log
 from pw_console import PwConsoleEmbed
 from pw_console.__main__ import create_temp_log_file
+from pw_console.pyserial_wrapper import SerialWithLogging
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
 from pw_rpc import callback_client
 from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
 
+from pw_tokenizer.database import LoadTokenDatabases
+from pw_tokenizer.detokenize import Detokenizer, detokenize_base64
+from pw_tokenizer import tokens
 
 # Protos
 from attributes_service import attributes_service_pb2
@@ -103,6 +110,16 @@ def _parse_args():
         default=sys.stdout.buffer,
         help=('The file to which to write device output (HDLC channel 1); '
               'provide - or omit for stdout.'))
+    parser.add_argument(
+        '-r',
+        '--raw_serial',
+        action="store_true",
+        help=('Use raw serial instead of HDLC/RPC'))
+    parser.add_argument("--token-databases",
+                        metavar='elf_or_token_database',
+                        nargs="+",
+                        action=LoadTokenDatabases,
+                        help="Path to tokenizer database csv file(s).")
     group.add_argument('-s',
                        '--socket-addr',
                        type=str,
@@ -111,12 +128,54 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _start_ipython_terminal(client: HdlcRpcClient) -> None:
+def _start_ipython_raw_terminal() -> None:
+    """Starts an interactive IPython terminal with preset variables. This raw
+       terminal does not use HDLC and provides no RPC functionality, this is
+       just a serial log viewer."""
+    local_variables = dict(
+        LOG=_DEVICE_LOG,
+    )
+
+    welcome_message = cleandoc("""
+        Welcome to the CHIP Console!
+
+        This has been started in raw serial mode,
+        and all RPC functionality is disabled.
+
+        Press F1 for help.
+    """)
+
+    interactive_console = PwConsoleEmbed(
+        global_vars=local_variables,
+        local_vars=None,
+        loggers={
+            'Device Logs': [_DEVICE_LOG],
+            'Host Logs': [logging.getLogger()],
+            'Serial Debug': [logging.getLogger('pw_console.serial_debug_logger')],
+        },
+        repl_startup_message=welcome_message,
+        help_text=__doc__,
+        app_title="CHIP Console",
+    )
+
+    interactive_console.hide_windows('Host Logs')
+    interactive_console.hide_windows('Serial Debug')
+    interactive_console.hide_windows('Python Repl')
+
+    # Setup Python logger propagation
+    interactive_console.setup_python_logging()
+    # Don't send device logs to the root logger.
+    _DEVICE_LOG.propagate = False
+    interactive_console.embed()
+
+
+def _start_ipython_hdlc_terminal(client: HdlcRpcClient) -> None:
     """Starts an interactive IPython terminal with preset variables."""
     local_variables = dict(
         client=client,
         channel_client=client.client.channel(1),
         rpcs=client.client.channel(1).rpcs,
+        scripts=HelperScripts(client.client.channel(1).rpcs),
         protos=client.protos.packages,
         # Include the active pane logger for creating logs in the repl.
         LOG=_DEVICE_LOG,
@@ -132,7 +191,7 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
         Press F1 for help.
         Example commands:
 
-          rpcs.chip.rpc.DeviceCommon.GetDeviceInfo()
+          rpcs.chip.rpc.Device.GetDeviceInfo()
 
           LOG.warning('Message appears console log window.')
     """)
@@ -143,13 +202,19 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
         loggers={
             'Device Logs': [_DEVICE_LOG],
             'Host Logs': [logging.getLogger()],
+            'Serial Debug': [logging.getLogger('pw_console.serial_debug_logger')],
         },
         repl_startup_message=welcome_message,
         help_text=__doc__,
         app_title="CHIP Console",
     )
-    interactive_console.hide_windows('Host Logs')
+
     interactive_console.add_sentence_completer(completions)
+    interactive_console.add_bottom_toolbar(
+        DeviceToolbar(client.client.channel(1).rpcs))
+
+    interactive_console.hide_windows('Host Logs')
+    interactive_console.hide_windows('Serial Debug')
 
     # Setup Python logger propagation
     interactive_console.setup_python_logging()
@@ -180,15 +245,36 @@ class SocketClientImpl:
 
 
 def write_to_output(data: bytes,
-                    unused_output: BinaryIO = sys.stdout.buffer,):
+                    unused_output: BinaryIO = sys.stdout.buffer,
+                    detokenizer=None):
     log_line = data
     RegexStruct = namedtuple('RegexStruct', 'platform type regex match_num')
-    LEVEL_MAPPING = {"I": logging.INFO, "W": logging.WARNING,
-                     "E": logging.ERROR, "F": logging.FATAL, "V": logging.DEBUG, "D": logging.DEBUG}
+    LEVEL_MAPPING = {"I": logging.INFO, "W": logging.WARNING, "P": logging.INFO,
+                     "E": logging.ERROR, "F": logging.FATAL, "V": logging.DEBUG, "D": logging.DEBUG,
+                     "<inf>": logging.INFO, "<dbg>": logging.DEBUG, "<err>": logging.ERROR,
+                     "<info  >": logging.INFO, "<warn  >": logging.WARNING,
+                     "<error >": logging.ERROR, "<detail>": logging.DEBUG}
+
     ESP_CHIP_REGEX = r"(?P<level>[IWEFV]) \((?P<time>\d+)\) (?P<mod>chip\[[a-zA-Z]+\]):\s(?P<msg>.*)"
     ESP_APP_REGEX = r"(?P<level>[IWEFVD]) \((?P<time>\d+)\) (?P<mod>[a-z\-_A-Z]+):\s(?P<msg>.*)"
+
+    EFR_CHIP_REGEX = r"(?P<level><detail>|<info  >|<error >|<warn  >)\s(?P<mod>\[[a-zA-Z\-]+\])\s(?P<msg>.*)"
+    EFR_APP_REGEX = r"<efr32 >\s(?P<msg>.*)"
+
+    NRF_CHIP_REGEX = r"\[(?P<time>\d+)\] (?P<level><inf>|<dbg>|<err>) chip.*: \[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
+    NRF_APP_REGEX = r"\[(?P<time>\d+)\] (?P<level><inf>|<dbg>|<err>) (?P<msg>.*)"
+
+    NXP_CHIP_REGEX = r"\[(?P<time>\d+)\]\[(?P<level>[EPDF])\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
+    NXP_APP_REGEX = r"\[(?P<time>\d+)\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
+
     LogRegexes = [RegexStruct("ESP", "CHIP", re.compile(ESP_CHIP_REGEX), 4),
-                  RegexStruct("ESP", "APP", re.compile(ESP_APP_REGEX), 4)
+                  RegexStruct("ESP", "APP", re.compile(ESP_APP_REGEX), 4),
+                  RegexStruct("EFR", "CHIP", re.compile(EFR_CHIP_REGEX), 3),
+                  RegexStruct("EFR", "APP", re.compile(EFR_APP_REGEX), 1),
+                  RegexStruct("NRF", "CHIP", re.compile(NRF_CHIP_REGEX), 4),
+                  RegexStruct("NRF", "APP", re.compile(NRF_APP_REGEX), 3),
+                  RegexStruct("NXP", "CHIP", re.compile(NXP_CHIP_REGEX), 4),
+                  RegexStruct("NXP", "APP", re.compile(NXP_APP_REGEX), 3)
                   ]
     for line in log_line.decode(errors="surrogateescape").splitlines():
         fields = {'level': logging.INFO, "time": "",
@@ -200,13 +286,34 @@ def write_to_output(data: bytes,
                 fields.update(match.groupdict())
                 if "level" in match.groupdict():
                     fields["level"] = LEVEL_MAPPING[fields["level"]]
+                if detokenizer:
+                    _LOG.warn(fields["msg"])
+                    if len(fields["msg"]) % 2:
+                        # TODO the msg likely wrapped, trim for now
+                        fields["msg"] = fields["msg"][:-1]
+                    fields["msg"] = detokenizer.detokenize(
+                        bytes.fromhex(fields["msg"]))
                 break
+
         _DEVICE_LOG.log(fields["level"], fields["msg"], extra={'extra_metadata_fields': {
-                        "time": fields["time"], "type": fields["type"], "mod": fields["mod"]}})
+                        "timestamp": fields["time"], "type": fields["type"], "mod": fields["mod"]}})
+
+
+def _read_raw_serial(read: Callable[[], bytes], output):
+    """Continuously read and pass to output."""
+    with ThreadPoolExecutor() as executor:
+        while True:
+            try:
+                data = read()
+            except Exception as exc:  # pylint: disable=broad-except
+                continue
+            if data:
+                output(data)
 
 
 def console(device: str, baudrate: int,
-            socket_addr: str, output: Any) -> int:
+            token_databases: Collection[tokens.Database],
+            socket_addr: str, output: Any, raw_serial: bool) -> int:
     """Starts an interactive RPC console for HDLC."""
     # argparse.FileType doesn't correctly handle '-' for binary files.
     if output is sys.stdout:
@@ -215,8 +322,10 @@ def console(device: str, baudrate: int,
     logfile = create_temp_log_file()
     pw_cli.log.install(logging.INFO, True, False, logfile)
 
+    serial_impl = SerialWithLogging
+
     if socket_addr is None:
-        serial_device = serial.Serial(device, baudrate, timeout=1)
+        serial_device = serial_impl(device, baudrate, timeout=1)
         def read(): return serial_device.read(8192)
         write = serial_device.write
     else:
@@ -233,11 +342,24 @@ def console(device: str, baudrate: int,
         default_stream_timeout_s=None,
     )
 
-    _start_ipython_terminal(
-        HdlcRpcClient(read, PROTOS, default_channels(write),
-                      lambda data: write_to_output(data, output),
-                      client_impl=callback_client_impl)
-    )
+    detokenizer = Detokenizer(tokens.Database.merged(*token_databases),
+                              show_errors=False) if token_databases else None
+
+    if raw_serial:
+        threading.Thread(target=_read_raw_serial,
+                         daemon=True,
+                         args=(read,
+                               lambda data: write_to_output(
+                                   data, output, detokenizer),
+                               )).start()
+        _start_ipython_raw_terminal()
+    else:
+        _start_ipython_hdlc_terminal(
+            HdlcRpcClient(read, PROTOS, default_channels(write),
+                          lambda data: write_to_output(
+                              data, output, detokenizer),
+                          client_impl=callback_client_impl)
+        )
     return 0
 
 

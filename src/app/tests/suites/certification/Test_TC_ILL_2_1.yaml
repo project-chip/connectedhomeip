@@ -16,36 +16,48 @@ name: 69.2.1. [TC-ILL-2.1] Attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Illuminance Measurement"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label:
-          "Test Harness Client reads MinMeasuredValue and MaxMeasuredValue from
-          Server DUT"
-      disabled: true
+    - label: "TH reads MinMeasuredValue attribute from DUT"
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 1
+              maxValue: 65533
 
-    - label:
-          "Note the values of the MinMeasuredValue (Imin) and MaxMeasuredValue
-          (Imax) attributes."
-      disabled: true
+    - label: "TH reads MaxMeasuredValue attribute from DUT"
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 2
+              maxValue: 65534
 
-    - label: "Test Harness Client reads MeasuredValue from Server DUT"
-      disabled: true
+    - label: "TH reads Tolerance attribute from DUT"
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 2048
 
-    - label:
-          "Adjust the brightness of the light source such that it is visibly
-          different."
-      disabled: true
-
-    - label: "Test Harness Client reads MeasuredValue from Server DUT"
-      disabled: true
-
-    - label: "TH reads the Tolerance attribute from the DUT"
-      disabled: true
-
-    - label: "TH reads the LightSensorType attribute from the DUT"
-      disabled: true
+    - label: "TH reads LightSensorType attribute from DUT"
+      command: "readAttribute"
+      attribute: "LightSensorType"
+      response:
+          constraints:
+              type: enum8

@@ -44,14 +44,18 @@ declare_args() {
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
-}
 
-show_qr_code = true
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
+}
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
+
+# Enables LCD on supported devices
+lcd_on = show_qr_code
 
 efr32_sdk("sdk") {
   sources = [
@@ -89,16 +93,18 @@ efr32_executable("ota_requestor_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
+
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -119,9 +125,14 @@ efr32_executable("ota_requestor_app") {
     ]
   }
 
-  if (show_qr_code) {
+  if (lcd_on) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
   }
 
   if (chip_enable_pw_rpc) {

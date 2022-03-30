@@ -70,6 +70,12 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                                        setupPIN:(NSUInteger)setupPIN
                                           error:(NSError * __autoreleasing *)error;
 
+/**
+ * Temporary until PairingDelegate is fixed to clearly communicate this
+ * information to consumers.
+ */
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
+
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -91,6 +97,8 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+- (void)setKeyValueStoreManagerPath:(const char *)keyValueStorePath;
 
 /**
  * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to

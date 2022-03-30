@@ -3,7 +3,7 @@
 This is a reference application that implements an example of an OTA Provider
 Cluster Server.
 
-## Building
+## Build
 
 Suggest doing the following:
 
@@ -13,31 +13,32 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug c
 
 ## Usage
 
-| Command Line Options                                                  | Description                                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -f/--filepath <file>                                                  | Path to a file containing an OTA image                                                                                                                                                                                                                                                                                                                                                |
-| -o/--otaImageList <file>                                              | Path to a file containing a list of OTA images                                                                                                                                                                                                                                                                                                                                        |
-| -q/--queryImageStatus <updateAvailable \| busy \| updateNotAvailable> | Value for the Status field in the QueryImageResponse                                                                                                                                                                                                                                                                                                                                  |
-| -x/--ignoreQueryImage <num_times_to_ignore>                           | The number of times to ignore the QueryImage Command and not send a response                                                                                                                                                                                                                                                                                                          |  |
-| -y/--ignoreApplyUpdate <num_times_to_ignore>                          | The number of times to ignore the ApplyUpdate Request and not send a response                                                                                                                                                                                                                                                                                                         |
-| -a/--applyUpdateAction <proceed \| awaitNextAction \| discontinue>    | Value for the Action field in the ApplyUpdateResponse                                                                                                                                                                                                                                                                                                                                 |
-| -t/--delayedActionTimeSec <time>                                      | Value in seconds for the DelayedActionTime field in the QueryImageResponse and ApplyUpdateResponse                                                                                                                                                                                                                                                                                    |
-| -u/--userConsentState <granted \| denied \| deferred>                 | Current user consent state which results in various values for Status field in QueryImageResponse <br> Note that -q/--queryImageStatus overrides this option <li> granted: Status field in QueryImageResponse is set to updateAvailable <li> denied: Status field in QueryImageResponse is set to updateNotAvailable <li> deferred: Status field in QueryImageResponse is set to busy |
-| -s/--softwareVersion <version>                                        | Value for the SoftwareVersion field in the QueryImageResponse <br> Note that -o/--otaImageList overrides this option                                                                                                                                                                                                                                                                  |
-| -S/--softwareVersionStr <version string>                              | Value for the SoftwareVersionString field in the QueryImageResponse <br> Note that -o/--otaImageList overrides this option                                                                                                                                                                                                                                                            |
-| -c/--UserConsentNeeded                                                | If provided, and value of RequestorCanConsent field in QueryImage Command is true, <br> then value of UserConsentNeeded field in the QueryImageResponse is set to true. <br> Else, value of UserConsentNeeded is false.                                                                                                                                                               |
+| Command Line Options                                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -f/--filepath <file>                                                  | Path to a file containing an OTA image                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -o/--otaImageList <file>                                              | Path to a file containing a list of OTA images                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| -q/--queryImageStatus <updateAvailable \| busy \| updateNotAvailable> | Value for the Status field in the first QueryImageResponse. <br> For all subsequent responses, the value of updateAvailable will be used.                                                                                                                                                                                                                                                                                                                                                                                  |
+| -x/--ignoreQueryImage <num_times_to_ignore>                           | The number of times to ignore the QueryImage Command and not send a response                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -y/--ignoreApplyUpdate <num_times_to_ignore>                          | The number of times to ignore the ApplyUpdate Request and not send a response                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -a/--applyUpdateAction <proceed \| awaitNextAction \| discontinue>    | Value for the Action field in the first ApplyUpdateResponse. <br> For all subsequent responses, the value of proceed will be used.                                                                                                                                                                                                                                                                                                                                                                                         |
+| -t/--delayedQueryActionTimeSec <time>                                 | Value in seconds for the DelayedActionTime field in the first QueryImageResponse. <br> Value will revert back to 0 seconds on subsequent QueryImage Responses.                                                                                                                                                                                                                                                                                                                                                             |
+| -p/--delayedApplyActionTimeSec <time>                                 | Value in seconds for the DelayedActionTime field in the first ApplyUpdateResponse. <br> Value will revert back to 0 seconds on subsequent ApplyUpdate Responses.                                                                                                                                                                                                                                                                                                                                                           |
+| -u/--userConsentState <granted \| denied \| deferred>                 | The user consent state for the first QueryImageResponse. For all subsequent responses, the value of granted state will be used. <br> Current user consent state which results in various values for Status field in QueryImageResponse <br> Note that -q/--queryImageStatus overrides this option <li> granted: Status field in QueryImageResponse is set to updateAvailable <li> denied: Status field in QueryImageResponse is set to updateNotAvailable <li> deferred: Status field in QueryImageResponse is set to busy |
+| -c/--UserConsentNeeded                                                | If provided, and value of RequestorCanConsent field in QueryImage Command is true, <br> then value of UserConsentNeeded field in the QueryImageResponse is set to true. <br> Else, value of UserConsentNeeded is false.                                                                                                                                                                                                                                                                                                    |
 
 **Using `--filepath` and `--otaImageList`**
 
 -   The two options cannot be supplied together
--   If neither option is supplied, the application will respond with
-    `NotAvailable` status
+-   At least one option must be supplied
 -   If `--filepath` is supplied, the application will automatically serve that
-    file to the OTA Requestor (SoftwareVersion will be requester software
-    version + 1)
+    file to the OTA Requestor
 -   If `--otaImageList` is supplied, the application will parse the JSON file
     and extract all required data. The most recent/valid software version will
     be selected and the corresponding OTA file will be sent to the OTA Requestor
+-   The SoftwareVersion and SoftwareVersionString sent in the QueryImageResponse
+    is derived from the OTA image header. Please note that if the version in the
+    `--otaImageList` JSON file does not match that in the image header, the
+    application will terminate.
 
 An example of the `--otaImageList` file contents:
 
@@ -45,14 +46,37 @@ An example of the `--otaImageList` file contents:
 { "foo": 1, // ignored by parser
   "deviceSoftwareVersionModel":
   [
-      { "vendorId": 1, "productId": 1, "softwareVersion": 10, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota.txt" },
-      { "vendorId": 1, "productId": 1, "softwareVersion": 20, "softwareVersionString": "1.0.1", "cDVersionNumber": 18, "softwareVersionValid": false, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota.txt" },
-      { "vendorId": 1, "productId": 1, "softwareVersion": 30, "softwareVersionString": "1.0.2", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota.txt" },
-      { "vendorId": 1, "productId": 1, "softwareVersion": 40, "softwareVersionString": "1.1.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota.txt" },
-      { "vendorId": 1, "productId": 1, "softwareVersion": 50, "softwareVersionString": "1.1.1", "cDVersionNumber": 18, "softwareVersionValid": false, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota.txt" }
+      { "vendorId": 1, "productId": 1, "softwareVersion": 10, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota_v10.bin" },
+      { "vendorId": 1, "productId": 1, "softwareVersion": 20, "softwareVersionString": "1.0.1", "cDVersionNumber": 18, "softwareVersionValid": false, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota_v20.bin" },
+      { "vendorId": 1, "productId": 1, "softwareVersion": 30, "softwareVersionString": "1.0.2", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota_v30.bin" },
+      { "vendorId": 1, "productId": 1, "softwareVersion": 40, "softwareVersionString": "1.1.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota_v40.bin" },
+      { "vendorId": 1, "productId": 1, "softwareVersion": 50, "softwareVersionString": "1.1.1", "cDVersionNumber": 18, "softwareVersionValid": false, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/tmp/ota_v50.bin" }
   ]
 }
 ```
+
+## Software Image Header
+
+All Matter software images must contain a header as defined in section 11.21.1
+of the specification. The
+[ota_image_tool](https://github.com/project-chip/connectedhomeip/blob/master/src/app/ota_image_tool.py)
+is available for generating the required header on a software image.
+
+All images supplied to the OTA Provider application (via `--filepath` or
+`--otaImageList`) must contain the software image header. The OTA Provider
+application will use the software version specified in the header to set the
+`SoftwareVersion` field of the QueryImageResponse. For instance, if the image
+supplied represents an image with software version 2, the tool can be used as
+follows:
+
+```
+src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 firmware.bin firmware.ota
+```
+
+Please see this
+[section](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-requestor-app/linux#generate-images)
+for information on building an OTA Requestor application with a specific
+software version.
 
 ## Access Control Requirements
 
@@ -83,5 +107,4 @@ being 0xDEADBEEF on endpoint 0.
 
 -   Synchronous BDX transfer only
 -   Does not check VID/PID
--   No configuration for `AwaitNextAction`
 -   Only one transfer at a time (does not check incoming `UpdateTokens`)

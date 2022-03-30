@@ -29,5 +29,5 @@ public:
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
     CHIP_ERROR Log(const char * message);
-    CHIP_ERROR UserPrompt(const char * message);
+    CHIP_ERROR UserPrompt(const char * message, const char * expectedValue = nullptr);
 };

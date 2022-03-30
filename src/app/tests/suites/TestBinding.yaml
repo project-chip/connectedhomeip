@@ -58,7 +58,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Write binding table"
+    - label: "Write binding table (endpoint 1)"
       command: "writeAttribute"
       attribute: "binding"
       arguments:
@@ -69,7 +69,32 @@ tests:
                   { FabricIndex: 0, Node: 2, Endpoint: 1 },
               ]
 
-    - label: "Read binding table"
+    - label: "Read binding table (endpoint 1)"
+      command: "readAttribute"
+      attribute: "binding"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, Group: 1 },
+                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
+              ]
+
+    - label: "Write binding table (endpoint 0)"
+      command: "writeAttribute"
+      attribute: "binding"
+      endpoint: 0
+      arguments:
+          value: [{ FabricIndex: 0, Node: 3, Endpoint: 1 }]
+
+    - label: "Read binding table (endpoint 0)"
+      command: "readAttribute"
+      attribute: "binding"
+      endpoint: 0
+      response:
+          value: [{ FabricIndex: 1, Node: 3, Endpoint: 1 }]
+
+    - label: "Verify endpoint 1 not changed"
       command: "readAttribute"
       attribute: "binding"
       response:

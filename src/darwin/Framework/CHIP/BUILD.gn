@@ -30,6 +30,9 @@ static_library("framework") {
   sources = [
     "CHIP.h",
     "CHIPCluster.mm",
+    "CHIPCommissioningParameters.m",
+    "CHIPControllerAccessControl.h",
+    "CHIPControllerAccessControl.mm",
     "CHIPDevice.h",
     "CHIPDevice.mm",
     "CHIPDeviceConnectionBridge.mm",
@@ -42,6 +45,7 @@ static_library("framework") {
     "CHIPError.h",
     "CHIPError.mm",
     "CHIPError_Internal.h",
+    "CHIPIMDispatch.mm",
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
@@ -69,6 +73,7 @@ static_library("framework") {
     "${chip_root}/src/controller",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

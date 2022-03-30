@@ -52,7 +52,7 @@ struct ReadPrepareParams
     System::Clock::Timeout mTimeout                 = kImMessageTimeout;
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
-    bool mKeepSubscriptions                         = true;
+    bool mKeepSubscriptions                         = false;
     bool mIsFabricFiltered                          = true;
     OnResubscribePolicyCB mResubscribePolicy        = nullptr;
 

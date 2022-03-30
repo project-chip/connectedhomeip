@@ -20,7 +20,6 @@
 
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <random>
 
 CHIP_ERROR DiscoveryCommands::FindCommissionable()
 {
@@ -99,31 +98,21 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
 {
     ReturnErrorOnFailure(TearDownDiscoveryCommands());
 
-    if (mReady == false)
+    if (!mReady)
     {
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
         mReady = true;
     }
+    mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryCommands::TearDownDiscoveryCommands()
 {
+    mDNSResolver.SetOperationalDelegate(nullptr);
     mDNSResolver.SetCommissioningDelegate(nullptr);
     return CHIP_NO_ERROR;
-}
-
-uint16_t DiscoveryCommands::GetUniqueDiscriminator()
-{
-    if (mDiscriminatorUseForFiltering == 0)
-    {
-        std::random_device dev;
-        std::mt19937 rng(dev());
-        std::uniform_int_distribution<std::mt19937::result_type> distribution(1, 4096);
-        mDiscriminatorUseForFiltering = static_cast<uint16_t>(distribution(rng));
-    }
-    return mDiscriminatorUseForFiltering;
 }
 
 void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
@@ -132,18 +121,6 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
     //       on which result comes first. At the moment, the code assume that there is only
     //       a single match on the network, but if that's not enough, there may be a need
     //       to implement some sort of list that is built for a given duration before returning
-    //
-    //       But also, running on CI seems to show cross-talks between CI instances, so multiple
-    //       results will comes up. Unexpected advertisements are filtered by validating the
-    //       discriminator from the advertisement matches the one coming from the config section
-    //       of the test.
-    if (nodeData.longDiscriminator != GetUniqueDiscriminator())
-    {
-        ChipLogError(chipTool, "Non fatal error: Unexpected node advertisment. It will be ignored");
-        nodeData.LogDetail();
-        return;
-    }
-
     ReturnOnFailure(TearDownDiscoveryCommands());
 
     nodeData.LogDetail();

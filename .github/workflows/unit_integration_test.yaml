@@ -37,17 +37,21 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.56
+            image: connectedhomeip/chip-build:0.5.58
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Bootstrap
               timeout-minutes: 10
               run: |
@@ -59,8 +63,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -81,7 +85,7 @@ jobs:
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 30 
+              timeout-minutes: 30
               run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
               timeout-minutes: 30

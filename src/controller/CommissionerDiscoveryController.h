@@ -183,7 +183,7 @@ public:
      *
      * This code will call the registered UserPrompter's PromptForCommissionOKPermission
      */
-    void OnUserDirectedCommissioningRequest(UDCClientState state);
+    void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
      * This method should be called after the user has given consent for commissioning of the client

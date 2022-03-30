@@ -21,16 +21,13 @@ config:
 
 tests:
     - label:
-          "DUT sends a ReceiveInit message to TH + TH sends a ReceiveAccept
-          message back to DUT"
-      disabled: true
+          "IF (PICS_DT_Receiver_Driver) TH sends a SendInit message to DUT + DUT
+          sends a SendAccept message back to TH + DUT sends a BlockQuery message
+          to TH + TH sends a Block message back to DUT"
+      verification: |
+          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
 
-    - label:
-          "TH sends a Block message to DUT + DUT sends a BlockAck message back
-          to TH"
-      disabled: true
-
-    - label:
-          "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
-          back to TH"
+          [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
+          [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
+          [1636410922974] [59203:62969336] CHIP: [ATM]   Block Counter: 0
       disabled: true

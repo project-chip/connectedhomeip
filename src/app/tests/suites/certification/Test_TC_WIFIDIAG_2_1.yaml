@@ -21,17 +21,21 @@ config:
 
 tests:
     - label: "Commission DUT to TH"
+      verification: |
+
       disabled: true
 
-    - label:
-          "Disconnect node WiFi as a result of de-authentication or
-          dis-association."
+    - label: "TH sends chip-tool command to DUT"
+      verification: |
+          chip-tool wifinetworkdiagnostics read-event disconnection 1 0
       disabled: true
 
-    - label:
-          "Disconnect node WiFi as a result of de-authentication or
-          dis-association. DUT exhausts all internal retries."
+    - label: "TH sends chip-tool command to DUT"
+      verification: |
+          chip-tool wifinetworkdiagnostics read-event association-failure 1 0
       disabled: true
 
-    - label: "Disconnect and reconnect node WiFi."
+    - label: "TH sends chip-tool command to DUT"
+      verification: |
+          chip-tool wifinetworkdiagnostics read-event connection-status 1 0
       disabled: true

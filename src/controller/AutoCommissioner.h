@@ -28,17 +28,18 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner() {}
-    virtual ~AutoCommissioner();
+    AutoCommissioner();
+    ~AutoCommissioner() override;
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
-    virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
+    CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
 
-    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+    CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -49,8 +50,8 @@ private:
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
-    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
-    EndpointId GetEndpoint(const CommissioningStage & stage);
+    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage) const;
+    EndpointId GetEndpoint(const CommissioningStage & stage) const;
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;

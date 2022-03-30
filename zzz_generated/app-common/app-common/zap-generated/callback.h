@@ -14788,9 +14788,8 @@ bool emberAfChannelClusterChangeChannelCallback(
 /**
  * @brief Channel Cluster ChangeChannelResponse Command callback (from server)
  */
-bool emberAfChannelClusterChangeChannelResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t status);
+bool emberAfChannelClusterChangeChannelResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                        uint8_t status, chip::CharSpan data);
 /**
  * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
  */
@@ -14878,7 +14877,7 @@ bool emberAfMediaPlaybackClusterSkipBackwardCallback(
  * @brief Media Playback Cluster PlaybackResponse Command callback (from server)
  */
 bool emberAfMediaPlaybackClusterPlaybackResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status);
+                                                         uint8_t status, chip::CharSpan data);
 /**
  * @brief Media Playback Cluster Seek Command callback (from client)
  */

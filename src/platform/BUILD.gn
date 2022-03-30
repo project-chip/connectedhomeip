@@ -50,11 +50,14 @@ if (chip_device_platform != "none") {
     # Use OpenThread ftd or mtd library
     chip_device_config_thread_ftd = chip_openthread_ftd
 
-    # By pass provision and secure session
-    chip_bypass_rendezvous = false
-
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
+
+    # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    # Linux platform has already transitioned.
+    chip_use_transitional_commissionable_data_provider =
+        chip_device_platform != "linux" && chip_device_platform != "android"
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
@@ -93,7 +96,6 @@ if (chip_device_platform != "none") {
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
-    chip_device_config_enable_dnssd = chip_mdns != "none"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
     defines = [
@@ -102,8 +104,6 @@ if (chip_device_platform != "none") {
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
-      "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
-      "CHIP_BYPASS_RENDEZVOUS=${chip_bypass_rendezvous}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
@@ -135,6 +135,12 @@ if (chip_device_platform != "none") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
+    }
+
+    if (chip_use_transitional_commissionable_data_provider) {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
+    } else {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -245,11 +251,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      chip_device_config_enable_dnssd = chip_mdns != "none"
-      defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
-        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
-      ]
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
     }
   }
 }
@@ -277,6 +279,7 @@ if (chip_device_platform != "none") {
       "../include/platform/CHIPDeviceError.h",
       "../include/platform/CHIPDeviceEvent.h",
       "../include/platform/CHIPDeviceLayer.h",
+      "../include/platform/CommissionableDataProvider.h",
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
@@ -285,6 +288,7 @@ if (chip_device_platform != "none") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
+      "../include/platform/TestOnlyCommissionableDataProvider.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
@@ -292,17 +296,26 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/DeviceNetworkProvisioning.h",
       "../include/platform/internal/EventLogging.h",
       "../include/platform/internal/GenericConfigurationManagerImpl.h",
+      "../include/platform/internal/GenericConfigurationManagerImpl.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
+      "../include/platform/internal/GenericPlatformManagerImpl.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.ipp",
       "../include/platform/internal/testing/ConfigUnitTest.h",
+      "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
@@ -319,13 +332,6 @@ if (chip_device_platform != "none") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",
-      ]
-    }
-
-    if (chip_enable_ota_requestor) {
-      sources += [
-        "GenericOTARequestorDriver.cpp",
-        "GenericOTARequestorDriver.h",
       ]
     }
 

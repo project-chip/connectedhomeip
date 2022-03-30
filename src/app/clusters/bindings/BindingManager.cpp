@@ -18,6 +18,7 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
+#include <lib/support/CHIPMem.h>
 
 namespace {
 
@@ -25,12 +26,13 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
 {
     void OnFabricDeletedFromStorage(chip::CompressedFabricId compressedFabricId, chip::FabricIndex fabricIndex)
     {
-        auto iter = chip::BindingTable::GetInstance().begin();
-        while (iter != chip::BindingTable::GetInstance().end())
+        chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
+        auto iter                         = bindingTable.begin();
+        while (iter != bindingTable.end())
         {
             if (iter->fabricIndex == fabricIndex)
             {
-                iter = chip::BindingTable::GetInstance().RemoveAt(iter);
+                bindingTable.RemoveAt(iter);
             }
             else
             {
@@ -53,9 +55,9 @@ BindingFabricTableDelegate gFabricTableDelegate;
 
 namespace {
 
-chip::PeerId PeerIdForNode(chip::FabricTable & fabricTable, chip::FabricIndex fabric, chip::NodeId node)
+chip::PeerId PeerIdForNode(chip::FabricTable * fabricTable, chip::FabricIndex fabric, chip::NodeId node)
 {
-    chip::FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(fabric);
+    chip::FabricInfo * fabricInfo = fabricTable->FindFabricWithIndex(fabric);
     if (fabricInfo == nullptr)
     {
         return chip::PeerId();
@@ -80,20 +82,42 @@ CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
     return CHIP_NO_ERROR;
 }
 
-void BindingManager::SetAppServer(Server * appServer)
+CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
 {
-    mAppServer = appServer;
-    mAppServer->GetFabricTable().AddFabricDelegate(&gFabricTableDelegate);
+    VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mInitParams = params;
+    params.mFabricTable->AddFabricDelegate(&gFabricTableDelegate);
+    BindingTable::GetInstance().SetPersistentStorage(params.mStorage);
+    CHIP_ERROR error = BindingTable::GetInstance().LoadFromStorage();
+    if (error != CHIP_NO_ERROR)
+    {
+        // This can happen during first boot of the device.
+        ChipLogProgress(AppServer, "Cannot load binding table: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+    else
+    {
+        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+        {
+            if (entry.type == EMBER_UNICAST_BINDING)
+            {
+                // The CASE connection can also fail if the unicast peer is offline.
+                // There is recovery mechanism to retry connection on-demand so ignore error.
+                (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
 {
-    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    PeerId peer = PeerIdForNode(mAppServer->GetFabricTable(), fabric, node);
+    VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    PeerId peer = PeerIdForNode(mInitParams.mFabricTable, fabric, node);
     VerifyOrReturnError(peer.GetNodeId() != kUndefinedNodeId, CHIP_ERROR_NOT_FOUND);
     CHIP_ERROR error =
-        mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (error == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
@@ -104,11 +128,11 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
         if (mPendingNotificationMap.FindLRUConnectPeer(&fabricToRemove, &nodeToRemove) == CHIP_NO_ERROR)
         {
             mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
-            PeerId lruPeer = PeerIdForNode(mAppServer->GetFabricTable(), fabricToRemove, nodeToRemove);
-            mAppServer->GetCASESessionManager()->ReleaseSession(lruPeer);
+            PeerId lruPeer = PeerIdForNode(mInitParams.mFabricTable, fabricToRemove, nodeToRemove);
+            mInitParams.mCASESessionManager->ReleaseSession(lruPeer);
             // Now retry
-            error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback,
-                                                                                &mOnConnectionFailureCallback);
+            error =
+                mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
         }
     }
     return error;
@@ -131,7 +155,7 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
     {
         EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
 
-        PeerId peer = PeerIdForNode(mAppServer->GetFabricTable(), entry.fabricIndex, entry.nodeId);
+        PeerId peer = PeerIdForNode(mInitParams.mFabricTable, entry.fabricIndex, entry.nodeId);
         if (device->GetPeerId() == peer)
         {
             fabricToRemove = entry.fabricIndex;
@@ -152,27 +176,19 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 {
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    mAppServer->GetCASESessionManager()->ReleaseSession(peerId);
+    mInitParams.mCASESessionManager->ReleaseSession(peerId);
 }
 
 void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
-    mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
-}
-
-CHIP_ERROR BindingManager::NotifyBindingAdded(const EmberBindingTableEntry & binding)
-{
-    if (mBindingAddedHandler)
-    {
-        mBindingAddedHandler(binding);
-    }
-    return CHIP_NO_ERROR;
+    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(compressedFabricId);
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
-    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
@@ -180,11 +196,11 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(iter->fabricIndex);
+                FabricInfo * fabricInfo = mInitParams.mFabricTable->FindFabricWithIndex(iter->fabricIndex);
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(iter->nodeId);
-                OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(peer);
-                if (peerDevice != nullptr && peerDevice->IsConnected() && mBoundDeviceChangedHandler)
+                OperationalDeviceProxy * peerDevice = mInitParams.mCASESessionManager->FindExistingSession(peer);
+                if (peerDevice != nullptr && peerDevice->IsConnected())
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(*iter, peerDevice, context);
@@ -192,10 +208,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 else
                 {
                     mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), context);
-                    if (peerDevice == nullptr || !peerDevice->IsConnecting())
-                    {
-                        ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
-                    }
+                    ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
                 }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)

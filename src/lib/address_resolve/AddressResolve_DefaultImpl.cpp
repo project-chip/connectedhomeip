@@ -63,7 +63,7 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
             {
                 return IpScore::kGlobalUnicastWithSharedPrefix;
             }
-            else if (ip.IsIPv6ULA())
+            if (ip.IsIPv6ULA())
             {
                 return IpScore::kUniqueLocalWithSharedPrefix;
             }
@@ -85,10 +85,8 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 
         return IpScore::kOtherIpv6;
     }
-    else
-    {
-        return IpScore::kIpv4;
-    }
+
+    return IpScore::kIpv4;
 }
 
 } // namespace
@@ -142,7 +140,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMinLookupTime() - elapsed;
     }
-    else if (elapsed < mRequest.GetMaxLookupTime())
+    if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
     }
@@ -163,32 +161,55 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     if (elapsed < mRequest.GetMinLookupTime())
     {
         ChipLogProgress(Discovery, "Keeping DNSSD lookup active");
-        return NodeLookupAction::kKeepSearching;
+        return NodeLookupAction::KeepSearching();
     }
 
     // Minimal time to search reached. If any IP available, ready to return it.
     if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
     {
-        GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestResult);
-        return NodeLookupAction::kStopSearching;
+        return NodeLookupAction::Success(mBestResult);
     }
 
     // Give up if the maximum search time has been reached
     if (elapsed >= mRequest.GetMaxLookupTime())
     {
-        GetListener()->OnNodeAddressResolutionFailed(GetRequest().GetPeerId(), CHIP_ERROR_TIMEOUT);
-        return NodeLookupAction::kStopSearching;
+        return NodeLookupAction::Error(CHIP_ERROR_TIMEOUT);
     }
 
-    return NodeLookupAction::kKeepSearching;
+    return NodeLookupAction::KeepSearching();
 }
 
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId(), Inet::IPAddressType::kAny));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)
+{
+    VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
+    mActiveLookups.Remove(&handle);
+
+    // Adjust any timing updates.
+    ReArmTimer();
+
+    if (cancel_method == FailureCallback::Call)
+    {
+        handle.GetListener()->OnNodeAddressResolutionFailed(handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
+    }
+
+    // TODO: There should be some form of cancel into Dnssd::Resolver::Instance()
+    //       to stop any resolution mechanism if applicable.
+    //
+    // Current code just removes the internal list and any callbacks of resolution will
+    // be ignored. This works from the perspective of the caller of this method,
+    // but may be wasteful by letting dnssd still work in the background.
+
     return CHIP_NO_ERROR;
 }
 
@@ -197,6 +218,31 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
     mSystemLayer = systemLayer;
     Dnssd::Resolver::Instance().SetOperationalDelegate(this);
     return CHIP_NO_ERROR;
+}
+
+void Resolver::Shutdown()
+{
+    while (mActiveLookups.begin() != mActiveLookups.end())
+    {
+        auto current = mActiveLookups.begin();
+
+        const PeerId peerId     = current->GetRequest().GetPeerId();
+        NodeListener * listener = current->GetListener();
+
+        mActiveLookups.Erase(current);
+
+        // Failure callback only called after iterator was cleared:
+        // This allows failure handlers to deallocate structures that may
+        // contain the active lookup data as a member (intrusive lists members)
+        listener->OnNodeAddressResolutionFailed(peerId, CHIP_ERROR_SHUT_DOWN);
+    }
+
+    // Re-arm of timer is expected to cancel any active timer as the
+    // internal list of active lookups is empty at this point.
+    ReArmTimer();
+
+    mSystemLayer = nullptr;
+    Dnssd::Resolver::Instance().SetOperationalDelegate(nullptr);
 }
 
 void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -220,17 +266,53 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         for (size_t i = 0; i < nodeData.mNumIPs; i++)
         {
+#if !INET_CONFIG_ENABLE_IPV4
+            if (!nodeData.mAddress[i].IsIPv6())
+            {
+                ChipLogError(Discovery, "Skipping IPv4 address during operational resolve.");
+                continue;
+            }
+#endif
             result.address.SetIPAddress(nodeData.mAddress[i]);
             current->LookupResult(result);
         }
 
-        if (current->NextAction(mTimeSource.GetMonotonicTimestamp()) == NodeLookupAction::kStopSearching)
-        {
-            mActiveLookups.Erase(current);
-        }
+        HandleAction(current);
     }
 
     ReArmTimer();
+}
+
+void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
+{
+    const NodeLookupAction action = current->NextAction(mTimeSource.GetMonotonicTimestamp());
+
+    if (action.Type() == NodeLookupResult::kKeepSearching)
+    {
+        // No change in iterator
+        return;
+    }
+
+    // final result, handle either success or failure
+    const PeerId peerId     = current->GetRequest().GetPeerId();
+    NodeListener * listener = current->GetListener();
+    mActiveLookups.Erase(current);
+
+    // ensure action is taken AFTER the current current lookup is marked complete
+    // This allows failure handlers to deallocate structures that may
+    // contain the active lookup data as a member (intrusive lists members)
+    switch (action.Type())
+    {
+    case NodeLookupResult::kLookupError:
+        listener->OnNodeAddressResolutionFailed(peerId, action.ErrorResult());
+        break;
+    case NodeLookupResult::kLookupSuccess:
+        listener->OnNodeAddressResolved(peerId, action.ResolveResult());
+        break;
+    default:
+        ChipLogError(Discovery, "Unexpected lookup state (not success or fail).");
+        break;
+    }
 }
 
 void Resolver::HandleTimer()
@@ -240,10 +322,8 @@ void Resolver::HandleTimer()
     {
         auto current = it;
         it++;
-        if (current->NextAction(mTimeSource.GetMonotonicTimestamp()) == NodeLookupAction::kStopSearching)
-        {
-            mActiveLookups.Erase(current);
-        }
+
+        HandleAction(current);
     }
 
     ReArmTimer();
@@ -261,8 +341,13 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
             continue;
         }
 
-        current->GetListener()->OnNodeAddressResolutionFailed(peerId, error);
+        NodeListener * listener = current->GetListener();
         mActiveLookups.Erase(current);
+
+        // Failure callback only called after iterator was cleared:
+        // This allows failure handlers to deallocate structures that may
+        // contain the active lookup data as a member (intrusive lists members)
+        listener->OnNodeAddressResolutionFailed(peerId, error);
     }
     ReArmTimer();
 }
@@ -300,9 +385,16 @@ void Resolver::ReArmTimer()
         auto it = mActiveLookups.begin();
         while (it != mActiveLookups.end())
         {
-            it->GetListener()->OnNodeAddressResolutionFailed(it->GetRequest().GetPeerId(), err);
+            const PeerId peerId     = it->GetRequest().GetPeerId();
+            NodeListener * listener = it->GetListener();
+
             mActiveLookups.Erase(it);
             it = mActiveLookups.begin();
+
+            // Callback only called after active lookup is cleared
+            // This allows failure handlers to deallocate structures that may
+            // contain the active lookup data as a member (intrusive lists members)
+            listener->OnNodeAddressResolutionFailed(peerId, err);
         }
     }
 }

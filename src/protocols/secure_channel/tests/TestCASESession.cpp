@@ -260,7 +260,7 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-class TestCASESessionPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+class TestCASESessionPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
     TestCASESessionPersistentStorageDelegate()
@@ -294,17 +294,22 @@ public:
     {
         for (int i = 0; i < 16; i++)
         {
-            if (keys[i] != nullptr && keysize[i] != 0 && size >= valuesize[i])
+            if (keys[i] != nullptr && keysize[i] != 0 && strncmp(key, keys[i], keysize[i]) == 0)
             {
-                if (memcmp(key, keys[i], keysize[i]) == 0)
+                if (size >= valuesize[i])
                 {
                     memcpy(buffer, values[i], valuesize[i]);
                     size = valuesize[i];
                     return CHIP_NO_ERROR;
                 }
+                else
+                {
+                    size = (valuesize[i]);
+                    return CHIP_ERROR_BUFFER_TOO_SMALL;
+                }
             }
         }
-        return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -316,7 +321,7 @@ public:
                 keysize[i] = static_cast<uint16_t>(strlen(key));
                 keysize[i]++;
                 keys[i] = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(keysize[i]));
-                strcpy(keys[i], key);
+                memcpy(keys[i], key, keysize[i]);
                 values[i] = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(size));
                 memcpy(values[i], value, size);
                 valuesize[i] = size;
@@ -326,22 +331,28 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
     {
-        return SyncSetKeyValue(key, buffer, size);
-    };
+        for (int i = 0; i < 16; i++)
+        {
+            if (keys[i] != nullptr && keysize[i] != 0 && strncmp(key, keys[i], keysize[i]) == 0)
+            {
+                Platform::MemoryFree(keys[i]);
+                keys[i] = nullptr;
 
-    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-    {
-        return SyncGetKeyValue(key, buffer, size);
-    };
-
-    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
+                if (values[i] != nullptr)
+                {
+                    Platform::MemoryFree(values[i]);
+                    values[i] = nullptr;
+                }
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
 
 private:
-    char * keys[16];
+    char * keys[16]; // Not null-terminated
     void * values[16];
     uint16_t keysize[16];
     uint16_t valuesize[16];
@@ -363,7 +374,10 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
+#if CONFIG_NETWORK_LAYER_BLE
+                                                                nullptr,
+#endif
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
@@ -645,14 +659,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
     ctx.EnableAsyncDispatch();
-
-    ctx.SetBobNodeId(kPlaceholderNodeId);
-    ctx.SetAliceNodeId(kPlaceholderNodeId);
-    ctx.SetBobKeyId(0);
-    ctx.SetAliceKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);
@@ -676,8 +685,8 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     gCommissionerStorageDelegate.Cleanup();
     gDeviceStorageDelegate.Cleanup();
-    gCommissionerFabrics.Reset();
-    gDeviceFabrics.Reset();
+    gCommissionerFabrics.DeleteAllFabrics();
+    gDeviceFabrics.DeleteAllFabrics();
     static_cast<TestContext *>(inContext)->Shutdown();
     return SUCCESS;
 }

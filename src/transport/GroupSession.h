@@ -24,19 +24,21 @@
 namespace chip {
 namespace Transport {
 
-class GroupSession : public Session
+class IncomingGroupSession : public Session
 {
 public:
-    GroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~GroupSession() { NotifySessionReleased(); }
+    ~IncomingGroupSession() override { NotifySessionReleased(); }
 
-    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "secure"; };
+    const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -64,76 +66,50 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;
     const NodeId mSourceNodeId;
 };
 
-/*
- * @brief
- *   An table which manages GroupSessions
- */
-template <size_t kMaxSessionCount>
-class GroupSessionTable
+class OutgoingGroupSession : public Session
 {
 public:
-    ~GroupSessionTable() { mEntries.ReleaseAll(); }
+    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
+    ~OutgoingGroupSession() override { NotifySessionReleased(); }
 
-    /**
-     * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
-     *
-     * @return the session found or allocated, nullptr if not found and allocation failed.
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId)
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "outgoing group"; };
+#endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
-        GroupSession * entry = mEntries.CreateObject(group, fabricIndex, sourceNodeId);
-        if (entry != nullptr)
-        {
-            return MakeOptional<SessionHandle>(*entry);
-        }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+        return Access::SubjectDescriptor(); // no subject exists for outgoing group session.
     }
 
-    /**
-     * Get a session using given GroupId
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindEntry(GroupId group, FabricIndex fabricIndex)
+    bool RequireMRP() const override { return false; }
+
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override
     {
-        GroupSession * result = nullptr;
-        mEntries.ForEachActiveObject([&](GroupSession * entry) {
-            if (entry->GetGroupId() == group && entry->GetFabricIndex() == fabricIndex)
-            {
-                result = entry;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-        if (result != nullptr)
-        {
-            return MakeOptional<SessionHandle>(*result);
-        }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
+        VerifyOrDie(false);
+        return cfg;
     }
 
-    /**
-     * @brief Deletes an entry from the object pool
-     *
-     * @param entry The GroupSession entry to delete
-     */
-    void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        VerifyOrDie(false);
+        return System::Clock::Timeout();
+    }
+
+    GroupId GetGroupId() const { return mGroupId; }
 
 private:
-    BitMapObjectPool<GroupSession, kMaxSessionCount> mEntries;
+    const GroupId mGroupId;
 };
 
 } // namespace Transport

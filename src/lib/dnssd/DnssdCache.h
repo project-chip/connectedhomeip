@@ -160,8 +160,7 @@ private:
                     MarkEntryUnused(entry);
                     break; // return nullptr
                 }
-                else
-                    return &entry;
+                return &entry;
             }
             if (entry.mPeerId != nullPeerId && entry.mExpiryTime < current_time)
             {

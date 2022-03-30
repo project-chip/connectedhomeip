@@ -64,6 +64,10 @@ function(chip_configure_data_model APP_TARGET)
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
         )
+
+        target_compile_options(${APP_TARGET} PUBLIC
+           "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+        )
     endif()
 
     if (ARG_ZAP_FILE)
@@ -84,6 +88,7 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/ember-print.cpp
         ${CHIP_APP_BASE_DIR}/util/error-mapping.cpp
         ${CHIP_APP_BASE_DIR}/util/message.cpp
+        ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
     )
 endfunction()

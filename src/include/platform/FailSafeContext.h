@@ -42,28 +42,36 @@ public:
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
 
-    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex)
+    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
-    inline bool IsFailSafeArmed() { return mFailSafeArmed; }
+    inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
 
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex)
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
         VerifyOrDie(mFailSafeArmed);
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
+    inline bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
+    inline bool AddNocCommandHasBeenInvoked() { return mAddNocCommandHasBeenInvoked; }
+    inline bool UpdateNocCommandHasBeenInvoked() { return mUpdateNocCommandHasBeenInvoked; }
 
-    inline void SetNocCommandInvoked(FabricIndex nocFabricIndex)
+    inline void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     {
-        mNocCommandHasBeenInvoked = true;
-        mFabricIndex              = nocFabricIndex;
+        mAddNocCommandHasBeenInvoked = true;
+        mFabricIndex                 = nocFabricIndex;
     }
 
-    inline FabricIndex GetFabricIndex()
+    inline void SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex)
+    {
+        mUpdateNocCommandHasBeenInvoked = true;
+        mFabricIndex                    = nocFabricIndex;
+    }
+
+    inline FabricIndex GetFabricIndex() const
     {
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
@@ -72,14 +80,15 @@ public:
 private:
     // ===== Private members reserved for use by this class only.
 
-    bool mFailSafeArmed            = false;
-    bool mNocCommandHasBeenInvoked = false;
-    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+    bool mFailSafeArmed                  = false;
+    bool mAddNocCommandHasBeenInvoked    = false;
+    bool mUpdateNocCommandHasBeenInvoked = false;
+    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
-    void CommissioningFailedTimerComplete();
+    void FailSafeTimerExpired();
 };
 
 } // namespace DeviceLayer

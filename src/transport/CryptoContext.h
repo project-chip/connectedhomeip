@@ -35,6 +35,11 @@ namespace chip {
 class DLL_EXPORT CryptoContext
 {
 public:
+    static constexpr size_t kAESCCMNonceLen = 13;
+    using NonceStorage                      = std::array<uint8_t, kAESCCMNonceLen>;
+    using NonceView                         = FixedSpan<uint8_t, kAESCCMNonceLen>;
+    using ConstNonceView                    = FixedSpan<const uint8_t, kAESCCMNonceLen>;
+
     CryptoContext();
     ~CryptoContext();
     CryptoContext(CryptoContext &&)      = default;
@@ -86,6 +91,9 @@ public:
      */
     CHIP_ERROR InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
 
+    /** @brief Build a Nonce buffer using given parameters for encrypt or decrypt. */
+    static CHIP_ERROR BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId);
+
     /**
      * @brief
      *   Encrypt the input data using keys established in the secure channel
@@ -93,12 +101,13 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
+     * @param nonce Nonce buffer for encrypt
      * @param header message header structure. Encryption type will be set on the header.
      * @param mac - output the resulting mac
      *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce, PacketHeader & header,
                        MessageAuthenticationCode & mac) const;
 
     /**
@@ -108,12 +117,13 @@ public:
      * @param input Encrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for decrypted data
+     * @param nonce Nonce buffer for decrypt
      * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      * @param mac Input mac
      */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                       const MessageAuthenticationCode & mac) const;
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
+                       const PacketHeader & header, const MessageAuthenticationCode & mac) const;
 
     ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
 
@@ -142,8 +152,6 @@ private:
     bool mKeyAvailable;
     CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
     Crypto::SymmetricKeyContext * mKeyContext = nullptr;
-
-    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag

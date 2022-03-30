@@ -35,9 +35,10 @@ namespace chip {
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
-    OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
-    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
+#endif
+    OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
 };
 
 /**
@@ -48,7 +49,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public Dnssd::OperationalResolveDelegate
+class CASESessionManager
 {
 public:
     CASESessionManager() = delete;
@@ -60,10 +61,10 @@ public:
         mConfig = params;
     }
 
-    virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+    virtual ~CASESessionManager() {}
 
-    CHIP_ERROR Init();
-    void Shutdown() { mDNSResolver.Shutdown(); }
+    CHIP_ERROR Init(chip::System::Layer * systemLayer);
+    void Shutdown() {}
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -74,20 +75,13 @@ public:
     CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId);
+    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionForFabric(CompressedFabricId compressedFabricId);
+    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
 
-    /**
-     * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
-     * on the fabric that was configured for the CASESessionManager object.
-     *
-     * The results of the DNS-SD resolution request is provided to the class via `OperationalResolveDelegate`
-     * implementation of CASESessionManager.
-     */
-    CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
+    void ReleaseAllSessions();
 
     /**
      * This API returns the address for the given node ID.
@@ -99,16 +93,11 @@ public:
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
-    //////////// OperationalResolveDelegate Implementation ///////////////
-    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
-
 private:
-    OperationalDeviceProxy * FindSession(const SessionHandle & session);
-    void ReleaseSession(OperationalDeviceProxy * device);
+    OperationalDeviceProxy * FindSession(const SessionHandle & session) const;
+    void ReleaseSession(OperationalDeviceProxy * device) const;
 
     CASESessionManagerConfig mConfig;
-    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace chip

@@ -64,17 +64,28 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
+static CHIPToolPersistentStorageDelegate * storage = nil;
+
+static uint16_t kTestVendorId = 0xFFF1u;
+
 CHIPDeviceController * InitializeCHIP(void)
 {
-    static CHIPToolPersistentStorageDelegate * storage = nil;
     static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:0 nocSigner:nil];
+        [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
     });
 
     return controller;
+}
+
+void CHIPRestartController(CHIPDeviceController * controller)
+{
+    NSLog(@"Shutting down the stack");
+    [controller shutdown];
+    NSLog(@"Starting up the stack");
+    [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)

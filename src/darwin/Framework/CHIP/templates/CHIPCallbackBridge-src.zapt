@@ -46,6 +46,9 @@
   {{#if_is_struct type}}
   {{#>CHIPCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/CHIPCallbackBridge}}
   {{/if_is_struct}}
+  {{#if_is_bitmap type}}
+  {{#>CHIPCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/CHIPCallbackBridge}}
+  {{/if_is_bitmap}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

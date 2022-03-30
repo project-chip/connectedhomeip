@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ChipIdLookup
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
 import chip.devicecontroller.model.ChipAttributePath
@@ -18,6 +19,7 @@ import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
+import java.lang.StringBuilder
 import kotlinx.android.synthetic.main.wildcard_fragment.attributeIdEd
 import kotlinx.android.synthetic.main.wildcard_fragment.clusterIdEd
 import kotlinx.android.synthetic.main.wildcard_fragment.endpointIdEd
@@ -40,10 +42,12 @@ class WildcardFragment : Fragment() {
       Log.e(TAG, "Report error for $attributePath: $ex")
     }
 
-    override fun onReport(nodeData: NodeState) {
+    override fun onReport(nodeState: NodeState) {
       Log.i(TAG, "Received wildcard report")
-      Log.i(TAG, nodeData.toString())
-      requireActivity().runOnUiThread { outputTv.text = nodeData.toString() }
+
+      val debugString = nodeStateToDebugString(nodeState)
+      Log.i(TAG, debugString)
+      requireActivity().runOnUiThread { outputTv.text = debugString }
     }
   }
 
@@ -60,6 +64,23 @@ class WildcardFragment : Fragment() {
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
     }
+  }
+
+  private fun nodeStateToDebugString(nodeState: NodeState): String {
+    val stringBuilder = StringBuilder()
+    nodeState.endpointStates.forEach { (endpointId, endpointState) ->
+      stringBuilder.append("Endpoint $endpointId: {\n")
+      endpointState.clusterStates.forEach { (clusterId, clusterState) ->
+        stringBuilder.append("\t${ChipIdLookup.clusterIdToName(clusterId)}Cluster: {\n")
+        clusterState.attributeStates.forEach { (attributeId, attributeState) ->
+          val attributeName = ChipIdLookup.attributeIdToName(clusterId, attributeId)
+          stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
+        }
+        stringBuilder.append("\t}\n")
+      }
+      stringBuilder.append("}\n")
+    }
+    return stringBuilder.toString()
   }
 
   private suspend fun subscribe(minInterval: Int, maxInterval: Int) {

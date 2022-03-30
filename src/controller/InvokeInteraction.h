@@ -90,6 +90,40 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     return CHIP_NO_ERROR;
 }
 
+/*
+ * A typed group command invocation function that takes as input a cluster-object representation of a command request and
+ * callbacks when completed trought the done callback
+ *
+ * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
+ * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
+ * and a ResponseType type is expected to work.
+ *
+ * Since this sends a group command, no response will be received and all allocated rescources will be cleared before exing this
+ * function
+ */
+template <typename RequestObjectT>
+CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, chip::FabricIndex fabric, chip::GroupId groupId,
+                                     const RequestObjectT & requestCommandData)
+{
+    CHIP_ERROR error                   = CHIP_NO_ERROR;
+    app::CommandPathParams commandPath = { groupId, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
+                                           app::CommandPathFlags::kGroupIdValid };
+    Transport::OutgoingGroupSession session(groupId, fabric);
+
+    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    error = commandSender->AddRequestData(commandPath, requestCommandData);
+    SuccessOrExit(error);
+
+    error = commandSender->SendGroupCommandRequest(SessionHandle(session));
+    SuccessOrExit(error);
+
+exit:
+    chip::Platform::Delete(commandSender.release());
+    return error;
+}
+
 template <typename RequestObjectT>
 CHIP_ERROR
 InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,

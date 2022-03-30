@@ -16,7 +16,6 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
@@ -63,7 +62,6 @@ target_include_directories(app PRIVATE
                            ${ALL_CLUSTERS_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
-                           ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include)
 
 target_sources(app PRIVATE
@@ -73,12 +71,13 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
-               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
-
+               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
+
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()

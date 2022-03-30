@@ -16,21 +16,59 @@ name: 57.1.1. [TC-I-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Identify"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
+    #issue #12190 as per spec default value is 4 but expecting 2
     - label: "TH reads the ClusterRevision attribute from the DUT"
       disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 4
 
-    - label: "TH reads the AttributeList attribute from the DUT"
-      disabled: true
+    - label: "Reads constraints of ClusterRevision attribute"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          constraints:
+              type: uint16
 
-    - label: "TH reads the CommandList attribute from the DUT"
-      disabled: true
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
 
-    - label: "TH reads the EventList attribute from the DUT"
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: EventList"
       disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list

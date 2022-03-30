@@ -35,7 +35,7 @@ NetworkCommissioning::WiFiScanResponse * sScanResult;
 SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
 } // namespace
 
-CHIP_ERROR SlWiFiDriver::Init()
+CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;

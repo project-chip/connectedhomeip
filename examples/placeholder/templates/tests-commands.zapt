@@ -5,7 +5,7 @@
 #include "TestCommand.h"
 
 {{#if (getTests)}}
-{{>test_cluster tests=(getTests) credsIssuerConfigArg=false}}
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=false needsWaitDuration=false}}
 {{/if}}
 
 std::unique_ptr<TestCommand>GetTestCommand(std::string testName)

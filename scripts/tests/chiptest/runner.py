@@ -14,33 +14,33 @@
 
 import logging
 import os
-import subprocess
-import sys
-import threading
-import time
 import pty
+import queue
 import re
-
-from dataclasses import dataclass
+import subprocess
+import threading
 
 
 class LogPipe(threading.Thread):
+    """Create PTY-based PIPE for IPC.
+
+    Python provides a built-in mechanism for creating comunication PIPEs for
+    subprocesses spawned with Popen(). However, created PIPEs will most likely
+    enable IO buffering in the spawned process. In order to trick such process
+    to flush its streams immediately, we are going to create a PIPE based on
+    pseudoterminal (PTY).
+    """
 
     def __init__(self, level, capture_delegate=None, name=None):
-        """Setup the object with a logger and a loglevel
-
-            and start the thread
-            """
+        """
+        Setup the object with a logger and a loglevel and start the thread.
+        """
         threading.Thread.__init__(self)
 
         self.daemon = False
         self.level = level
-        if sys.platform == 'darwin':
-            self.fd_read, self.fd_write = pty.openpty()
-        else:
-            self.fd_read, self.fd_write = os.pipe()
-
-        self.pipeReader = os.fdopen(self.fd_read)
+        self.fd_read, self.fd_write = pty.openpty()
+        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')
         self.captured_logs = []
         self.capture_delegate = capture_delegate
         self.name = name
@@ -61,33 +61,61 @@ class LogPipe(threading.Thread):
         return None
 
     def fileno(self):
-        """Return the write file descriptor of the pipe"""
+        """Return the write file descriptor of the pipe."""
         return self.fd_write
 
     def run(self):
         """Run the thread, logging everything."""
-        for line in iter(self.pipeReader.readline, ''):
+        while True:
+            try:
+                line = self.reader.readline()
+                # It seems that Darwin platform returns empty string in case
+                # when writing side of PTY is closed (Linux raises OSError).
+                if line == '':
+                    break
+            except OSError:
+                break
             logging.log(self.level, line.strip('\n'))
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
-
-        self.pipeReader.close()
+        self.reader.close()
 
     def close(self):
         """Close the write end of the pipe."""
         os.close(self.fd_write)
 
 
+class RunnerWaitQueue:
+
+    def __init__(self):
+        self.queue = queue.Queue()
+
+    def __wait(self, process, userdata):
+        process.wait()
+        self.queue.put((process, userdata))
+
+    def add_process(self, process, userdata=None):
+        t = threading.Thread(target=self.__wait, args=(process, userdata))
+        t.daemon = True
+        t.start()
+
+    def get(self):
+        return self.queue.get()
+
+
 class Runner:
+
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, cmd, name, wait=True, dependencies=[]):
         outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' OUT')
+            logging.DEBUG, capture_delegate=self.capture_delegate,
+            name=name + ' OUT')
         errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate, name=name + ' ERR')
+            logging.INFO, capture_delegate=self.capture_delegate,
+            name=name + ' ERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
@@ -99,16 +127,22 @@ class Runner:
         if not wait:
             return s, outpipe, errpipe
 
-        while s.poll() is None:
-            # dependencies MUST NOT be done
-            for dependency in dependencies:
-                if dependency.poll() is not None:
-                    s.kill()
-                    raise Exception("Unexpected return %d for %r" %
-                                    (dependency.poll(), dependency))
+        wait = RunnerWaitQueue()
+        wait.add_process(s)
 
-        code = s.wait()
-        if code != 0:
-            raise Exception('Command %r failed: %d' % (cmd, code))
-        else:
-            logging.debug('Command %r completed with error code 0', cmd)
+        for dependency in dependencies:
+            for accessory in dependency.accessories:
+                wait.add_process(accessory, dependency)
+
+        for process, userdata in iter(wait.queue.get, None):
+            if process == s:
+                break
+            # dependencies MUST NOT be done
+            s.kill()
+            raise Exception("Unexpected return %d for %r" %
+                            (process.returncode, userdata))
+
+        if s.returncode != 0:
+            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+
+        logging.debug('Command %r completed with error code 0', cmd)

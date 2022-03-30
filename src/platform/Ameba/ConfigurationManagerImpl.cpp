@@ -27,7 +27,7 @@
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <wifi_conf.h>
@@ -80,7 +80,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(BootReasonType::Unspecified);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 

@@ -22,7 +22,7 @@
 #include <platform/mbed/ConnectivityManagerImpl.h>
 #include <platform/mbed/NetworkCommissioningDriver.h>
 
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 
@@ -56,7 +56,7 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 #if CHIP_DEVICE_ENABLE_DATA_MODEL
     err = sWiFiNetworkCommissioningInstance.Init();
 #else
-    err = NetworkCommissioning::WiFiDriverImpl::GetInstance().Init();
+    err = NetworkCommissioning::WiFiDriverImpl::GetInstance().Init(nullptr);
 #endif
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "WiFi driver init failed: %s", chip::ErrorStr(err)));
 
@@ -116,7 +116,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
         {
             if (mWiFiStationMode == kWiFiStationMode_Enabled)
             {
-                NetworkCommissioning::WiFiDriverImpl::GetInstance().Init();
+                NetworkCommissioning::WiFiDriverImpl::GetInstance().Init(nullptr);
             }
             else if (mWiFiStationMode == kWiFiStationMode_Disabled)
             {

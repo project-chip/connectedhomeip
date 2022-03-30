@@ -22,36 +22,24 @@ config:
 tests:
     - label:
           "IF (PICS_DT_RequestorCanConsent_True) DUT sends a QueryImage command
-          to the TH/OTA-P.RequestorCanConsent is set to True by DUT. + OTA-P/TH
-          responds with a QueryImageResponse with UserConsentNeeded field set to
-          True."
+          to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT.
+          QueryStatus is set to Available, UserConsentNeeded is set to True"
+      verification: |
+          Same as 3.3.1. [TC-SU-2.2]  #8
       disabled: true
 
     - label:
           "IF (PICS_DT_BDX_Supported) DUT sends a QueryImage command to the
-          TH/OTA-P TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
+          TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
           is set to Available. Set ImageURI to the location where the image is
           located."
-      disabled: true
-
-    - label:
-          "IF (PICS_DT_HTTPS_Supported) DUT sends a QueryImage command to the
-          TH/OTA-P + TH/OTA-P sends a QueryImageResponse back to DUT.QueryStatus
-          is set to Available. Set ImageURI with the https url of the software
-          image."
-      disabled: true
-
-    - label:
-          "During the transfer of the image to the DUT, force fail the transfer
-          before it completely transfers the image."
-      disabled: true
-
-    - label:
-          "IF (PICS_DT_RC_STARTOFS_BIT_SET). During the transfer of the image to
-          the DUT, pause the image transfer and unpause the image transfer."
+      verification: |
+          Same as 3.3.1. [TC-SU-2.2]  #1
       disabled: true
 
     - label:
           "IF (PICS_DT_Vendor_Specific) Perform the OTA Update on DUT using
           vendor specific mechanism."
+      verification: |
+          Use vendor specific steps to initiate OTA Update and verify that the software image is transferred to the DUT
       disabled: true

@@ -45,6 +45,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
     "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
     "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
+    "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
@@ -58,6 +59,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
     "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
+    "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
   ]
 }
 
@@ -83,6 +85,10 @@ static_library("core") {
   output_name = "libChipCore"
 
   sources = [
+    # For now cluster enum/bitmap definitions are in zzz-generated.
+    # We should consider putting them directly in this directory
+    # instead.
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "CHIPCallback.h",
     "CHIPCircularTLVBuffer.cpp",
     "CHIPCircularTLVBuffer.h",
@@ -100,6 +106,7 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "ClusterEnums.h",
     "DataModelTypes.h",
     "GroupId.h",
     "NodeId.h",

@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          CHIPDeviceControllerXPCProxyHandle * _Nullable container))completion;
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller
                                      nodeId:(NSUInteger)nodeId
-                                    handler:(void (^)(id _Nullable value, NSError * _Nullable error))handler;
+                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler;
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
                                         nodeId:(NSUInteger)nodeId
                                     completion:(void (^)(void))completion;

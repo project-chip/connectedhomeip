@@ -65,6 +65,8 @@ public:
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+
+    void SetMaxAttributesPerChunk(uint32_t aMaxAttributesPerChunk) { mMaxAttributesPerChunk = aMaxAttributesPerChunk; }
 #endif
 
     /**
@@ -87,14 +89,14 @@ public:
     /**
      * Application marks mutated change path and would be sent out in later report.
      */
-    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
+    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
 
     /**
      * @brief
      *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
@@ -118,12 +120,22 @@ public:
         }
     }
 
-    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+    uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
+
+    uint64_t GetDirtySetGeneration() const { return mDirtyGeneration; }
 
     void ScheduleUrgentEventDeliverySync();
 
 private:
     friend class TestReportingEngine;
+
+    struct AttributePathParamsWithGeneration : public AttributePathParams
+    {
+        AttributePathParamsWithGeneration() {}
+        AttributePathParamsWithGeneration(const AttributePathParams aPath) : AttributePathParams(aPath) {}
+        uint64_t mGeneration = 0;
+    };
+
     /**
      * Build Single Report Data including attribute changes and event data stream, and send out
      *
@@ -133,7 +145,7 @@ private:
     CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
-                                                 bool * apHasMoreChunks, bool * apHasEncodedData);
+                                                 bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
@@ -144,7 +156,8 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
+    bool IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+                                   const ConcreteReadAttributePath & aPath);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
@@ -164,7 +177,6 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
@@ -174,7 +186,9 @@ private:
      *
      * Return whether one of our paths is now a superset of the provided path.
      */
-    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
+    bool MergeOverlappedAttributePath(AttributePathParams & aAttributePath);
+
+    inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
@@ -204,10 +218,25 @@ private:
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+    ObjectPool<AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+
+    /**
+     * A generation counter for the dirty attrbute set.
+     * ReadHandlers can save the generation value when generating reports.
+     *
+     * Then we can tell whether they might have missed reporting an attribute by
+     * comparing its generation counter to the saved one.
+     *
+     * mDirtySetGeneration will increase by one when SetDirty is called.
+     *
+     * Count it from 1, so 0 can be used in ReadHandler to indicate "the read handler has never
+     * completed a report".
+     */
+    uint64_t mDirtyGeneration = 1;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    uint32_t mReservedSize = 0;
+    uint32_t mReservedSize          = 0;
+    uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
 };
 

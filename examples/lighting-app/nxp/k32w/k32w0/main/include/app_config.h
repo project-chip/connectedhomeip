@@ -45,7 +45,11 @@
 #define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
 #if K32W_LOG_ENABLED
+#if CHIP_PW_TOKENIZER_LOGGING
+#define K32W_LOG(MSG, ...) ChipLogDetail(Echo, MSG, __VA_ARGS__);
+#else
 #define K32W_LOG(...) otPlatLog(OT_LOG_LEVEL_NONE, OT_LOG_REGION_API, ##__VA_ARGS__);
+#endif
 #else
 #define K32W_LOG(...)
 #endif

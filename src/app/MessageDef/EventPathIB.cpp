@@ -156,6 +156,14 @@ CHIP_ERROR EventPathIB::Parser::GetEvent(EventId * const apEvent) const
     return GetUnsignedInteger(to_underlying(Tag::kEvent), apEvent);
 }
 
+CHIP_ERROR EventPathIB::Parser::GetEventPath(ConcreteEventPath * const apPath) const
+{
+    VerifyOrReturnError(GetEndpoint(&(apPath->mEndpointId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    VerifyOrReturnError(GetCluster(&(apPath->mClusterId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    VerifyOrReturnError(GetEvent(&(apPath->mEventId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EventPathIB::Parser::GetIsUrgent(bool * const apIsUrgent) const
 {
     return GetSimpleValue(to_underlying(Tag::kIsUrgent), TLV::kTLVType_Boolean, apIsUrgent);
@@ -234,6 +242,10 @@ CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams
         Event(aEventPathParams.mEventId);
     }
 
+    if (aEventPathParams.mIsUrgentEvent)
+    {
+        IsUrgent(aEventPathParams.mIsUrgentEvent);
+    }
     EndOfEventPathIB();
     return GetError();
 }

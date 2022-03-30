@@ -134,10 +134,8 @@ public:
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return mStatus;
-            }
+
+            return mStatus;
         }
 
     private:
@@ -155,6 +153,15 @@ public:
 
             if (mStatus == CHIP_NO_ERROR)
             {
+                //
+                // Re-construct mValue to reset its state back to cluster object defaults.
+                // This is especially important when decoding successive list elements
+                // that do not contain all of the fields for a given struct because
+                // they are marked optional/fabric-sensitive. Without this re-construction,
+                // data from previous decode attempts will continue to linger and give
+                // an incorrect view of the state as seen from a client.
+                //
+                mValue  = T();
                 mStatus = DataModel::Decode(mReader, mValue);
             }
 
@@ -185,10 +192,8 @@ public:
             *size = 0;
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            return mReader.CountRemainingInContainer(size);
-        }
+
+        return mReader.CountRemainingInContainer(size);
     }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader)

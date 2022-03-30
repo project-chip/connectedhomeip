@@ -148,7 +148,7 @@ class NrfConnectBuilder(Builder):
 
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {outdir} -b {board} {sourcedir}{overlayflags}
         '''.format(
                 outdir=shlex.quote(self.output_dir),

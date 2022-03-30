@@ -20,26 +20,24 @@
 
 #include <app/util/basic-types.h>
 
-#include <app/ClusterInfo.h>
-
 namespace chip {
 namespace app {
 struct DataVersionFilter
 {
     DataVersionFilter(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aDataVersion) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mDataVersion(aDataVersion)
+        mClusterId(aClusterId), mDataVersion(aDataVersion), mEndpointId(aEndpointId)
     {}
 
     DataVersionFilter() {}
 
-    bool IsValidDataVersionFilter()
+    bool IsValidDataVersionFilter() const
     {
         return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion.HasValue());
     }
 
-    EndpointId mEndpointId = kInvalidEndpointId;
-    ClusterId mClusterId   = kInvalidClusterId;
-    Optional<DataVersion> mDataVersion;
+    ClusterId mClusterId = kInvalidClusterId;    // uint32
+    Optional<DataVersion> mDataVersion;          // uint32
+    EndpointId mEndpointId = kInvalidEndpointId; // uint16
 };
 } // namespace app
 } // namespace chip

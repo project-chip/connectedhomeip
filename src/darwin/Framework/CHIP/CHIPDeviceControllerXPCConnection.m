@@ -93,6 +93,7 @@
             if (!xpcConnection) {
                 CHIP_LOG_ERROR("Cannot connect to XPC server for remote controller");
                 completion(self.workQueue, nil);
+                return;
             }
             xpcConnection.remoteObjectInterface = self.remoteDeviceServerProtocol;
             xpcConnection.exportedInterface = self.remoteDeviceClientProtocol;
@@ -120,7 +121,7 @@
 
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller
                                      nodeId:(NSUInteger)nodeId
-                                    handler:(void (^)(id _Nullable value, NSError * _Nullable error))handler
+                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler
 {
     dispatch_async(_workQueue, ^{
         BOOL shouldRetainProxyForReport = ([self.reportRegistry count] == 0);
@@ -147,29 +148,47 @@
                                     completion:(void (^)(void))completion
 {
     dispatch_async(_workQueue, ^{
-        NSMutableDictionary * controllerDictionary = self.reportRegistry[controller];
-        if (!controllerDictionary) {
+        __auto_type clearRegistry = ^{
+            NSMutableDictionary * controllerDictionary = self.reportRegistry[controller];
+            if (!controllerDictionary) {
+                completion();
+                return;
+            }
+            NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+            NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+            if (!nodeArray) {
+                completion();
+                return;
+            }
+            [controllerDictionary removeObjectForKey:nodeIdKey];
+            if ([controllerDictionary count] == 0) {
+                // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
+                self.proxyRetainerForReports = nil;
+            }
             completion();
-            return;
-        }
-        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
-        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
-        if (!nodeArray) {
-            completion();
-            return;
-        }
-        [controllerDictionary removeObjectForKey:nodeIdKey];
-        if ([controllerDictionary count] == 0) {
-            // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
-            self.proxyRetainerForReports = nil;
-        }
-        completion();
+        };
+        [self
+            getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, CHIPDeviceControllerXPCProxyHandle * _Nullable handle) {
+                if (handle) {
+                    CHIP_LOG_DEBUG("CHIP XPC connection requests to stop reports");
+                    [handle.proxy stopReportsWithController:controller
+                                                     nodeId:nodeId
+                                                 completion:^{
+                                                     __auto_type handleRetainer = handle;
+                                                     (void) handleRetainer;
+                                                     clearRegistry();
+                                                 }];
+                } else {
+                    CHIP_LOG_ERROR("CHIP XPC connection failed to stop reporting");
+                    clearRegistry();
+                }
+            }];
     });
 }
 
 - (void)handleReportWithController:(id)controller
                             nodeId:(NSUInteger)nodeId
-                             value:(id _Nullable)value
+                            values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
     dispatch_async(_workQueue, ^{
@@ -182,8 +201,8 @@
         if (!nodeArray) {
             return;
         }
-        for (void (^handler)(id _Nullable value, NSError * _Nullable error) in nodeArray) {
-            handler(value, error);
+        for (void (^handler)(id _Nullable values, NSError * _Nullable error) in nodeArray) {
+            handler(values, error);
         }
     });
 }

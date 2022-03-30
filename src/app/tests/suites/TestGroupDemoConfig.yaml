@@ -64,8 +64,8 @@ tests:
                 value: {
                         GroupKeySetID: 0x01a1,
                         #  TODO Revert this once MCSP is implemented
-                        # GroupKeySecurityPolicy: 0,
-                        GroupKeySecurityPolicy: 1, # 1 => LowLatency => TrustFirst
+                        # GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # 0 => TrustFirst
                         EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         EpochStartTime0: 1110000,
                         EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",

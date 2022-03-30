@@ -37,6 +37,9 @@ public class TvApp {
 
   public native void nativeInit();
 
+  // post native init after platform is inited
+  public native void postInit();
+
   public native void setKeypadInputManager(int endpoint, KeypadInputManager manager);
 
   public native void setWakeOnLanManager(int endpoint, WakeOnLanManager manager);
@@ -50,6 +53,8 @@ public class TvApp {
   public native void setMediaPlaybackManager(int endpoint, MediaPlaybackManager manager);
 
   public native void setChannelManager(int endpoint, ChannelManager manager);
+
+  public native void setDACProvider(DACProvider provider);
 
   static {
     System.loadLibrary("TvApp");

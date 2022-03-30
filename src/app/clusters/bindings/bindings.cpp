@@ -25,11 +25,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/bindings.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/binding-table.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -51,6 +49,8 @@ public:
 private:
     CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
+
+    CHIP_ERROR NotifyBindingsChanged();
 };
 
 BindingTableAccess gAttrAccess;
@@ -86,7 +86,7 @@ CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, F
     return CHIP_NO_ERROR;
 }
 
-void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
     EmberBindingTableEntry bindingEntry;
 
@@ -98,17 +98,9 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
     {
         bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
                                                        entry.cluster);
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(
-                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                ChipLogValueX64(entry.node.Value()), err.Format());
-        }
     }
-    BindingTable::GetInstance().Add(bindingEntry);
 
-    BindingManager::GetInstance().NotifyBindingAdded(bindingEntry);
+    AddBindingEntry(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -128,25 +120,25 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
     return encoder.EncodeList([&](const auto & subEncoder) {
         for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            if (entry.local == endpoint && entry.type == EMBER_UNICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
-                    .fabricIndex = entry.fabricIndex,
                     .node        = MakeOptional(entry.nodeId),
                     .group       = NullOptional,
                     .endpoint    = MakeOptional(entry.remote),
                     .cluster     = entry.clusterId,
+                    .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }
-            else if (entry.type == EMBER_MULTICAST_BINDING)
+            else if (entry.local == endpoint && entry.type == EMBER_MULTICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
-                    .fabricIndex = entry.fabricIndex,
                     .node        = NullOptional,
                     .group       = MakeOptional(entry.groupId),
                     .endpoint    = NullOptional,
                     .cluster     = entry.clusterId,
+                    .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }
@@ -177,17 +169,17 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
         ReturnErrorOnFailure(CheckValidBindingList(newBindingList, accessingFabricIndex));
 
-        // Clear all entries for the current accessing fabric
+        // Clear all entries for the current accessing fabric and endpoint
         auto bindingTableIter = BindingTable::GetInstance().begin();
         while (bindingTableIter != BindingTable::GetInstance().end())
         {
-            if (bindingTableIter->fabricIndex == accessingFabricIndex)
+            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == accessingFabricIndex)
             {
                 if (bindingTableIter->type == EMBER_UNICAST_BINDING)
                 {
                     BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                 }
-                bindingTableIter = BindingTable::GetInstance().RemoveAt(bindingTableIter);
+                ReturnErrorOnFailure(BindingTable::GetInstance().RemoveAt(bindingTableIter));
             }
             else
             {
@@ -199,8 +191,9 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         auto iter = newBindingList.begin();
         while (iter.Next())
         {
-            AddBindingEntry(iter.GetValue(), path.mEndpointId);
+            CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -211,14 +204,40 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        AddBindingEntry(target, path.mEndpointId);
+        CreateBindingEntry(target, path.mEndpointId);
+        LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
+
+CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
+{
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+}
+
 } // namespace
 
 void MatterBindingPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+}
+
+void AddBindingEntry(const EmberBindingTableEntry & entry)
+{
+    if (entry.type == EMBER_UNICAST_BINDING)
+    {
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogError(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.nodeId), err.Format());
+        }
+    }
+
+    BindingTable::GetInstance().Add(entry);
 }

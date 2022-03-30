@@ -34,7 +34,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
     auto val = mStorage.find(key);
     if (val == mStorage.end())
     {
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     if (value == nullptr)
@@ -46,14 +46,14 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
     if (size == 0)
     {
         size = neededSize;
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     if (size < neededSize)
     {
         memcpy(value, val->second.data(), size);
         size = neededSize;
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     memcpy(value, val->second.data(), neededSize);
@@ -71,6 +71,12 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, co
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
+    auto val = mStorage.find(key);
+    if (val == mStorage.end())
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
     mStorage.erase(key);
     return CHIP_NO_ERROR;
 }
@@ -88,13 +94,13 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
     if (tmpSize == 0)
     {
         ChipLogDetail(Controller, "Key Not Found\n");
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     else if (size < tmpSize)
     {
         ChipLogDetail(Controller, "Buf not big enough\n");
         size = tmpSize;
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     else
     {
@@ -114,6 +120,14 @@ CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value,
 
 CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
 {
+    uint8_t val[1];
+    uint16_t size  = 0;
+    CHIP_ERROR err = SyncGetKeyValue(key, val, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return err;
+    }
+
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
 }

@@ -68,7 +68,7 @@ public:
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                     ExchangeDelegate * delegate);
 
-    ~ExchangeContext();
+    ~ExchangeContext() override;
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -79,10 +79,7 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
-    bool IsGroupExchangeContext() const
-    {
-        return (mSession && mSession->GetSessionType() == Transport::Session::SessionType::kGroup);
-    }
+    bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionReleaseDelegate
     void OnSessionReleased() override;

@@ -180,12 +180,12 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
-    CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
+    CommissionAdvertisingParameters & SetDeviceType(Optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
         return *this;
     }
-    Optional<uint16_t> GetDeviceType() const { return mDeviceType; }
+    Optional<uint32_t> GetDeviceType() const { return mDeviceType; }
 
     CommissionAdvertisingParameters & SetDeviceName(Optional<const char *> deviceName)
     {
@@ -262,7 +262,7 @@ private:
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
-    chip::Optional<uint16_t> mDeviceType;
+    chip::Optional<uint32_t> mDeviceType;
     chip::Optional<uint16_t> mPairingHint;
 
     char mDeviceName[kKeyDeviceNameMaxLength + 1];

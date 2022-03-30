@@ -34,6 +34,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -550,10 +551,10 @@ CHIP_ERROR PrintQRCodeContent()
     uint16_t productId;
     std::string result;
 
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+    err = GetCommissionableDataProvider()->GetSetupPasscode(setUpPINCode);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(setUpDiscriminator);
     SuccessOrExit(err);
 
     err = ConfigurationMgr().GetVendorId(vendorId);

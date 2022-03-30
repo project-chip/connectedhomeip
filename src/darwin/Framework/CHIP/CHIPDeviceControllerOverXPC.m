@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "CHIPDeviceControllerOverXPC.h"
+#import "CHIPDeviceControllerOverXPC_Internal.h"
 
 #import "CHIPDeviceController+XPC.h"
 #import "CHIPDeviceControllerXPCConnection.h"
@@ -34,14 +34,6 @@ static void SetupXPCQueue(void)
         globalWorkQueue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
     });
 }
-
-@interface CHIPDeviceControllerOverXPC ()
-
-@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerId;
-@property (nonatomic, readonly, strong) dispatch_queue_t workQueue;
-@property (nonatomic, readonly, strong) CHIPDeviceControllerXPCConnection * xpcConnection;
-
-@end
 
 @implementation CHIPDeviceControllerOverXPC
 
@@ -108,6 +100,12 @@ static void SetupXPCQueue(void)
 {
     CHIP_LOG_ERROR("CHIPDevice doesn't support getDeviceBeingCommissioned over XPC");
     return nil;
+}
+
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
+{
+    CHIP_LOG_ERROR("CHIPDevice doesn't support deviceBeingCommissionedOverBLE over XPC");
+    return NO;
 }
 
 - (BOOL)getConnectedDevice:(uint64_t)deviceID

@@ -17,6 +17,7 @@
 
 #include <Globals.h>
 
+chip::FabricTable gFabricTable;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::SessionManager gSessionManager;

@@ -88,6 +88,7 @@ private:
     std::mutex mLock;
     bool mDirty;
     std::string mConfigPath;
+    bool mInitialized = false;
 };
 
 } // namespace Internal

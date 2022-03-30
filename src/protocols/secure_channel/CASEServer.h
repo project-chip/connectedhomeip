@@ -17,7 +17,9 @@
 
 #pragma once
 
+#if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
+#endif
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
@@ -29,7 +31,7 @@ class CASEServer : public SessionEstablishmentDelegate, public Messaging::Exchan
 {
 public:
     CASEServer() {}
-    ~CASEServer()
+    ~CASEServer() override
     {
         if (mExchangeManager != nullptr)
         {
@@ -38,7 +40,10 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics);
+#if CONFIG_NETWORK_LAYER_BLE
+                                             Ble::BleLayer * bleLayer,
+#endif
+                                             SessionManager * sessionManager, FabricTable * fabrics);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -58,7 +63,9 @@ private:
     CASESession mPairingSession;
     uint16_t mSessionKeyId           = 0;
     SessionManager * mSessionManager = nullptr;
-    Ble::BleLayer * mBleLayer        = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     FabricTable * mFabrics = nullptr;
     SessionIDAllocator mSessionIDAllocator;

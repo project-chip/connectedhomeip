@@ -22,6 +22,10 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
+if (chip_pw_tokenizer_logging) {
+  import("//build_overrides/pigweed.gni")
+}
+
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
 
@@ -174,6 +178,10 @@ static_library("support") {
       "CHIPFaultInjection.h",
     ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  if (chip_pw_tokenizer_logging) {
+    public_deps += [ "${dir_pw_tokenizer}:global_handler_with_payload" ]
   }
 
   if (chip_config_memory_debug_dmalloc) {

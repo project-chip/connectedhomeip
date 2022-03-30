@@ -84,6 +84,7 @@ limitations under the License.
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
       <arg name="status" type="StatusEnum"/>
+      <arg name="data"   type="CHAR_STRING" optional="true"/>
     </command>
 
   </cluster>
@@ -91,24 +92,24 @@ limitations under the License.
   <struct name="PlaybackPosition">
     <cluster code="0x0506"/>
     <item name="updatedAt" type="INT64U"/>
-    <item name="position" type="INT64U" isNullable="true"/>    
+    <item name="position"  type="INT64U" isNullable="true"/>    
   </struct>
 
   <enum name="PlaybackStateEnum" type="ENUM8">
     <cluster code="0x0506"/>
-    <item name="Playing" value="0x00"/>
-    <item name="Paused" value="0x01"/>
+    <item name="Playing"    value="0x00"/>
+    <item name="Paused"     value="0x01"/>
     <item name="NotPlaying" value="0x02"/>
-    <item name="Buffering" value="0x03"/>
+    <item name="Buffering"  value="0x03"/>
   </enum>
 
   <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x0506"/>
-    <item name="Success" value="0x00"/>
+    <item name="Success"                value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
-    <item name="NotAllowed" value="0x02"/>
-    <item name="NotActive" value="0x03"/>
-    <item name="SpeedOutOfRange" value="0x04"/>
-    <item name="SeekOutOfRange" value="0x05"/>
+    <item name="NotAllowed"             value="0x02"/>
+    <item name="NotActive"              value="0x03"/>
+    <item name="SpeedOutOfRange"        value="0x04"/>
+    <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 </configurator>

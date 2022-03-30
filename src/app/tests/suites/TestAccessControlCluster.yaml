@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write three entries"
+    - label: "Write entries"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -49,29 +49,29 @@ tests:
                       FabricIndex: 0,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [1234, 5678, 0x8080, 0xFFFF],
+                      Subjects: [4, 5, 6, 7],
                       Targets:
                           [
-                              { Cluster: null, Endpoint: 1, DeviceType: null },
-                              { Cluster: 2, Endpoint: null, DeviceType: null },
-                              { Cluster: 3, Endpoint: 4, DeviceType: null },
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
                           ],
                   },
                   {
                       FabricIndex: 0,
                       Privilege: 3, # operate
                       AuthMode: 3, # group
-                      Subjects: [0x0101, 0x0102, 0xAAAA, 0xBBBB],
+                      Subjects: [12, 13, 14, 15],
                       Targets:
                           [
-                              { Cluster: null, Endpoint: 2, DeviceType: null },
-                              { Cluster: 3, Endpoint: null, DeviceType: null },
-                              { Cluster: 4, Endpoint: 5, DeviceType: null },
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
                           ],
                   },
               ]
 
-    - label: "Read three entries"
+    - label: "Verify"
       command: "readAttribute"
       attribute: "ACL"
       response:
@@ -92,29 +92,29 @@ tests:
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [1234, 5678, 0x8080, 0xFFFF],
+                      Subjects: [4, 5, 6, 7],
                       Targets:
                           [
-                              { Cluster: null, Endpoint: 1, DeviceType: null },
-                              { Cluster: 2, Endpoint: null, DeviceType: null },
-                              { Cluster: 3, Endpoint: 4, DeviceType: null },
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
                           ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 3, # operate
                       AuthMode: 3, # group
-                      Subjects: [0x0101, 0x0102, 0xAAAA, 0xBBBB],
+                      Subjects: [12, 13, 14, 15],
                       Targets:
                           [
-                              { Cluster: null, Endpoint: 2, DeviceType: null },
-                              { Cluster: 3, Endpoint: null, DeviceType: null },
-                              { Cluster: 4, Endpoint: 5, DeviceType: null },
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
                           ],
                   },
               ]
 
-    - label: "Write two entries"
+    - label: "Write entries empty lists"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -124,23 +124,18 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: null,
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null },
-                              { Cluster: 1, Endpoint: null, DeviceType: null },
-                              { Cluster: 2, Endpoint: 3, DeviceType: null },
-                          ],
+                      Targets: null,
                   },
                   {
                       FabricIndex: 0,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [0xCCCC, 0xDDDD],
-                      Targets: [{ Cluster: 5, Endpoint: 6, DeviceType: null }],
+                      Subjects: [],
+                      Targets: [],
                   },
               ]
 
-    - label: "Read two entries"
+    - label: "Verify"
       command: "readAttribute"
       attribute: "ACL"
       response:
@@ -150,24 +145,285 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: null,
-                      Targets:
-                          [
-                              { Cluster: null, Endpoint: 0, DeviceType: null },
-                              { Cluster: 1, Endpoint: null, DeviceType: null },
-                              { Cluster: 2, Endpoint: 3, DeviceType: null },
-                          ],
+                      Targets: null,
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
-                      Subjects: [0xCCCC, 0xDDDD],
-                      Targets: [{ Cluster: 5, Endpoint: 6, DeviceType: null }],
+                      Subjects: null,
+                      Targets: null,
                   },
               ]
 
-    # NOTE: this effectively restores the ACL contents from before this test ran
-    - label: "Write one entry"
+    - label: "Write entry invalid privilege"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # admin
+                      AuthMode: 3, # group
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid auth mode"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 1, # pase
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid subject"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [0],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid target"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry too many subjects"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects:
+                          [
+                              1,
+                              2,
+                              3,
+                              4,
+                              5,
+                              6,
+                              7,
+                              8,
+                              9,
+                              10,
+                              11,
+                              12,
+                              13,
+                              14,
+                              15,
+                              16,
+                              17,
+                              18,
+                              19,
+                              20,
+                          ],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry too many targets"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 1, DeviceType: null },
+                              { Cluster: null, Endpoint: 2, DeviceType: null },
+                              { Cluster: null, Endpoint: 3, DeviceType: null },
+                              { Cluster: null, Endpoint: 4, DeviceType: null },
+                              { Cluster: null, Endpoint: 5, DeviceType: null },
+                              { Cluster: null, Endpoint: 6, DeviceType: null },
+                              { Cluster: null, Endpoint: 7, DeviceType: null },
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: null, Endpoint: 9, DeviceType: null },
+                              { Cluster: null, Endpoint: 10, DeviceType: null },
+                              { Cluster: null, Endpoint: 11, DeviceType: null },
+                              { Cluster: null, Endpoint: 12, DeviceType: null },
+                              { Cluster: null, Endpoint: 13, DeviceType: null },
+                              { Cluster: null, Endpoint: 14, DeviceType: null },
+                              { Cluster: null, Endpoint: 15, DeviceType: null },
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: null, Endpoint: 17, DeviceType: null },
+                              { Cluster: null, Endpoint: 18, DeviceType: null },
+                              { Cluster: null, Endpoint: 19, DeviceType: null },
+                              { Cluster: null, Endpoint: 20, DeviceType: null },
+                          ],
+                  },
+              ]
+      response:
+          error: 1
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Restore ACL"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -181,7 +437,7 @@ tests:
                   },
               ]
 
-    - label: "Read one entry"
+    - label: "Verify"
       command: "readAttribute"
       attribute: "ACL"
       response:

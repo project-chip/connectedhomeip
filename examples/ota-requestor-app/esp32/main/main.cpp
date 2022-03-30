@@ -30,6 +30,8 @@
 #include "nvs_flash.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -40,8 +42,6 @@
 #include <lib/support/ErrorStr.h>
 
 #include "OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/OTARequestorInterface.h"
 
 using namespace ::chip;
 using namespace ::chip::System;
@@ -54,6 +54,7 @@ const char * TAG = "ota-requester-app";
 static DeviceCallbacks EchoCallbacks;
 
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
@@ -71,7 +72,8 @@ static void InitServer(intptr_t context)
     sWiFiNetworkCommissioningInstance.Init();
 
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

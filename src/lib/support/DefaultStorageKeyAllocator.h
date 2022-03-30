@@ -18,6 +18,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <string.h>
@@ -34,8 +35,12 @@ public:
     const char * KeyName() { return mKeyName; }
 
     // Fabric Table
-
-    const char * FabricTable(chip::FabricIndex fabric) { return Format("f/%x/t", fabric); }
+    const char * FabricIndexInfo() { return Format("g/fidx"); }
+    const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
+    const char * FabricICAC(FabricIndex fabric) { return Format("f/%x/i", fabric); }
+    const char * FabricRCAC(FabricIndex fabric) { return Format("f/%x/r", fabric); }
+    const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
+    const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // Access Control List
 
@@ -69,9 +74,19 @@ public:
         return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
-private:
-    static const size_t kKeyLengthMax = 32;
+    const char * BindingTable() { return Format("bt"); }
+    const char * BindingTableEntry(uint8_t index) { return Format("bt/%x", index); }
 
+    static const char * OTADefaultProviders() { return "o/dp"; }
+    static const char * OTACurrentProvider() { return "o/cp"; }
+    static const char * OTAUpdateToken() { return "o/ut"; }
+    static const char * OTACurrentUpdateState() { return "o/us"; }
+    static const char * OTATargetVersion() { return "o/tv"; }
+
+    // [G]lobal [D]NS-related keys
+    static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }
+
+private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.
     const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
@@ -83,7 +98,7 @@ private:
         return mKeyName;
     }
 
-    char mKeyName[kKeyLengthMax + 1] = { 0 };
+    char mKeyName[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
 };
 
 } // namespace chip

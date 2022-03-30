@@ -240,6 +240,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
+    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
     mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
@@ -321,10 +322,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
-    else // We are writing a non-list attribute, or we are writing a single element of a list.
-    {
-        return PutSinglePreencodedAttributeWritePayload(attributePath, data);
-    }
+    // We are writing a non-list attribute, or we are writing a single element of a list.
+    return PutSinglePreencodedAttributeWritePayload(attributePath, data);
 }
 
 const char * WriteClient::GetStateStr() const
@@ -499,8 +498,8 @@ exit:
 
 void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    ChipLogError(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
 
     if (mpCallback != nullptr)
     {

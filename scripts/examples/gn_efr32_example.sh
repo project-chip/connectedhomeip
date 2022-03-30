@@ -61,6 +61,10 @@ if [ "$#" == "0" ]; then
             Location for an alternate or modified efr32 SDK
         enable_heap_monitoring
             Monitor & log memory usage at runtime. (Default false)
+        enable_openthread_cli
+            Enables openthread cli without matter shell. (Default true)
+        show_qr_code
+            Enables QR code on LCD for devices with an LCD
         setupDiscriminator
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
@@ -78,7 +82,8 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         Presets
         --sed
-            enable sleepy end device and set thread mtd
+            enable sleepy end device, set thread mtd
+            For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
     "
@@ -153,4 +158,18 @@ else
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
+    # Generate bootloader file
+    if [ "${BUILD_DIR:0:2}" == "./" ]; then
+        BUILD_DIR_TRIMMED="${BUILD_DIR:2}"
+        S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
+        if [ -z "$S37_PATH" ]; then
+            echo "Bootloader could not be built"
+        else
+            TARGET_PATH=${S37_PATH%????}
+            OTA_PATH="$TARGET_PATH".ota
+            commander gbl create "$TARGET_PATH".gbl --app "$S37_PATH"
+            GBL_PATH="$TARGET_PATH".gbl
+            ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 "$GBL_PATH" "$OTA_PATH"
+        fi
+    fi
 fi
