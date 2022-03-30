@@ -40,7 +40,11 @@ limitations under the License.
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
-    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
+    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">
+      <description>Breadcrumb</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="administer"/>
+    </attribute>
     <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
     <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="RegulatoryLocationType" writable="false" optional="true">RegulatoryConfig</attribute>
     <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="RegulatoryLocationType" writable="false" optional="true">LocationCapability</attribute>
@@ -49,6 +53,7 @@ limitations under the License.
       <arg name="expiryLengthSeconds" type="INT16U"/>
       <arg name="breadcrumb" type="INT64U"/>
       <arg name="timeoutMs" type="INT32U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Sender expects ArmFailSafeResponse command within TimeoutMs milliseconds after sending ArmFailSafe command</description>
@@ -61,6 +66,7 @@ limitations under the License.
       <arg name="countryCode" type="CHAR_STRING"/>      
       <arg name="breadcrumb" type="INT64U"/>
       <arg name="timeoutMs" type="INT32U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x03" name="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Sender expects SetRegulatoryConfigResponse command within TimeoutMs milliseconds after sending SetRegulatoryConfig command</description>
@@ -69,6 +75,7 @@ limitations under the License.
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Commissionee that the Commissioner has successfully completed all steps of commissioning</description>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Sender expects CommissioningCompleteResponse command if the CommissioningComplete command was correctly received</description>
