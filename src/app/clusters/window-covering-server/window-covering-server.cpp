@@ -367,15 +367,26 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t lift   = Percent100thsToLift(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionLift::Set(endpoint, lift);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
     Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Lift Position Set: %u%%", percent);
 }
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
@@ -402,15 +413,26 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t tilt   = Percent100thsToTilt(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionTilt::Set(endpoint, tilt);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
     Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
@@ -482,7 +504,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
         {
-            LiftPositionSet(endpoint, position.Value());
+            LiftPositionSet(endpoint, position);
         }
     }
 
@@ -492,7 +514,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
         {
-            TiltPositionSet(endpoint, position.Value());
+            TiltPositionSet(endpoint, position);
         }
     }
 }

@@ -411,10 +411,8 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
 
     Attributes::InstalledOpenLimitLift::Set(endpoint, LIFT_OPEN_LIMIT);
     Attributes::InstalledClosedLimitLift::Set(endpoint, LIFT_CLOSED_LIMIT);
-    LiftPositionSet(endpoint, LiftToPercent100ths(endpoint, LIFT_CLOSED_LIMIT));
     Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
     Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
-    TiltPositionSet(endpoint, TiltToPercent100ths(endpoint, TILT_CLOSED_LIMIT));
 
     // Attribute: Id  0 Type
     TypeSet(endpoint, EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
@@ -736,7 +734,6 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
 void WindowApp::Cover::ScheduleTiltPositionSet(intptr_t arg)
 {
     WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
-    TiltPositionSet(data->mEndpointId, data->percent100ths);
 
     chip::Platform::Delete(data);
 }
@@ -744,7 +741,6 @@ void WindowApp::Cover::ScheduleTiltPositionSet(intptr_t arg)
 void WindowApp::Cover::ScheduleLiftPositionSet(intptr_t arg)
 {
     WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
-    LiftPositionSet(data->mEndpointId, data->percent100ths);
 
     chip::Platform::Delete(data);
 }
