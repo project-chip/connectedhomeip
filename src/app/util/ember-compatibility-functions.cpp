@@ -970,6 +970,12 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     return (*(version)) == aRequiredVersion;
 }
 
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    return index != 0xFFFF && emberAfDeviceIdFromIndex(index) == deviceType;
+}
+
 } // namespace app
 } // namespace chip
 

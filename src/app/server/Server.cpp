@@ -70,6 +70,15 @@ void StopEventLoop(intptr_t arg)
     }
 }
 
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+    }
+} sDeviceTypeResolver;
+
 } // namespace
 
 namespace chip {
@@ -142,7 +151,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
     VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
 
-    err = mAccessControl.Init(accessDelegate);
+    err = mAccessControl.Init(accessDelegate, sDeviceTypeResolver);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
