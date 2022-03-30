@@ -21,6 +21,7 @@
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip;
@@ -34,10 +35,9 @@ constexpr EndpointId kSupportedEndpoint = 0;
 
 class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
 public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
     {
-        // We only allow access to the OTA software update provider.
-        return false;
+        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 } gDeviceTypeResolver;
 
