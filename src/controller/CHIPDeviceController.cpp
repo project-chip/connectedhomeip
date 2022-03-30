@@ -413,7 +413,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .exchangeMgr        = mSystemState->ExchangeMgr(),
         .udpEndPointManager = mSystemState->UDPEndPointManager(),
         .storageDelegate    = mStorageDelegate,
-        .idAllocator        = mSystemState->SessionIDAlloc(),
         .fabricsTable       = mSystemState->Fabrics(),
     };
 }
@@ -610,8 +609,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
     Optional<SessionHandle> session;
-
-    uint16_t keyID = 0;
+    SessionHolder secureSessionHolder;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -677,8 +675,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
-    err = mSystemState->SessionIDAlloc()->Allocate(keyID);
-    SuccessOrExit(err);
+    secureSessionHolder = mSystemState->SessionMgr()->AllocateSession();
+    VerifyOrExit(secureSessionHolder, CHIP_ERROR_NO_MEMORY);
 
     // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
     device->SetActive(true);
@@ -692,7 +690,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), secureSessionHolder,
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 

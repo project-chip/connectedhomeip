@@ -80,8 +80,6 @@ public:
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
-    SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
-
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
@@ -248,12 +246,10 @@ private:
 
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
-    SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    SecurePairingUsingTestSecret mTestPairing;
     CommissioningWindowManager mCommissioningWindowManager;
 
     // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications

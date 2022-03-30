@@ -50,11 +50,18 @@ public:
 
     CATValues GetPeerCATs() const { return mPeerCATs; }
 
-    // TODO: the local key id should be allocateed at start
-    // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
-    // id , and SetLocalSessionId is not necessary.
-    uint16_t GetLocalSessionId() const { return mLocalSessionId; }
-    bool IsValidLocalSessionId() const { return mLocalSessionId != kInvalidKeyId; }
+    Optional<uint16_t> GetLocalSessionId() const
+    {
+        Optional<uint16_t> localSessionId;
+        VerifyOrExit(mSecureSessionHolder, localSessionId = Optional<uint16_t>::Missing());
+        VerifyOrExit(mSecureSessionHolder->GetSessionType() == Transport::Session::SessionType::kSecure,
+                     localSessionId = Optional<uint16_t>::Missing());
+        localSessionId.SetValue(mSecureSessionHolder->AsSecureSession()->GetLocalSessionId());
+    exit:
+        return localSessionId;
+    }
+
+    SessionHolder & GetSecureSessionHolder() { return mSecureSessionHolder; }
 
     uint16_t GetPeerSessionId() const
     {
@@ -97,7 +104,7 @@ protected:
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
-    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
+    void SetSecureSessionHolder(SessionHolder holder) { mSecureSessionHolder = holder; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
     virtual void OnSuccessStatusReport() {}
     virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -170,7 +177,7 @@ protected:
         mPeerCATs    = kUndefinedCATs;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
         mPeerSessionId.ClearValue();
-        mLocalSessionId = kInvalidKeyId;
+        mSecureSessionHolder.Release();
     }
 
 private:
@@ -178,10 +185,7 @@ private:
     NodeId mPeerNodeId = kUndefinedNodeId;
     CATValues mPeerCATs;
 
-    // TODO: the local key id should be allocateed at start
-    // then we can remove kInvalidKeyId
-    static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
-    uint16_t mLocalSessionId                = kInvalidKeyId;
+    SessionHolder mSecureSessionHolder;
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
     Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();

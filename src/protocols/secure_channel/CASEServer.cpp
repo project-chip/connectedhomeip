@@ -74,12 +74,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
 #endif
 
-    ReturnErrorOnFailure(mSessionIDAllocator.Allocate(mSessionKeyId));
+    SessionHolder secureSessionHolder = mSessionManager->AllocateSession();
+    VerifyOrReturnError(secureSessionHolder, CHIP_ERROR_NO_MEMORY);
 
     // Setup CASE state machine using the credentials for the current fabric.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
     ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
-        mSessionKeyId, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+        secureSessionHolder, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
@@ -123,7 +124,6 @@ void CASEServer::Cleanup()
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    mSessionIDAllocator.Free(mSessionKeyId);
     Cleanup();
 }
 

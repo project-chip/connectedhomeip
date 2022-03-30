@@ -168,12 +168,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -283,12 +283,12 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -384,12 +384,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -497,36 +497,36 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     SessionHolderWithDelegate session5(callback);
 
     // First pairing
-    SecurePairingUsingTestSecret pairing1(1, 1);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing1(1, 1, sessionManager);
     err = sessionManager.NewPairing(session1, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
-    SecurePairingUsingTestSecret pairing2(1, 2);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing2(1, 2, sessionManager);
     err = sessionManager.NewPairing(session2, peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
-    SecurePairingUsingTestSecret pairing3(1, 3);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing3(1, 3, sessionManager);
     err = sessionManager.NewPairing(session3, peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
-    SecurePairingUsingTestSecret pairing4(1, 2);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing4(1, 2, sessionManager);
     err = sessionManager.NewPairing(session4, peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and undefined node ID
-    SecurePairingUsingTestSecret pairing5(1, 1);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing5(1, 1, sessionManager);
     err = sessionManager.NewPairing(session5, peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
@@ -590,12 +590,12 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -704,12 +704,12 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -764,6 +764,56 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
+{
+    SessionManager sessionManager;
+    TestSessionReleaseCallback callback;
+
+    // Allocate a session.
+    SessionHolderWithDelegate session1(sessionManager.AllocateSession(), callback);
+    NL_TEST_ASSERT(inSuite, session1);
+    auto sessionId1 = session1->AsSecureSession()->GetLocalSessionId();
+
+    // Allocate a session at a colliding ID, verify eviction.
+    callback.mOldConnectionDropped = false;
+    SessionHolderWithDelegate session2(sessionManager.AllocateSession(sessionId1), callback);
+    NL_TEST_ASSERT(inSuite, session2);
+
+    auto prevSessionId = sessionId1;
+    // Verify that session IDs monotonically increase, except for the
+    // wraparound case where we skip session ID 0.
+    for (uint32_t i = 0; i < 10; ++i)
+    {
+        auto session = sessionManager.AllocateSession();
+        if (!session)
+        {
+            break;
+        }
+        auto sessionId = session->AsSecureSession()->GetLocalSessionId();
+        NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        prevSessionId = sessionId;
+    }
+
+    sessionManager.~SessionManager();
+    new (&sessionManager) SessionManager();
+
+    prevSessionId = 0;
+    // Verify that session IDs monotonically increase, even when releasing
+    // sessions, except for the wraparound case where we skip session ID 0.
+    for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
+    {
+        auto session = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, session);
+        auto sessionId = session->AsSecureSession()->GetLocalSessionId();
+        NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        prevSessionId = sessionId;
+        sessionManager.ExpirePairing(session.Get());
+    }
+
+    // Verify that session IDs monotonically increase, even when we free sessions.
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -779,6 +829,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
     NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
+    NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
 
     NL_TEST_SENTINEL()
 };

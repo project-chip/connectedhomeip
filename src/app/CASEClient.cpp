@@ -35,8 +35,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, mrpConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
-    uint16_t keyID = 0;
-    ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
+    SessionHolder secureSessionHolder = mInitParams.sessionManager->AllocateSession();
+    VerifyOrReturnError(secureSessionHolder, CHIP_ERROR_NO_MEMORY);
 
     // Allocate the exchange immediately before calling CASESession::EstablishSession.
     //
@@ -48,8 +48,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
-    ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), keyID, exchange, this,
-                                                       mInitParams.mrpLocalConfig));
+    ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), secureSessionHolder,
+                                                       exchange, this, mInitParams.mrpLocalConfig));
     mConnectionSuccessCallback = onConnection;
     mConnectionFailureCallback = onFailure;
     mConectionContext          = context;
@@ -61,8 +61,6 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
 
 void CASEClient::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    mInitParams.idAllocator->Free(mCASESession.GetLocalSessionId());
-
     if (mConnectionFailureCallback)
     {
         mConnectionFailureCallback(mConectionContext, this, error);

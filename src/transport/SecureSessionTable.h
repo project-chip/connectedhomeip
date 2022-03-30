@@ -25,10 +25,8 @@
 namespace chip {
 namespace Transport {
 
-// TODO; use 0xffff to match any key id, this is a temporary solution for
-// InteractionModel, where key id is not obtainable. This will be removed when
-// InteractionModel is migrated to messaging layer
-constexpr const uint16_t kAnyKeyId = 0xffff;
+constexpr uint16_t kMaxSessionID       = UINT16_MAX;
+constexpr uint16_t kUnsecuredSessionId = 0;
 
 /**
  * Handles a set of sessions.
@@ -69,6 +67,49 @@ public:
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
+    /**
+     * Allocates a new secure session out of the internal resource pool with the
+     * specified session ID.  The returned secure session will not become active
+     * until the call to SecureSession::Activate.
+     *
+     * @returns allocated session on success, else failure
+     */
+    CHECK_RETURN_VALUE
+    Optional<SessionHandle> CreateNewSecureSession(uint16_t localSessionId)
+    {
+        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
+        SecureSession * allocated  = nullptr;
+        VerifyOrExit(!FindSecureSessionByLocalKey(localSessionId).HasValue(), rv = Optional<SessionHandle>::Missing());
+        allocated = mEntries.CreateObject(localSessionId);
+        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
+        rv = MakeOptional<SessionHandle>(*allocated);
+    exit:
+        return rv;
+    }
+
+    /**
+     * Allocates a new secure session out of the internal resource pool with a
+     * non-colliding session ID and increments mNextSessionId to give a clue to
+     * the allocator for the next allocation.  The secure session session will
+     * become active unitl the call to SecureSession::Activate.
+     *
+     * @returns allocated session on success, else failure
+     */
+    CHECK_RETURN_VALUE
+    Optional<SessionHandle> CreateNewSecureSession()
+    {
+        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
+        auto sessionId             = FindUnusedSessionId();
+        SecureSession * allocated  = nullptr;
+        VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
+        allocated = mEntries.CreateObject(sessionId.Value());
+        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
+        rv             = MakeOptional<SessionHandle>(*allocated);
+        mNextSessionId = sessionId.Value() == kMaxSessionID ? kUnsecuredSessionId + 1 : sessionId.Value() + 1;
+    exit:
+        return rv;
+    }
+
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
     template <typename Function>
@@ -78,7 +119,7 @@ public:
     }
 
     /**
-     * Get a secure session given a Node Id and Peer's Encryption Key Id.
+     * Get a secure session given a Encryption key ID.
      *
      * @param localSessionId Encryption key ID used by the local node.
      *
@@ -109,7 +150,8 @@ public:
     void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
     {
         mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLastActivityTime() + maxIdleTime < System::SystemClock().GetMonotonicTimestamp())
+            if (session->GetSecureSessionType() != SecureSession::Type::kPending &&
+                session->GetLastActivityTime() + maxIdleTime < System::SystemClock().GetMonotonicTimestamp())
             {
                 callback(*session);
                 ReleaseSession(session);
@@ -119,7 +161,76 @@ public:
     }
 
 private:
+    /**
+     * Find an available session ID that is unused in the secure sesion table.
+     *
+     * The search algorithm iterates over the session ID space in the outer loop
+     * and the session table in the inner loop to locate an available session ID
+     * from the starting mNextSessionId clue.
+     *
+     * Outer-loop iteration considers the session ID space in 64-entry buckets
+     * to give us runtime of O(kMaxSessionCount^2 / 64).  This is the fastest
+     * we can be without a sorted session table or additional storage.
+     *
+     * @return an unused session ID if any is found, else nothing
+     */
+    CHECK_RETURN_VALUE
+    Optional<uint16_t> FindUnusedSessionId()
+    {
+        uint16_t candidate_base = 0;
+        uint64_t candidate_mask = 0;
+        for (uint32_t i = 0; i <= kMaxSessionID; i += 64)
+        {
+            // Candidate_base is the base Session ID we are searching from.
+            // We have a 64-bit mask anchored at this ID at iterate over the
+            // whole session table, marking bits in the mask for in-use IDs.
+            // If we can iterate through the entire session table and have
+            // any bits free in the mask, we have available session IDs.
+            candidate_base = static_cast<uint16_t>(i) + mNextSessionId;
+            candidate_mask = 0;
+            {
+                uint16_t shift = kUnsecuredSessionId - candidate_base;
+                if (shift <= 63)
+                {
+                    candidate_mask |= (1ULL << shift); // kUnsecuredSessionId is never available
+                }
+            }
+            mEntries.ForEachActiveObject([&](auto session) {
+                uint16_t shift = session->GetLocalSessionId() - candidate_base;
+                if (shift <= 63)
+                {
+                    candidate_mask |= (1ULL << shift);
+                }
+                if (candidate_mask == UINT64_MAX)
+                {
+                    return Loop::Break; // No bits clear means this bucket is full.
+                }
+                return Loop::Continue;
+            });
+            if (candidate_mask != UINT64_MAX)
+            {
+                break; // Any bit clear means we have an available ID in this bucket.
+            }
+        }
+        if (candidate_mask != UINT64_MAX)
+        {
+            uint16_t offset = 0;
+            while (candidate_mask & 1)
+            {
+                candidate_mask >>= 1;
+                ++offset;
+            }
+            uint16_t available = candidate_base + offset;
+            return MakeOptional<uint16_t>(available);
+        }
+        else
+        {
+            return Optional<uint16_t>::Missing();
+        }
+    }
+
     BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
+    uint16_t mNextSessionId = 0;
 };
 
 } // namespace Transport

@@ -23,7 +23,6 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayerImpl.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -56,7 +55,6 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     VerifyOrDie(fabric != nullptr);
     secure_channel::MessageCounterManager messageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
-    SessionIDAllocator idAllocator;
     GroupDataProviderImpl groupDataProvider;
 
     systemLayer.Init();
@@ -72,7 +70,6 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     DeviceProxyInitParams params = {
         .sessionManager    = &sessionManager,
         .exchangeMgr       = &exchangeMgr,
-        .idAllocator       = &idAllocator,
         .fabricInfo        = fabric,
         .groupDataProvider = &groupDataProvider,
     };

@@ -111,7 +111,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
-    mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
@@ -241,7 +240,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .exchangeMgr       = &mExchangeMgr,
-            .idAllocator       = &mSessionIDAllocator,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = &mGroupsProvider,

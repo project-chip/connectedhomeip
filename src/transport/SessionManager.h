@@ -168,6 +168,21 @@ public:
     CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                           PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
 
+    /**
+     * @brief
+     *   Allocate a secure session and non-colliding session ID in the secure
+     *   session table.
+     */
+    SessionHolder AllocateSession();
+
+    /**
+     * @brief
+     *   Allocate a secure session in the secure session table at the specified
+     *   session ID.  If the session ID collides with an existing session, evict
+     *   it.
+     */
+    SessionHolder AllocateSession(uint16_t localSessionId);
+
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
