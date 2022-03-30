@@ -42,7 +42,7 @@ public:
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
-    CHIP_ERROR SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
+    CHIP_ERROR SetUpdateNocCommandInvoked();
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
