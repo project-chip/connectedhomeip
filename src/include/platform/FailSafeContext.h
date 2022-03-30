@@ -49,6 +49,8 @@ public:
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
+    // Returns true if the fail-safe is in a state where commands that require an armed
+    // fail-safe can no longer execute, but a new fail-safe can't be armed yet.
     inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
     inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
