@@ -95,7 +95,6 @@ public:
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         mInitParams = params;
-        // Do not do worse
         if (params.Validate() != CHIP_NO_ERROR)
         {
             mState = State::Uninitialized;

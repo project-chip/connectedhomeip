@@ -52,6 +52,12 @@ CHIP_ERROR GenerateCaseDestinationId(const ByteSpan & ipk, const ByteSpan & init
     HMAC_sha hmac;
     CHIP_ERROR err =
         hmac.HMAC_SHA256(ipk.data(), ipk.size(), bbuf.Buffer(), written, outDestinationId.data(), outDestinationId.size());
+
+    if (err == CHIP_NO_ERROR)
+    {
+        outDestinationId.reduce_size(kSHA256_Hash_Length);
+    }
+
     return err;
 }
 

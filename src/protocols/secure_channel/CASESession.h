@@ -108,7 +108,7 @@ public:
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
-     * @brief Set the Group Data Provider which will be used to look-up IPKs
+     * @brief Set the Group Data Provider which will be used to look up IPKs
      *
      * The GroupDataProvider set MUST have key sets available through `GetIpkKeySet` method
      * for the FabricIndex that is associated with the CASESession's FabricInfo.
@@ -195,7 +195,7 @@ private:
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();
     // On success, sets locally maching mFabricInfo in internal state to the entry matched by
-    // destinationId/initiatorRandom from processing of Sigma1
+    // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
     CHIP_ERROR FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
     CHIP_ERROR SendSigma1();

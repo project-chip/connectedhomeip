@@ -1830,7 +1830,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
 
     KeyMapData mapping(fabric.fabric_index, fabric.first_map);
 
-    // Group found, get the keyset
+    // Fabric found, get the keyset
     KeySetData keyset;
     VerifyOrReturnError(keyset.Find(mStorage, fabric, kIdentityProtectionKeySetId), CHIP_ERROR_NOT_FOUND);
 
@@ -1841,7 +1841,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
     out_keyset.num_keys_used = keyset.keys_count;
     out_keyset.policy        = keyset.policy;
 
-    for (size_t key_idx = 0; key_idx < KeySet::kEpochKeysMax; ++key_idx)
+    for (size_t key_idx = 0; key_idx < ArraySize(out_keyset.epoch_keys); ++key_idx)
     {
         out_keyset.epoch_keys[key_idx].Clear();
         if (key_idx < keyset.keys_count)
