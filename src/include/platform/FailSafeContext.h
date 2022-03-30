@@ -77,6 +77,7 @@ public:
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
     }
+    void ForceFailSafeTimerExpiry();
 
     static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
     static CHIP_ERROR DeleteFromStorage();
