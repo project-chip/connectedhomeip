@@ -65,8 +65,8 @@ section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
 -   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended]). This can be done simply with the
-    following commands.
+    version][sysconfig_recommended]). This can be done simply with the following
+    commands.
 
     ```
     $ cd ~

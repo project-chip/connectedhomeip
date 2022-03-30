@@ -63,8 +63,8 @@ section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
 -   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended]). This can be done simply with the
-    following commands.
+    version][sysconfig_recommended]). This can be done simply with the following
+    commands.
 
     ```
     $ cd ~
@@ -211,9 +211,9 @@ fully provisioned, BLE advertising will stop.
 
 Pairing this application with `ble-thread` can be done with any of the enabled
 [CHIP Controller](../../../src/controller/README.md) applications. Use the
-information printed on the console to aide in pairing the device. The
-controller application can also be used to control the example app with the
-cluster commands.
+information printed on the console to aide in pairing the device. The controller
+application can also be used to control the example app with the cluster
+commands.
 
 ## TI Support
 
@@ -232,7 +232,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
 [cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
-[matter-e2e-faq]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
+[matter-e2e-faq]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
     https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
