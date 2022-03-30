@@ -96,7 +96,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
             {
                 channelInfo.name = Optional<CharSpan>(name.charSpan());
             }
-            
+
             jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
             jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
             JniUtfString affiliateCallSign(env, jaffiliateCallSign);
@@ -104,7 +104,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
             {
                 channelInfo.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
             }
-            
+
 
             jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
             jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
@@ -155,7 +155,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
         jfieldID lineupNameFild = env->GetFieldID(channelLineupClazz, "lineupName", "Ljava/lang/String;");
         jstring jlineupName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, lineupNameFild));
         JniUtfString lineupName(env, jlineupName);
-        if (jlineupName != nullptr) 
+        if (jlineupName != nullptr)
         {
             lineupInfo.lineupName = Optional<CharSpan>(lineupName.charSpan());
         }
@@ -201,7 +201,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
         jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
         jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
         JniUtfString callsign(env, jcallSign);
-        if ( jcallSign != nullptr) 
+        if ( jcallSign != nullptr)
         {
             channelInfo.callSign = Optional<CharSpan>(callsign.charSpan());
         }
@@ -221,7 +221,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
         {
             channelInfo.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
         }
-       
+
         jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
         jint jmajorNum          = env->GetIntField(channelInfoObject, majorNumField);
         channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
