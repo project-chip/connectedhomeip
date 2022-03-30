@@ -48,7 +48,8 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
-constexpr uint32_t kDelayNotifyUpdateApplied                 = 10; // Delay before sending notify update applied command
+System::Clock::Seconds32 mDelayNotifyUpdateAppliedSeconds =
+    System::Clock::Seconds32(0); // Delay before sending notify update applied command
 
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
@@ -57,13 +58,9 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 } // namespace
 
-void ScheduleNotifyUpdateApplied(chip::System::Layer * systemLayer, void * appState)
+void GenericOTARequestorDriver::DelayNotifyUpdateAppliedAction(uint32_t seconds)
 {
-    OTARequestorInterface * requestor = static_cast<OTARequestorInterface *>(appState);
-    if (requestor != nullptr)
-    {
-        requestor->NotifyUpdateApplied();
-    }
+    mDelayNotifyUpdateAppliedSeconds = System::Clock::Seconds32(seconds);
 }
 
 void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
@@ -74,19 +71,20 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
 
     if (mImageProcessor->IsFirstImageRun())
     {
-        SystemLayer().ScheduleLambda([this] {
-            CHIP_ERROR error = mImageProcessor->ConfirmCurrentImage();
+        ScheduleDelayedAction(
+            mDelayNotifyUpdateAppliedSeconds,
+            [](System::Layer *, void * context) {
+                CHIP_ERROR error = ToDriver(context)->mImageProcessor->ConfirmCurrentImage();
+                if (error != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
+                    ToDriver(context)->mRequestor->Reset();
+                    return;
+                }
 
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
-                mRequestor->Reset();
-                return;
-            }
-
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kDelayNotifyUpdateApplied),
-                                                        ScheduleNotifyUpdateApplied, mRequestor);
-        });
+                ToDriver(context)->mRequestor->NotifyUpdateApplied();
+            },
+            this);
     }
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))
     {

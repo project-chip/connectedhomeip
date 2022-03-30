@@ -50,7 +50,8 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-const char * TAG = "ota-requester-app";
+const char * TAG                  = "ota-requester-app";
+const uint32_t delayNotifySeconds = 10;
 static DeviceCallbacks EchoCallbacks;
 
 DefaultOTARequestor gRequestorCore;
@@ -78,6 +79,7 @@ static void InitServer(intptr_t context)
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.DelayNotifyUpdateAppliedAction(delayNotifySeconds);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 }
 

@@ -80,6 +80,7 @@ public:
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void SendQueryImage() override;
     bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) override;
+    void DelayNotifyUpdateAppliedAction(uint32_t seconds);
 
 protected:
     void StartPeriodicQueryTimer();
