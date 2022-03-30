@@ -32,6 +32,7 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -90,6 +91,7 @@ struct DeviceControllerSystemStateParams
     SessionIDAllocator * sessionIDAllocator                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider            = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -108,7 +110,7 @@ public:
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
         mSessionIDAllocator(params.sessionIDAllocator), mOperationalDevicePool(params.operationalDevicePool),
-        mCASEClientPool(params.caseClientPool)
+        mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -141,7 +143,8 @@ public:
     {
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mExchangeMgr != nullptr && mMessageCounterManager != nullptr && mFabrics != nullptr && mCASESessionManager != nullptr &&
-            mSessionIDAllocator != nullptr && mOperationalDevicePool != nullptr && mCASEClientPool != nullptr;
+            mSessionIDAllocator != nullptr && mOperationalDevicePool != nullptr && mCASEClientPool != nullptr &&
+            mGroupDataProvider != nullptr;
     };
 
     System::Layer * SystemLayer() { return mSystemLayer; };
@@ -157,6 +160,7 @@ public:
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     SessionIDAllocator * SessionIDAlloc() const { return mSessionIDAllocator; }
+    Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
 
 private:
     DeviceControllerSystemState(){};
@@ -177,6 +181,7 @@ private:
     SessionIDAllocator * mSessionIDAllocator                       = nullptr;
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
+    Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

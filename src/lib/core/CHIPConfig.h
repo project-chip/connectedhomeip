@@ -1511,12 +1511,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
- * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
- * Binds to number of GroupState entries to support per fabric
+ * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#endif
+
+#if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
+#error "Please ensure CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC > 0 to support at least the IPK."
 #endif
 
 /**
