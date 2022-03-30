@@ -874,7 +874,6 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
-    ChipLogProgress(Controller, "OnPairingComplete");
     mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     if (mRunCommissioningAfterConnection)
     {

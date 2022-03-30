@@ -96,6 +96,8 @@ private:
 
     CHIP_ERROR OpenCommissioningWindow();
 
+    // Re-adds an unsolicited message handler for PASE without re-starting the commissioning window timer.
+    // Used to allow devices to re-establish pase sessions or re-try after a failure.
     CHIP_ERROR ListenForPASE();
 
     // Helper for Shutdown and Cleanup.  Does not do anything with
