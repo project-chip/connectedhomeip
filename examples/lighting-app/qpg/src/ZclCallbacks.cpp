@@ -27,6 +27,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <assert.h>
 
 using namespace ::chip;
 using namespace chip::app::Clusters;
