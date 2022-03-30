@@ -72,7 +72,7 @@ void FailSafeContext::FailSafeTimerExpired()
 
     if (status != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
+        ChipLogError(DeviceLayer, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
     mFailSafeBusy = true;
