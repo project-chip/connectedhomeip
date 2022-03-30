@@ -47,6 +47,7 @@ struct BrowseContext : public GenericContext
     size_t mServiceSize;
     BrowseContext(const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle,
                   Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx)
+
     {
         memset(mType, 0, sizeof(mType));
         strncpy(mType, type, strnlen(type, kDnssdTypeMaxSize));
@@ -61,6 +62,7 @@ struct BrowseContext : public GenericContext
         mServices     = nullptr;
         mServiceSize  = 0;
     }
+
     ~BrowseContext()
     {
         if (mServices && mServiceSize > 0)
@@ -92,11 +94,13 @@ struct ResolveContext : public GenericContext
     DnssdService * mService;
     Inet::IPAddress * mExtraIPs;
     size_t mExtraIPSize;
+
     enum class ResolveState
     {
         QuerySrv,
         QueryTxt,
     } mResolveState;
+
     ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb,
                    void * cbCtx)
     {
@@ -118,6 +122,7 @@ struct ResolveContext : public GenericContext
         mExtraIPs                                     = nullptr;
         mExtraIPSize                                  = 0;
     }
+
     ~ResolveContext()
     {
         if (mService)
