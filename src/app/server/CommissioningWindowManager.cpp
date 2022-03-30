@@ -51,12 +51,24 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         ChipLogProgress(AppServer, "Commissioning completed successfully");
+        DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
+        mCommissioningTimeoutTimerArmed = false;
         Cleanup();
+        mServer->GetSecureSessionManager().ExpireAllPairings(kUndefinedNodeId, kUndefinedFabricIndex);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(AppServer, "Failsafe timer expired");
-        OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+#if CONFIG_NETWORK_LAYER_BLE
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+#endif
+        if (mFailedCommissioningAttempts++ < kMaxFailedCommissioningAttempts)
+        {
+            // If the number of commissioning attempts has not exceeded maximum
+            // retries, let's start listening for commissioning connections again.
+            ChipLogProgress(Controller, "listening for pase mFailedCommissioningAttempts = %d", (int) mFailedCommissioningAttempts);
+            AdvertiseAndListenForPASE();
+        }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -134,8 +146,6 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 void CommissioningWindowManager::OnSessionEstablished()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
-    DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
-    mCommissioningTimeoutTimerArmed = false;
     SessionHolder sessionHolder;
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
         sessionHolder, Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
