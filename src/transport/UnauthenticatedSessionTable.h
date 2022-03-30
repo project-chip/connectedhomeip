@@ -54,7 +54,9 @@ public:
 
     UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), 
+        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), 
+        mMRPConfig(config)
     {}
     ~UnauthenticatedSession() override { NotifySessionReleased(); }
 
@@ -65,6 +67,10 @@ public:
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+    void MarkActiveRx() { 
+        mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kUnauthenticated; }
 #if CHIP_PROGRESS_LOGGING
@@ -122,7 +128,8 @@ private:
     const NodeId mEphemeralInitiatorNodeId;
     const SessionRole mSessionRole;
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
