@@ -196,3 +196,7 @@
 [submodule "third_party/telink_sdk/repo"]
 	path = third_party/telink_sdk/repo
 	url = https://github.com/rikorsev/telink_b91_ble_sdk
+[submodule "ti_simplelink_sdk"]
+	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
+	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
+	branch = main
