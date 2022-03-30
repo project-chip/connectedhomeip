@@ -197,7 +197,6 @@ function getManualTests()
   ];
 
   const PowerSourceConfiguration = [
-    'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
     'Test_TC_PSCFG_3_1',
   ];
@@ -452,6 +451,10 @@ function getTests()
     'Test_TC_PCC_2_4',
   ];
 
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
+  ];
+
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
@@ -563,6 +566,7 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
+    'Test_TC_DL_1_3',
   ];
 
   const Groups = [
@@ -593,6 +597,7 @@ function getTests()
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
     SecureChannel, //
     Switch, //

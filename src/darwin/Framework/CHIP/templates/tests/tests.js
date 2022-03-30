@@ -80,6 +80,10 @@ function getTests()
     'Test_TC_DM_3_1',
   ];
 
+  const DoorLock = [
+    'Test_TC_DL_1_3',
+  ];
+
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
@@ -194,6 +198,10 @@ function getTests()
     'Test_TC_PCC_2_4',
   ];
 
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
+  ];
+
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
@@ -287,6 +295,7 @@ function getTests()
     ColorControl, //
     DeviceDiscovery, //
     DeviceManagement, //
+    DoorLock, //
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
@@ -301,6 +310,7 @@ function getTests()
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
     Switch, //
     TemperatureMeasurement, //
