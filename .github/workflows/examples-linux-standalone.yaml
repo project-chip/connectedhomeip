@@ -72,7 +72,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/build/build_examples.py --no-log-timestamps --target-glob '*-chip-cert' build"
             - name: Build example Standalone Echo Client
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool_debug
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

@@ -250,6 +250,8 @@ def HostTargets():
         ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool']), separate_event_loop=False),
+    builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), interactive_mode=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),

@@ -296,7 +296,7 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
             if (subscriptionEstablishedCb != nullptr)
             {
                 subscriptionEstablishedCb(context);

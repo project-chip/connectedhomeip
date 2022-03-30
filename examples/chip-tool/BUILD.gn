@@ -23,6 +23,7 @@ assert(chip_build_tools)
 declare_args() {
   # Use a separate eventloop for CHIP tasks
   config_use_separate_eventloop = true
+  config_use_interactive_mode = true
 }
 
 config("config") {
@@ -32,9 +33,16 @@ config("config") {
     "${chip_root}/src/lib",
   ]
 
-  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+  defines = [
+    "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
+    "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+  ]
 
   cflags = [ "-Wconversion" ]
+
+  if (config_use_interactive_mode) {
+    libs = [ "readline" ]
+  }
 }
 
 static_library("chip-tool-utils") {
@@ -66,6 +74,10 @@ static_library("chip-tool-utils") {
     "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
   ]
+
+  if (config_use_interactive_mode) {
+    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+  }
 
   public_deps = [
     "${chip_root}/src/app/server",

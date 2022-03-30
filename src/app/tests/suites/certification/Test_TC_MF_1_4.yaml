@@ -51,7 +51,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory

@@ -10,6 +10,7 @@
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
+#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 {{> clusters_header}}
@@ -180,4 +181,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
 {{#zcl_clusters}}
     registerCluster{{asUpperCamelCase name}}(commands, credsIssuerConfig);
 {{/zcl_clusters}}
+    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

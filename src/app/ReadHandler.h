@@ -54,7 +54,10 @@ namespace app {
 //
 namespace reporting {
 class Engine;
-}
+class TestReportingEngine;
+} // namespace reporting
+
+class InteractionModelEngine;
 
 /**
  *  @class ReadHandler
@@ -74,26 +77,71 @@ public:
         Subscribe,
     };
 
-    class Callback
+    /*
+     * A callback used to interact with the application.
+     */
+    class ApplicationCallback
     {
     public:
-        virtual ~Callback() = default;
+        virtual ~ApplicationCallback() = default;
+
+        /*
+         * Called right after a SubscribeRequest has been parsed and processed. This notifies an interested application
+         * of a subscription that is about to be established. It also provides an avenue for altering the parameters of the
+         * subscription (specifically, the min/max negotiated intervals) or even outright rejecting the subscription for
+         * application-specific reasons.
+         *
+         * TODO: Need a new IM status code to convey application-rejected subscribes. Currently, a Failure IM status code is sent
+         * back to the subscriber, which isn't sufficient.
+         *
+         * To reject the subscription, a CHIP_ERROR code that is not equivalent to CHIP_NO_ERROR should be returned.
+         *
+         * More information about the set of paths associated with this subscription can be retrieved by calling the appropriate
+         * Get* methods below.
+         *
+         * aReadHandler:            Reference to the ReadHandler associated with the subscription.
+         * aSecureSession:          A reference to the underlying secure session associated with the subscription.
+         *
+         */
+        virtual CHIP_ERROR OnSubscriptionRequested(ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        /*
+         * Called after a subscription has been fully established.
+         */
+        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler){};
+
+        /*
+         * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
+         * after they had been fully established (and therefore had called OnSubscriptionEstablished).
+         * OnSubscriptionEstablishment().
+         */
+        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};
+    };
+
+    /*
+     * A callback used to manage the lifetime of the ReadHandler object.
+     */
+    class ManagementCallback
+    {
+    public:
+        virtual ~ManagementCallback() = default;
 
         /*
          * Method that signals to a registered callback that this object
          * has completed doing useful work and is now safe for release/destruction.
          */
         virtual void OnDone(ReadHandler & apReadHandlerObj) = 0;
-    };
 
-    /**
-     *
-     *  Constructor.
-     *
-     *  The callback passed in has to outlive this handler object.
-     *
-     */
-    ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+        /*
+         * Retrieve the ApplicationCallback (if a valid one exists) from our management entity. This avoids
+         * storing multiple references to the application provided callback and having to subsequently manage lifetime
+         * issues w.r.t the ReadHandler itself.
+         */
+        virtual ApplicationCallback * GetAppCallback() = 0;
+    };
 
     /*
      * Destructor - as part of destruction, it will abort the exchange context
@@ -102,6 +150,43 @@ public:
      * See Abort() for details on when that might occur.
      */
     ~ReadHandler() override;
+
+    /**
+     *
+     *  Constructor.
+     *
+     *  The callback passed in has to outlive this handler object.
+     *
+     */
+    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+
+    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+
+    void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
+    {
+        aMinInterval = mMinIntervalFloorSeconds;
+        aMaxInterval = mMaxIntervalCeilingSeconds;
+    }
+
+    /*
+     * Set the reporting intervals for the subscription. This SHALL only be called
+     * from the OnSubscriptionRequested callback above.
+     */
+    CHIP_ERROR SetReportingIntervals(uint16_t aMinInterval, uint16_t aMaxInterval)
+    {
+        VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(aMinInterval <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+
+        mMinIntervalFloorSeconds   = aMinInterval;
+        mMaxIntervalCeilingSeconds = aMaxInterval;
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
+    EventNumber & GetEventMin() { return mEventMin; }
 
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
@@ -131,6 +216,7 @@ public:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
+    bool IsIdle() const { return mState == HandlerState::Idle; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
@@ -139,11 +225,6 @@ public:
     void ResetPathIterator();
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
-    ObjectList<AttributePathParams> * GetAttributePathList() { return mpAttributePathList; }
-    ObjectList<EventPathParams> * GetEventPathList() { return mpEventPathList; }
-    ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
-    EventNumber & GetEventMin() { return mEventMin; }
-    PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
     // with snapshotted last event number. if current priority  is in the end, no valid
@@ -191,8 +272,8 @@ public:
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
-private:
     friend class TestReadInteraction;
+    friend class chip::app::reporting::TestReportingEngine;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
@@ -200,6 +281,7 @@ private:
     // should really be taking application usage considerations as well. Hence, make it a friend.
     //
     friend class chip::app::reporting::Engine;
+    friend class chip::app::InteractionModelEngine;
 
     enum class HandlerState
     {
@@ -265,7 +347,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber      = 0;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    Callback & mCallback;
+    ManagementCallback & mManagementCallback;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions
