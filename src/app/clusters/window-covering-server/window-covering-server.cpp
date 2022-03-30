@@ -720,13 +720,12 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100thsValue);
     if (HasFeaturePaLift(endpoint))
     {
         if (IsPercent100thsValid(liftPercent100thsValue))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -779,13 +778,12 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100thsValue);
     if (HasFeaturePaTilt(endpoint))
     {
         if (IsPercent100thsValid(tiltPercent100thsValue))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
