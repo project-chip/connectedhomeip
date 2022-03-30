@@ -401,10 +401,15 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     mLiftTimer = WindowApp::Instance().CreateTimer("Timer:Lift", COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
     mTiltTimer = WindowApp::Instance().CreateTimer("Timer:Tilt", COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
 
+    // Preset Lift attributes
     Attributes::InstalledOpenLimitLift::Set(endpoint, LIFT_OPEN_LIMIT);
     Attributes::InstalledClosedLimitLift::Set(endpoint, LIFT_CLOSED_LIMIT);
+
+    // Preset Tilt attributes
     Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
     Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
+
+    // Note: All Current Positions are preset via Zap config and kept accross reboot via NVM: no need to init them
 
     // Attribute: Id  0 Type
     TypeSet(endpoint, EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
