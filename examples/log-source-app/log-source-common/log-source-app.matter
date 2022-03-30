@@ -163,19 +163,19 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
-    CommissioningError errorCode = 0;
-    CHAR_STRING debugText = 1;
-  }
-
   response struct SetRegulatoryConfigResponse {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
+  response struct CommissioningCompleteResponse {
+    CommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command CommissioningComplete(): CommissioningCompleteResponse = 4;
   command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -231,8 +231,8 @@ server cluster NetworkCommissioning = 49 {
 
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING operationalDataset = 0;
+  request struct ScanNetworksRequest {
+    OCTET_STRING ssid = 0;
     INT64U breadcrumb = 1;
   }
 
@@ -242,12 +242,17 @@ server cluster NetworkCommissioning = 49 {
     INT64U breadcrumb = 2;
   }
 
-  request struct ConnectNetworkRequest {
-    OCTET_STRING networkID = 0;
+  request struct AddOrUpdateThreadNetworkRequest {
+    OCTET_STRING operationalDataset = 0;
     INT64U breadcrumb = 1;
   }
 
   request struct RemoveNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct ConnectNetworkRequest {
     OCTET_STRING networkID = 0;
     INT64U breadcrumb = 1;
   }
@@ -258,15 +263,11 @@ server cluster NetworkCommissioning = 49 {
     INT64U breadcrumb = 2;
   }
 
-  request struct ScanNetworksRequest {
-    OCTET_STRING ssid = 0;
-    INT64U breadcrumb = 1;
-  }
-
-  response struct ConnectNetworkResponse {
+  response struct ScanNetworksResponse {
     NetworkCommissioningStatus networkingStatus = 0;
     CHAR_STRING debugText = 1;
-    INT32S errorValue = 2;
+    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
   response struct NetworkConfigResponse {
@@ -275,19 +276,18 @@ server cluster NetworkCommissioning = 49 {
     optional INT8U networkIndex = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ConnectNetworkResponse {
     NetworkCommissioningStatus networkingStatus = 0;
     CHAR_STRING debugText = 1;
-    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
-    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+    INT32S errorValue = 2;
   }
 
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
   command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -319,6 +319,18 @@ server cluster OperationalCredentials = 62 {
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly global attribute int16u clusterRevision = 65533;
 
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
@@ -327,28 +339,16 @@ server cluster OperationalCredentials = 62 {
     INT16U adminVendorId = 4;
   }
 
-  request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct AttestationRequestRequest {
-    OCTET_STRING attestationNonce = 0;
-  }
-
-  request struct CSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
-  request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+  request struct UpdateFabricLabelRequest {
+    CHAR_STRING label = 0;
   }
 
   request struct RemoveFabricRequest {
     fabric_idx fabricIndex = 0;
   }
 
-  request struct UpdateFabricLabelRequest {
-    CHAR_STRING label = 0;
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
   }
 
   response struct AttestationResponse {
@@ -356,13 +356,13 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CertificateChainResponse {
+    OCTET_STRING certificate = 0;
+  }
+
   response struct CSRResponse {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
-  }
-
-  response struct CertificateChainResponse {
-    OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
@@ -371,13 +371,13 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  command AddNOC(AddNOCRequest): NOCResponse = 6;
-  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
 
