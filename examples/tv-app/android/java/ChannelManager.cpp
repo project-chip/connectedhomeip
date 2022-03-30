@@ -100,11 +100,10 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
             jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
             jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
             JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-            if ( jaffiliateCallSign != nullptr )
+            if (jaffiliateCallSign != nullptr)
             {
                 channelInfo.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
             }
-
 
             jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
             jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
@@ -147,7 +146,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
         jfieldID operatorNameFild = env->GetFieldID(channelLineupClazz, "operatorName", "Ljava/lang/String;");
         jstring joperatorName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, operatorNameFild));
         JniUtfString operatorName(env, joperatorName);
-        if ( joperatorName != nullptr )
+        if (joperatorName != nullptr)
         {
             lineupInfo.operatorName = operatorName.charSpan();
         }
@@ -201,7 +200,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
         jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
         jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
         JniUtfString callsign(env, jcallSign);
-        if ( jcallSign != nullptr)
+        if (jcallSign != nullptr)
         {
             channelInfo.callSign = Optional<CharSpan>(callsign.charSpan());
         }
