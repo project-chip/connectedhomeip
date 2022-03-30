@@ -198,7 +198,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
 
     // Call-back into commissioner with the generated data.
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan, MakeOptional(ipkSpan), Optional<NodeId>());
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan, MakeOptional(ipkSpan),
+                        Optional<NodeId>());
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
