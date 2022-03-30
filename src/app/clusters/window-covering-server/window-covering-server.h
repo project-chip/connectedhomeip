@@ -24,9 +24,9 @@
 
 #include <app/data-model/Nullable.h>
 
-#define WC_PERCENT100THS_MIN_OPEN   0
+#define WC_PERCENT100THS_MIN_OPEN 0
 #define WC_PERCENT100THS_MAX_CLOSED 10000
-#define WC_PERCENT100THS_MIDDLE     5000
+#define WC_PERCENT100THS_MIDDLE 5000
 
 namespace chip {
 namespace app {

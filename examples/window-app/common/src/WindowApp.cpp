@@ -520,7 +520,6 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
@@ -576,7 +575,6 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
         mTiltTimer->Start();
     }
 }
-
 
 void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
 {
@@ -643,9 +641,9 @@ void WindowApp::Cover::SchedulePositionSet(chip::Percent100ths position, bool is
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
     VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::SchedulePositionSet - Out of Memory for WorkData"));
 
-    data->mEndpointId = mEndpoint;
+    data->mEndpointId   = mEndpoint;
     data->percent100ths = position;
-    data->isTilt = isTilt;
+    data->isTilt        = isTilt;
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackPositionSet, reinterpret_cast<intptr_t>(data));
 }

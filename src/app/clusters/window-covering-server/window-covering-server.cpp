@@ -464,7 +464,7 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
     case OperationalState::MovingDownOrClose:
         if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
         {
-            percent100ths = static_cast<Percent100ths> (percent100ths + delta);
+            percent100ths = static_cast<Percent100ths>(percent100ths + delta);
         }
         else
         {
@@ -474,7 +474,7 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
     case OperationalState::MovingUpOrOpen:
         if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
         {
-            percent100ths = static_cast<Percent100ths> (percent100ths - delta);
+            percent100ths = static_cast<Percent100ths>(percent100ths - delta);
         }
         else
         {
