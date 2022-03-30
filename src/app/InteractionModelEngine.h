@@ -223,10 +223,7 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool()
-    {
-        return mReadHandlers;
-    }
+    auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -234,10 +231,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacity(int32_t sz)
-    {
-        mReadHandlerCapacityOverride = sz;
-    }
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
