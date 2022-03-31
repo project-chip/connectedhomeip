@@ -79,10 +79,9 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
-} else if (lwip_platform == "bl602") {
+} else if (lwip_platform == "external") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
-    public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
   }
 
   group("all") {
@@ -119,6 +118,15 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+  }
+} else if (lwip_platform == "bl602") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
   }
 } else {
   config("lwip_config") {

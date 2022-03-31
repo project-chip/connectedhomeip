@@ -143,15 +143,6 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
             {
                 extraKeyInfo[0] = 0;
             }
-
-#if CHIP_CONFIG_SECURITY_TEST_MODE
-            ChipLogProgress(SecurityManager,
-                            "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 ", data 0x%02" PRIX8 "...%s", key.KeyId,
-                            ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, key.Key[0], extraKeyInfo);
-#else
-            ChipLogProgress(SecurityManager, "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 "%s", key.KeyId,
-                            ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, extraKeyInfo);
-#endif
         }
 
 #endif // CHIP_PROGRESS_LOGGING
