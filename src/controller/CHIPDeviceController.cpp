@@ -676,7 +676,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     secureSessionHolder = mSystemState->SessionMgr()->AllocateSession();
-    VerifyOrExit(secureSessionHolder, CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(secureSessionHolder, err = CHIP_ERROR_NO_MEMORY);
 
     // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
     device->SetActive(true);
