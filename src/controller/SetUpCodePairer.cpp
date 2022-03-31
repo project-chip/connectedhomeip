@@ -45,15 +45,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     mRemoteId     = remoteId;
     mSetUpPINCode = payload.setUpPINCode;
 
-    for (auto & waiting : mWaitingForDiscovery)
-    {
-        waiting = false;
-    }
-
-    for (auto & params : mDiscoveredParameters)
-    {
-        params = RendezvousParameters();
-    }
+    ResetDiscoveryState();
 
     return Connect(payload);
 }
@@ -314,6 +306,19 @@ bool SetUpCodePairer::TryNextRendezvousParameters()
     }
 
     return false;
+}
+
+void SetUpCodePairer::ResetDiscoveryState()
+{
+    for (auto & waiting : mWaitingForDiscovery)
+    {
+        waiting = false;
+    }
+
+    for (auto & params : mDiscoveredParameters)
+    {
+        params = RendezvousParameters();
+    }
 }
 
 } // namespace Controller

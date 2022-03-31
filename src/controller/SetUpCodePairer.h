@@ -53,7 +53,7 @@ enum class SetupCodePairerBehaviour : uint8_t
 class DLL_EXPORT SetUpCodePairer
 {
 public:
-    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
+    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) { ResetDiscoveryState(); }
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
@@ -90,6 +90,10 @@ private:
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
 
+    // Reset our mWaitingForDiscovery/mDiscoveredParameters state to indicate no
+    // pending work.
+    void ResetDiscoveryState();
+
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes
     {
@@ -118,7 +122,7 @@ private:
 
     // Boolean will be set to true if we currently have an async discovery
     // process happening via the relevant transport.
-    bool mWaitingForDiscovery[kTransportTypeCount];
+    bool mWaitingForDiscovery[kTransportTypeCount] = { false };
 
     // HasPeerAddress() for a given transport type will test true if we have
     // discovered an address for that transport and not tried connecting to it
