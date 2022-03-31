@@ -103,7 +103,7 @@ protected:
     virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
 
     /**
-     * @brief Set the total count of the UserLabelList on a given endpoint
+     * @brief Set the total length of the UserLabelList on a given endpoint
      *
      * @param endpoint - id of the UserLabelList.
      * @param val - total count of the UserLabelList.
