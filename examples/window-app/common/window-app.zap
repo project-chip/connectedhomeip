@@ -2075,17 +2075,6 @@
               "reportableChange": 0
             },
             {
-              "name": "SupportsConcurrentConnection",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "external",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-            },
-            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
