@@ -39,6 +39,7 @@
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
+#include <controller/DevicePairingDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
@@ -109,47 +110,6 @@ struct ControllerInitParams
     bool enableServerInteractions = false;
 
     uint16_t controllerVendorId;
-};
-
-class DLL_EXPORT DevicePairingDelegate
-{
-public:
-    virtual ~DevicePairingDelegate() {}
-
-    enum Status : uint8_t
-    {
-        SecurePairingSuccess = 0,
-        SecurePairingFailed,
-    };
-
-    /**
-     * @brief
-     *   Called when the pairing reaches a certain stage.
-     *
-     * @param status Current status of pairing
-     */
-    virtual void OnStatusUpdate(DevicePairingDelegate::Status status) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is complete (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingComplete(CHIP_ERROR error) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is deleted (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingDeleted(CHIP_ERROR error) {}
-
-    /**
-     *   Called when the commissioning process is complete (with success or error)
-     */
-    virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}
 };
 
 struct CommissionerInitParams : public ControllerInitParams
@@ -587,6 +547,7 @@ public:
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
     // AttributeCache::Callback impl
     void OnDone() override;
@@ -622,11 +583,6 @@ private:
     void OnSessionEstablishmentTimeout();
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
-
-    // Helper to call once we decide that pairing has failed.  This might be
-    // called from OnSessionEstablishmentError if we have no other transports to
-    // try, or in various other failure cases.
-    void PairingFailed(CHIP_ERROR err);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.

@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <controller/DevicePairingDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
@@ -50,7 +51,8 @@ enum class SetupCodePairerBehaviour : uint8_t
     kCommission,
     kPaseOnly,
 };
-class DLL_EXPORT SetUpCodePairer
+
+class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) { ResetDiscoveryState(); }
@@ -66,19 +68,13 @@ public:
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    // Called by the commissioner when PASE establishment fails.
-    //
-    // May start a new PASE establishment.
-    //
-    // Will return whether we might in fact have more rendezvous parameters to
-    // try (e.g. because we started a new PASE establishment or are waiting on
-    // more device discovery).
-    //
-    // The commissioner can use the return value to decide whether pairing has
-    // actually failed or not.
-    bool TryNextRendezvousParameters();
-
 private:
+    // DevicePairingDelegate implementation.
+    void OnStatusUpdate(DevicePairingDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+
     CHIP_ERROR Connect(SetupPayload & paload);
     CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
     CHIP_ERROR StopConnectOverBle();
@@ -93,6 +89,27 @@ private:
     // Reset our mWaitingForDiscovery/mDiscoveredParameters state to indicate no
     // pending work.
     void ResetDiscoveryState();
+
+    // Get ready to start PASE establishment via mCommissioner.  Sets up
+    // whatever state is needed for that.
+    void ExpectPASEEstablishment();
+
+    // PASE establishment by mCommissioner has completed: we either have a PASE
+    // session now or we failed to set one up, but we are done waiting on
+    // mCommissioner.
+    void PASEEstablishmentComplete();
+
+    // Called when PASE establishment fails.
+    //
+    // May start a new PASE establishment.
+    //
+    // Will return whether we might in fact have more rendezvous parameters to
+    // try (e.g. because we started a new PASE establishment or are waiting on
+    // more device discovery).
+    //
+    // The commissioner can use the return value to decide whether pairing has
+    // actually failed or not.
+    bool TryNextRendezvousParameters();
 
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes
@@ -120,6 +137,11 @@ private:
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
 
+    // While we are trying to pair, we intercept the DevicePairingDelegate
+    // notifications from mCommissioner.  We want to make sure we send them on
+    // to the original pairing delegate, if any.
+    DevicePairingDelegate * mPairingDelegate = nullptr;
+
     // Boolean will be set to true if we currently have an async discovery
     // process happening via the relevant transport.
     bool mWaitingForDiscovery[kTransportTypeCount] = { false };
@@ -131,10 +153,10 @@ private:
     // mWaitingForDiscovery are false.
     RendezvousParameters mDiscoveredParameters[kTransportTypeCount];
 
-    // mWaitingForConnection is true if we have called either
+    // mWaitingForPASE is true if we have called either
     // EstablishPASEConnection or PairDevice on mCommissioner and are now just
     // waiting to see whether that works.
-    bool mWaitingForConnection = false;
+    bool mWaitingForPASE = false;
 };
 
 } // namespace Controller
