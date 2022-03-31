@@ -36,7 +36,7 @@ executable("chip-tool-darwin") {
   include_dirs = [
     ".",
     "${chip_root}/zzz_generated/chip-tool-darwin",
-    "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h"
+    "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
   ]
 
   deps = [
