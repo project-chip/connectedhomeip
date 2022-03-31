@@ -132,6 +132,16 @@ typedef struct
 } EmberAfCluster;
 
 /**
+ * @brief Struct that represents a logical device type consisting
+ * of a DeviceID and its version.
+ */
+typedef struct
+{
+    uint16_t deviceId;
+    uint8_t deviceVersion;
+} EmberAfDeviceType;
+
+/**
  * @brief Struct used to find an attribute in storage. Together the elements
  * in this search record constitute the "primary key" used to identify a unique
  * attribute value in attribute storage.
@@ -386,14 +396,12 @@ typedef struct
      * Actual zigbee endpoint number.
      */
     chip::EndpointId endpoint;
+
     /**
-     * Device ID of the device on this endpoint.
+     * Span pointing to a list of supported device types
      */
-    uint16_t deviceId;
-    /**
-     * Version of the device.
-     */
-    uint8_t deviceVersion;
+    chip::Span<const EmberAfDeviceType> deviceTypeList;
+
     /**
      * Meta-data about the endpoint
      */

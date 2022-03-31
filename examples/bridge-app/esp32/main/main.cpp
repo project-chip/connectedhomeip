@@ -66,9 +66,15 @@ static Device gLight3("Light 3", "Kitchen");
 static Device gLight4("Light 4", "Den");
 
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_CHIP_BRIDGE 0x0a0b
+#define DEVICE_TYPE_BRIDGE_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
+
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_ROOT_NODE 0x0016
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_BRIDGE 0x000e
+
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
@@ -369,6 +375,10 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
+const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, 1 }, { DEVICE_TYPE_BRIDGE, 1 } };
+
+const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, 1 }, { DEVICE_TYPE_BRIDGE_NODE, 1 } };
+
 static void InitServer(intptr_t context)
 {
     chip::Server::GetInstance().Init();
@@ -388,56 +398,66 @@ static void InitServer(intptr_t context)
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
+    //
+    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
+    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
+    //
+    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
+
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight1DataVersions));
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
-    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight3DataVersions));
+    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight1DataVersions));
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight3DataVersions));
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight4DataVersions));
+    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight4DataVersions));
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
-}
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
 
-extern "C" void app_main()
-{
-    // Initialize the ESP NVS layer.
-    esp_err_t err = nvs_flash_init();
-    if (err != ESP_OK)
+    extern "C" void app_main()
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
-        return;
+        // Initialize the ESP NVS layer.
+        esp_err_t err = nvs_flash_init();
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+            return;
+        }
+
+        CHIP_ERROR chip_err = CHIP_NO_ERROR;
+
+        // bridge will have own database named gDevices.
+        // Clear database
+        memset(gDevices, 0, sizeof(gDevices));
+
+        // Whenever bridged device changes its state
+        gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
+        gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
+        gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
+        gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
+
+        gLight1.SetReachable(true);
+        gLight2.SetReachable(true);
+        gLight3.SetReachable(true);
+        gLight4.SetReachable(true);
+
+        CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+
+        chip_err = deviceMgr.Init(&AppCallback);
+        if (chip_err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
+            return;
+        }
+
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
     }
-
-    CHIP_ERROR chip_err = CHIP_NO_ERROR;
-
-    // bridge will have own database named gDevices.
-    // Clear database
-    memset(gDevices, 0, sizeof(gDevices));
-
-    // Whenever bridged device changes its state
-    gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
-
-    gLight1.SetReachable(true);
-    gLight2.SetReachable(true);
-    gLight3.SetReachable(true);
-    gLight4.SetReachable(true);
-
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-
-    chip_err = deviceMgr.Init(&AppCallback);
-    if (chip_err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
-        return;
-    }
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-}

@@ -972,8 +972,17 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return index != 0xFFFF && emberAfDeviceIdFromIndex(index) == deviceType;
+    auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint);
+
+    for (auto & device : deviceTypeList)
+    {
+        if (device.deviceId == deviceType)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app
