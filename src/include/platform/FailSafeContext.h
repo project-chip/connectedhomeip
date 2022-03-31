@@ -46,7 +46,7 @@ public:
 
     /**
      * @brief
-     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   Schedules a call to cleanup the FailSafe Context asynchronously after various cleanup work
      *   has completed.
      */
     void ScheduleFailSafeCleanup();
