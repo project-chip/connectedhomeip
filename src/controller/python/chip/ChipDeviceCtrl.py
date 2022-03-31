@@ -210,6 +210,8 @@ class ChipDeviceController():
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.CheckIsActive()
 
+        self._ChipStack.commissioningCompleteEvent.clear()
+
         self.state = DCState.RENDEZVOUS_ONGOING
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
