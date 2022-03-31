@@ -43,8 +43,8 @@ To start the console provide the path to the device, for example:
 
     $ chip-console --device /dev/ttyUSB0
 
-Note that `chip-console` is an entry point for chip_rpc.console and could also be run with
-`python -m chip_rpc.console`.
+Note that `chip-console` is an entry point for chip_rpc.console and could also
+be run with `python -m chip_rpc.console`.
 
 An example RPC command:
 
