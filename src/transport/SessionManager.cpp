@@ -405,15 +405,13 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
 {
     uint16_t peerSessionId = pairing->GetPeerSessionId();
     SecureSession * secureSession;
-    uint16_t localSessionId;
     sessionHolder = pairing->GetSecureSessionHolder();
     VerifyOrReturnError(sessionHolder, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sessionHolder->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
-    secureSession  = sessionHolder->AsSecureSession();
-    localSessionId = secureSession->GetLocalSessionId();
+    secureSession = sessionHolder->AsSecureSession();
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
-                  ChipLogValueX64(peerNodeId), localSessionId, peerSessionId);
+                  ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);
     secureSession->Activate(pairing->GetSecureSessionType(), peerNodeId, pairing->GetPeerCATs(), peerSessionId, fabric,
                             pairing->GetMRPConfig());
 
