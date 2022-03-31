@@ -1723,7 +1723,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
+            actualCountryCodeSize = 2;
+            memset(countryCodeStr, 'X', actualCountryCodeSize);
+            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
