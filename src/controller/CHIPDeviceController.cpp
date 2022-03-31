@@ -1100,8 +1100,8 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, dacPubkey));
 
     // Retrieve attestation challenge
-    // ByteSpan attestationChallenge =
-    //    proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    ByteSpan attestationChallenge =
+        proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
@@ -1110,8 +1110,8 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
     }
 
-    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, dac, ByteSpan(), ByteSpan(),
-                                                             &mDeviceNOCChainCallback);
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
+                                                             dac, ByteSpan(), ByteSpan(), &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,

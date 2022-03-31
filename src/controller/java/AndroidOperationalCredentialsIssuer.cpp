@@ -120,15 +120,16 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     return NewNodeOperationalX509Cert(noc_request, pubkey, mIssuer, noc);
 }
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
-                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                 const ByteSpan & attestationSignature,
+                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
                                                                  const ByteSpan & PAI, const ByteSpan & PAA,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onOpCSRGenerationComplete", "([B)V", &method);
+                                                             "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());

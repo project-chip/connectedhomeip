@@ -176,12 +176,17 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     return NewNodeOperationalX509Cert(noc_request, pubkey, mIntermediateIssuer, noc);
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
-                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                 const ByteSpan & attestationSignature,
+                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
                                                                  const ByteSpan & PAI, const ByteSpan & PAA,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    // At this point, Credential issues may wish to validate the CSR information
+    (void) attestationChallenge;
+    (void) csrNonce;
+
     NodeId assignedId;
     if (mNodeIdRequested)
     {
