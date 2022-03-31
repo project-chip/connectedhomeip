@@ -415,17 +415,26 @@ public:
     virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
-     * Indicates the start of a series of list operations, this function will be called before first Write to the list.
+     * Indicates the start of a series of list operations. This function will be called before the first Write operation of a series
+     * of consequence attribute data of the same attribute.
+     *
+     * 1) This function won't be called if the user writes a null value to a list attribute.
+     * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
+     * of the same attribute.
      *
      * @param [in] aPath indicates the path of the modified list.
      */
     virtual void OnListWriteBegin(const ConcreteAttributePath & aPath) {}
 
     /**
-     * Indicates the end of a series of list operations. This function will be called after last Write to the list or when the
-     * transaction is aborted with a possibly incomplete list.
+     * Indicates the end of a series of list operations. This function will be called after the last Write operation of a series
+     * of consequence attribute data of the same attribute.
      *
-     * Note: The list might be untouched due to failed ACL checks.
+     * 1) This function won't be called if the user writes a null value to a list attribute.
+     * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
+     * of the same attribute.
+     * 3) When aWriteWasSuccessful is true, the data written must be consistent or the list is untouched.
+     * 4) When aWriteWasSuccessful is false, the list might be untouched.
      *
      * @param [in] aPath indicates the path of the modified list
      * @param [in] aWriteWasSuccessful indicates whether the delivered list is complete.

@@ -238,6 +238,9 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
     GroupId groupId         = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     FabricIndex fabricIndex = GetAccessingFabricIndex();
 
+    auto processingConcreteAttributePath = mProcessingAttributePath.Value();
+    mProcessingAttributePath.ClearValue();
+
     iterator = groupDataProvider->IterateEndpoints(fabricIndex);
     VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -248,7 +251,6 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
             continue;
         }
 
-        auto processingConcreteAttributePath        = mProcessingAttributePath.Value();
         processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
 
         if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
@@ -257,21 +259,22 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
         }
     }
     iterator->Release();
-    mProcessingAttributePath.ClearValue();
     return CHIP_NO_ERROR;
 }
 namespace {
 
 bool ShouldReportListWriteEnd(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,
-                              const ConcreteAttributePath & nextAttribute)
+                              const ConcreteDataAttributePath & nextAttribute)
 {
-    return previousProcessed.HasValue() && previousProcessedAttributeIsList && previousProcessed.Value() != nextAttribute;
+    return previousProcessed.HasValue() && previousProcessedAttributeIsList &&
+        (previousProcessed.Value() != nextAttribute || !nextAttribute.IsListOperation());
 }
 
-bool ShouldReportListWriteBegin(const Optional<ConcreteAttributePath> & previousProcessed,
+bool ShouldReportListWriteBegin(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,
                                 const ConcreteDataAttributePath & nextAttribute)
 {
-    return nextAttribute.IsListOperation() && (!previousProcessed.HasValue() || previousProcessed.Value() != nextAttribute);
+    return nextAttribute.IsListOperation() &&
+        (!previousProcessed.HasValue() || previousProcessed.Value() != nextAttribute || !previousProcessedAttributeIsList);
 }
 
 } // namespace
@@ -332,12 +335,13 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
         if (ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
         {
-            DeliverListWriteEnd(mProcessingAttributePath.Value(), true /* writeWasSuccessful */);
+            DeliverListWriteEnd(mProcessingAttributePath.Value(), mAttributeWriteSuccessful);
         }
 
-        if (ShouldReportListWriteBegin(mProcessingAttributePath, dataAttributePath))
+        if (ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
         {
             DeliverListWriteBegin(dataAttributePath);
+            mAttributeWriteSuccessful = true;
         }
 
         mProcessingAttributeIsList = dataAttributePath.IsListOperation();
@@ -376,7 +380,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
     if (!mHasMoreChunks)
     {
-        DeliverFinalListWriteEnd(true /* wasSuccessful */);
+        DeliverFinalListWriteEnd(mAttributeWriteSuccessful);
     }
 
 exit:
@@ -442,7 +446,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
         bool shouldReportListWriteEnd =
             ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
-        bool shouldReportListWriteBegin = ShouldReportListWriteBegin(mProcessingAttributePath, dataAttributePath);
+        bool shouldReportListWriteBegin =
+            ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
 
         while (iterator->Next(mapping))
         {
@@ -616,6 +621,12 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, cons
 {
     AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();
     AttributeStatusIB::Builder & attributeStatusIB = writeResponses.CreateAttributeStatus();
+
+    if (!aStatus.IsSuccess())
+    {
+        mAttributeWriteSuccessful = false;
+    }
+
     ReturnErrorOnFailure(writeResponses.GetError());
 
     AttributePathIB::Builder & path = attributeStatusIB.CreatePath();

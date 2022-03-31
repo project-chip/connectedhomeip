@@ -172,6 +172,18 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
+    else if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::NotList)
+    {
+        app::DataModel::Nullable<uint8_t> data;
+        CHIP_ERROR err = aDecoder.Decode(data);
+        ChipLogError(Zcl, "Decode result: %s", err.AsString());
+        if (!data.IsNull())
+        {
+            // To simulate a nullable list.
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return err;
+    }
     else
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -484,14 +496,23 @@ using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
 
 enum class Operations : uint8_t
 {
-    kNoop                = 0,
-    kShutdownWriteClient = 1,
+    kNoop,
+    kShutdownWriteClient,
+};
+
+enum class ListData : uint8_t
+{
+    kNull,
+    kList,
+    kBadValue,
 };
 
 struct Instructions
 {
     // The paths used in write request
     std::vector<ConcreteAttributePath> paths;
+    // The type of content of the list, it should be an empty vector or its size should equals to the list of paths.
+    std::vector<ListData> data;
     // operations on OnListWriteBegin and OnListWriteEnd on the server side.
     std::function<Operations(const app::ConcreteAttributePath & path)> onListWriteBeginActions;
     // The expected status when OnListWriteEnd is called. In the same order as paths
@@ -507,8 +528,6 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
         &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
         static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
-
-    NL_TEST_ASSERT(apSuite, instructions.paths.size() == instructions.expectedStatus.size());
 
     ConcreteAttributePath onGoingPath = ConcreteAttributePath();
     std::vector<PathStatus> status;
@@ -539,11 +558,35 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     };
 
     ByteSpan list[kTestListLength];
+    uint8_t badList[kTestListLength];
 
-    for (const auto & p : instructions.paths)
+    if (instructions.data.size() == 0)
     {
-        err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                           DataModel::List<ByteSpan>(list, kTestListLength));
+        instructions.data = std::vector<ListData>(instructions.paths.size(), ListData::kList);
+    }
+    NL_TEST_ASSERT(apSuite, instructions.paths.size() == instructions.data.size());
+
+    for (size_t i = 0; i < instructions.paths.size(); i++)
+    {
+        const auto & p = instructions.paths[i];
+        switch (instructions.data[i])
+        {
+        case ListData::kNull: {
+            DataModel::Nullable<uint8_t> null; // The actual type is not important since we will only put a null value.
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId), null);
+            break;
+        }
+        case ListData::kList: {
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                               DataModel::List<ByteSpan>(list, kTestListLength));
+            break;
+        }
+        case ListData::kBadValue: {
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                               DataModel::List<uint8_t>(badList, kTestListLength));
+            break;
+        }
+        }
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
@@ -607,7 +650,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                 .expectedStatus = { true, true },
             });
 
-    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications with the status of each list");
+    ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest(apSuite, ctx,
             Instructions{
                 .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
@@ -621,6 +664,50 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                         return Operations::kNoop;
                     },
                 .expectedStatus = { true, false },
+            });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 5: for nullable lists, we should receive nofications if we write some non-null value after writing a null value");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 6: for nullable lists, we should receive nofications if we write some null value after writing a non-null value");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 7: for nullable lists, we should receive nofications if we write some null value after writing a non-null value");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull, ListData::kList },
+                .expectedStatus = { true, true },
+            });
+
+    ChipLogProgress(Zcl,
+                    "Test 8: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+                    "during processing the requests");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kBadValue },
+                .expectedStatus = { false },
             });
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
