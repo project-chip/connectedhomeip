@@ -158,6 +158,25 @@ void printQRCode()
 }
 #endif // CONFIG_HAVE_DISPLAY
 
+void InitServer(intptr_t context)
+{
+    // Start IM server
+    chip::Server::GetInstance().Init();
+
+    // Device Attestation & Onboarding codes
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Shell, "OpenBasicCommissioningWindow() failed");
+    }
+
+    // Register a function to receive events from the CHIP device layer.  Note that calls to
+    // this function will happen on the CHIP event loop thread, not the app_main thread.
+    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
+}
+
 extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -173,26 +192,12 @@ extern "C" void app_main(void)
     // Network connectivity
     // Note to integration: StartWiFiManagement does not exist on ESP32
 
-    // Start IM server
-    chip::Server::GetInstance().Init();
-
-    // Device Attestation & Onboarding codes
-    chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
 #if CONFIG_HAVE_DISPLAY
     printQRCode();
 #endif // CONFIG_HAVE_DISPLAY
-
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
-    {
-        ChipLogError(Shell, "OpenBasicCommissioningWindow() failed");
-    }
-
-    // Register a function to receive events from the CHIP device layer.  Note that calls to
-    // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
