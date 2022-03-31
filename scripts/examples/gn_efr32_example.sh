@@ -158,7 +158,6 @@ else
         fi
     fi
     ninja -v -C "$BUILD_DIR"/
-    mv """$BUILD_DIR/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.efr32.json"
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
