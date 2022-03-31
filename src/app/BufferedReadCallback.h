@@ -84,10 +84,10 @@ private:
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
-    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<DataVersionFilter> & aDataVersionFilters) override
+    CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber) override
     {
-        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters);
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters, aNumber);
     }
 
 private:

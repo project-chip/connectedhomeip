@@ -376,11 +376,11 @@ private:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
+    void OnError(CHIP_ERROR aError) override { mCallback.OnError(aError); }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
-        return mCallback.OnEventData(aEventHeader, apData, apStatus);
+        mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
     void OnDone() override { return mCallback.OnDone(); }
@@ -388,11 +388,11 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
-        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+        mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
-    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<DataVersionFilter> & aDataVersionFilters) override;
+    CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber) override;
 
 private:
     Callback & mCallback;

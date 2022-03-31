@@ -53,6 +53,7 @@ chip::app::CircularEventBuffer gCircularEventBuffer[3];
 chip::ClusterId kTestClusterId          = 6;
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
+chip::EndpointId kTestEndpointId2       = 2;
 chip::EventId kTestEventIdDebug         = 1;
 chip::EventId kTestEventIdCritical      = 2;
 uint8_t kTestFieldValue1                = 1;
@@ -235,7 +236,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
+    if (!(aPath.mClusterId == kTestClusterId && (aPath.mEndpointId == kTestEndpointId || aPath.mEndpointId == kTestEndpointId2)))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -496,11 +497,14 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
                                chip::app::ReadClient::InteractionType::Read);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -523,10 +527,13 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
 
@@ -636,7 +643,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     eventPathParams[0].mEventId    = 4;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 1 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -687,7 +695,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     eventPathParams[1].mEventId    = 5;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 2 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -1679,9 +1688,9 @@ void TestReadInteraction::TestReadWithAttributeCache(nlTestSuite * apSuite, void
 
     readPrepareParams.mEventPathParamsListSize = 2;
 
-    chip::app::AttributePathParams attributePathParams[2];
+    chip::app::AttributePathParams attributePathParams[3];
     readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId2;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
     readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
 
@@ -1689,7 +1698,11 @@ void TestReadInteraction::TestReadWithAttributeCache(nlTestSuite * apSuite, void
     readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
     readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
 
-    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpAttributePathParamsList[2].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[2].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[2].mAttributeId = 1;
+
+    readPrepareParams.mAttributePathParamsListSize = 3;
 
     readPrepareParams.mEnableCachedDataVersionFilter = true;
 
@@ -1703,7 +1716,7 @@ void TestReadInteraction::TestReadWithAttributeCache(nlTestSuite * apSuite, void
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         delegate.mNumAttributeResponse = 0;
         app::ReadClient readClient1(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                     cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);

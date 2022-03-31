@@ -173,10 +173,10 @@ public:
          * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
          * return the number of successful encoded data version filters.
          */
-        virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<DataVersionFilter> & aDataVersionFilters)
+        virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                         const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
         {
-            return 0;
+            return CHIP_NO_ERROR;
         }
     };
 
@@ -314,13 +314,13 @@ private:
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
-                                  size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
-                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, const Span<EventPathParams> & aEventPaths);
+    CHIP_ERROR GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
+                                      const Span<AttributePathParams> & aAttributePaths);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const Span<AttributePathParams> & aAttributePaths,
                                              const Span<DataVersionFilter> & aDataVersionFilters,
-                                             bool aEnableCachedDataVersionFilter);
+                                             bool aEnableCachedDataVersionFilter, uint32_t & aNumber);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

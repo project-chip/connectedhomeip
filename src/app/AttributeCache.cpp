@@ -227,12 +227,11 @@ struct compare
     }
 };
 
-uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<DataVersionFilter> & aDataVersionFilters)
+CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                         const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
-    uint32_t number = 0;
 
     std::set<ConcreteDataAttributePathWithSize, compare> clusterSet;
     for (auto path = mChangedAttributeSet.begin(); path != mChangedAttributeSet.end(); path++)
@@ -242,17 +241,26 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
         clusterSet.insert(cluster);
     }
 
-    for (auto path1 = clusterSet.rbegin(); path1 != clusterSet.rend(); path1++)
+    for (auto path = clusterSet.rbegin(); path != clusterSet.rend(); path++)
     {
-        DataVersionFilter dataVersionFilter(path1->mEndpointId, path1->mClusterId, path1->mDataVersion);
+        bool isIntersectDataVersionFilter = false;
+        DataVersionFilter dataVersionFilter(path->mEndpointId, path->mClusterId, path->mDataVersion);
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
         VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INCORRECT_STATE);
+
+        // if the particular cached data version intersects with user provided data version filter, skip the cached one, and respect
+        // the user-provided one
         for (auto & filter : aDataVersionFilters)
         {
-            if (filter.IsSameCluster(*path1))
+            if (filter.IsSameCluster(*path))
             {
-                continue;
+                isIntersectDataVersionFilter = true;
+                break;
             }
+        }
+        if (isIntersectDataVersionFilter)
+        {
+            continue;
         }
 
         DataVersionFilterIB::Builder & filter = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
@@ -268,7 +276,7 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
             DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
             dataVersionFilter.mEndpointId, ChipLogValueMEI(dataVersionFilter.mClusterId), dataVersionFilter.mDataVersion.Value());
 
-        number++;
+        aNumber++;
     }
 
 exit:
@@ -276,7 +284,7 @@ exit:
     {
         aDataVersionFilterIBsBuilder.Rollback(backup);
     }
-    return number;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app
