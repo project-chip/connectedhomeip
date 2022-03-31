@@ -1098,7 +1098,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
+                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
                                                           const NodeId adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
@@ -1106,7 +1106,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
 
     OperationalCredentials::Commands::AddNOC::Type request;
     request.NOCValue      = nocCertBuf;
-    request.ICACValue     = chip::Optional<ByteSpan>(icaCertBuf);
+    request.ICACValue     = icaCertBuf;
     request.IPKValue      = ipk;
     request.caseAdminNode = adminSubject;
     request.adminVendorId = mVendorId;
@@ -1859,14 +1859,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
-            !params.GetAdminSubject().HasValue())
+        if (!params.GetNoc().HasValue() || !params.GetIpk().HasValue() || !params.GetAdminSubject().HasValue())
         {
             ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value());
         break;
     case CommissioningStage::kWiFiNetworkSetup: {
