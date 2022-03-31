@@ -167,7 +167,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
             lineupInfo.postalCode = Optional<CharSpan>(postalCode.charSpan());
         }
 
-        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
+        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoType", "I");
         jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
         lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
 
@@ -246,9 +246,6 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChangeChannelResponseType response;
-    response.data = chip::MakeOptional(CharSpan::fromCharString("data response"));
-
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
@@ -268,9 +265,20 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
         jclass channelClass = env->GetObjectClass(channelObject);
 
+        ChangeChannelResponseType response;
+
         jfieldID getStatusField = env->GetFieldID(channelClass, "status", "I");
         jint jstatus            = env->GetIntField(channelObject, getStatusField);
         response.status         = static_cast<app::Clusters::Channel::StatusEnum>(jstatus);
+
+        jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
+        jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
+        JniUtfString junitname(env, jname);
+        if (jname != NULL)
+        {
+            response.data = Optional<CharSpan>(junitname.charSpan());
+        }
+
 
         helper.Success(response);
     }
