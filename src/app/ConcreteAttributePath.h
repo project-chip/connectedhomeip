@@ -144,13 +144,13 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
 struct ConcreteDataAttributePathWithSize : public ConcreteDataAttributePath
 {
-    ConcreteDataAttributePathWithSize(const ConcreteDataAttributePath &aPath)
+    ConcreteDataAttributePathWithSize(const ConcreteDataAttributePath & aPath)
     {
-        mEndpointId = aPath.mEndpointId;
-        mClusterId = aPath.mClusterId;
+        mEndpointId  = aPath.mEndpointId;
+        mClusterId   = aPath.mClusterId;
         mAttributeId = aPath.mAttributeId;
-        mListIndex = aPath.mListIndex;
-        mListOp    = aPath.mListOp;
+        mListIndex   = aPath.mListIndex;
+        mListOp      = aPath.mListOp;
         mDataVersion = aPath.mDataVersion;
     }
     uint32_t mSize = 0;

@@ -217,7 +217,7 @@ public:
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
-    void UpdateClusterSize(ConcreteDataAttributePathWithSize &aCluster)
+    void UpdateClusterSize(ConcreteDataAttributePathWithSize & aCluster)
     {
         uint32_t totalSize = 0;
         ForEachAttribute(aCluster.mEndpointId, aCluster.mClusterId, [this, &totalSize](const ConcreteAttributePath & path) {

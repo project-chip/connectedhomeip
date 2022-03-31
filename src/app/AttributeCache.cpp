@@ -219,8 +219,12 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
-struct compare {
-    bool operator()(const ConcreteDataAttributePathWithSize& x, const ConcreteDataAttributePathWithSize& y) const { return x.mSize > y.mSize; }
+struct compare
+{
+    bool operator()(const ConcreteDataAttributePathWithSize & x, const ConcreteDataAttributePathWithSize & y) const
+    {
+        return x.mSize > y.mSize;
+    }
 };
 
 uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
