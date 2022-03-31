@@ -623,6 +623,28 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
 
+# Generating esp32-devkitc-ota-requestor
+mkdir -p {out}/esp32-devkitc-ota-requestor
+
+cp examples/ota-requestor-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor reconfigure'
+
+# Generating esp32-devkitc-ota-requestor-rpc
+mkdir -p {out}/esp32-devkitc-ota-requestor-rpc
+
+cp examples/ota-requestor-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc reconfigure'
+
 # Generating esp32-devkitc-shell
 mkdir -p {out}/esp32-devkitc-shell
 
@@ -1823,6 +1845,20 @@ rm -f examples/lock-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock build'
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+# Building esp32-devkitc-ota-requestor
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor build'
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+# Building esp32-devkitc-ota-requestor-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc build'
 
 rm -f examples/shell/esp32/sdkconfig
 
