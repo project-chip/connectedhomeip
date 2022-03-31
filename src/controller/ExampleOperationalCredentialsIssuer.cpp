@@ -243,14 +243,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
 
     ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
-
     memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
-    Optional<Crypto::AesCcm128KeySpan> ipkSpanValue;
-    ipkSpanValue.SetValue(ipkSpan);
 
     // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, ipkSpanValue, Optional<NodeId>());
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, MakeOptional(ipkSpan),
+                        Optional<NodeId>());
     return CHIP_NO_ERROR;
 }
 
