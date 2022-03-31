@@ -381,8 +381,8 @@ void WindowApp::HandleLongPress()
     {
         // Long press button down: Cycle between covering types
         mDownSuppressed          = true;
-        EmberAfWcType cover_type = GetCover().CycleType();
-        mTiltMode                = mTiltMode && (EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT == cover_type);
+        Type type                = GetCover().CycleType();
+        mTiltMode                = mTiltMode && (Type::kTiltBlindLiftAndTilt == type);
     }
 }
 
@@ -588,27 +588,27 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
     }
 }
 
-EmberAfWcType WindowApp::Cover::CycleType()
+Type WindowApp::Cover::CycleType()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    EmberAfWcType type = TypeGet(mEndpoint);
+    Type type = TypeGet(mEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     switch (type)
     {
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE:
-        type = EMBER_ZCL_WC_TYPE_DRAPERY;
+    case Type::kRollerShade:
+        type = Type::kDrapery;
         // tilt = false;
         break;
-    case EMBER_ZCL_WC_TYPE_DRAPERY:
-        type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
+    case Type::kDrapery:
+        type = Type::kTiltBlindLiftAndTilt;
         break;
-    case EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT:
-        type = EMBER_ZCL_WC_TYPE_ROLLERSHADE;
+    case Type::kTiltBlindLiftAndTilt:
+        type = Type::kRollerShade;
         // tilt = false;
         break;
     default:
-        type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
+        type = Type::kTiltBlindLiftAndTilt;
     }
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
