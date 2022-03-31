@@ -1187,7 +1187,8 @@ client cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse {
     NetworkCommissioningStatus networkingStatus = 0;
-    CHAR_STRING debugText = 1;
+    optional CHAR_STRING debugText = 1;
+    optional INT8U networkIndex = 2;
   }
 
   response struct ConnectNetworkResponse {
@@ -1312,7 +1313,8 @@ server cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse {
     NetworkCommissioningStatus networkingStatus = 0;
-    CHAR_STRING debugText = 1;
+    optional CHAR_STRING debugText = 1;
+    optional INT8U networkIndex = 2;
   }
 
   response struct ConnectNetworkResponse {

@@ -57,7 +57,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from alpha again"
       identity: "alpha"
@@ -92,7 +92,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from beta"
       identity: "beta"
@@ -122,7 +122,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from gamma"
       identity: "gamma"

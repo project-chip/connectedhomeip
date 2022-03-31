@@ -87,8 +87,11 @@ bool AmebaWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan network
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status AmebaWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status AmebaWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                           uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
@@ -102,8 +105,10 @@ Status AmebaWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId)
+Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -111,8 +116,9 @@ Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);

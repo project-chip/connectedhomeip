@@ -27,6 +27,7 @@
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
+#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 /*----------------------------------------------------------------------------*\
@@ -26421,4 +26422,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);
     registerClusterApplianceStatistics(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

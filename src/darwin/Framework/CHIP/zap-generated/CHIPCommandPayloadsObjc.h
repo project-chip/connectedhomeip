@@ -682,7 +682,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPNetworkCommissioningClusterNetworkConfigResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (strong, nonatomic) NSNumber * _Nullable networkIndex;
 - (instancetype)init;
 @end
 

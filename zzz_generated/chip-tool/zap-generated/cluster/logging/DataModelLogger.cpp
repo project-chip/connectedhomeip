@@ -3897,6 +3897,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkIndex", indent + 1, value.networkIndex));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

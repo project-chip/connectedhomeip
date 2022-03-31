@@ -760,9 +760,10 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
                     ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
-    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);
+
+    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     if (mReadPrepareParams.mResubscribePolicy != nullptr)
     {

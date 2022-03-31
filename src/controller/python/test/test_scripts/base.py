@@ -249,7 +249,7 @@ class BaseTestHelper:
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
-        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=10000)
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
         self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(

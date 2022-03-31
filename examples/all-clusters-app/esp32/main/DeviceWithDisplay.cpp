@@ -392,7 +392,7 @@ public:
         {
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
             chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly);
+                CommissioningWindowManager::MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly);
         }
     }
 

@@ -31,7 +31,7 @@ public class ChannelManagerStub implements ChannelManager {
   @Override
   public ChannelInfo[] getChannelList() {
     ChannelInfo ChannelInfo1 = new ChannelInfo(1, 11, "HDMI1", "callSign1", "affiliateCallSign1");
-    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 22, "HDMI2", "callSign2", "affiliateCallSign2");
+    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 22, "HDMI2", null, "");
     Log.d(TAG, "getChannelList at " + endpoint);
     return new ChannelInfo[] {ChannelInfo1, ChannelInfo2};
   }

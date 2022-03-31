@@ -36,8 +36,9 @@
 namespace chip {
 namespace app {
 
-ReadHandler::ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType) :
-    mCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
+                         InteractionType aInteractionType) :
+    mManagementCallback(apCallback)
 {
     mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
     mpExchangeCtx           = apExchangeContext;
@@ -80,6 +81,12 @@ void ReadHandler::Abort(bool aCalledFromDestructor)
 
 ReadHandler::~ReadHandler()
 {
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (mActiveSubscription && appCallback)
+    {
+        appCallback->OnSubscriptionTerminated(*this);
+    }
+
     Abort(true);
 
     if (IsType(InteractionType::Subscribe))
@@ -109,7 +116,7 @@ void ReadHandler::Close()
     }
 
     MoveToState(HandlerState::AwaitingDestruction);
-    mCallback.OnDone(*this);
+    mManagementCallback.OnDone(*this);
 }
 
 CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
@@ -159,10 +166,18 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         {
             if (IsPriming())
             {
-                err           = SendSubscribeResponse();
+                err = SendSubscribeResponse();
+
                 mpExchangeCtx = nullptr;
                 SuccessOrExit(err);
+
                 mActiveSubscription = true;
+
+                auto * appCallback = mManagementCallback.GetAppCallback();
+                if (appCallback)
+                {
+                    appCallback->OnSubscriptionEstablished(*this);
+                }
             }
             else
             {
@@ -697,6 +712,23 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+
+    //
+    // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
+    // This also provides the application an opportunity to modify the negotiated min/max intervals set above.
+    //
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (appCallback)
+    {
+        if (appCallback->OnSubscriptionRequested(*this, *mpExchangeCtx->GetSessionHandle()->AsSecureSession()) != CHIP_NO_ERROR)
+        {
+            return CHIP_ERROR_TRANSACTION_CANCELED;
+        }
+    }
+
+    ChipLogProgress(DataManagement, "Final negotiated min/max parameters: Min = %ds, Max = %ds", mMinIntervalFloorSeconds,
+                    mMaxIntervalCeilingSeconds);
+
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());

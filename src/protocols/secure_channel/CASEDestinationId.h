@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,25 +14,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <ota-provider-common/DefaultUserConsentProvider.h>
+#pragma once
+
+#include <stdint.h>
+
+#include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
+#include <crypto/CHIPCryptoPAL.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/Span.h>
 
 namespace chip {
-namespace ota {
 
-UserConsentState DefaultUserConsentProvider::GetUserConsentState(const UserConsentSubject & subject)
-{
-    subject.Log();
+constexpr uint16_t kSigmaParamRandomNumberSize = 32;
+constexpr uint16_t kIPKSize                    = Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
-    if (mUseGlobalConsent)
-    {
-        // Reset mGlobalConsentState to success case after returning other possible values once.
-        UserConsentState curGlobalConsentState = mGlobalConsentState;
-        mGlobalConsentState                    = UserConsentState::kGranted;
-        return curGlobalConsentState;
-    }
+CHIP_ERROR GenerateCaseDestinationId(const ByteSpan & ipk, const ByteSpan & initiatorRandom, const ByteSpan & rootPubKey,
+                                     FabricId fabricId, NodeId nodeId, MutableByteSpan & outDestinationId);
 
-    return UserConsentState::kGranted;
-}
-
-} // namespace ota
 } // namespace chip

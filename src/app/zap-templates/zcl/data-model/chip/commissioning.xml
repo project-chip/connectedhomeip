@@ -122,7 +122,8 @@ limitations under the License.
         <command source="server" code="0x05" name="NetworkConfigResponse" optional="true" cli="chip network_commissioning addwifiresponse">
             <description>TODO</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
-            <arg name="DebugText" type="CHAR_STRING"/>
+            <arg name="DebugText" type="CHAR_STRING" optional="true" />
+            <arg name="NetworkIndex" type="INT8U" optional="true" />
         </command>
         <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
             <description>TODO</description>

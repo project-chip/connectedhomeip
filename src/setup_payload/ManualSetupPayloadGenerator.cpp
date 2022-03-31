@@ -109,13 +109,13 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
     static_assert(kManualSetupChunk2PINCodeLsbitsLength + kManualSetupChunk3PINCodeMsbitsLength == kSetupPINCodeFieldLengthInBits,
                   "PIN code won't fit");
 
-    if (!mPayloadContents.isValidManualCode())
+    if (!mAllowInvalidPayload && !mPayloadContents.isValidManualCode())
     {
         ChipLogError(SetupPayload, "Failed encoding invalid payload");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    bool useLongCode = (mPayloadContents.commissioningFlow != CommissioningFlow::kStandard);
+    bool useLongCode = (mPayloadContents.commissioningFlow != CommissioningFlow::kStandard) && !mForceShortCode;
 
     // Add two for the check digit and null terminator.
     if ((useLongCode && outBuffer.size() < kManualSetupLongCodeCharLength + 2) ||

@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <json/json.h>
 #include <ota-provider-common/BdxOtaSender.h>
-#include <ota-provider-common/DefaultUserConsentProvider.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
 #include "AppMain.h"
@@ -55,7 +55,7 @@ constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 
 OTAProviderExample gOtaProvider;
-chip::ota::DefaultUserConsentProvider gUserConsentProvider;
+chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAQueryStatus gQueryImageStatus              = OTAQueryStatus::kUpdateAvailable;
