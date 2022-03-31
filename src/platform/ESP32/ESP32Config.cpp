@@ -318,82 +318,18 @@ CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
 
 bool ESP32Config::ConfigValueExists(Key key)
 {
-    ScopedNvsHandle handle;
-
-    if (handle.Open(key.Namespace, NVS_READONLY) != CHIP_NO_ERROR)
+    nvs_iterator_t iterator = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY);
+    for (; iterator; iterator = nvs_entry_next(iterator))
     {
-        return false;
+        nvs_entry_info_t info;
+        nvs_entry_info(iterator, &info);
+        if (strcmp(info.key, key.Name) == 0)
+        {
+            nvs_release_iterator(iterator);
+            return true;
+        }
     }
-
-    // This code is a rather unfortunate consequence of the limitations
-    // in the ESP NVS API.  As defined, there is no API for determining
-    // whether a particular key exists.  Furthermore, calling one of the
-    // nvs_get_* APIs will result in a ESP_ERR_NVS_NOT_FOUND in the case
-    // where the key exists, but the requested data type does not match.
-    // (This is true despite the existence of the ESP_ERR_NVS_TYPE_MISMATCH
-    // error, which would seem to be the obvious correct response).
-    //
-    // Thus the solution is to exhaustively check for the key using
-    // each possible value type.
-    esp_err_t err;
-    {
-        uint8_t v;
-        err = nvs_get_u8(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int8_t v;
-        err = nvs_get_i8(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint16_t v;
-        err = nvs_get_u16(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int16_t v;
-        err = nvs_get_i16(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint32_t v;
-        err = nvs_get_u32(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int32_t v;
-        err = nvs_get_i32(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint64_t v;
-        err = nvs_get_u64(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int64_t v;
-        err = nvs_get_i64(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        size_t sz;
-        err = nvs_get_str(handle, key.Name, NULL, &sz);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        size_t sz;
-        err = nvs_get_blob(handle, key.Name, NULL, &sz);
-    }
-
-    // In the case of blob and string, ESP_ERR_NVS_INVALID_LENGTH means
-    // the key exists.
-    if (err == ESP_ERR_NVS_INVALID_LENGTH)
-    {
-        err = ESP_OK;
-    }
-
-    return err == ESP_OK;
+    return false;
 }
 
 CHIP_ERROR ESP32Config::EnsureNamespace(const char * ns)
