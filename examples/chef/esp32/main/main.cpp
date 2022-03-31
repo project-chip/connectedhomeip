@@ -158,7 +158,7 @@ void printQRCode()
 }
 #endif // CONFIG_HAVE_DISPLAY
 
-void InitServer(intptr_t context)
+void InitServer(intptr_t)
 {
     // Start IM server
     chip::Server::GetInstance().Init();
@@ -192,7 +192,7 @@ extern "C" void app_main(void)
     // Network connectivity
     // Note to integration: StartWiFiManagement does not exist on ESP32
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer);
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
 #if CONFIG_HAVE_DISPLAY

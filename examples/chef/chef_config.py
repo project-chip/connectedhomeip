@@ -1,4 +1,3 @@
-import os
 #
 # USER DEFINED INFORMATION
 #
