@@ -180,15 +180,15 @@ tests:
       arguments:
           value: 4
 
-#    - label: "Save StartUpOnOff"
-#      cluster: "On/Off"
-#      command: "readAttribute"
-#      attribute: "StartUpOnOff"
-#      response:
-#        saveAs: StoredStartUpOnOff
-#        constraints:
-#          type: uint8
-#
+    #    - label: "Save StartUpOnOff"
+    #      cluster: "On/Off"
+    #      command: "readAttribute"
+    #      attribute: "StartUpOnOff"
+    #      response:
+    #        saveAs: StoredStartUpOnOff
+    #        constraints:
+    #          type: uint8
+    #
     - label: "Set StartUpOnOff"
       cluster: "On/Off"
       command: "writeAttribute"
