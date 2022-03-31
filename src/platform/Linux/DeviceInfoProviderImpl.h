@@ -66,8 +66,8 @@ protected:
         char mUserLabelValueBuf[kMaxLabelValueLength + 1];
     };
 
-    CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val) override;
-    CHIP_ERROR GetUserLabelCount(EndpointId endpoint, size_t & val) override;
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override;
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
 };
 

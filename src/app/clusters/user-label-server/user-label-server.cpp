@@ -59,22 +59,31 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceLayer::DeviceInfoProvider::UserLabelIterator * it = DeviceLayer::GetDeviceInfoProvider()->IterateUserLabel(endpoint);
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
-    if (it)
+    if (provider)
     {
-        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-            UserLabel::Structs::LabelStruct::Type userlabel;
+        DeviceLayer::DeviceInfoProvider::UserLabelIterator * it = provider->IterateUserLabel(endpoint);
 
-            while (it->Next(userlabel))
-            {
-                ReturnErrorOnFailure(encoder.Encode(userlabel));
-            }
+        if (it)
+        {
+            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+                UserLabel::Structs::LabelStruct::Type userlabel;
 
-            return CHIP_NO_ERROR;
-        });
+                while (it->Next(userlabel))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(userlabel));
+                }
 
-        it->Release();
+                return CHIP_NO_ERROR;
+            });
+
+            it->Release();
+        }
+        else
+        {
+            err = aEncoder.EncodeEmptyList();
+        }
     }
     else
     {

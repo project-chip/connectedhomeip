@@ -40,7 +40,7 @@ CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
 {
     size_t index = 0;
 
-    ReturnErrorOnFailure(SetUserLabelCount(endpoint, labelList.size()));
+    ReturnErrorOnFailure(SetUserLabelLength(endpoint, labelList.size()));
 
     for (const UserLabelType & label : labelList)
     {
@@ -52,10 +52,14 @@ CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
 
 CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLabelType & label)
 {
-    size_t index;
+    size_t length;
 
-    ReturnErrorOnFailure(GetUserLabelCount(endpoint, index));
-    ReturnErrorOnFailure(SetUserLabelAt(endpoint, index + 1, label));
+    // Increase the size of UserLabelList by 1
+    ReturnErrorOnFailure(GetUserLabelLength(endpoint, length));
+    ReturnErrorOnFailure(SetUserLabelLength(endpoint, length + 1));
+
+    // Append the user label at the end of UserLabelList
+    ReturnErrorOnFailure(SetUserLabelAt(endpoint, length, label));
 
     return CHIP_NO_ERROR;
 }

@@ -105,13 +105,13 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
     }
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelCount(EndpointId endpoint, size_t val)
+CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
     // TODO:: store the user label count.
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelCount(EndpointId endpoint, size_t & val)
+CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
     // TODO:: read the user label count. temporarily return the size of hardcoded labelList.
     val = 4;
@@ -136,7 +136,7 @@ DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoP
 {
     size_t total = 0;
 
-    ReturnOnFailure(mProvider.GetUserLabelCount(mEndpoint, total));
+    ReturnOnFailure(mProvider.GetUserLabelLength(mEndpoint, total));
     mTotal = total;
     mIndex = 0;
 }

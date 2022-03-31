@@ -82,9 +82,9 @@ public:
 
     // Iterators
     /**
-     *  Creates an iterator that may be used to obtain the list of user labels associated with the given endpoint.
+     *  Creates an iterator that may be used to obtain the list of labels associated with the given endpoint.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
-     *  Modifying the user label during the iteration is currently not supported, and may yield unexpected behaviour.
+     *  Modifying the label during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -98,7 +98,8 @@ protected:
      * @param endpoint - id to UserLabelList on which to set the UserLabel.
      * @param index - index within the UserLabelList for which to set the UserLabel.
      * @param userLabel - user label to set.
-     * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_KEY_ID if index exceed the range (Total length - 1),
+     *         or other CHIP_ERROR values from implementation on other errors.
      */
     virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
 
@@ -109,7 +110,7 @@ protected:
      * @param val - total count of the UserLabelList.
      * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
      */
-    virtual CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val) = 0;
+    virtual CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) = 0;
 
     /**
      * @brief Get the total length of the UserLabelList on a given endpoint
@@ -118,7 +119,7 @@ protected:
      * @param val - output of the total count of the UserLabelList.
      * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
      */
-    virtual CHIP_ERROR GetUserLabelCount(EndpointId endpoint, size_t & val) = 0;
+    virtual CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) = 0;
 };
 
 /**
