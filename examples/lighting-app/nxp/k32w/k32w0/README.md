@@ -33,11 +33,6 @@ network.
     -   [Writing the application](#appwrite)
     -   [OTA Testing](#otatesting)
     -   [Known issues](#otaissues)
--   [Pigweed Tokenizer](#tokenizer)
-    -   [Detokenizer script](#detokenizer)
-    -   [Notes](#detokenizernotes)
-    -   [Known issues](#detokenizerknownissues)
-
 <hr>
 
 <a name="intro"></a>
@@ -408,7 +403,7 @@ The concept for OTA is the next one:
 -   the OTA Requestor functionality is embedded inside the Lighting Application.
     It will be used for requesting OTA blocks from the OTA Provider;
 -   the controller (a linux application called chip-tool) will be used for
-    commmissionning both the device and the OTA Provider App. The device will be
+    commissionning both the device and the OTA Provider App. The device will be
     commissioned using the standard Matter flow (BLE + IEEE 802.15.4) while the
     OTA Provider Application will be commissioned using the _onnetwork_ option
     of chip-tool;
@@ -483,70 +478,3 @@ doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupd
     may fail. Please make sure that the SRP cache is disabled (_ot-ctl srp
     server disable_) on the openthread border router while commissioning the OTA
     Provider Application.
-
-<a name="tokenizer"></a>
-
-## Pigweed tokenizer
-
-The tokenizer is a pigweed module that allows hashing the strings. This greatly
-reduces the flash needed for logs. The module can be enabled by building with
-the gn argument _chip_pw_tokenizer_logging=true_. The detokenizer script is
-needed for parsing the hashed scripts.
-
-<a name="detokenizer"></a>
-
-### Detokenizer script
-
-The python3 script detokenizer.py is a script that decodes the tokenized logs
-either from a file or from a serial port. The script can be used in the
-following ways:
-
-```
-usage: detokenizer.py serial [-h] -i INPUT -d DATABASE [-o OUTPUT]
-usage: detokenizer.py file [-h] -i INPUT -d DATABASE -o OUTPUT
-```
-
-The first parameter is either _serial_ or _file_ and it selects between decoding
-from a file or from a serial port.
-
-The second parameter is _-i INPUT_ and it must se set to the path of the file or
-the serial to decode from.
-
-The third parameter is _-d DATABSE_ and represents the path to the token
-database to be used for decoding. The default path is
-_out/debug/chip-k32w061-light-example-database.bin_ after a successful build.
-
-The forth parameter is _-o OUTPUT_ and it represents the path to the output file
-where the decoded logs will be stored. This parameter is required for file usage
-and optional for serial usage. If not provided when used with serial port, it
-will show the decoded log only at the stdout and not save it to file.
-
-<a name="detokenizernotes"></a>
-
-### Notes
-
-The token database is created automatically after building the binary if the
-argument _chip_pw_tokenizer_logging=true_ was used.
-
-The detokenizer script must be run inside the example's folder after a
-successful run of the _scripts/activate.sh_ script. The pw_tokenizer module used
-by the script is loaded by the environment.
-
-<a name="detokenizerknownissues"></a>
-
-### Known issues
-
-The building process will not update the token database if it already exists. In
-case that new strings are added and the database already exists in the output
-folder, it must be deleted so that it will be recreated at the next build.
-
-Not all tokens will be decoded. This is due to a gcc/pw_tokenizer issue. The
-pw_tokenizer creates special elf sections using attributes where the tokens and
-strings will be stored. This sections will be used by the database creation
-script. For template C++ functions, gcc ignores these attributes and places all
-the strings by default in the .rodata section. As a result the database creation
-script won't find them in the special-created sections.
-
-If run, closed and rerun with the serial option on the same serial port, the
-detokenization script will get stuck and not show any logs. The solution is to
-unplug and plug the board and then rerun the script.

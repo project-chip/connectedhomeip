@@ -145,9 +145,7 @@ CHIP_ERROR AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
-#endif
 
     K32W_LOG("Current Software Version: %s", currentSoftwareVer);
     return err;
@@ -532,7 +530,6 @@ void AppTask::BleHandler(void * aGenericEvent)
     }
 }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
@@ -547,6 +544,7 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
         }
     }
 
+#if CONFIG_CHIP_NFC_COMMISSIONING
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
         if (!NFCMgr().IsTagEmulationStarted())
@@ -572,8 +570,8 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
             K32W_LOG("Started NFC Tag Emulation!");
         }
     }
-}
 #endif
+}
 
 void AppTask::CancelTimer()
 {

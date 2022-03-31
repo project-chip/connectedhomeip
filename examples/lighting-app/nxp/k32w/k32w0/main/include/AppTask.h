@@ -44,7 +44,6 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     void PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction);
-    void PostOTAResume();
     void PostEvent(const AppEvent * event);
 
     void UpdateClusterState(void);
@@ -81,6 +80,7 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
     static void StartOTAQuery(intptr_t arg);
+    static void PostOTAResume();
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);

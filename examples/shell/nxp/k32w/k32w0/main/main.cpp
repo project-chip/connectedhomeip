@@ -20,12 +20,8 @@
 // Main Code
 // ================================================================================
 
-#include "openthread/platform/logging.h"
 #include <mbedtls/platform.h>
-#include <openthread-system.h>
-#include <openthread/cli.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
+#include <AppTask.h>
 
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
@@ -40,13 +36,6 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
-#include "MemManager.h"
-#include "RNG_Interface.h"
-#include "TimersManager.h"
-#include "radio.h"
-
-#include <AppTask.h>
-
 const uint16_t shell_task_size    = 3096;
 const uint8_t shell_task_priority = 0;
 
@@ -60,12 +49,8 @@ typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
-extern "C" void boardFwkInit(void);
-
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
-
-static char initString[] = "app";
 
 extern "C" unsigned int sleep(unsigned int seconds)
 {
@@ -84,6 +69,7 @@ extern "C" void main_task(void const * argument)
     int status     = 0;
     char * argv[1] = { 0 };
     BaseType_t shellTaskHandle;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -92,14 +78,13 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    argv[0] = &initString[0];
+    err = PlatformMgrImpl().InitBoardFwk();
+    if (err != CHIP_NO_ERROR)
+    {
+        return;
+    }
+
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
-    /* Initialize board framework services */
-    boardFwkInit();
-
-    /* Used for OT initializations */
-    otSysInit(1, argv);
 
     K32W_LOG("Welcome to NXP Shell Demo App");
 
@@ -174,15 +159,4 @@ extern "C" void otSysEventSignalPending(void)
         BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
         portYIELD_FROM_ISR(yieldRequired);
     }
-}
-
-extern "C" void boardFwkInit(void)
-{
-    MEM_Init();
-
-    /* RNG initialization and PRNG initial seeding */
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
-
-    TMR_Init();
 }

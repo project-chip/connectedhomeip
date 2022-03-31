@@ -179,9 +179,7 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s", currentSoftwareVer);
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
-#endif
 
     return err;
 }
@@ -502,6 +500,14 @@ void AppTask::StartOTAQuery(intptr_t arg)
 {
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
+
+void AppTask::PostOTAResume()
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_OTAResume;
+    event.Handler = OTAResumeEventHandler;
+    sAppTask.PostEvent(&event);
+}
 #endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
@@ -535,7 +541,6 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
@@ -550,6 +555,14 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
         }
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    if (event->Type == DeviceEventType::kOtaStateChanged && event->OtaStateChanged.newState == kOtaSpaceAvailable)
+    {
+        sAppTask.PostOTAResume();
+    }
+#endif
+
+#if CONFIG_CHIP_NFC_COMMISSIONING
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
         if (!NFCMgr().IsTagEmulationStarted())
@@ -575,8 +588,8 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
             K32W_LOG("Started NFC Tag Emulation!");
         }
     }
-}
 #endif
+}
 
 void AppTask::CancelTimer()
 {
@@ -658,14 +671,6 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
     event.Handler           = LightActionEventHandler;
-    PostEvent(&event);
-}
-
-void AppTask::PostOTAResume()
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_OTAResume;
-    event.Handler = OTAResumeEventHandler;
     PostEvent(&event);
 }
 

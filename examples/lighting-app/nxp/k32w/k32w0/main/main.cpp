@@ -20,50 +20,32 @@
 // Main Code
 // ================================================================================
 
-#include "openthread/platform/logging.h"
 #include <mbedtls/platform.h>
-#include <openthread-system.h>
-#include <openthread/cli.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
+#include <AppTask.h>
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"
-
-#include "MemManager.h"
-#include "RNG_Interface.h"
-#include "TimersManager.h"
-#include "radio.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-#include <AppTask.h>
-
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
-extern "C" void boardFwkInit(void);
-
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
-static char initString[] = "app";
-
 extern "C" void main_task(void const * argument)
 {
-    char * argv[1] = { 0 };
-    argv[0]        = &initString[0];
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -72,15 +54,13 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    SHA_ClkInit(SHA_INSTANCE);
-
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    /* Initialize board framework services */
-    boardFwkInit();
-
-    /* Used for OT initializations */
-    otSysInit(1, argv);
+    err = PlatformMgrImpl().InitBoardFwk();
+    if (err != CHIP_NO_ERROR)
+    {
+        return;
+    }
 
     K32W_LOG("Welcome to NXP Lighting Demo App");
 
@@ -91,43 +71,43 @@ extern "C" void main_task(void const * argument)
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during PlatformMgr().InitMatterStack()");
         goto exit;
     }
 
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    if (ret != CHIP_NO_ERROR)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    if (err != CHIP_NO_ERROR)
     {
         goto exit;
     }
 
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
     }
 
     // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
+    err = ThreadStackMgrImpl().StartThreadTask();
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during ThreadStackMgrImpl().StartThreadTask()");
         goto exit;
     }
 
-    ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    err = GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during GetAppTask().StartAppTask()");
         goto exit;
@@ -145,15 +125,4 @@ extern "C" void otSysEventSignalPending(void)
         BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
         portYIELD_FROM_ISR(yieldRequired);
     }
-}
-
-extern "C" void boardFwkInit(void)
-{
-    MEM_Init();
-
-    /* RNG initialization and PRNG initial seeding */
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
-
-    TMR_Init();
 }

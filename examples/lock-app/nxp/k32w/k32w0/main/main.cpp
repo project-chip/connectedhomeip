@@ -20,18 +20,13 @@
 // Main Code
 // ================================================================================
 
-#include "openthread/platform/logging.h"
 #include <mbedtls/platform.h>
-#include <openthread-system.h>
-#include <openthread/cli.h>
-#include <openthread/error.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
+#include <AppTask.h>
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"
@@ -40,8 +35,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
-
-#include <AppTask.h>
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "Keyboard.h"
@@ -53,15 +46,9 @@ using namespace ::chip::Logging;
 #include "radio.h"
 #endif
 
-#include "MemManager.h"
-#include "RNG_Interface.h"
-#include "TimersManager.h"
-
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
-
-extern "C" void boardFwkInit(void);
 
 /* low power requirements */
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
@@ -93,12 +80,9 @@ static sDualModeAppStates dualModeStates;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
-static char initString[] = "app";
-
 extern "C" void main_task(void const * argument)
 {
-    char * argv[1] = { 0 };
-    argv[0]        = &initString[0];
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -107,7 +91,11 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    SHA_ClkInit(SHA_INSTANCE);
+    err = PlatformMgrImpl().InitBoardFwk();
+    if (err != CHIP_NO_ERROR)
+    {
+        return;
+    }
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_Init();
@@ -120,12 +108,6 @@ extern "C" void main_task(void const * argument)
 #endif
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
-    /* Initialize board framework services */
-    boardFwkInit();
-
-    /* Used for OT initializations */
-    otSysInit(1, argv);
 
     K32W_LOG("Welcome to NXP ELock Demo App");
 
@@ -337,17 +319,6 @@ static void BOARD_SetClockForWakeup(void)
     CLOCK_EnableClock(kCLOCK_Iocon);
     /* Enables the clock for the GPIO0 module */
     CLOCK_EnableClock(kCLOCK_Gpio0);
-}
-
-extern "C" void boardFwkInit(void)
-{
-    MEM_Init();
-
-    /* RNG initialization and PRNG initial seeding */
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
-
-    TMR_Init();
 }
 
 #endif

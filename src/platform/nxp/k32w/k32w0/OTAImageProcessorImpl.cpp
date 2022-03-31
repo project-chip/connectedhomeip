@@ -18,15 +18,15 @@
 
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
 #include "OtaUtils.h"
 
-#include "AppTask.h"
-
 extern "C" void ResetMCU(void);
 
+using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
@@ -306,7 +306,17 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::HandleBlockEraseComplete(uint32_t)
 {
-    GetAppTask().PostOTAResume();
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = kOtaSpaceAvailable;
+    error                              = PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event");
+    }
 }
 
 } // namespace chip
