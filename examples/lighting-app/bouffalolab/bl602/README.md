@@ -10,9 +10,7 @@
 
 *   Build the example application:
 
-```
-connectedhomeip$ ./scripts/examples/gn_bl602_example.sh ./examples/lighting-app/bouffalolab/bl602 out/lighting_app_bl602
-```
+    `connectedhomeip$ ./scripts/build/build_examples.py --target bl602-lighting build`
 
 Generated files
 
@@ -50,7 +48,7 @@ commissioning and cluster control.
          - chip-device-ctrl > ble-scan
          - chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
          - chip-device-ctrl > connect -ble 3904 20202021 135246
-
+        
          Parameters:
          1. Discriminator: 3904
          2. Setup-pin-code: 20202021

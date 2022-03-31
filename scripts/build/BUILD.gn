@@ -46,6 +46,7 @@ pw_python_package("build_examples") {
     "builders/qpg.py",
     "builders/telink.py",
     "builders/tizen.py",
+    "builders/bl602.py",
     "runner/__init__.py",
     "runner/printonly.py",
     "runner/shell.py",
