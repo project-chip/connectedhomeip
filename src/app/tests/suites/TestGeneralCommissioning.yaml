@@ -28,7 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-
     - label: "Write Breadcrumb (1/2)"
       command: "writeAttribute"
       attribute: "Breadcrumb"
