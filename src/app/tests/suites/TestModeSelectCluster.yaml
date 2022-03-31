@@ -180,15 +180,6 @@ tests:
       arguments:
           value: 4
 
-    #    - label: "Save StartUpOnOff"
-    #      cluster: "On/Off"
-    #      command: "readAttribute"
-    #      attribute: "StartUpOnOff"
-    #      response:
-    #        saveAs: StoredStartUpOnOff
-    #        constraints:
-    #          type: uint8
-    #
     - label: "Set StartUpOnOff"
       cluster: "On/Off"
       command: "writeAttribute"
@@ -247,11 +238,3 @@ tests:
       attribute: "CurrentMode"
       response:
           value: 7
-#
-#    - label: "Restore StartUpOnOff"
-#      cluster: "On/Off"
-#      command: "writeAttribute"
-#      attribute: "StartUpOnOff"
-#      arguments:
-#        value: 0
-#
