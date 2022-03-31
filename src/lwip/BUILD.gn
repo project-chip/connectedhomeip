@@ -55,10 +55,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/p6.gni")
 } else if (lwip_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
-} else if (lwip_platform == "external") {
-  if (getenv("BL602_SDK_ROOT") != "") {
-    import("//build_overrides/bl602_sdk.gni")
-  }
+} else if (lwip_platform == "bl602") {
+  import("//build_overrides/bl602_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -81,12 +79,10 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
-} else if (lwip_platform == "external") {
+} else if (lwip_platform == "bl602") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
-    if (getenv("BL602_SDK_ROOT") != "") {
-      public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
-    }
+    public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
   }
 
   group("all") {

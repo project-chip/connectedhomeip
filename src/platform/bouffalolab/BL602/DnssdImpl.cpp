@@ -15,21 +15,21 @@
  *    limitations under the License.
  */
 
-#include "lib/dnssd/platform/Dnssd.h"
-
-#include <lwip/ip4_addr.h>
-#include <lwip/ip6_addr.h>
-#include <mdns.h>
-
-#include "platform/CHIPDeviceLayer.h"
+#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include "lib/dnssd/platform/Dnssd.h"
 
 #include <BL602Config.h>
 #include <lwip/netifapi.h>
 #include <mdns_server.h>
 #include <wifi_mgmr_ext.h>
+#include <lwip/ip4_addr.h>
+#include <lwip/ip6_addr.h>
+#include <mdns.h>
+
+using namespace chip::Dnssd;
 
 using namespace ::chip::DeviceLayer::Internal;
 namespace {

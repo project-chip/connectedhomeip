@@ -25,7 +25,7 @@ mbedtls_target = "${bl602_sdk_build_root}:bl602_sdk"
 chip_device_platform = "bl602"
 chip_mdns = "platform"
 
-lwip_platform = "external"
+lwip_platform = "bl602"
 
 chip_inet_config_enable_ipv4 = true
 

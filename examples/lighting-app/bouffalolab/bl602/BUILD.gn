@@ -65,6 +65,8 @@ bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
 
   sources = [
+    #"${bl602_project_dir}/include/CHIPProjectConfig.h",
+    "include/CHIPProjectConfig.h",
     "${examples_plat_dir}/InitPlatform.cpp",
     "src/AppTask.cpp",
     "src/CHIPDeviceManager.cpp",

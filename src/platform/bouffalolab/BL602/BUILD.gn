@@ -49,7 +49,13 @@ static_library("BL602") {
     "SystemPlatformConfig.h",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+  ]
+
+  public_deps = [ 
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   # defines = [
   #   "CHIP_KVS_SECTOR_COUNT=1",
@@ -57,7 +63,7 @@ static_library("BL602") {
   # ]
 
   # Add pigweed KVS
-  deps = [
+  deps += [
     "$dir_pw_kvs:crc16",
     "$dir_pw_log",
   ]

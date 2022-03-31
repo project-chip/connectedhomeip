@@ -20,7 +20,7 @@ import("bl602_board.gni")
 
 declare_args() {
   # Location of the bl602 SDK.
-  bl602_sdk_root = "${chip_root}/third_party/bl602_sdk/repo"
+  bl602_sdk_root = "${chip_root}/third_party/bouffalolab/bl602_sdk/repo"
 }
 
 assert(bl602_sdk_root != "", "bl602_sdk_root must be specified")
