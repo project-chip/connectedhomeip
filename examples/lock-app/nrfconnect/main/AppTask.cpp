@@ -57,7 +57,7 @@ using namespace ::chip::DeviceLayer;
 namespace {
 constexpr EndpointId kLockEndpointId = 1;
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 k_timer sFunctionTimer;
 
