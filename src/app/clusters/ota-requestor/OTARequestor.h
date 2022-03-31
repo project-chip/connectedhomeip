@@ -41,7 +41,6 @@ public:
 
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
-    void Shutdown(void) override;
 
     EmberAfStatus HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
