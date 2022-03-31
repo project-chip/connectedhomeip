@@ -379,6 +379,10 @@ function getTests()
     'Test_TC_LVL_6_1',
   ];
 
+  const UserLabel = [
+    'Test_TC_LC_1_2',
+  ];
+
   const MediaControl = [
     'Test_TC_MC_1_1',
     'Test_TC_MC_1_2',
@@ -605,6 +609,7 @@ function getTests()
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     TV, //

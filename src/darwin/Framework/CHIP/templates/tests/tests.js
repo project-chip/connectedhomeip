@@ -236,6 +236,10 @@ function getTests()
     'Test_TC_DIAG_TH_NW_1_2',
   ];
 
+  const UserLabel = [
+    'Test_TC_LC_1_2',
+  ];
+
   const WiFiNetworkDiagnostics = [
     'Test_TC_WIFIDIAG_1_1',
     'Test_TC_WIFIDIAG_3_1',
@@ -317,6 +321,7 @@ function getTests()
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     Others, //
