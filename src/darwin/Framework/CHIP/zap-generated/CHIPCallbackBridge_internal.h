@@ -405,6 +405,12 @@ typedef void (*NullableDoorLockClusterDoorLockUserStatusAttributeCallback)(
 typedef void (*DoorLockClusterDoorLockUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserType);
 typedef void (*NullableDoorLockClusterDoorLockUserTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> &);
+typedef void (*WindowCoveringClusterEndProductTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::EndProductType);
+typedef void (*NullableWindowCoveringClusterEndProductTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> &);
+typedef void (*WindowCoveringClusterTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::Type);
+typedef void (*NullableWindowCoveringClusterTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> &);
 typedef void (*PumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode);
 typedef void (*NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
@@ -13469,6 +13475,119 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringClusterEndProductTypeAttributeCallback>
+{
+public:
+    CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringClusterEndProductTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::EndProductType value);
+};
+
+class CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableWindowCoveringClusterEndProductTypeAttributeCallback>
+{
+public:
+    CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableWindowCoveringClusterEndProductTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value);
+};
+
+class CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringClusterTypeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringClusterTypeAttributeCallback>
+{
+public:
+    CHIPWindowCoveringClusterTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringClusterTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::Type value);
+};
+
+class CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringClusterTypeAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringClusterTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableWindowCoveringClusterTypeAttributeCallback>
+{
+public:
+    CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableWindowCoveringClusterTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value);
+};
+
+class CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
