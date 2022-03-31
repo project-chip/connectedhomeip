@@ -277,7 +277,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
 
-    # Build the bl602 lock app example.
+    # Build the bl602 lighting app example.
     enable_bl602_lighting_app_build = enable_bl602_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
