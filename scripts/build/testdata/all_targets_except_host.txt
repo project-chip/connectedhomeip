@@ -145,6 +145,8 @@ esp32-devkitc-all-clusters-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-light
 esp32-devkitc-lock
+esp32-devkitc-ota-requestor
+esp32-devkitc-ota-requestor-rpc
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-devkitc-temperature-measurement-rpc

@@ -331,6 +331,8 @@ def Esp32Targets():
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
     yield devkitc.Extend('temperature-measurement-rpc', app=Esp32App.TEMPERATURE_MEASUREMENT, enable_rpcs=True)
+    yield devkitc.Extend('ota-requestor', app=Esp32App.OTA_REQUESTOR)
+    yield devkitc.Extend('ota-requestor-rpc', app=Esp32App.OTA_REQUESTOR, enable_rpcs=True)
 
     yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
 

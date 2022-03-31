@@ -17,6 +17,13 @@ import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/error.gni")
+import("$dir_pw_build/target_types.gni")
+
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
@@ -63,4 +70,11 @@ source_set("efr-matter-shell") {
       "${chip_root}/src/lib/shell:shell_core",
     ]
   }
+}
+
+  config("config_includes") {
+    include_dirs = [ "." ]
+  }
+pw_source_set("freertos_config") {
+  public_configs = [ ":config_includes" ]
 }
