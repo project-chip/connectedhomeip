@@ -71,7 +71,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build examples
-              timeout-minutes: 30
+              timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py --target-glob cc13x2x7_26x2x7* build \
