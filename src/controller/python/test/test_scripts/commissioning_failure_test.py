@@ -87,41 +87,40 @@ def main():
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=True, paaTrustStorePath=options.paaPath)
+    test = BaseTestHelper(nodeid=112233, testCommissioner=True,
+                          paaTrustStorePath=options.paaPath)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to set network commissioning parameters")
 
     logger.info("Testing PASE connection to device")
 
-
     # For now, only test failures up to enabling the network.
     # TODO: remove once pase handling on case session is handled properly.
     if options.report:
-        for testFailureStage in range(2,17):
+        for testFailureStage in range(2, 17):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
-                    "Failed to establish PASE connection with device")
+                      "Failed to establish PASE connection with device")
             FailIfNot(test.TestCommissionFailureOnReport(1, testFailureStage),
-                    "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
+                      "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
         for testFailureStage in range(2, 17):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
-                    "Failed to establish PASE connection with device")
+                      "Failed to establish PASE connection with device")
             FailIfNot(test.TestCommissionFailure(1, testFailureStage),
-                    "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
-
+                      "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
 
     # Ensure we can still commission for real
     FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
-                                        setuppin=20202021,
-                                        nodeid=1),
-                    "Failed to establish PASE connection with device")
-    FailIfNot(test.TestCommissionFailure(1, 0),"Failed to commission device")
+                                setuppin=20202021,
+                                nodeid=1),
+              "Failed to establish PASE connection with device")
+    FailIfNot(test.TestCommissionFailure(1, 0), "Failed to commission device")
 
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,

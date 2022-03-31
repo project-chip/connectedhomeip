@@ -276,11 +276,11 @@ class ChipDeviceController():
 
     def SetTestCommissionerSimulateFailureOnStage(self, stage: int):
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage(
-                stage)
+            stage)
 
     def SetTestCommissionerSimulateFailureOnReport(self, stage: int):
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
-                stage)
+            stage)
 
     def CheckTestCommissionerCallbacks(self):
         return self._ChipStack.Call(
