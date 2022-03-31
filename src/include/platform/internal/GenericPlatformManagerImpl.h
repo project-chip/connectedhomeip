@@ -60,9 +60,6 @@ protected:
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR
-    _GetFixedLabelList(EndpointId endpoint,
-                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
@@ -85,13 +82,6 @@ private:
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetFixedLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
 
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
