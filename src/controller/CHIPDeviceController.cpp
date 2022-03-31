@@ -1746,9 +1746,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
-        request.newRegulatoryConfig    = regulatoryConfig;
-        request.countryCode            = countryCode;
-        request.breadcrumb             = breadcrumb;
+        request.newRegulatoryConfig = regulatoryConfig;
+        request.countryCode         = countryCode;
+        request.breadcrumb          = breadcrumb;
         SendCommand<GeneralCommissioningCluster>(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
