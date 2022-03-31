@@ -167,12 +167,14 @@ public:
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
         /**
-         * This function is invoked when using read/subscribeRequest, where the ReadClient would use cached cluster data version to
-         * update data version filter list
+         * This function is invoked when constructing read/subscribeRequest, where the ReadClient would use cached cluster data
+         * version to construct data version filter list. When the particular cached cluster data version intersects with user
+         * provided data version filters, that cached one would be skipped. When encoded cluster data version filters exceeds the
+         * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
+         * return the number of successful encoded data version filters.
          */
         virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       DataVersionFilter * apDataVersionFilterList,
-                                                       size_t aDataVersionFilterListSize)
+                                                       const Span<DataVersionFilter> & aDataVersionFilters)
         {
             return 0;
         }
@@ -317,7 +319,7 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize,
+                                             const Span<DataVersionFilter> & aDataVersionFilters,
                                              bool aEnableCachedDataVersionFilter);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
@@ -374,17 +376,15 @@ private:
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
 
-    // Reserved size for the FabricFiltered boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
-    static constexpr uint16_t kFabricFiltered = 1 + 1;
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
     // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
     // context tag, 1 byte for value
     static constexpr uint16_t kReservedSizeForIMRevision = 1 + 1 + 1;
-    // Reserved buffer for TLV level overhead (the overhead for fabric filter flag, end
+    // Reserved buffer for TLV level overhead (the overhead for data version filter IBs EndOfContainer, IM reversion end
     // of RequestMessage (another end of container)).
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
-        kFabricFiltered + kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
+        kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
 }; // namespace app

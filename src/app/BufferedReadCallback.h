@@ -85,10 +85,9 @@ private:
     }
 
     uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize) override
+                                           const Span<DataVersionFilter> & aDataVersionFilters) override
     {
-        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, apDataVersionFilterList,
-                                                       aDataVersionFilterListSize);
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters);
     }
 
 private:

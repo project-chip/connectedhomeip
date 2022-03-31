@@ -228,8 +228,7 @@ struct compare
 };
 
 uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       DataVersionFilter * apDataVersionFilterList,
-                                                       size_t aDataVersionFilterListSize)
+                                                       const Span<DataVersionFilter> & aDataVersionFilters)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
@@ -247,10 +246,10 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
     {
         DataVersionFilter dataVersionFilter(path1->mEndpointId, path1->mClusterId, path1->mDataVersion);
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
-        VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INVALID_ARGUMENT);
-        for (size_t index = 0; index < aDataVersionFilterListSize; index++)
+        VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INCORRECT_STATE);
+        for (auto & filter : aDataVersionFilters)
         {
-            if (apDataVersionFilterList[index].IsSameCluster(*path1))
+            if (filter.IsSameCluster(*path1))
             {
                 continue;
             }
@@ -264,7 +263,6 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
                                 .Cluster(dataVersionFilter.mClusterId)
                                 .EndOfClusterPathIB()
                                 .GetError());
-        VerifyOrExit(dataVersionFilter.mDataVersion.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
         SuccessOrExit(err = filter.DataVersion(dataVersionFilter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
         ChipLogProgress(
             DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
