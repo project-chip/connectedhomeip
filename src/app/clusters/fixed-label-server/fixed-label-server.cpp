@@ -59,23 +59,16 @@ CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeVal
 
     if (it)
     {
-        if (it->Count() > 0)
-        {
-            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                FixedLabel::Structs::LabelStruct::Type fixedlabel;
+        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+            FixedLabel::Structs::LabelStruct::Type fixedlabel;
 
-                while (it->Next(fixedlabel))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(fixedlabel));
-                }
+            while (it->Next(fixedlabel))
+            {
+                ReturnErrorOnFailure(encoder.Encode(fixedlabel));
+            }
 
-                return CHIP_NO_ERROR;
-            });
-        }
-        else
-        {
-            err = aEncoder.EncodeEmptyList();
-        }
+            return CHIP_NO_ERROR;
+        });
 
         it->Release();
     }
