@@ -92,9 +92,33 @@ public:
     virtual UserLabelIterator * IterateUserLabel(EndpointId endpoint)   = 0;
 
 protected:
+    /**
+     * @brief Set the UserLabel at the specified index of the UserLabelList on a given endpoint
+     *
+     * @param endpoint - id to UserLabelList on which to set the UserLabel.
+     * @param index - index within the UserLabelList for which to set the UserLabel.
+     * @param userLabel - user label to set.
+     * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
+     */
     virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
-    virtual CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val)                                 = 0;
-    virtual CHIP_ERROR GetUserLabelCount(EndpointId endpoint, size_t & val)                               = 0;
+
+    /**
+     * @brief Set the total count of the UserLabelList on a given endpoint
+     *
+     * @param endpoint - id of the UserLabelList.
+     * @param val - total count of the UserLabelList.
+     * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
+     */
+    virtual CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val) = 0;
+
+    /**
+     * @brief Get the total count of the UserLabelList on a given endpoint
+     *
+     * @param endpoint - id of the UserLabelList.
+     * @param val - output of the total count of the UserLabelList.
+     * @return CHIP_NO_ERROR on success, other CHIP_ERROR values from implementation on other errors.
+     */
+    virtual CHIP_ERROR GetUserLabelCount(EndpointId endpoint, size_t & val) = 0;
 };
 
 /**
