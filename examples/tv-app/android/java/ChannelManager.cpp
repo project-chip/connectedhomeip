@@ -279,7 +279,6 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
             response.data = Optional<CharSpan>(junitname.charSpan());
         }
 
-
         helper.Success(response);
     }
 
