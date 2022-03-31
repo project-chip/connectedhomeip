@@ -24,6 +24,7 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/efr32_sdk/repo"
   enable_openthread_cli = true
+  kvs_max_entries = 75
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -130,6 +131,8 @@ template("efr32_sdk") {
       "CORTEXM3_EFM32_MICRO",
       "EFR32_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
+      "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "EFR32_OPENTHREAD_API",
       "PHY=EMBER_PHY_RAIL",
       "CORTEXM3",

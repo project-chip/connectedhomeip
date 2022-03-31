@@ -63,6 +63,9 @@ if [ "$#" == "0" ]; then
             Monitor & log memory usage at runtime. (Default false)
         enable_openthread_cli
             Enables openthread cli without matter shell. (Default true)
+        kvs_max_entries
+            Set the maxium Kvs entries that can be store in NVM (Default 75)
+            Thresholds: 30 <= kvs_max_entries <= 255
         show_qr_code
             Enables QR code on LCD for devices with an LCD
         setupDiscriminator
