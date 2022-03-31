@@ -156,9 +156,6 @@ public:
     // Reset any relevant states
     virtual void Reset(void) = 0;
 
-    // Perform any clean up necessary
-    virtual void Shutdown(void) = 0;
-
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
