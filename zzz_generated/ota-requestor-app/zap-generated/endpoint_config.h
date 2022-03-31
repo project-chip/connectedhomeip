@@ -112,7 +112,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 66
+#define GENERATED_ATTRIBUTE_COUNT 67
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -195,6 +195,7 @@
               ZAP_EMPTY_DEFAULT() },                                               /* BasicCommissioningInfo */                    \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },          /* RegulatoryConfig */                          \
             { 0x00000003, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },          /* LocationCapability */                        \
+            { 0x00000004, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(1) },        /* SupportsConcurrentConnection */              \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(14) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
                                                                                                                                    \
@@ -389,8 +390,8 @@
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
       .clusterId = 0x00000030,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(35), \
-      .attributeCount = 6, \
-      .clusterSize = 16, \
+      .attributeCount = 7, \
+      .clusterSize = 17, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 2 ) ,\
@@ -399,7 +400,7 @@
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
       .clusterId = 0x00000031,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(41), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(42), \
       .attributeCount = 10, \
       .clusterSize = 48, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -410,7 +411,7 @@
   { \
       /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
       .clusterId = 0x0000003C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(51), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(52), \
       .attributeCount = 4, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -421,7 +422,7 @@
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
       .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(55), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(56), \
       .attributeCount = 7, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -432,7 +433,7 @@
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
       .clusterId = 0x00000040,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(62), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(63), \
       .attributeCount = 2, \
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -443,7 +444,7 @@
   { \
       /* Endpoint: 0, Cluster: User Label (server) */ \
       .clusterId = 0x00000041,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(64), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(65), \
       .attributeCount = 2, \
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -462,7 +463,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 166 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 12, 167 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -474,7 +475,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (166)
+#define ATTRIBUTE_MAX_SIZE (167)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
