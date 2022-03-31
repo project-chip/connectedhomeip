@@ -71,9 +71,11 @@ LEDWidget sUnusedLED;
 bool sIsThreadProvisioned    = false;
 bool sIsThreadEnabled        = false;
 bool sIsThreadBLEAdvertising = false;
-bool sIsSMPAdvertising       = false;
-bool sHaveBLEConnections     = false;
-bool sWasDimmerTriggered     = false;
+#ifdef CONFIG_MCUMGR_SMP_BT
+bool sIsSMPAdvertising = false;
+#endif
+bool sHaveBLEConnections = false;
+bool sWasDimmerTriggered = false;
 
 k_timer sFunctionTimer;
 k_timer sDimmerPressKeyTimer;
@@ -417,8 +419,9 @@ void AppTask::UpdateStatusLED()
         sStatusLED.Set(false);
     }
 
-    // Ble LED indicates BLE connectivity:
-    //- blinking 200 ms means BLE advertising
+// Ble LED indicates BLE connectivity:
+//- blinking 200 ms means BLE advertising
+#ifdef CONFIG_MCUMGR_SMP_BT
     if (sIsSMPAdvertising)
     {
         sBleLED.Blink(30, 170);
@@ -427,6 +430,9 @@ void AppTask::UpdateStatusLED()
     {
         sBleLED.Set(false);
     }
+#else
+    sBleLED.Set(false);
+#endif
 #endif
 }
 
