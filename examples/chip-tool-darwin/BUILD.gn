@@ -22,6 +22,7 @@ assert(chip_build_tools)
 executable("chip-tool-darwin") {
   sources = [
     "${chip_root}/zzz_generated/chip-tool-darwin/zap-generated/cluster/CHIPTestClustersObjc.mm",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/common/CHIPCommandBridge.mm",
     "commands/common/CHIPCommandStorageDelegate.mm",
@@ -35,6 +36,7 @@ executable("chip-tool-darwin") {
   include_dirs = [
     ".",
     "${chip_root}/zzz_generated/chip-tool-darwin",
+    "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h"
   ]
 
   deps = [
