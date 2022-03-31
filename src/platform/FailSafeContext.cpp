@@ -60,28 +60,28 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 
 void FailSafeContext::FailSafeTimerExpired()
 {
-    ChipDeviceEvent event;
-    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-    event.FailSafeTimerExpired.PeerFabricIndex                = mFabricIndex;
-    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
-    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
-    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
+    ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
+}
 
+void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
+{
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;
     mUpdateNocCommandHasBeenInvoked = false;
+    mFailSafeBusy                   = true;
+
+    ChipDeviceEvent event;
+    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
+    event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
+    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
+    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
+    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
-    ScheduleFailSafeCleanup();
-}
-
-void FailSafeContext::ScheduleFailSafeCleanup()
-{
-    mFailSafeBusy = true;
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 

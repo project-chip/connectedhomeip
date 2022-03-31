@@ -46,10 +46,10 @@ public:
 
     /**
      * @brief
-     *   Schedules a call to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
      *   has completed.
      */
-    void ScheduleFailSafeCleanup();
+    void ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked);
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {

@@ -267,16 +267,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
         SuccessOrExit(err);
 
-        ChipDeviceEvent event;
-        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-
-        err = PlatformMgr().PostEvent(&event);
-        SuccessOrExit(err);
-
-        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup();
+        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
     }
 
 exit:
