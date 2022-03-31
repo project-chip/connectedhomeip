@@ -335,9 +335,9 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
     size_t ipkIndex = (ipkKeySet.num_keys_used > 1) ? ((ipkKeySet.num_keys_used - 1) - 1) : 0;
     memcpy(&mIPK[0], ipkKeySet.epoch_keys[ipkIndex].key, sizeof(mIPK));
 
-    ChipLogProgress(Support, "RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider,
-                    (unsigned) mFabricInfo->GetFabricIndex());
-    ChipLogByteSpan(Support, ByteSpan(mIPK));
+    ChipLogProgress(SecureChannel, "RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider,
+                    static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(SecureChannel, ByteSpan(mIPK));
 
     return CHIP_NO_ERROR;
 }
@@ -383,7 +383,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
         FabricId fabricId = mFabricInfo->GetFabricId();
         uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
-        Credentials::P256PublicKeySpan rootPubKeySpan(&rootPubKeyBuf[0]);
+        Credentials::P256PublicKeySpan rootPubKeySpan(rootPubKeyBuf);
         ReturnErrorOnFailure(mFabricInfo->GetRootPubkey(rootPubKeySpan));
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
@@ -453,7 +453,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         FabricId fabricId = fabricInfo.GetFabricId();
         NodeId nodeId     = fabricInfo.GetNodeId();
         uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
-        Credentials::P256PublicKeySpan rootPubKeySpan(&rootPubKeyBuf[0]);
+        Credentials::P256PublicKeySpan rootPubKeySpan(rootPubKeyBuf);
         ReturnErrorOnFailure(fabricInfo.GetRootPubkey(rootPubKeySpan));
 
         // Get IPK operational group key set for current candidate fabric

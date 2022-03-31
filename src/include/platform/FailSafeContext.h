@@ -42,7 +42,14 @@ public:
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
-    CHIP_ERROR SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex);
+    CHIP_ERROR SetUpdateNocCommandInvoked();
+
+    /**
+     * @brief
+     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   has completed.
+     */
+    void ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked);
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
@@ -54,8 +61,6 @@ public:
     inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
     inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
-
-    inline void SetFailSafeBusy(bool val) { mFailSafeBusy = val; }
 
     inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {

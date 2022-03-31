@@ -1298,6 +1298,13 @@ server cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+server cluster FanControl = 514 {
+  attribute enum8 fanMode = 0;
+  attribute enum8 fanModeSequence = 1;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -3634,6 +3641,7 @@ endpoint 1 {
   server  cluster Descriptor;
   server  cluster DoorLock;
   server  cluster ElectricalMeasurement;
+  server  cluster FanControl;
   server  cluster FixedLabel;
   server  cluster FlowMeasurement;
   server  cluster Groups;

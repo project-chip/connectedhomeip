@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 #pragma once
-#include <platform/UserConsentDelegate.h>
+#include <app/OTAUserConsentCommon.h>
 
 namespace chip {
 namespace ota {
 
-class OTARequestorUserConsentDelegate : public UserConsentDelegate
+class OTARequestorUserConsentDelegate
 {
 public:
     virtual ~OTARequestorUserConsentDelegate() = default;
@@ -31,6 +31,21 @@ public:
     // When GetUserConsentState() returns kObtaining this will be called to
     // check if the user consent is granted or denied.
     virtual UserConsentState CheckDeferredUserConsentState() = 0;
+
+    const char * UserConsentStateToString(UserConsentState state)
+    {
+        switch (state)
+        {
+        case kGranted:
+            return "Granted";
+        case kObtaining:
+            return "Obtaining";
+        case kDenied:
+            return "Denied";
+        default:
+            return "Unknown";
+        }
+    }
 };
 
 } // namespace ota

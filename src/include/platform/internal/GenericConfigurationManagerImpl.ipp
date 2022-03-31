@@ -267,19 +267,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
         SuccessOrExit(err);
 
-        ChipDeviceEvent event;
-        event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-        event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-        event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-        event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-
-        err = PlatformMgr().PostEvent(&event);
-        SuccessOrExit(err);
-
-        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(true);
-
-        // Ensure HandleFailSafeContextCleanup runs after the timer-expired event has been processed.
-        PlatformMgr().ScheduleWork(HandleFailSafeContextCleanup);
+        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
     }
 
 exit:
@@ -899,22 +887,6 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         }
         ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu32 " (0x%" PRIX32 ")", deviceType, deviceType);
     }
-}
-
-template <class ConfigClass>
-void GenericConfigurationManagerImpl<ConfigClass>::HandleFailSafeContextCleanup(intptr_t arg)
-{
-    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to set FailSafeArmed config to false");
-    }
-
-    if (FailSafeContext::DeleteFromStorage() != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
-    }
-
-    DeviceControlServer::DeviceControlSvr().GetFailSafeContext().SetFailSafeBusy(false);
 }
 
 } // namespace Internal

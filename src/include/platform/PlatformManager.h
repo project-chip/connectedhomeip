@@ -37,7 +37,6 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
-static constexpr size_t kMaxFixedLabels   = 10;
 static constexpr size_t kMaxUserLabels    = 10;
 static constexpr size_t kMaxLanguageTags  = 254; // Maximum number of entry type 'ARRAY' supports
 static constexpr size_t kMaxCalendarTypes = 12;
@@ -195,8 +194,6 @@ public:
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
-    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
     CHIP_ERROR SetUserLabelList(EndpointId endpoint,
                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR GetUserLabelList(EndpointId endpoint,
@@ -456,13 +453,6 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duratio
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
 }
-
-inline CHIP_ERROR PlatformManager::GetFixedLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
-}
-
 inline CHIP_ERROR
 PlatformManager::SetUserLabelList(EndpointId endpoint,
                                   AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)

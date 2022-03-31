@@ -23,12 +23,12 @@ public class ChannelInfo {
   public static final int kMultipleMatches = 0;
   public static final int kNoMatches = 1;
 
-  private int errorType;
-  private int majorNumber;
-  private int minorNumber;
-  private String name;
-  private String callSign;
-  private String affiliateCallSign;
+  public int errorType;
+  public int majorNumber;
+  public int minorNumber;
+  public String name;
+  public String callSign;
+  public String affiliateCallSign;
 
   public ChannelInfo(
       int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
