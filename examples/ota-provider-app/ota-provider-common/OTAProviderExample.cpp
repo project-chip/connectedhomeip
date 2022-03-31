@@ -191,7 +191,7 @@ bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader
     }
 
     otaFile.read(reinterpret_cast<char *>(otaFileContent), kOtaHeaderMaxSize);
-    if (!otaFile.good())
+    if (otaFile.bad())
     {
         ChipLogError(SoftwareUpdate, "Error reading OTA image file: %s", otaFilePath);
         return false;

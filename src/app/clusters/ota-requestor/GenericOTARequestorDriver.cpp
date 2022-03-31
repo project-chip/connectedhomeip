@@ -275,9 +275,7 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
 void GenericOTARequestorDriver::OTACommissioningCallback()
 {
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
-        [](System::Layer *, void * context) { static_cast<OTARequestorDriver *>(context)->SendQueryImage(); }, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
