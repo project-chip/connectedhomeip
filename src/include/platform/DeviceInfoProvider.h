@@ -112,7 +112,7 @@ protected:
     virtual CHIP_ERROR SetUserLabelCount(EndpointId endpoint, size_t val) = 0;
 
     /**
-     * @brief Get the total count of the UserLabelList on a given endpoint
+     * @brief Get the total length of the UserLabelList on a given endpoint
      *
      * @param endpoint - id of the UserLabelList.
      * @param val - output of the total count of the UserLabelList.
