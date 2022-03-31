@@ -997,6 +997,26 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::Device
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
+                                           const ByteSpan & AttestationSignature, ByteSpan dac, ByteSpan csrNonce)
+{
+    MATTER_TRACE_EVENT_SCOPE("ValidateCSR", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+
+    P256PublicKey dacPubkey;
+    ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, dacPubkey));
+
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge =
+        proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+
+    // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
+    return dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature, dacPubkey,
+                                                            csrNonce);
+}
+
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificateSigningRequestCommand", "DeviceCommissioner");
@@ -1071,20 +1091,17 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     MATTER_TRACE_EVENT_SCOPE("ProcessOpCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
+    // This will be used once the GenerateNOCChain
+    (void) csrNonce;
 
-    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+    ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
     P256PublicKey dacPubkey;
     ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, dacPubkey));
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-
-    // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
-    ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
-                                                                          dacPubkey, csrNonce));
+    // ByteSpan attestationChallenge =
+    //    proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
@@ -1809,6 +1826,23 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
         break;
+    case CommissioningStage::kValidateCSR: {
+        if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
+        {
+            ChipLogError(Controller, "Unable to validate CSR");
+            return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        // This is non-blocking, so send the callback immediately.
+        CHIP_ERROR err = ValidateCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
+                                     params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
+                                     params.GetCSRNonce().Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Unable to validate CSR");
+        }
+        CommissioningStageComplete(err);
+    }
+    break;
     case CommissioningStage::kGenerateNOCChain: {
         if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
         {

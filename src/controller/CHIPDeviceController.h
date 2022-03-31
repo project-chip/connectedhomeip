@@ -555,7 +555,10 @@ public:
      *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
      * @return int  The max number of commissionable nodes supported
      */
-    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+    int GetMaxCommissionableNodesSupported()
+    {
+        return kMaxCommissionableNodes;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -574,7 +577,10 @@ public:
      *   Return the UDC Server instance
      *
      */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer()
+    {
+        return mUdcServer;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
@@ -586,7 +592,10 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate)
+    {
+        mPairingDelegate = pairingDelegate;
+    }
 
     // AttributeCache::Callback impl
     void OnDone() override;
@@ -728,6 +737,20 @@ private:
      */
     CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
                           ByteSpan csrNonce);
+
+    /**
+     * @brief
+     *   This function validates the CSR information from the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] proxy           device proxy
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
+     */
+    CHIP_ERROR ValidateCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
+                           ByteSpan csrNonce);
 
     /**
      * @brief
