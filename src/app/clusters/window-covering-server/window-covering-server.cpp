@@ -158,16 +158,17 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint)
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
-void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
+void TypeSet(chip::EndpointId endpoint, Type type)
 {
-    Attributes::Type::Set(endpoint, chip::to_underlying(type));
+    Attributes::Type::Set(endpoint, type);
 }
 
-EmberAfWcType TypeGet(chip::EndpointId endpoint)
+Type TypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    //std::underlying_type<EmberAfWcType>::type value;
+    chip::app::Clusters::WindowCovering::Type value;
     Attributes::Type::Get(endpoint, &value);
-    return static_cast<EmberAfWcType>(value);
+    return value;
 }
 
 void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
@@ -236,16 +237,17 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
-void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type)
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
-    Attributes::EndProductType::Set(endpoint, chip::to_underlying(type));
+    Attributes::EndProductType::Set(endpoint, type);
 }
 
-EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint)
+EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    EndProductType value;
     Attributes::EndProductType::Get(endpoint, &value);
-    return static_cast<EmberAfWcEndProductType>(value);
+
+    return value;
 }
 
 void ModeSet(chip::EndpointId endpoint, const Mode & mode)

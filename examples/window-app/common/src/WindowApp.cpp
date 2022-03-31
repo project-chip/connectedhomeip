@@ -412,7 +412,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     // Note: All Current Positions are preset via Zap config and kept accross reboot via NVM: no need to init them
 
     // Attribute: Id  0 Type
-    TypeSet(endpoint, EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
+    TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
 
     // Attribute: Id  7 ConfigStatus
     ConfigStatus configStatus = { .operational             = 1,
@@ -427,7 +427,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
 
     // Attribute: Id 13 EndProductType
-    EndProductTypeSet(endpoint, EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
+    EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);
 
     // Attribute: Id 24 Mode
     Mode mode = { .motorDirReversed = 0, .calibrationMode = 1, .maintenanceMode = 1, .ledDisplay = 1 };
