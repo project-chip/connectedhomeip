@@ -117,10 +117,9 @@ CHIP_ERROR FailSafeContext::SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FailSafeContext::SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex)
+CHIP_ERROR FailSafeContext::SetUpdateNocCommandInvoked()
 {
     mUpdateNocCommandHasBeenInvoked = true;
-    mFabricIndex                    = nocFabricIndex;
 
     ReturnErrorOnFailure(CommitToStorage());
 
