@@ -121,7 +121,7 @@ public:
 
         void StepToward(OperationalState direction, bool isTilt);
 
-        EmberAfWcType CycleType();
+        Type CycleType();
 
         static void OnLiftTimeout(Timer & timer);
         static void OnTiltTimeout(Timer & timer);
