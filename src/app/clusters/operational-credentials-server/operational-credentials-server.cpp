@@ -40,6 +40,7 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
@@ -589,6 +590,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
     Credentials::GroupDataProvider::KeySet keyset;
+    FabricInfo * newFabricInfo = nullptr;
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -650,11 +652,17 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
-    keyset.keyset_id     = 0; // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    keyset.keyset_id     = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
     keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
     keyset.num_keys_used = 1;
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-    err = gFabricBeingCommissioned.GetCompressedId(compressed_fabric_id);
+
+    newFabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(newFabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INTERNAL));
+    err = newFabricInfo->GetCompressedId(compressed_fabric_id);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 

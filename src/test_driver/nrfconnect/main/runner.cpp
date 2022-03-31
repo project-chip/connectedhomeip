@@ -26,7 +26,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-LOG_MODULE_REGISTER(runner);
+LOG_MODULE_REGISTER(runner, CONFIG_MATTER_LOG_LEVEL);
 
 void main(void)
 {

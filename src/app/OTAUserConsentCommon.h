@@ -81,28 +81,5 @@ struct UserConsentSubject
     }
 };
 
-class UserConsentDelegate
-{
-public:
-    virtual ~UserConsentDelegate() = default;
-
-    virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
-
-    const char * UserConsentStateToString(UserConsentState state)
-    {
-        switch (state)
-        {
-        case kGranted:
-            return "Granted";
-        case kObtaining:
-            return "Obtaining";
-        case kDenied:
-            return "Denied";
-        default:
-            return "Unknown";
-        }
-    }
-};
-
 } // namespace ota
 } // namespace chip

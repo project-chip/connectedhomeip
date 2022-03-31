@@ -110,7 +110,7 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey()
+    Crypto::P256Keypair * GetOperationalKey() const
     {
         if (mOperationalKey == nullptr)
         {
@@ -139,12 +139,6 @@ public:
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
-
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId) const;
-
-    CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
-                                  size_t ipkListEntries) const;
 
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
@@ -231,9 +225,9 @@ private:
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+    mutable Crypto::P256KeypairHSM * mOperationalKey = nullptr;
 #else
-    Crypto::P256Keypair * mOperationalKey = nullptr;
+    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
 
     MutableByteSpan mRootCert;

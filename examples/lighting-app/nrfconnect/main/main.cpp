@@ -30,7 +30,7 @@
 #include <usb/usb_device.h>
 #endif
 
-LOG_MODULE_REGISTER(app);
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
 

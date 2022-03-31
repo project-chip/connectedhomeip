@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <Credentials/GroupDataProviderImpl.h>
 #include <app/OperationalDeviceProxy.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
@@ -32,6 +33,7 @@
 using namespace chip;
 using namespace chip::Transport;
 using namespace chip::Messaging;
+using namespace chip::Credentials;
 
 #if INET_CONFIG_ENABLE_IPV4
 namespace {
@@ -40,6 +42,7 @@ using TestTransportMgr = TransportMgr<Transport::UDP>;
 
 void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
 {
+    // TODO: This test appears not to be workable since it does not init the fabric table!!!
     Platform::MemoryInit();
     TestTransportMgr transportMgr;
     SessionManager sessionManager;
@@ -50,9 +53,11 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     // stack.
     FabricTable * fabrics = Platform::New<FabricTable>();
     FabricInfo * fabric   = fabrics->FindFabricWithIndex(1);
+    VerifyOrDie(fabric != nullptr);
     secure_channel::MessageCounterManager messageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
     SessionIDAllocator idAllocator;
+    GroupDataProviderImpl groupDataProvider;
 
     systemLayer.Init();
     udpEndPointManager.Init(systemLayer);
@@ -60,12 +65,16 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager, &deviceStorage);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
+    groupDataProvider.SetPersistentStorage(&deviceStorage);
+    VerifyOrDie(groupDataProvider.Init() == CHIP_NO_ERROR);
+    // TODO: Set IPK in groupDataProvider
 
     DeviceProxyInitParams params = {
-        .sessionManager = &sessionManager,
-        .exchangeMgr    = &exchangeMgr,
-        .idAllocator    = &idAllocator,
-        .fabricInfo     = fabric,
+        .sessionManager    = &sessionManager,
+        .exchangeMgr       = &exchangeMgr,
+        .idAllocator       = &idAllocator,
+        .fabricInfo        = fabric,
+        .groupDataProvider = &groupDataProvider,
     };
     NodeId mockNodeId = 1;
     OperationalDeviceProxy device(params, PeerId().SetNodeId(mockNodeId));

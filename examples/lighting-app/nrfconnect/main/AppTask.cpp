@@ -47,7 +47,7 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
