@@ -408,7 +408,7 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
     sessionHolder = pairing->GetSecureSessionHolder();
     VerifyOrReturnError(sessionHolder, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sessionHolder->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
-    secureSession  = sessionHolder->AsSecureSession();
+    secureSession = sessionHolder->AsSecureSession();
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
                   ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);
