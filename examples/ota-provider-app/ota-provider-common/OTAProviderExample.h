@@ -20,10 +20,10 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/ota-provider/OTAProviderUserConsentDelegate.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
-#include <platform/UserConsentDelegate.h>
 #include <vector>
 
 /**
@@ -78,7 +78,7 @@ public:
     }
     void SetDelayedQueryActionTimeSec(uint32_t time) { mDelayedQueryActionTimeSec = time; }
     void SetDelayedApplyActionTimeSec(uint32_t time) { mDelayedApplyActionTimeSec = time; }
-    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
+    void SetUserConsentDelegate(chip::ota::OTAProviderUserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
@@ -106,7 +106,7 @@ private:
     uint32_t mIgnoreApplyUpdateCount;
     uint32_t mDelayedQueryActionTimeSec;
     uint32_t mDelayedApplyActionTimeSec;
-    chip::ota::UserConsentDelegate * mUserConsentDelegate;
+    chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
     bool mUserConsentNeeded;
     uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];

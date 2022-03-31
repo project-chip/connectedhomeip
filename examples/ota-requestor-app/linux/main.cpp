@@ -19,7 +19,7 @@
 #include "AppMain.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
@@ -59,7 +59,7 @@ DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsentProvider gUserConsentProvider;
+chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
