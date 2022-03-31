@@ -105,7 +105,8 @@ public:
         allocated = mEntries.CreateObject(sessionId.Value());
         VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
         rv             = MakeOptional<SessionHandle>(*allocated);
-        mNextSessionId = sessionId.Value() == kMaxSessionID ? kUnsecuredSessionId + 1 : sessionId.Value() + 1;
+        mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
+                                                            : static_cast<uint16_t>(sessionId.Value() + 1);
     exit:
         return rv;
     }
@@ -186,17 +187,17 @@ private:
             // whole session table, marking bits in the mask for in-use IDs.
             // If we can iterate through the entire session table and have
             // any bits free in the mask, we have available session IDs.
-            candidate_base = static_cast<uint16_t>(i) + mNextSessionId;
+            candidate_base = static_cast<uint16_t>(i + mNextSessionId);
             candidate_mask = 0;
             {
-                uint16_t shift = kUnsecuredSessionId - candidate_base;
+                uint16_t shift = static_cast<uint16_t>(kUnsecuredSessionId - candidate_base);
                 if (shift <= 63)
                 {
                     candidate_mask |= (1ULL << shift); // kUnsecuredSessionId is never available
                 }
             }
             mEntries.ForEachActiveObject([&](auto session) {
-                uint16_t shift = session->GetLocalSessionId() - candidate_base;
+                uint16_t shift = static_cast<uint16_t>(session->GetLocalSessionId() - candidate_base);
                 if (shift <= 63)
                 {
                     candidate_mask |= (1ULL << shift);
@@ -220,7 +221,7 @@ private:
                 candidate_mask >>= 1;
                 ++offset;
             }
-            uint16_t available = candidate_base + offset;
+            uint16_t available = static_cast<uint16_t>(candidate_base + offset);
             return MakeOptional<uint16_t>(available);
         }
         else
