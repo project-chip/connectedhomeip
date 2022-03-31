@@ -31,6 +31,13 @@
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
 
+#ifndef KVS_MAX_ENTRIES
+#define KVS_MAX_ENTRIES 75 // Available key slot count for Kvs Key mapping.
+#endif
+
+static_assert((KVS_MAX_ENTRIES <= 255), "Implementation supports up to 255 Kvs entries");
+static_assert((KVS_MAX_ENTRIES >= 30), "Mininimal Kvs entries requirement is not met");
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -117,7 +124,7 @@ public:
     // Matter KVS storage Keys
     static constexpr Key kConfigKey_KvsStringKeyMap = EFR32ConfigKey(kMatterKvs_KeyBase, 0x00);
     static constexpr Key kConfigKey_KvsFirstKeySlot = EFR32ConfigKey(kMatterKvs_KeyBase, 0x01);
-    static constexpr Key kConfigKey_KvsLastKeySlot  = EFR32ConfigKey(kMatterKvs_KeyBase, 0x1E);
+    static constexpr Key kConfigKey_KvsLastKeySlot  = EFR32ConfigKey(kMatterKvs_KeyBase, KVS_MAX_ENTRIES);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x00);
@@ -130,7 +137,7 @@ public:
     static constexpr Key kMaxConfigKey_MatterCounter = EFR32ConfigKey(kMatterCounter_KeyBase, 0x1F);
 
     static constexpr Key kMinConfigKey_MatterKvs = EFR32ConfigKey(kMatterKvs_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterKvs = EFR32ConfigKey(kMatterKvs_KeyBase, 0x1F);
+    static constexpr Key kMaxConfigKey_MatterKvs = EFR32ConfigKey(kMatterKvs_KeyBase, 0xFF);
 
     static CHIP_ERROR Init(void);
     static void DeInit(void);

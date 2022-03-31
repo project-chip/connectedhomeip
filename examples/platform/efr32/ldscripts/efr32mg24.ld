@@ -258,15 +258,10 @@ SECTIONS
   linker_nvm_end = __main_flash_end__;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
-  /*
-  linker_storage_end = linker_nvm_begin;
-  linker_storage_begin = linker_storage_end - SIZEOF(.internal_storage);
-  linker_storage_size = SIZEOF(.internal_storage);
-  */
   __nvm3Base = linker_nvm_begin;
 
   /* Check if data + heap + stack exceeds RAM limit */
   /*ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")*/
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= __main_flash_end__, "NVM3 is excessing the flash size !")
-  
+
 }
