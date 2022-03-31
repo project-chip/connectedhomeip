@@ -321,6 +321,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
+      "DeviceInfoProvider.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "FailSafeContext.cpp",

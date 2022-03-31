@@ -638,6 +638,11 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
+    // Helper to call once we decide that pairing has failed.  This might be
+    // called from OnSessionEstablishmentError if we have no other transports to
+    // try, or in various other failure cases.
+    void PairingFailed(CHIP_ERROR err);
+
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */

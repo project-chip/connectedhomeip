@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
