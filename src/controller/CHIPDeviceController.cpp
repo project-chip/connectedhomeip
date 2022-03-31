@@ -442,7 +442,9 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     }
     else
     {
+#if CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER
         mDefaultCommissioner = &mAutoCommissioner;
+#endif
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable

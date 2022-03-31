@@ -1799,6 +1799,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE 64
 #endif // CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
 
+/*
+ * @def CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER
+ *
+ * @brief Enables a default auto-commissioner in the device controller.
+ *        Set this to 0 if you wish to provide your own
+ *        CommissioningDelegate.
+ */
+#ifndef CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER
+#define CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER 1
+#endif // CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER
+
 /**
  * @}
  */

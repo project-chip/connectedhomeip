@@ -765,7 +765,9 @@ private:
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
+#if CHIP_CONFIG_ENABLE_AUTOCOMMISSIONER
     AutoCommissioner mAutoCommissioner;
+#endif
     CommissioningDelegate * mDefaultCommissioner =
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
