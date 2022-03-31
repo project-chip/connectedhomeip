@@ -1609,16 +1609,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(step);
 
-    // TODO(cecille): This should be customized per command.
-    constexpr uint32_t kCommandTimeoutMs = 3000;
-
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
         GeneralCommissioning::Commands::ArmFailSafe::Type request;
         request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
         request.breadcrumb          = breadcrumb;
-        request.timeoutMs           = kCommandTimeoutMs;
         ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
         SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
     }
@@ -1682,7 +1678,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Setting Regulatory Config");
         auto capability =
             params.GetLocationCapability().ValueOr(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor);
-        app::Clusters::GeneralCommissioning::RegulatoryLocationType regulatoryLocation;
+        app::Clusters::GeneralCommissioning::RegulatoryLocationType regulatoryConfig;
         // Value is only switchable on the devices with indoor/outdoor capability
         if (capability == app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor)
         {
@@ -1690,26 +1686,26 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             // the current device setting then to outdoor (most restrictive)
             if (params.GetDeviceRegulatoryLocation().HasValue())
             {
-                regulatoryLocation = params.GetDeviceRegulatoryLocation().Value();
-                ChipLogProgress(Controller, "Setting regulatory location to %u from commissioner override",
-                                static_cast<uint8_t>(regulatoryLocation));
+                regulatoryConfig = params.GetDeviceRegulatoryLocation().Value();
+                ChipLogProgress(Controller, "Setting regulatory config to %u from commissioner override",
+                                static_cast<uint8_t>(regulatoryConfig));
             }
             else if (params.GetDefaultRegulatoryLocation().HasValue())
             {
-                regulatoryLocation = params.GetDefaultRegulatoryLocation().Value();
-                ChipLogProgress(Controller, "No regulatory location supplied by controller, leaving as device default (%u)",
-                                static_cast<uint8_t>(regulatoryLocation));
+                regulatoryConfig = params.GetDefaultRegulatoryLocation().Value();
+                ChipLogProgress(Controller, "No regulatory config supplied by controller, leaving as device default (%u)",
+                                static_cast<uint8_t>(regulatoryConfig));
             }
             else
             {
-                regulatoryLocation = app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor;
-                ChipLogProgress(Controller, "No overrride or device regulatory location supplied, setting to outdoor");
+                regulatoryConfig = app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor;
+                ChipLogProgress(Controller, "No overrride or device regulatory config supplied, setting to outdoor");
             }
         }
         else
         {
             ChipLogProgress(Controller, "Device does not support configurable regulatory location");
-            regulatoryLocation = capability;
+            regulatoryConfig = capability;
         }
         static constexpr size_t kMaxCountryCodeSize = 3;
         char countryCodeStr[kMaxCountryCodeSize]    = "XX";
@@ -1728,10 +1724,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
-        request.location    = regulatoryLocation;
-        request.countryCode = countryCode;
-        request.breadcrumb  = breadcrumb;
-        request.timeoutMs   = kCommandTimeoutMs;
+        request.newRegulatoryConfig    = regulatoryConfig;
+        request.countryCode            = countryCode;
+        request.breadcrumb             = breadcrumb;
         SendCommand<GeneralCommissioningCluster>(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;

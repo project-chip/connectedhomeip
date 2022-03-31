@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-function getManualTests()
-{
+function getManualTests() {
   const DeviceDiscovery = [
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
@@ -281,8 +280,7 @@ function getManualTests()
   return tests.flat(1);
 }
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -538,6 +536,7 @@ function getTests()
     'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
@@ -616,5 +615,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
