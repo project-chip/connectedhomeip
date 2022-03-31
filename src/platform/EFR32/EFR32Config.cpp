@@ -253,7 +253,7 @@ CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
         {
             err = MapNvm3Error(nvm3_readPartialData(nvm3_defaultHandle, key, buf, offset, bufSize));
             SuccessOrExit(err);
-            // read was succesful, but we did not read all the data from the object.
+            // read was successful, but we did not read all the data from the object.
             err    = CHIP_ERROR_BUFFER_TOO_SMALL;
             outLen = bufSize;
         }
