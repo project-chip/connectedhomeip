@@ -128,7 +128,7 @@ public:
     }
 
     /**
-     * Get a secure session given a Encryption key ID.
+     * Get a secure session given an Encryption key ID.
      *
      * @param localSessionId Encryption key ID used by the local node.
      *

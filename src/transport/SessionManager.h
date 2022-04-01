@@ -185,7 +185,7 @@ public:
      *   it.  This variant of the interface may be used in test scenarios where
      *   session IDs need to be predetermined.
      *
-     * @param localSessionId
+     * @param localSessionId ID for the allocated secure session
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
