@@ -41,6 +41,8 @@ class SecureSessionTable
 public:
     ~SecureSessionTable() { mEntries.ReleaseAll(); }
 
+    void Init() { mNextSessionId = chip::Crypto::GetRandU16(); }
+
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
@@ -84,7 +86,8 @@ public:
     {
         Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
         SecureSession * allocated  = nullptr;
-        VerifyOrExit(!FindSecureSessionByLocalKey(localSessionId).HasValue(), rv = Optional<SessionHandle>::Missing());
+        VerifyOrExit(localSessionId != kUnsecuredSessionId, rv = NullOptional);
+        VerifyOrExit(!FindSecureSessionByLocalKey(localSessionId).HasValue(), rv = NullOptional);
         allocated = mEntries.CreateObject(localSessionId);
         VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
         rv = MakeOptional<SessionHandle>(*allocated);

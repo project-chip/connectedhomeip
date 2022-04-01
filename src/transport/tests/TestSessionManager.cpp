@@ -780,8 +780,8 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, session2);
 
     auto prevSessionId = sessionId1;
-    // Verify that session IDs monotonically increase, except for the
-    // wraparound case where we skip session ID 0.
+    // Verify that we increment session ID by 1 for each allocation, except for
+    // the wraparound case where we skip session ID 0.
     for (uint32_t i = 0; i < 10; ++i)
     {
         auto session = sessionManager.AllocateSession();
@@ -791,6 +791,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         }
         auto sessionId = session->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
     }
 
@@ -798,19 +799,19 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     new (&sessionManager) SessionManager();
 
     prevSessionId = 0;
-    // Verify that session IDs monotonically increase, even when releasing
-    // sessions, except for the wraparound case where we skip session ID 0.
+    // Verify that we increment session ID by 1 for each allocation, except for
+    // the wraparound case where we skip session ID 0.
     for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
     {
         auto session = sessionManager.AllocateSession();
         NL_TEST_ASSERT(inSuite, session);
         auto sessionId = session->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
         sessionManager.ExpirePairing(session.Get());
     }
 
-    // Verify that session IDs monotonically increase, even when we free sessions.
     sessionManager.Shutdown();
 }
 
