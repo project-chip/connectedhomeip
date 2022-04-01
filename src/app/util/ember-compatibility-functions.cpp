@@ -247,6 +247,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
             bool commandExists;
             CommandId targetCommand;
         } context{ false, aCommandPath.mCommandId };
+
         CHIP_ERROR err = commandHandler->EnumerateAcceptedCommands(
             aCommandPath,
             [](CommandId command, void * context) -> Loop {
@@ -259,6 +260,18 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
                 return Loop::Continue;
             },
             &context);
+
+        // We now have three cases:
+        // 1) handler returned CHIP_ERROR_NOT_IMPLEMENTED.  In that case we
+        //    should fall back to looking at cluster->acceptedCommandList
+        // 2) handler returned success.  In that case, the handler is the source
+        //    of truth about the set of accepted commands, and
+        //    context.commandExists indicates whether a aCommandPath.mCommandId
+        //    was in the set, and we should return either Success or
+        //    UnsupportedCommand accordingly.
+        // 3) Some other status was returned.  In this case we should probably
+        //    err on the side of not allowing the command, since we have no idea
+        //    whether to allow it or not.
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
             if (err == CHIP_NO_ERROR)
