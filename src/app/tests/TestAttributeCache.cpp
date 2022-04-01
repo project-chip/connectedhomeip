@@ -612,10 +612,43 @@ void TestCache(nlTestSuite * apSuite, void * apContext)
                              AttributeInstruction(AttributeInstruction::kAttributeB, 0, AttributeInstruction::kData) });
 }
 
+void TestSortConcreteDataAttributePathWithSize(nlTestSuite * apSuite, void * apContext)
+{
+    ConcreteClusterPathWithSize cluster1;
+    cluster1.mSize = 1;
+    ConcreteClusterPathWithSize cluster2;
+    cluster2.mSize = 1;
+    ConcreteClusterPathWithSize cluster3;
+    cluster3.mSize = 1;
+    std::set<ConcreteClusterPathWithSize, compare> clusterSet;
+    clusterSet.insert(cluster1);
+    clusterSet.insert(cluster2);
+    clusterSet.insert(cluster3);
+    NL_TEST_ASSERT(gSuite, 1 == clusterSet.size());
+    clusterSet.clear();
+    cluster1.mEndpointId = 1;
+    cluster1.mSize = 2;
+    cluster2.mEndpointId = 2;
+    cluster2.mSize = 4;
+    cluster3.mEndpointId = 3;
+    cluster3.mSize = 1;
+    clusterSet.insert(cluster1);
+    clusterSet.insert(cluster2);
+    clusterSet.insert(cluster3);
+    NL_TEST_ASSERT(gSuite, 3 == clusterSet.size());
+    uint32_t temp = 0;
+    for (auto & item : clusterSet)
+    {
+        NL_TEST_ASSERT(gSuite, temp < item.mSize);
+        temp = item.mSize;
+    }
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestCache", TestCache),
+    NL_TEST_DEF("TestSortConcreteDataAttributePathWithSize", TestSortConcreteDataAttributePathWithSize),
     NL_TEST_SENTINEL()
 };
 

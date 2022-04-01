@@ -29,20 +29,11 @@ struct DataVersionFilter
         mClusterId(aClusterId), mDataVersion(aDataVersion), mEndpointId(aEndpointId)
     {}
 
-    DataVersionFilter(EndpointId aEndpointId, ClusterId aClusterId, Optional<DataVersion> aDataVersion) :
-        mClusterId(aClusterId), mDataVersion(aDataVersion), mEndpointId(aEndpointId)
-    {}
-
     DataVersionFilter() {}
 
     bool IsValidDataVersionFilter() const
     {
         return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion.HasValue());
-    }
-
-    bool IsSameCluster(const ConcreteDataAttributePath & other) const
-    {
-        return (mEndpointId == other.mEndpointId) && (mClusterId == other.mClusterId);
     }
 
     ClusterId mClusterId = kInvalidClusterId;    // uint32

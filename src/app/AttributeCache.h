@@ -35,6 +35,18 @@
 namespace chip {
 namespace app {
 
+struct compare
+{
+    bool operator()(const ConcreteClusterPathWithSize & x, const ConcreteClusterPathWithSize & y) const
+    {
+        if (x == y)
+        {
+            return false;
+        }
+        return x.mSize <= y.mSize;
+    }
+};
+
 /*
  * This implements an attribute cache designed to aggregate attribute data received by a client
  * from either read or subscribe interactions and keep it resident and available for clients to
@@ -217,7 +229,7 @@ public:
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
-    void UpdateClusterSize(ConcreteDataAttributePathWithSize & aCluster)
+    void UpdateClusterSize(ConcreteClusterPathWithSize & aCluster)
     {
         uint32_t totalSize = 0;
         ForEachAttribute(aCluster.mEndpointId, aCluster.mClusterId, [this, &totalSize](const ConcreteAttributePath & path) {
@@ -392,7 +404,7 @@ private:
     }
 
     uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<DataVersionFilter> & aDataVersionFilters) override;
+                                           const Span<AttributePathParams> & aAttributePaths) override;
 
 private:
     Callback & mCallback;

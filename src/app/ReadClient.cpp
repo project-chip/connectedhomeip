@@ -283,7 +283,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                     request.Checkpoint(backup);
                     DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                     ReturnErrorOnFailure(request.GetError());
-                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters) == 0)
+                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
                     {
                         request.Rollback(backup);
                     }
@@ -360,12 +360,18 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         VerifyOrReturnError(filter.IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
 
         // if data version filter does not intersect with attribute path requests asks for, discard this filter
+        bool intersected = false;
         for (auto & path : aAttributePaths)
         {
-            if (!path.IsAttributePathIntersect(filter))
+            if (path.IsAttributePathIntersect(filter))
             {
-                continue;
+                intersected = true;
+                break;
             }
+        }
+        if (!intersected)
+        {
+            continue;
         }
 
         DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
@@ -379,7 +385,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
     if (aEnableCachedDataVersionFilter)
     {
-        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters);
+        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
     }
 
     ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
@@ -941,9 +947,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
 
-                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters) == 0)
+                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
                 {
-                    ChipLogProgress(DataManagement, "Rollback DataVersionFilters2");
                     request.Rollback(backup);
                 }
                 else

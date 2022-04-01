@@ -59,11 +59,6 @@ struct ConcreteAttributePath : public ConcreteClusterPath
             ((mEndpointId == path.mEndpointId) && (mClusterId == path.mClusterId) && (mAttributeId < path.mAttributeId));
     }
 
-    bool IsSameCluster(const ConcreteAttributePath & other) const
-    {
-        return (mEndpointId == other.mEndpointId) && (mClusterId == other.mClusterId);
-    }
-
     AttributeId mAttributeId = 0;
 };
 
@@ -140,20 +135,6 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     uint16_t mListIndex                = 0;
     ListOperation mListOp              = ListOperation::NotList;
     Optional<DataVersion> mDataVersion = NullOptional;
-};
-
-struct ConcreteDataAttributePathWithSize : public ConcreteDataAttributePath
-{
-    ConcreteDataAttributePathWithSize(const ConcreteDataAttributePath & aPath)
-    {
-        mEndpointId  = aPath.mEndpointId;
-        mClusterId   = aPath.mClusterId;
-        mAttributeId = aPath.mAttributeId;
-        mListIndex   = aPath.mListIndex;
-        mListOp      = aPath.mListOp;
-        mDataVersion = aPath.mDataVersion;
-    }
-    uint32_t mSize = 0;
 };
 
 } // namespace app

@@ -219,47 +219,46 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
-struct compare
-{
-    bool operator()(const ConcreteDataAttributePathWithSize & x, const ConcreteDataAttributePathWithSize & y) const
-    {
-        return x.mSize < y.mSize;
-    }
-};
-
 uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<DataVersionFilter> & aDataVersionFilters)
+                                                       const Span<AttributePathParams> & aAttributePaths)
 {
     uint32_t number = 0;
     CHIP_ERROR err  = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
-    std::set<ConcreteDataAttributePathWithSize, compare> clusterSet;
-    for (auto path = mChangedAttributeSet.begin(); path != mChangedAttributeSet.end(); path++)
+    std::set<ConcreteClusterPathWithSize, compare> clusterSet;
+
+    for (auto & path : mChangedAttributeSet)
     {
-        ConcreteDataAttributePathWithSize cluster(*path);
+        if (!path.mDataVersion.HasValue())
+        {
+            continue;
+        }
+        ConcreteClusterPathWithSize cluster(path.mEndpointId, path.mClusterId, path.mDataVersion.Value());
         UpdateClusterSize(cluster);
-        clusterSet.insert(cluster);
+        if (cluster.mSize > 0)
+        {
+            clusterSet.insert(cluster);
+        }
     }
 
     for (auto path = clusterSet.rbegin(); path != clusterSet.rend(); path++)
     {
-        bool isIntersectDataVersionFilter = false;
+        bool intersected = false;
         DataVersionFilter dataVersionFilter(path->mEndpointId, path->mClusterId, path->mDataVersion);
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
         VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INCORRECT_STATE);
 
-        // if the particular cached data version intersects with user provided data version filter, skip the cached one, and respect
-        // the user-provided one
-        for (auto & filter : aDataVersionFilters)
+        // if the particular cached data version does not intersect with user provided attribute paths, skip the cached one
+        for (auto & attribute : aAttributePaths)
         {
-            if (filter.IsSameCluster(*path))
+            if (attribute.IsAttributePathIntersect(*path))
             {
-                isIntersectDataVersionFilter = true;
+                intersected = true;
                 break;
             }
         }
-        if (isIntersectDataVersionFilter)
+        if (!intersected)
         {
             continue;
         }

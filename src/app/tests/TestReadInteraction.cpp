@@ -54,6 +54,7 @@ chip::ClusterId kTestClusterId          = 6;
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
 chip::EndpointId kTestEndpointId2       = 2;
+chip::EndpointId kTestEndpointId3       = 3;
 chip::EventId kTestEventIdDebug         = 1;
 chip::EventId kTestEventIdCritical      = 2;
 uint8_t kTestFieldValue1                = 1;
@@ -236,7 +237,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == kTestClusterId && (aPath.mEndpointId == kTestEndpointId || aPath.mEndpointId == kTestEndpointId2)))
+    if (!(aPath.mClusterId == kTestClusterId && (aPath.mEndpointId == kTestEndpointId || aPath.mEndpointId == kTestEndpointId2 || aPath.mEndpointId == kTestEndpointId3)))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -309,6 +310,8 @@ public:
     static void TestReadWithAttributeCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadWithAttributeCacheWithUserDefinedDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadWithAttributeCacheRollbackDataVersionList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadWithAttributeSortingCachePartialRollbackDataVersionList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeWithAttributeCache(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeWithAttributeCacheWithUserDefinedDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void * apContext);
@@ -1895,6 +1898,182 @@ void TestReadInteraction::TestReadWithAttributeCacheRollbackDataVersionList(nlTe
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestReadWithAttributeSortingCachePartialRollbackDataVersionList(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    chip::app::AttributeCache cache(delegate);
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    chip::app::EventPathParams eventPathParams[100];
+    readPrepareParams.mpEventPathParamsList = eventPathParams;
+
+    readPrepareParams.mEventPathParamsListSize = 81;
+    for (uint32_t index = 0; index < readPrepareParams.mEventPathParamsListSize; index++)
+    {
+        readPrepareParams.mpEventPathParamsList[index].mEndpointId = kTestEndpointId;
+        readPrepareParams.mpEventPathParamsList[index].mClusterId  = kTestClusterId;
+        readPrepareParams.mpEventPathParamsList[index].mEventId    = index;
+    }
+
+    chip::app::AttributePathParams attributePathParams[7];
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
+
+    readPrepareParams.mpAttributePathParamsList[1].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
+
+    readPrepareParams.mpAttributePathParamsList[2].mEndpointId  = kTestEndpointId2;
+    readPrepareParams.mpAttributePathParamsList[2].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[2].mAttributeId = 1;
+
+    readPrepareParams.mpAttributePathParamsList[3].mEndpointId  = kTestEndpointId2;
+    readPrepareParams.mpAttributePathParamsList[3].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[3].mAttributeId = 2;
+
+    readPrepareParams.mpAttributePathParamsList[4].mEndpointId  = kTestEndpointId2;
+    readPrepareParams.mpAttributePathParamsList[4].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[4].mAttributeId = 3;
+
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[5].mEndpointId  = kTestEndpointId2;
+    readPrepareParams.mpAttributePathParamsList[5].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[5].mAttributeId = 4;
+
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[6].mEndpointId  = kTestEndpointId3;
+    readPrepareParams.mpAttributePathParamsList[6].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[6].mAttributeId = 1;
+
+    readPrepareParams.mAttributePathParamsListSize = 7;
+
+    readPrepareParams.mEnableCachedDataVersionFilter = true;
+
+    printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 7);
+        delegate.mNumAttributeResponse = 0;
+        app::ReadClient readClient1(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        err = readClient1.SendRequest(readPrepareParams);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    chip::app::AttributeCache cache(delegate);
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    chip::app::EventPathParams eventPathParams[100];
+    readPrepareParams.mpEventPathParamsList = eventPathParams;
+
+    readPrepareParams.mEventPathParamsListSize = 86;
+    for (uint32_t index = 0; index < readPrepareParams.mEventPathParamsListSize; index++)
+    {
+        readPrepareParams.mpEventPathParamsList[index].mEndpointId = kTestEndpointId;
+        readPrepareParams.mpEventPathParamsList[index].mClusterId  = kTestClusterId;
+        readPrepareParams.mpEventPathParamsList[index].mEventId    = index;
+    }
+
+    chip::app::AttributePathParams attributePathParams[2];
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId2;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 2;
+
+    readPrepareParams.mpAttributePathParamsList[1].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 1;
+
+    readPrepareParams.mAttributePathParamsListSize = 2;
+
+    chip::app::DataVersionFilter dataVersionFilters[1];
+    dataVersionFilters[0].mEndpointId = kTestEndpointId;
+    dataVersionFilters[0].mClusterId  = kTestClusterId;
+    dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion2);
+    readPrepareParams.mpDataVersionFilterList        = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize     = 1;
+    readPrepareParams.mEnableCachedDataVersionFilter = true;
+
+    printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        delegate.mNumAttributeResponse = 0;
+        app::ReadClient readClient1(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        err = readClient1.SendRequest(readPrepareParams);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestSubscribeWithAttributeCache(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2992,6 +3171,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadWithAttributeCache", chip::app::TestReadInteraction::TestReadWithAttributeCache),
     NL_TEST_DEF("TestReadWithAttributeCacheWithUserDefinedDataVersionFilter", chip::app::TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFilter),
     NL_TEST_DEF("TestReadWithAttributeCacheRollbackDataVersionList", chip::app::TestReadInteraction::TestReadWithAttributeCacheRollbackDataVersionList),
+    NL_TEST_DEF("TestReadWithAttributeSortingCachePartialRollbackDataVersionList", chip::app::TestReadInteraction::TestReadWithAttributeSortingCachePartialRollbackDataVersionList),
+    NL_TEST_DEF("TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback", chip::app::TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback),
     NL_TEST_DEF("TestSubscribeWithAttributeCache", chip::app::TestReadInteraction::TestSubscribeWithAttributeCache),
     NL_TEST_DEF("TestSubscribeWithAttributeCacheWithUserDefinedDataVersionFilter", chip::app::TestReadInteraction::TestSubscribeWithAttributeCacheWithUserDefinedDataVersionFilter),
     NL_TEST_DEF("TestSubscribeEarlyShutdown", chip::app::TestReadInteraction::TestSubscribeEarlyShutdown),

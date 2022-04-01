@@ -52,5 +52,19 @@ struct ConcreteClusterPath
     ClusterId mClusterId = 0;
 };
 
+struct ConcreteClusterPathWithSize : public ConcreteClusterPath
+{
+    ConcreteClusterPathWithSize(const EndpointId aEndpointId, const ClusterId aClusterId, DataVersion aDataVersion)
+    {
+        mEndpointId  = aEndpointId;
+        mClusterId   = aClusterId;
+        mDataVersion = aDataVersion;
+    }
+    ConcreteClusterPathWithSize() {}
+    DataVersion mDataVersion = 0;
+    uint32_t mSize = 0;
+
+};
+
 } // namespace app
 } // namespace chip

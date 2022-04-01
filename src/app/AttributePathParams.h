@@ -90,6 +90,14 @@ struct AttributePathParams
         return true;
     }
 
+    bool IsAttributePathIntersect(const ConcreteClusterPath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
     ClusterId mClusterId     = kInvalidClusterId;   // uint32
     AttributeId mAttributeId = kInvalidAttributeId; // uint32
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16

@@ -85,9 +85,9 @@ private:
     }
 
     uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<DataVersionFilter> & aDataVersionFilters) override
+                                           const Span<AttributePathParams> & aAttributePaths) override
     {
-        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters);
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
     }
 
 private:
