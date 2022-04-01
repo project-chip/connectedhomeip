@@ -25,8 +25,8 @@
 #include <wifi_mgmr_ext.h>
 
 #include <limits>
-#include <string>
 #include <stdint.h>
+#include <string>
 
 using namespace ::chip;
 //#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -65,9 +65,9 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork   = mSavedNetwork;
-    mpScanCallback    = nullptr;
-    mpConnectCallback = nullptr;
+    mStagingNetwork        = mSavedNetwork;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     return err;
@@ -114,7 +114,8 @@ bool BLWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,uint8_t & outNetworkIndex)
+Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                        uint8_t & outNetworkIndex)
 {
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
