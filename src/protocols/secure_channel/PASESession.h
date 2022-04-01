@@ -83,25 +83,25 @@ public:
      * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
      *
+     * @param sessionManager      session manager from which to allocate a secure session object
      * @param verifier            PASE verifier to be used for SPAKE2P pairing
      * @param pbkdf2IterCount     Iteration count for PBKDF2 function
      * @param salt                Salt to be used for SPAKE2P operation
-     * @param secureSessionHolder Pre-allocated SecureSession holder from SessionManager
      * @param delegate            Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                              SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
+    CHIP_ERROR WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
+                              const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
+     * @param sessionManager      session manager from which to allocate a secure session object
      * @param peerAddress         Address of peer to pair
      * @param peerSetUpPINCode    Setup PIN code of the peer device
-     * @param secureSessionHolder Pre-allocated SecureSession holder from SessionManager
      * @param exchangeCtxt        The exchange context to send and receive messages with the peer
      *                            Note: It's expected that the caller of this API hands over the
      *                            ownership of the exchangeCtxt to PASESession object. PASESession
@@ -110,7 +110,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, SessionHolder & secureSessionHolder,
+    CHIP_ERROR Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
                     Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                     SessionEstablishmentDelegate * delegate);
 
@@ -181,7 +181,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(SessionHolder & secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
@@ -279,15 +279,13 @@ public:
     {
         // Do not set to 0 to prevent unwanted unsecured session
         // since the session type is unknown.
-        auto holder = sessionManager.AllocateSession(mLocalSessionId);
-        SetSecureSessionHolder(holder);
+        AllocateSecureSession(sessionManager, MakeOptional(mLocalSessionId));
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
         PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
     {
-        auto holder = sessionManager.AllocateSession(localSessionId);
-        SetSecureSessionHolder(holder);
+        AllocateSecureSession(sessionManager, MakeOptional(localSessionId));
         SetPeerSessionId(peerSessionId);
     }
 

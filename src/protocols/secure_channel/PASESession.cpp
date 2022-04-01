@@ -117,10 +117,9 @@ void PASESession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PASESession::Init(SessionHolder & secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(secureSessionHolder && secureSessionHolder->IsSecureSession(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Reset any state maintained by PASESession object (in case it's being reused for pairing)
     Clear();
@@ -129,7 +128,7 @@ CHIP_ERROR PASESession::Init(SessionHolder & secureSessionHolder, uint32_t setup
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
 
     mDelegate = delegate;
-    SetSecureSessionHolder(secureSessionHolder);
+    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ChipLogDetail(SecureChannel, "Assigned local session key ID %d", GetLocalSessionId().Value());
 
@@ -167,8 +166,8 @@ CHIP_ERROR PASESession::SetupSpake2p()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
+CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
+                                       const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
@@ -177,7 +176,7 @@ CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_
     ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = Init(secureSessionHolder, kSetupPINCodeUndefinedValue, delegate);
+    CHIP_ERROR err = Init(sessionManager, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
     SuccessOrExit(err);
@@ -214,13 +213,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
-                             SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
+                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                             SessionEstablishmentDelegate * delegate)
 {
     MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CHIP_ERROR err = Init(secureSessionHolder, peerSetUpPINCode, delegate);
+    CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
     mExchangeCtxt = exchangeCtxt;

@@ -101,10 +101,33 @@ public:
                                           TLV::TLVWriter & tlvWriter);
 
 protected:
+    /**
+     * Allocate a secure session object from the passed session manager for the
+     * pending session establishment operation.
+     *
+     * The optional session ID argument may be passed for testing scenarios
+     * where the session ID must be predetermined.  But in most cases, it's
+     * better to leave session ID assignment to the session manager, which can
+     * select a non-colliding ID on our behalf.
+     *
+     * @param sessionManager session manager from which to allocate a secure session object
+     * @param sessionId optional argument to specify the session ID of the allocated session
+     * @return CHIP_ERROR The outcome of the attempted allocation
+     */
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, Optional<uint16_t> sessionId);
+
+    /**
+     * Allocate a secure session object from the passed session manager for the
+     * pending session establishment operation.
+     *
+     * @param sessionManager session manager from which to allocate a secure session object
+     * @return CHIP_ERROR The outcome of the attempted allocation
+     */
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
-    void SetSecureSessionHolder(SessionHolder & holder) { mSecureSessionHolder = holder; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
     virtual void OnSuccessStatusReport() {}
     virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)

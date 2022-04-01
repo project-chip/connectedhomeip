@@ -776,7 +776,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 
     // Allocate a session at a colliding ID, verify eviction.
     callback.mOldConnectionDropped = false;
-    SessionHolderWithDelegate session2(sessionManager.AllocateSession(sessionId1), callback);
+    SessionHolderWithDelegate session2(sessionManager.AllocateSession(MakeOptional(sessionId1)), callback);
     NL_TEST_ASSERT(inSuite, session2);
 
     auto prevSessionId = sessionId1;

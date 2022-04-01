@@ -187,18 +187,17 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(SessionHolder & secureSessionHolder, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(secureSessionHolder && secureSessionHolder->IsSecureSession(), CHIP_ERROR_INVALID_ARGUMENT);
 
     Clear();
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    SetSecureSessionHolder(secureSessionHolder);
     mDelegate = delegate;
+    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -208,12 +207,12 @@ CHIP_ERROR CASESession::Init(SessionHolder & secureSessionHolder, SessionEstabli
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(SessionHolder & secureSessionHolder, FabricTable * fabrics,
+CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
                                            SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(secureSessionHolder, delegate));
+    ReturnErrorOnFailure(Init(sessionManager, delegate));
 
     mFabricsTable   = fabrics;
     mLocalMRPConfig = mrpConfig;
@@ -225,8 +224,8 @@ CASESession::ListenForSessionEstablishment(SessionHolder & secureSessionHolder, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                                         SessionHolder & secureSessionHolder, ExchangeContext * exchangeCtxt,
+CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress,
+                                         FabricInfo * fabric, NodeId peerNodeId, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
@@ -242,7 +241,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(secureSessionHolder, delegate);
+    err = Init(sessionManager, delegate);
 
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.

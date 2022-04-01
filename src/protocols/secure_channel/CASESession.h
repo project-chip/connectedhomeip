@@ -79,33 +79,32 @@ public:
      * @brief
      *   Initialize using configured fabrics and wait for session establishment requests.
      *
-     * @param secureSessionHolder           Pre-allocated SecureSession holder from SessionManager
+     * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionHolder & secureSessionHolder, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+        SessionManager & sessionManager, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * @brief
      *   Create and send session establishment request using device's operational credentials.
      *
+     * @param sessionManager                session manager from which to allocate a secure session object
      * @param peerAddress                   Address of peer with which to establish a session.
      * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
-     * @param secureSessionHolder           Pre-allocated SecureSession holder from SessionManager
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                     SessionHolder & secureSessionHolder, Messaging::ExchangeContext * exchangeCtxt,
-                     SessionEstablishmentDelegate * delegate,
+    EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
+                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -191,7 +190,7 @@ private:
         kSentSigma2Resume = 4,
     };
 
-    CHIP_ERROR Init(SessionHolder & secureSessionHolder, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

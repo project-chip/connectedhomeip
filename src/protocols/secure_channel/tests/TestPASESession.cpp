@@ -121,47 +121,37 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
     SessionManager sessionManager;
-    SessionHolder secureSessionHolder;
-    SessionHolder emptySessionHolder;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
     CATValues peerCATs;
     peerCATs = pairing.GetPeerCATs();
     NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kUndefinedCATs, sizeof(CATValues)) == 0);
-    secureSessionHolder = sessionManager.AllocateSession();
-    NL_TEST_ASSERT(inSuite, secureSessionHolder);
 
     gLoopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(nullptr, 0),
-                                          emptySessionHolder, Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(nullptr, 0), Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8), emptySessionHolder,
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8),
                                           Optional<ReliableMessageProtocolConfig>::Missing(),
                                           nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8), emptySessionHolder,
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8),
                                           Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(sTestSpake2p01_Salt),
-                                          emptySessionHolder, Optional<ReliableMessageProtocolConfig>::Missing(),
-                                          &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(sTestSpake2p01_Salt),
-                                          secureSessionHolder, Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 }
@@ -174,22 +164,18 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
     SessionManager sessionManager;
-    SessionHolder secureSessionHolder;
-
-    secureSessionHolder = sessionManager.AllocateSession();
-    NL_TEST_ASSERT(inSuite, secureSessionHolder);
 
     gLoopback.Reset();
 
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, secureSessionHolder,
+                   pairing.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
                                 Optional<ReliableMessageProtocolConfig>::Missing(), nullptr, nullptr) != CHIP_NO_ERROR);
 
     gLoopback.Reset();
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, secureSessionHolder,
+                   pairing.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
                                 Optional<ReliableMessageProtocolConfig>::Missing(), context, &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -207,7 +193,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     PASESession pairing1;
     ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, secureSessionHolder,
+                   pairing1.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
                                  Optional<ReliableMessageProtocolConfig>::Missing(), context1,
                                  &delegate) == CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
@@ -225,10 +211,6 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
     SessionManager sessionManager;
-    SessionHolder secureSessionHolder;
-
-    secureSessionHolder = sessionManager.AllocateSession();
-    NL_TEST_ASSERT(inSuite, secureSessionHolder);
 
     gLoopback.mSentMessageCount = 0;
 
@@ -252,15 +234,14 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                                   ByteSpan(sTestSpake2p01_Salt), secureSessionHolder, mrpAccessoryConfig,
+                   pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                   ByteSpan(sTestSpake2p01_Salt), mrpAccessoryConfig,
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
-                                            secureSessionHolder, mrpCommissionerConfig, contextCommissioner,
-                                            &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
+                                            mrpCommissionerConfig, contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     while (gLoopback.mMessageDropped)
@@ -361,7 +342,6 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     PASESession pairingAccessory;
 
     SessionManager sessionManager;
-    SessionHolder secureSessionHolder;
 
     gLoopback.Reset();
     gLoopback.mSentMessageCount = 0;
@@ -370,10 +350,8 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
-    secureSessionHolder         = sessionManager.AllocateSession();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
-    NL_TEST_ASSERT(inSuite, secureSessionHolder);
 
     contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
         64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
@@ -385,14 +363,13 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                                   ByteSpan(sTestSpake2p01_Salt), secureSessionHolder,
-                                                   Optional<ReliableMessageProtocolConfig>::Missing(),
-                                                   &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(
+                       sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(sTestSpake2p01_Salt),
+                       Optional<ReliableMessageProtocolConfig>::Missing(), &delegateAccessory) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 4321, secureSessionHolder,
+                   pairingCommissioner.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), 4321,
                                             Optional<ReliableMessageProtocolConfig>::Missing(), contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
