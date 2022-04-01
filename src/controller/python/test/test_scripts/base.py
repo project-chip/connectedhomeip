@@ -246,6 +246,24 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
+    def TestFailsafe(self, nodeid: int):
+        self.logger.info("Testing arm failsafe")
+
+        self.logger.info("Opening Commissioning Window")
+        res = asyncio.run(self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
+
+        self.logger.info("Attempting to arm failsafe over CASE - this should fail since the commissioning window is open")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1, timeoutMs=1000), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
+            return True
+        return False
+
+
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
