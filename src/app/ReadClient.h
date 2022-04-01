@@ -173,10 +173,10 @@ public:
          * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
          * return the number of successful encoded data version filters.
          */
-        virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                         const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
+        virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       const Span<DataVersionFilter> & aDataVersionFilters)
         {
-            return CHIP_NO_ERROR;
+            return 0;
         }
     };
 
@@ -320,7 +320,7 @@ private:
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                              const Span<AttributePathParams> & aAttributePaths,
                                              const Span<DataVersionFilter> & aDataVersionFilters,
-                                             bool aEnableCachedDataVersionFilter, uint32_t & aNumber);
+                                             bool aEnableCachedDataVersionFilter);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

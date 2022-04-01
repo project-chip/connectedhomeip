@@ -227,7 +227,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         }
 
         reservedSize =
-            reservedSize + static_cast<uint16_t>(Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
+            static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
 
         writer.Init(std::move(msgBuf));
 
@@ -267,33 +267,23 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         bool hasEncodeDataVersionList = false;
         if (!attributePaths.empty())
         {
-            uint32_t number = 0;
-            TLV::TLVWriter backup;
-            request.Checkpoint(backup);
             if (!dataVersionFilters.empty())
             {
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
                 ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                                   aReadPrepareParams.mEnableCachedDataVersionFilter, number));
-                if (number == 0)
-                {
-                    request.Rollback(backup);
-                }
-                else
-                {
-                    hasEncodeDataVersionList = true;
-                }
+                                                                   aReadPrepareParams.mEnableCachedDataVersionFilter));
+                hasEncodeDataVersionList = true;
             }
             else
             {
                 if (aReadPrepareParams.mEnableCachedDataVersionFilter)
                 {
+                    TLV::TLVWriter backup;
+                    request.Checkpoint(backup);
                     DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                     ReturnErrorOnFailure(request.GetError());
-                    ReturnErrorOnFailure(
-                        mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters, number));
-                    if (number == 0)
+                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters) == 0)
                     {
                         request.Rollback(backup);
                     }
@@ -363,7 +353,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
-                                                     bool aEnableCachedDataVersionFilter, uint32_t & aNumber)
+                                                     bool aEnableCachedDataVersionFilter)
 {
     for (auto & filter : aDataVersionFilters)
     {
@@ -385,12 +375,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB().GetError());
         VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
-        aNumber++;
     }
 
     if (aEnableCachedDataVersionFilter)
     {
-        ReturnErrorOnFailure(mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters, aNumber));
+        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aDataVersionFilters);
     }
 
     ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
@@ -891,7 +880,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     }
 
     reservedSize =
-        reservedSize + static_cast<uint16_t>(Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
+        static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
 
     writer.Init(std::move(msgBuf));
     ReturnErrorOnFailure(writer.ReserveBuffer(reservedSize));
@@ -935,35 +924,26 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     bool hasEncodeDataVersionList = false;
     if (!attributePaths.empty())
     {
-        uint32_t number = 0;
-        TLV::TLVWriter backup;
-        request.Checkpoint(backup);
-
         if (!dataVersionFilters.empty())
         {
             DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
             ReturnErrorOnFailure(request.GetError());
             ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                               aReadPrepareParams.mEnableCachedDataVersionFilter, number));
-            if (number == 0)
-            {
-                request.Rollback(backup);
-            }
-            else
-            {
-                hasEncodeDataVersionList = true;
-            }
+                                                               aReadPrepareParams.mEnableCachedDataVersionFilter));
+            hasEncodeDataVersionList = true;
         }
         else
         {
             if (aReadPrepareParams.mEnableCachedDataVersionFilter)
             {
+                TLV::TLVWriter backup;
+                request.Checkpoint(backup);
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(
-                    mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters, number));
-                if (number == 0)
+
+                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, dataVersionFilters) == 0)
                 {
+                    ChipLogProgress(DataManagement, "Rollback DataVersionFilters2");
                     request.Rollback(backup);
                 }
                 else

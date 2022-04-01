@@ -223,14 +223,15 @@ struct compare
 {
     bool operator()(const ConcreteDataAttributePathWithSize & x, const ConcreteDataAttributePathWithSize & y) const
     {
-        return x.mSize > y.mSize;
+        return x.mSize < y.mSize;
     }
 };
 
-CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                         const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
+uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       const Span<DataVersionFilter> & aDataVersionFilters)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t number = 0;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
     std::set<ConcreteDataAttributePathWithSize, compare> clusterSet;
@@ -276,15 +277,16 @@ CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::B
             DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
             dataVersionFilter.mEndpointId, ChipLogValueMEI(dataVersionFilter.mClusterId), dataVersionFilter.mDataVersion.Value());
 
-        aNumber++;
+        number++;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogProgress(DataManagement, "OnUpdateDataVersionFilterList rollbacks");
         aDataVersionFilterIBsBuilder.Rollback(backup);
     }
-    return CHIP_NO_ERROR;
+    return number;
 }
 
 } // namespace app
