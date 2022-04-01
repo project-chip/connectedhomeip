@@ -72,6 +72,7 @@ executable("chip-tv-app") {
     "include/wake-on-lan/WakeOnLanManager.cpp",
     "include/wake-on-lan/WakeOnLanManager.h",
     "main.cpp",
+    "ZclCallbacks.cpp",
   ]
 
   deps = [
