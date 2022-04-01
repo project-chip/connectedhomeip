@@ -376,35 +376,44 @@ void BLEEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
 
 void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
 {
+    printf("\r\n\r\nFinalizeClose debug 0\r\n\r\n");
     mState = kState_Closed;
 
     // Ensure transmit queue is empty and set to NULL.
+    printf("\r\n\r\nFinalizeClose debug 1\r\n\r\n");
     QueueTxLock();
     mSendQueue = nullptr;
     QueueTxUnlock();
+    printf("\r\n\r\nFinalizeClose debug 2\r\n\r\n");
 
     // Fire application's close callback if we haven't already, and it's not suppressed.
     if (oldState != kState_Closing && (flags & kBleCloseFlag_SuppressCallback) == 0)
     {
+    printf("\r\n\r\nFinalizeClose debug 3\r\n\r\n");
         DoCloseCallback(oldState, flags, err);
     }
 
     if ((flags & kBleCloseFlag_SuppressCallback) != 0)
     {
+    printf("\r\n\r\nFinalizeClose debug 4\r\n\r\n");
+    printf("\r\n\r\nthis: %p\r\n\r\n", this);
         mBleTransport->OnEndPointConnectionClosed(this, err);
     }
 
     // If underlying BLE connection has closed, connection object is invalid, so just free the end point and return.
     if (err == BLE_ERROR_REMOTE_DEVICE_DISCONNECTED || err == BLE_ERROR_APP_CLOSED_CONNECTION)
     {
+    printf("\r\n\r\nFinalizeClose debug 5\r\n\r\n");
         mConnObj = BLE_CONNECTION_UNINITIALIZED; // Clear handle to BLE connection, so we don't double-close it.
         Free();
     }
     else // Otherwise, try to signal close to remote device before end point releases BLE connection and frees itself.
     {
+    printf("\r\n\r\nFinalizeClose debug 6\r\n\r\n");
         if (mRole == kBleRole_Central && mConnStateFlags.Has(ConnectionStateFlag::kDidBeginSubscribe))
         {
             // Cancel send and receive-ack timers, if running.
+    printf("\r\n\r\nFinalizeClose debug 7\r\n\r\n");
             StopAckReceivedTimer();
             StopSendAckTimer();
 
@@ -413,6 +422,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
             // we're really sure the unsubscribe request has been sent.
             if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID))
             {
+    printf("\r\n\r\nFinalizeClose debug 8\r\n\r\n");
                 ChipLogError(Ble, "BtpEngine unsub failed");
 
                 // If unsubscribe fails, release BLE connection and free end point immediately.
@@ -420,6 +430,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
             }
             else if (mConnObj != BLE_CONNECTION_UNINITIALIZED)
             {
+    printf("\r\n\r\nFinalizeClose debug 9\r\n\r\n");
                 // Unsubscribe request was sent successfully, and a confirmation wasn't spontaneously generated or
                 // received in the downcall to UnsubscribeCharacteristic, so set timer for the unsubscribe to complete.
                 err = StartUnsubscribeTimer();
@@ -435,6 +446,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
         }
         else // mRole == kBleRole_Peripheral, OR mTimerStateFlags.Has(ConnectionStateFlag::kDidBeginSubscribe) == false...
         {
+    printf("\r\n\r\nFinalizeClose debug 10\r\n\r\n");
             Free();
         }
     }

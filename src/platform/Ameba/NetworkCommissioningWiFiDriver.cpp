@@ -35,7 +35,7 @@ constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 } // namespace
 
-CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback *)
+CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -59,11 +59,13 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback *)
     mStagingNetwork   = mSavedNetwork;
     mpScanCallback    = nullptr;
     mpConnectCallback = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
     return err;
 }
 
 CHIP_ERROR AmebaWiFiDriver::Shutdown()
 {
+    mpStatusChangeCallback = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -244,20 +246,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
     vPortFree(ScanResult);
 }
 
-void AmebaWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
-{
-    if (callback != nullptr)
-    {
-        mpScanCallback = callback;
-        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
-        {
-            mpScanCallback = nullptr;
-            callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-        }
-    }
-}
-
-CHIP_ERROR GetConnectedNetwork(Network & network)
+CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
     rtw_wifi_setting_t wifi_setting;
     CHIP_GetWiFiConfig(&wifi_setting);
@@ -272,6 +261,57 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     memcpy(network.networkID, wifi_setting.ssid, length);
     network.networkIDLen = length;
     return CHIP_NO_ERROR;
+}
+
+void AmebaWiFiDriver::OnNetworkStatusChange()
+{
+    Network configuredNetwork;
+    rtw_wifi_setting_t mWiFiSetting;
+    CHIP_GetWiFiConfig(&mWiFiSetting);
+    bool staEnable = (mWiFiSetting.mode == RTW_MODE_STA || mWiFiSetting.mode == RTW_MODE_STA_AP);
+    bool staConnected = (mWiFiSetting.ssid[0] != 0);
+
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    if (staConnected)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetLastDisconnectReason()));
+}
+
+void AmebaWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
+{
+    if (callback != nullptr)
+    {
+        mpScanCallback = callback;
+        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
+        {
+            mpScanCallback = nullptr;
+            callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        }
+    }
+}
+
+CHIP_ERROR AmebaWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    VerifyOrReturnError(event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent, CHIP_ERROR_INVALID_ARGUMENT);
+    mLastDisconnectedReason = wifi_get_last_error();
+    return CHIP_NO_ERROR;
+}
+
+int32_t AmebaWiFiDriver::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
 }
 
 size_t AmebaWiFiDriver::WiFiNetworkIterator::Count()
@@ -290,12 +330,16 @@ bool AmebaWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.connected    = false;
     mExhausted        = true;
 
-    Network connectedNetwork;
-    CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
+    Network configuredNetwork;
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        if (connectedNetwork.networkIDLen == item.networkIDLen &&
-            memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        rtw_wifi_setting_t mWiFiSetting;
+        CHIP_GetWiFiConfig(&mWiFiSetting);
+        bool isConnected = (mWiFiSetting.ssid[0] != 0);
+
+        if (isConnected && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
             item.connected = true;
         }
