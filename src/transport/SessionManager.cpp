@@ -426,6 +426,8 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
 
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
 
+    sessionHolder.Grab(handle.Value());
+
     return CHIP_NO_ERROR;
 }
 
