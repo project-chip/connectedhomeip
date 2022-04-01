@@ -26,6 +26,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
@@ -50,6 +51,8 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
+    bool traceStreamToLogEnabled        = false;
+    chip::Optional<std::string> traceStreamFilename;
 
     static LinuxDeviceOptions & GetInstance();
 };

@@ -28,10 +28,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 
-#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-#include "TraceHandlers.h"
-#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-
 using namespace chip;
 using namespace chip::ArgParser;
 
@@ -369,12 +365,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     case kDeviceOption_TraceFile:
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(aValue));
+        LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{aValue});
         break;
     case kDeviceOption_TraceLog:
-        if (atoi(aValue) == 1)
+        if (atoi(aValue) != 0)
         {
-            chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+            LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
         }
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
