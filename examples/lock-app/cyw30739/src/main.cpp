@@ -132,9 +132,9 @@ APPLICATION_START()
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     /* Start CHIP datamodel server */
+    static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 

@@ -98,9 +98,9 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
+    static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
