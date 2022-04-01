@@ -55,22 +55,31 @@ CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeVal
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceLayer::DeviceInfoProvider::FixedLabelIterator * it = DeviceLayer::GetDeviceInfoProvider()->IterateFixedLabel(endpoint);
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
-    if (it)
+    if (provider)
     {
-        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-            FixedLabel::Structs::LabelStruct::Type fixedlabel;
+        DeviceLayer::DeviceInfoProvider::FixedLabelIterator * it = provider->IterateFixedLabel(endpoint);
 
-            while (it->Next(fixedlabel))
-            {
-                ReturnErrorOnFailure(encoder.Encode(fixedlabel));
-            }
+        if (it)
+        {
+            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+                FixedLabel::Structs::LabelStruct::Type fixedlabel;
 
-            return CHIP_NO_ERROR;
-        });
+                while (it->Next(fixedlabel))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(fixedlabel));
+                }
 
-        it->Release();
+                return CHIP_NO_ERROR;
+            });
+
+            it->Release();
+        }
+        else
+        {
+            err = aEncoder.EncodeEmptyList();
+        }
     }
     else
     {
