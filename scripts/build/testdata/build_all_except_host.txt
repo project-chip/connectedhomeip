@@ -897,6 +897,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating qpg-shell
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-shell
 
+# Generating bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-lighting
+
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
 export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
@@ -1762,3 +1765,6 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light
+
+# Building bl602-light
+ninja -C {out}/bl602-light
