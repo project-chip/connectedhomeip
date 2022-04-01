@@ -25,6 +25,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
@@ -165,10 +167,26 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     if (!failSafeContext.IsFailSafeBusy() &&
         (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {
-        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                     Failure);
-        response.errorCode = CommissioningError::kOk;
-        commandObj->AddResponse(commandPath, response);
+        // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+        // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+        if (!failSafeContext.IsFailSafeArmed() &&
+            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            commandObj->GetExchangeContext()->GetSessionHandle()->GetSessionType() == Transport::Session::SessionType::kSecure &&
+            commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() ==
+                Transport::SecureSession::Type::kCASE)
+        {
+            response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+            commandObj->AddResponse(commandPath, response);
+        }
+        else
+        {
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
     }
     else
     {
