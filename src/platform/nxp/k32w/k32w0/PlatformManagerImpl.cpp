@@ -26,10 +26,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <openthread-system.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
-#include <openthread-system.h>
 
 #include <lwip/tcpip.h>
 
@@ -49,23 +49,23 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     char initString[] = "app";
-    char * argv[1] = { 0 };
-    argv[0]        = &initString[0];
+    char * argv[1]    = { 0 };
+    argv[0]           = &initString[0];
 
     SHA_ClkInit(SHA_INSTANCE);
 
     if (MEM_Init() != MEM_SUCCESS_c)
     {
         err = CHIP_ERROR_NO_MEMORY;
-	    goto exit;
+        goto exit;
     }
 
     if (RNG_Init() != gRngSuccess_d)
     {
         err = CHIP_ERROR_RANDOM_DATA_UNAVAILABLE;
-	    goto exit;
+        goto exit;
     }
     RNG_SetPseudoRandomNoSeed(NULL);
 

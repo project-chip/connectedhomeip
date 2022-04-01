@@ -20,8 +20,8 @@
 // Main Code
 // ================================================================================
 
-#include <mbedtls/platform.h>
 #include <AppTask.h>
+#include <mbedtls/platform.h>
 
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>

@@ -22,11 +22,11 @@
 
 #include <mbedtls/platform.h>
 
+#include <AppTask.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
-#include <AppTask.h>
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"

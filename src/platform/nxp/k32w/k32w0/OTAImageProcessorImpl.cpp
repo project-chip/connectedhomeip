@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
