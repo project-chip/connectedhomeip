@@ -68,7 +68,7 @@ class SessionHolderWithDelegate : public SessionHolder
 {
 public:
     SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
-    SessionHolderWithDelegate(SessionHolder holder, SessionReleaseDelegate & delegate) : SessionHolder(holder), mDelegate(delegate)
+    SessionHolderWithDelegate(SessionHolder && holder, SessionReleaseDelegate & delegate) : SessionHolder(holder), mDelegate(delegate)
     {}
     operator bool() const { return SessionHolder::operator bool(); }
 
