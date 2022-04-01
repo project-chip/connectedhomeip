@@ -1092,9 +1092,6 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     MATTER_TRACE_EVENT_SCOPE("ProcessOpCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    // This will be used once the GenerateNOCChain
-    (void) csrNonce;
-
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
     P256PublicKey dacPubkey;
