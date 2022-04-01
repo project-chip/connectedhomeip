@@ -770,26 +770,33 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     TestSessionReleaseCallback callback;
 
     // Allocate a session.
-    SessionHolderWithDelegate session1(sessionManager.AllocateSession(), callback);
-    NL_TEST_ASSERT(inSuite, session1);
-    auto sessionId1 = session1->AsSecureSession()->GetLocalSessionId();
+    uint16_t sessionId1;
+    {
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        SessionHolderWithDelegate session(handle.Value(), callback);
+        sessionId1 = session->AsSecureSession()->GetLocalSessionId();
+    }
 
     // Allocate a session at a colliding ID, verify eviction.
-    callback.mOldConnectionDropped = false;
-    SessionHolderWithDelegate session2(sessionManager.AllocateSession(sessionId1), callback);
-    NL_TEST_ASSERT(inSuite, session2);
+    {
+        callback.mOldConnectionDropped = false;
+        auto handle                    = sessionManager.AllocateSession(sessionId1);
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        SessionHolderWithDelegate session(handle.Value(), callback);
+    }
 
-    auto prevSessionId = sessionId1;
     // Verify that we increment session ID by 1 for each allocation, except for
     // the wraparound case where we skip session ID 0.
+    auto prevSessionId = sessionId1;
     for (uint32_t i = 0; i < 10; ++i)
     {
-        auto session = sessionManager.AllocateSession();
-        if (!session)
+        auto handle = sessionManager.AllocateSession();
+        if (!handle.HasValue())
         {
             break;
         }
-        auto sessionId = session->AsSecureSession()->GetLocalSessionId();
+        auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
         NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
@@ -803,13 +810,13 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     // the wraparound case where we skip session ID 0.
     for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
     {
-        auto session = sessionManager.AllocateSession();
-        NL_TEST_ASSERT(inSuite, session);
-        auto sessionId = session->AsSecureSession()->GetLocalSessionId();
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
         NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
-        sessionManager.ExpirePairing(session.Get());
+        sessionManager.ExpirePairing(handle.Value());
     }
 
     sessionManager.Shutdown();

@@ -374,17 +374,12 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
-SessionHolder SessionManager::AllocateSession()
+Optional<SessionHandle> SessionManager::AllocateSession()
 {
-    SessionHolder holder;
-    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSession();
-    VerifyOrExit(session.HasValue(), holder = holder);
-    holder.Grab(session.Value());
-exit:
-    return holder;
+    return mSecureSessions.CreateNewSecureSession();
 }
 
-SessionHolder SessionManager::AllocateSession(uint16_t sessionId)
+Optional<SessionHandle> SessionManager::AllocateSession(uint16_t sessionId)
 {
     // If we forego SessionManager session ID allocation, we can have a
     // collission.  In case of such a collission, we must evict first.
@@ -393,12 +388,7 @@ SessionHolder SessionManager::AllocateSession(uint16_t sessionId)
     {
         mSecureSessions.ReleaseSession(oldSession.Value()->AsSecureSession());
     }
-    SessionHolder holder;
-    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSession(sessionId);
-    VerifyOrExit(session.HasValue(), holder = holder);
-    holder.Grab(session.Value());
-exit:
-    return holder;
+    return mSecureSessions.CreateNewSecureSession(sessionId);
 }
 
 CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
@@ -407,10 +397,10 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
 {
     uint16_t peerSessionId = pairing->GetPeerSessionId();
     SecureSession * secureSession;
-    sessionHolder = pairing->GetSecureSessionHolder();
-    VerifyOrReturnError(sessionHolder, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(sessionHolder->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
-    secureSession = sessionHolder->AsSecureSession();
+    auto handle = pairing->GetSecureSessionHandle();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(handle.Value()->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
+    secureSession = handle.Value()->AsSecureSession();
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
                   ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);

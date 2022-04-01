@@ -25,15 +25,17 @@ namespace chip {
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId)
 {
-    mSecureSessionHolder = sessionManager.AllocateSession(sessionId);
-    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_NO_MEMORY);
+    auto handle = sessionManager.AllocateSession(sessionId);
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
+    mSecureSessionHolder.Grab(handle.Value());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
 {
-    mSecureSessionHolder = sessionManager.AllocateSession();
-    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_NO_MEMORY);
+    auto handle = sessionManager.AllocateSession();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
+    mSecureSessionHolder.Grab(handle.Value());
     return CHIP_NO_ERROR;
 }
 

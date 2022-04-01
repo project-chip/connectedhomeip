@@ -95,7 +95,7 @@ CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & exist
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 {
-    if (!mPairingBobToAlice.GetSecureSessionHolder())
+    if (!mPairingBobToAlice.GetSecureSessionHandle().HasValue())
     {
         mPairingBobToAlice.Init(mSessionManager);
     }
@@ -106,7 +106,7 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
-    if (!mPairingAliceToBob.GetSecureSessionHolder())
+    if (!mPairingAliceToBob.GetSecureSessionHandle().HasValue())
     {
         mPairingAliceToBob.Init(mSessionManager);
     }

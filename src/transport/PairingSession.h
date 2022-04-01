@@ -61,7 +61,7 @@ public:
         return localSessionId;
     }
 
-    const SessionHolder & GetSecureSessionHolder() const { return mSecureSessionHolder; }
+    auto GetSecureSessionHandle() const { return mSecureSessionHolder.ToOptional(); }
 
     uint16_t GetPeerSessionId() const
     {

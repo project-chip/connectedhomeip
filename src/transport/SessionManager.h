@@ -172,8 +172,11 @@ public:
      * @brief
      *   Allocate a secure session and non-colliding session ID in the secure
      *   session table.
+     *
+     * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
-    SessionHolder AllocateSession();
+    CHECK_RETURN_VALUE
+    Optional<SessionHandle> AllocateSession();
 
     /**
      * @brief
@@ -183,9 +186,10 @@ public:
      *   session IDs need to be predetermined.
      *
      * @param localSessionId
-     * @return SessionHolder with a reference to a SecureSession on success, else an empty SessionHolder
+     * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
-    SessionHolder AllocateSession(uint16_t localSessionId);
+    CHECK_RETURN_VALUE
+    Optional<SessionHandle> AllocateSession(uint16_t localSessionId);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
