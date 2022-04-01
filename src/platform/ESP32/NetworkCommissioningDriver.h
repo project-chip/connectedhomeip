@@ -109,6 +109,8 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
+    static void ConnectWifiNetworkTimeout(chip::System::Layer * aLayer, void * aAppState);
+    void OnConnectWiFiNetworkFailed();
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 
