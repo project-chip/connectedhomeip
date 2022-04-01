@@ -133,6 +133,7 @@ public:
         printf("Test_TC_OO_2_1\n");
         printf("Test_TC_OO_2_2\n");
         printf("Test_TC_OO_2_3\n");
+        printf("Test_TC_OO_2_4\n");
         printf("Test_TC_PS_1_1\n");
         printf("Test_TC_PS_2_1\n");
         printf("Test_TC_PRS_1_1\n");
@@ -27723,6 +27724,491 @@ private:
             NSLog(@"Send Off Command Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OO_2_4 : public TestCommandBridge {
+public:
+    Test_TC_OO_2_4()
+        : TestCommandBridge("Test_TC_OO_2_4")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OO_2_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_OO_2_4\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_OO_2_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH sends On command to DUT\n");
+            err = TestThSendsOnCommandToDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH writes a value of 0 to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesAValueOf0ToStartUpOnOffAttributeOfDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Power off DUT\n");
+            err = TestPowerOffDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : TH writes a value of 1 to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Power off DUT\n");
+            err = TestPowerOffDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : TH writes a value of 2 to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Power off DUT\n");
+            err = TestPowerOffDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Power off DUT\n");
+            err = TestPowerOffDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : TH writes NULL to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesNullToStartUpOnOffAttributeOfDut_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Power off DUT\n");
+            err = TestPowerOffDut_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : TH sends Off command to DUT\n");
+            err = TestThSendsOffCommandToDut_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Power off DUT\n");
+            err = TestPowerOffDut_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait 1000ms For device to reboot\n");
+            err = TestWait1000msForDeviceToReboot_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_24();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 25;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThSendsOnCommandToDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"TH sends On command to DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThWritesAValueOf0ToStartUpOnOffAttributeOfDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpOnOffArgument;
+        startUpOnOffArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeStartUpOnOffWithValue:startUpOnOffArgument
+                                   completionHandler:^(NSError * _Nullable err) {
+                                       NSLog(@"TH writes a value of 0 to StartUpOnOff attribute of DUT Error: %@", err);
+
+                                       VerifyOrReturn(CheckValue("status", err, 0));
+
+                                       NextTest();
+                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_3()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_4()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpOnOffArgument;
+        startUpOnOffArgument = [NSNumber numberWithUnsignedChar:1];
+        [cluster writeAttributeStartUpOnOffWithValue:startUpOnOffArgument
+                                   completionHandler:^(NSError * _Nullable err) {
+                                       NSLog(@"TH writes a value of 1 to StartUpOnOff attribute of DUT Error: %@", err);
+
+                                       VerifyOrReturn(CheckValue("status", err, 0));
+
+                                       NextTest();
+                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_7()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_8()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpOnOffArgument;
+        startUpOnOffArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster writeAttributeStartUpOnOffWithValue:startUpOnOffArgument
+                                   completionHandler:^(NSError * _Nullable err) {
+                                       NSLog(@"TH writes a value of 2 to StartUpOnOff attribute of DUT Error: %@", err);
+
+                                       VerifyOrReturn(CheckValue("status", err, 0));
+
+                                       NextTest();
+                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_11()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_12()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_14()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_15()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThWritesNullToStartUpOnOffAttributeOfDut_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpOnOffArgument;
+        startUpOnOffArgument = nil;
+        [cluster writeAttributeStartUpOnOffWithValue:startUpOnOffArgument
+                                   completionHandler:^(NSError * _Nullable err) {
+                                       NSLog(@"TH writes NULL to StartUpOnOff attribute of DUT Error: %@", err);
+
+                                       VerifyOrReturn(CheckValue("status", err, 0));
+
+                                       NextTest();
+                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_18()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_19()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_20()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThSendsOffCommandToDut_21()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"TH sends Off command to DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_22()
+    {
+        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait1000msForDeviceToReboot_23()
+    {
+        WaitForMs(1000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_24()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the OnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("OnOff", actualValue, 0));
+            }
 
             NextTest();
         }];
@@ -63286,6 +63772,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),
         make_unique<Test_TC_OO_2_3>(),
+        make_unique<Test_TC_OO_2_4>(),
         make_unique<Test_TC_PS_1_1>(),
         make_unique<Test_TC_PS_2_1>(),
         make_unique<Test_TC_PRS_1_1>(),

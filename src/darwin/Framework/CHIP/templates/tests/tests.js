@@ -178,6 +178,7 @@ function getTests()
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
