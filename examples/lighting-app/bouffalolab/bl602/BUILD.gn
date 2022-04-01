@@ -66,8 +66,8 @@ bl602_executable("lighting_app") {
 
   sources = [
     #"${bl602_project_dir}/include/CHIPProjectConfig.h",
-    "include/CHIPProjectConfig.h",
     "${examples_plat_dir}/InitPlatform.cpp",
+    "include/CHIPProjectConfig.h",
     "src/AppTask.cpp",
     "src/CHIPDeviceManager.cpp",
     "src/DeviceCallbacks.cpp",

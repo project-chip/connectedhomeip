@@ -49,13 +49,9 @@ static_library("BL602") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = [
-    "${chip_root}/src/lib/dnssd:platform_header",
-  ]
+  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
-  public_deps = [ 
-    "${chip_root}/src/platform:platform_base",
-  ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   # defines = [
   #   "CHIP_KVS_SECTOR_COUNT=1",
