@@ -104,7 +104,7 @@ protected:
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
-    void SetSecureSessionHolder(SessionHolder holder) { mSecureSessionHolder = holder; }
+    void SetSecureSessionHolder(SessionHolder & holder) { mSecureSessionHolder = holder; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
     virtual void OnSuccessStatusReport() {}
     virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)

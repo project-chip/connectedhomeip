@@ -117,7 +117,7 @@ void PASESession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PASESession::Init(SessionHolder secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(SessionHolder & secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secureSessionHolder && secureSessionHolder->IsSecureSession(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -168,7 +168,7 @@ CHIP_ERROR PASESession::SetupSpake2p()
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       SessionHolder secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
@@ -214,9 +214,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, SessionHolder secureSessionHolder,
-                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
-                             SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
+                             SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);

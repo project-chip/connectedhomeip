@@ -187,7 +187,7 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(SessionHolder secureSessionHolder, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionHolder & secureSessionHolder, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -208,7 +208,7 @@ CHIP_ERROR CASESession::Init(SessionHolder secureSessionHolder, SessionEstablish
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(SessionHolder secureSessionHolder, FabricTable * fabrics,
+CASESession::ListenForSessionEstablishment(SessionHolder & secureSessionHolder, FabricTable * fabrics,
                                            SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
@@ -226,7 +226,7 @@ CASESession::ListenForSessionEstablishment(SessionHolder secureSessionHolder, Fa
 }
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                                         SessionHolder secureSessionHolder, ExchangeContext * exchangeCtxt,
+                                         SessionHolder & secureSessionHolder, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");

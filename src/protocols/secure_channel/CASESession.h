@@ -86,7 +86,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionHolder secureSessionHolder, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+        SessionHolder & secureSessionHolder, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -104,7 +104,7 @@ public:
      */
     CHIP_ERROR
     EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                     SessionHolder secureSessionHolder, Messaging::ExchangeContext * exchangeCtxt,
+                     SessionHolder & secureSessionHolder, Messaging::ExchangeContext * exchangeCtxt,
                      SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
@@ -191,7 +191,7 @@ private:
         kSentSigma2Resume = 4,
     };
 
-    CHIP_ERROR Init(SessionHolder secureSessionHolder, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionHolder & secureSessionHolder, SessionEstablishmentDelegate * delegate);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

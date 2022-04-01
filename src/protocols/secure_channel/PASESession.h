@@ -92,7 +92,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                              SessionHolder secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                              SessionHolder & secureSessionHolder, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
     /**
@@ -110,7 +110,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, SessionHolder secureSessionHolder,
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, SessionHolder & secureSessionHolder,
                     Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                     SessionEstablishmentDelegate * delegate);
 
@@ -181,7 +181,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(SessionHolder secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionHolder & secureSessionHolder, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
@@ -279,13 +279,15 @@ public:
     {
         // Do not set to 0 to prevent unwanted unsecured session
         // since the session type is unknown.
-        SetSecureSessionHolder(sessionManager.AllocateSession(mLocalSessionId));
+        auto holder = sessionManager.AllocateSession(mLocalSessionId);
+        SetSecureSessionHolder(holder);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
         PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
     {
-        SetSecureSessionHolder(sessionManager.AllocateSession(localSessionId));
+        auto holder = sessionManager.AllocateSession(localSessionId);
+        SetSecureSessionHolder(holder);
         SetPeerSessionId(peerSessionId);
     }
 
