@@ -26538,8 +26538,6 @@ public:
         params.expiryLengthSeconds = [NSNumber numberWithUnsignedShort:mExpiryLengthSeconds];
 
         params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
-
-        params.timeoutMs = [NSNumber numberWithUnsignedInt:mTimeoutMs];
         [cluster armFailSafeWithParams:params
                      completionHandler:^(
                          CHIPGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable values, NSError * _Nullable error) {
@@ -26614,15 +26612,13 @@ public:
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         __auto_type * params = [[CHIPGeneralCommissioningClusterSetRegulatoryConfigParams alloc] init];
 
-        params.location = [NSNumber numberWithUnsignedChar:mLocation];
+        params.newRegulatoryConfig = [NSNumber numberWithUnsignedChar:mNewRegulatoryConfig];
 
         params.countryCode = [[NSString alloc] initWithBytes:mCountryCode.data()
                                                       length:mCountryCode.size()
                                                     encoding:NSUTF8StringEncoding];
 
         params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
-
-        params.timeoutMs = [NSNumber numberWithUnsignedInt:mTimeoutMs];
         [cluster
             setRegulatoryConfigWithParams:params
                         completionHandler:^(CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable values,
