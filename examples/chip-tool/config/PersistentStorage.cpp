@@ -169,7 +169,7 @@ uint16_t PersistentStorage::GetListenPort()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // By default chip-tool listens on an ephemeral port.
-    uint16_t chipListenPort = 0;
+    uint16_t chipListenPort = CHIP_PORT;
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
