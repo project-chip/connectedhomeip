@@ -276,7 +276,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         JniUtfString junitname(env, jname);
         if (jname != NULL)
         {
-            response.data = Optional<CharSpan>(junitname.charSpan());
+            response.data = MakeOptional(junitname.charSpan());
         }
 
         helper.Success(response);
