@@ -65,7 +65,6 @@ private:
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
-    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR _GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
