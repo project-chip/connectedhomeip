@@ -48,7 +48,7 @@ commissioning and cluster control.
          - chip-device-ctrl > ble-scan
          - chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
          - chip-device-ctrl > connect -ble 3904 20202021 135246
-        
+
          Parameters:
          1. Discriminator: 3904
          2. Setup-pin-code: 20202021
