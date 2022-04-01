@@ -329,6 +329,7 @@ bool ESP32Config::ConfigValueExists(Key key)
             return true;
         }
     }
+    // if nvs_entry_find() or nvs_entry_next() returns NULL, then no need to release the iterator.
     return false;
 }
 
