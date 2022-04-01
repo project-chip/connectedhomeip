@@ -57,6 +57,14 @@ CHIP_ERROR TransportMgrBase::MulticastGroupJoinLeave(const Transport::PeerAddres
 
 void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    if (msg->TotalLength() > CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE)
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(addrBuffer);
+        ChipLogError(Inet, "message from %s dropped due to message beeing too long (%u bytes).", addrBuffer, msg->TotalLength());
+        return;
+    }
+
     if (msg->HasChainedBuffer())
     {
         // Something in the lower levels messed up.
