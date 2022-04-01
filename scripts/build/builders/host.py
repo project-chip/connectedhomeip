@@ -22,6 +22,7 @@ from .gn import GnBuilder
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
+    CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
@@ -39,6 +40,8 @@ class HostApp(Enum):
             return 'all-clusters-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            return 'chip-tool-darwin'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
@@ -71,6 +74,9 @@ class HostApp(Enum):
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            yield 'chip-tool-darwin'
+            yield 'chip-tool-darwin.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
             yield 'thermostat-app.map'

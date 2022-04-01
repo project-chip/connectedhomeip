@@ -15,6 +15,7 @@
 
 import logging
 import os
+import sys
 import threading
 import time
 import typing
@@ -239,16 +240,18 @@ class TestDefinition:
             # so it will be commissionable again.
             app.factoryReset()
             app.start(str(randrange(1, 4096)))
+            trust_store_path = [] if sys.platform == 'darwin' else [
+                '--paa-trust-store-path', DEVELOPMENT_PAA_LIST]
+            pairing_cmd = tool_cmd + \
+                ['pairing', 'qrcode', TEST_NODE_ID,
+                    app.setupCode] + trust_store_path
+            runner.RunSubprocess(pairing_cmd,
+                                 name='PAIR', dependencies=[apps_register])
 
+            test_cmd = tool_cmd + ['tests', self.run_name] + \
+                trust_store_path + ['--PICS', pics_file]
             runner.RunSubprocess(
-                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
-                name='PAIR', dependencies=[apps_register])
-
-            runner.RunSubprocess(
-                tool_cmd + ['tests', self.run_name] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] +
-                ['--PICS', pics_file],
+                test_cmd,
                 name='TEST', dependencies=[apps_register])
 
         except Exception:
