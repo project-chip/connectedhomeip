@@ -21,122 +21,183 @@
  *          Platform-specific key value storage implementation for EFR32
  */
 
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/EFR32/EFR32Config.h>
 #include <platform/KeyValueStoreManager.h>
+#include <stdio.h>
+#include <string.h>
 
-/* ignore GCC Wconversion warnings for pigweed */
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
+using namespace ::chip;
+using namespace ::chip::DeviceLayer::Internal;
 
-#include <pw_log/log.h>
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#define CONVERT_KEYMAP_INDEX_TO_NVM3KEY(index) (EFR32Config::kConfigKey_KvsFirstKeySlot + index)
+#define CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key) (nvm3Key - EFR32Config::kConfigKey_KvsFirstKeySlot)
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
+char mKvsStoredKeyString[KeyValueStoreManagerImpl::kMaxEntries][PersistentStorageDelegate::kKeyLengthMax + 1];
 
-#if defined(CHIP_KVS_AVAILABLE) && CHIP_KVS_AVAILABLE
+CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
+{
+    CHIP_ERROR err;
+    err = EFR32Config::Init();
+    SuccessOrExit(err);
+
+    memset(mKvsStoredKeyString, 0, sizeof(mKvsStoredKeyString));
+    size_t outLen;
+    err = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsStoredKeyString),
+                                          sizeof(mKvsStoredKeyString), outLen);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
+    return err;
+}
+
+bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
+{
+    return ((EFR32Config::kConfigKey_KvsFirstKeySlot <= nvm3Key) && (nvm3Key <= EFR32Config::kConfigKey_KvsLastKeySlot));
+}
+
+CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded) const
+{
+    CHIP_ERROR err;
+    uint8_t firstEmptyKeySlot = kMaxEntries;
+    for (uint8_t keyIndex = 0; keyIndex < kMaxEntries; keyIndex++)
+    {
+        if (strcmp(key, mKvsStoredKeyString[keyIndex]) == 0)
+        {
+            nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(keyIndex);
+            VerifyOrDie(IsValidKvsNvm3Key(nvm3Key) == true);
+            return CHIP_NO_ERROR;
+        }
+
+        if (isSlotNeeded && (firstEmptyKeySlot == kMaxEntries) && (mKvsStoredKeyString[keyIndex][0] == 0))
+        {
+            firstEmptyKeySlot = keyIndex;
+        }
+    }
+
+    if (isSlotNeeded)
+    {
+        if (firstEmptyKeySlot != kMaxEntries)
+        {
+            nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(firstEmptyKeySlot);
+            VerifyOrDie(IsValidKvsNvm3Key(nvm3Key) == true);
+            err = CHIP_NO_ERROR;
+        }
+        else
+        {
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+    }
+    else
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+    return err;
+}
+
+void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
+{
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_KvsStringKeyMap,
+                                     reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
+}
+
+void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
+{
+    /*
+        During commissioning, the key map will be modified multiples times subsequently.
+        Commit the key map in nvm once it as stabilized.
+    */
+    SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(5)),
+                             KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
+}
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-    assert(CHIP_KVS_AVAILABLE);
-    auto status_and_size = mKvs.Get(key, std::span<std::byte>(reinterpret_cast<std::byte *>(value), value_size), offset_bytes);
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint32_t nvm3Key;
+    CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    size_t outLen;
+    err = EFR32Config::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen, offset_bytes);
     if (read_bytes_size)
     {
-        *read_bytes_size = status_and_size.size();
+        *read_bytes_size = outLen;
     }
-    switch (status_and_size.status().code())
-    {
-    case pw::OkStatus().code():
-        return CHIP_NO_ERROR;
-    case pw::Status::NotFound().code():
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    case pw::Status::DataLoss().code():
-        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted().code():
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    case pw::Status::FailedPrecondition().code():
-        return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument().code():
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    default:
-        break;
-    }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+
+    return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    assert(CHIP_KVS_AVAILABLE);
-    auto status = mKvs.Put(key, std::span<const std::byte>(reinterpret_cast<const std::byte *>(value), value_size));
-    switch (status.code())
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint32_t nvm3Key;
+    CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key, /* isSlotNeeded */ true);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    err = EFR32Config::WriteConfigValueBin(nvm3Key, reinterpret_cast<const uint8_t *>(value), value_size);
+    if (err == CHIP_NO_ERROR)
     {
-    case pw::OkStatus().code():
-        return CHIP_NO_ERROR;
-    case pw::Status::DataLoss().code():
-        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted().code():
-    case pw::Status::AlreadyExists().code():
-        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    case pw::Status::FailedPrecondition().code():
-        return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument().code():
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    default:
-        break;
+        uint32_t keyIndex = nvm3Key - EFR32Config::kConfigKey_KvsFirstKeySlot;
+        strncpy(mKvsStoredKeyString[keyIndex], key, sizeof(mKvsStoredKeyString[keyIndex]) - 1);
+        ScheduleKeyMapSave();
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+
+    return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    assert(CHIP_KVS_AVAILABLE);
-    auto status = mKvs.Delete(key);
-    switch (status.code())
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint32_t nvm3Key;
+    CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    err = EFR32Config::ClearConfigValue(nvm3Key);
+    if (err == CHIP_NO_ERROR)
     {
-    case pw::OkStatus().code():
-        return CHIP_NO_ERROR;
-    case pw::Status::NotFound().code():
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    case pw::Status::DataLoss().code():
-        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted().code():
-        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    case pw::Status::FailedPrecondition().code():
-        return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument().code():
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    default:
-        break;
+        uint32_t keyIndex = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
+        memset(mKvsStoredKeyString[keyIndex], 0, sizeof(mKvsStoredKeyString[keyIndex]));
+        ScheduleKeyMapSave();
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+
+    return err;
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
+CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition(void)
 {
-    assert(CHIP_KVS_AVAILABLE);
-    auto status = mKvsPartition.Erase();
-    switch (status.code())
+    // Iterate over all the Matter Kvs nvm3 records and delete each one...
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    for (uint32_t nvm3Key = EFR32Config::kMinConfigKey_MatterKvs; nvm3Key < EFR32Config::kMaxConfigKey_MatterKvs; nvm3Key++)
     {
-    case pw::OkStatus().code():
-        return CHIP_NO_ERROR;
-    case pw::Status::DeadlineExceeded().code():
-        return CHIP_ERROR_TIMEOUT;
-    case pw::Status::PermissionDenied().code():
-        return CHIP_ERROR_ACCESS_DENIED;
-    default:
-        break;
+        err = EFR32Config::ClearConfigValue(nvm3Key);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            break;
+        }
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+
+    memset(mKvsStoredKeyString, 0, sizeof(mKvsStoredKeyString));
+    return err;
 }
-#endif // defined(CHIP_KVS_AVAILABLE) && CHIP_KVS_AVAILABLE
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer

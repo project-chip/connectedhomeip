@@ -105,5 +105,96 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
     }
 }
 
+CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
+{
+    // TODO:: store the user label count.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
+{
+    // TODO:: read the user label count. temporarily return the size of hardcoded labelList.
+    val = 4;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
+{
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set.
+    // Add yaml test to verify this.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
+{
+    return new UserLabelIteratorImpl(*this, endpoint);
+}
+
+DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint) :
+    mProvider(provider), mEndpoint(endpoint)
+{
+    size_t total = 0;
+
+    ReturnOnFailure(mProvider.GetUserLabelLength(mEndpoint, total));
+    mTotal = total;
+    mIndex = 0;
+}
+
+bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
+{
+    // TODO:: get the user labelList from persistent storage, temporarily, use the following
+    // hardcoded labelList on all endpoints.
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    const char * labelPtr = nullptr;
+    const char * valuePtr = nullptr;
+
+    VerifyOrReturnError(mIndex < mTotal, false);
+
+    switch (mIndex)
+    {
+    case 0:
+        labelPtr = "room";
+        valuePtr = "bedroom 2";
+        break;
+    case 1:
+        labelPtr = "orientation";
+        valuePtr = "North";
+        break;
+    case 2:
+        labelPtr = "floor";
+        valuePtr = "2";
+        break;
+    case 3:
+        labelPtr = "direction";
+        valuePtr = "up";
+        break;
+    default:
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        break;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
+        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+
+        Platform::CopyString(mUserLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
+        Platform::CopyString(mUserLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
+
+        output.label = CharSpan::fromCharString(mUserLabelNameBuf);
+        output.value = CharSpan::fromCharString(mUserLabelValueBuf);
+
+        mIndex++;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 } // namespace DeviceLayer
 } // namespace chip

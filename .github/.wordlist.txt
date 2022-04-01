@@ -865,6 +865,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
