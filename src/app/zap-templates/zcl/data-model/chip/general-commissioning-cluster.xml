@@ -41,6 +41,10 @@ limitations under the License.
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to manage global aspects of the Commissioning flow.</description>
     <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
+      <description>Breadcrumb</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="administer"/>
+    </attribute>
     <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
     <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
     <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
@@ -50,6 +54,7 @@ limitations under the License.
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="expiryLengthSeconds" type="INT16U"/>
       <arg name="breadcrumb" type="INT64U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Success/failure response for ArmFailSafe command</description>
@@ -61,6 +66,7 @@ limitations under the License.
       <arg name="NewRegulatoryConfig" type="RegulatoryLocationType"/>
       <arg name="countryCode" type="CHAR_STRING"/>
       <arg name="breadcrumb" type="INT64U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x03" name="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Success/failure response for SetRegulatoryConfig command</description>
@@ -69,6 +75,7 @@ limitations under the License.
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period.</description>
+      <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Indicates to client whether CommissioningComplete command succeeded</description>
