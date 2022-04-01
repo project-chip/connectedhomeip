@@ -61,7 +61,7 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrBuffer);
-        ChipLogError(Inet, "message from %s dropped due to message beeing too long (%u bytes).", addrBuffer, msg->TotalLength());
+        ChipLogError(Inet, "Oversize message (%u bytes) from %s dropped.", msg->TotalLength(), addrBuffer);
         return;
     }
 
