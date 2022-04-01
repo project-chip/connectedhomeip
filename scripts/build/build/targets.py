@@ -460,15 +460,8 @@ def AmebaTargets():
 def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
-    # This is for testing only  in case debug builds are to be fixed
-    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
-    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
-    #    gen/include/lwip/lwip_buildconfig.h
-    yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
-
-    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
-    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT,
-                        tokenizer=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,

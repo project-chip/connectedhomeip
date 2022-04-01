@@ -12,6 +12,7 @@ aabbccddeeff
 aarch
 abcdef
 abfb
+appwrite
 ABI
 ABIs
 ables
@@ -175,6 +176,7 @@ CatalogVendorId
 CBB
 cbd
 ccf
+csg
 CCMP
 CCS
 CCSTUDIO
@@ -315,6 +317,7 @@ dataset
 datasets
 DataVersion
 dbf
+doru
 DBG
 dBm
 DBUILD
@@ -593,8 +596,10 @@ IDF
 IDL
 IDLs
 idx
+ifconfig
 ifdef
 ifdefs
+itsfoss
 IGMP
 ignoreApplyUpdate
 ignoreQueryImage
@@ -896,6 +901,8 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+otaissues
+otatesting
 OTA
 OTADownloader
 otaDownloadPath
@@ -939,7 +946,10 @@ pbxproj
 PCA
 pcaps
 PDFs
+PDM
 PDK
+PSECT
+pdm
 peerAddrStr
 peerNodeId
 peerSessionId
@@ -948,6 +958,7 @@ percentageLiftValue
 periodicQueryTimeout
 pexpect
 pickString
+psect
 PID
 Pigweed
 PinCode
@@ -1018,6 +1029,7 @@ QRCodeUrl
 QSPI
 QueryImage
 QueryImageResponse
+Quickstart
 queryImageStatus
 qvCHIP
 RADVD
@@ -1027,6 +1039,7 @@ rAv
 RCP
 ReadAttribute
 ReadConfigValue
+RPis
 readelf
 readfds
 README
@@ -1088,6 +1101,7 @@ scalable
 scm
 sco
 scp
+ssbl
 ScriptBinding
 SDC
 SDHC
@@ -1118,6 +1132,7 @@ SetupQRCode
 sexualized
 SHA
 ShadeConfiguration
+SSBL
 showDocumentation
 shubhamdp
 SIGINT
@@ -1344,6 +1359,7 @@ whde
 whitespace
 whitespaces
 whl
+wg
 wic
 WiFiNetworkDiagnostics
 WindowCovering

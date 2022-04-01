@@ -44,8 +44,7 @@ source_set("freertos_mbedtls_utils") {
     "Memconfig.cpp",
   ]
 
-  #TODO: not sure this is required, maybe we should make this dependant on mbedtls
-  public_deps = [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+  deps = [ "${chip_root}/src/lib/support" ]
 
   cflags = [ "-Wconversion" ]
 

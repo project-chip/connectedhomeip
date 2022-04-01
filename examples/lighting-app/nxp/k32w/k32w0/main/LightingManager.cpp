@@ -28,7 +28,7 @@ LightingManager LightingManager::sLight;
 
 int LightingManager::Init()
 {
-    mState = kState_Off;
+    mState = kState_On;
 
     return 0;
 }
