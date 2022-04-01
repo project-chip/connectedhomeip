@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void)initParams.InitBeforeServerInit();
+    (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

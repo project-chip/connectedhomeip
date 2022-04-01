@@ -98,9 +98,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     CASESessionManagerConfig caseSessionManagerConfig;
 
-    mOperationalServicePort   = initParams.operationalServicePort;
+    mOperationalServicePort        = initParams.operationalServicePort;
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
-    mInterfaceId          = initParams.interfaceId;
+    mInterfaceId                   = initParams.interfaceId;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 

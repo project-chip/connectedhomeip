@@ -655,7 +655,7 @@ int main(int argc, char * argv[])
 
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void)initParams.InitBeforeServerInit();
+    (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

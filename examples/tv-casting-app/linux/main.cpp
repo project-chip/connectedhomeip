@@ -142,7 +142,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void)initParams.InitBeforeServerInit();
+    (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();

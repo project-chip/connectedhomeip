@@ -128,7 +128,7 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void)initParams.InitBeforeServerInit();
+    (void) initParams.InitBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();

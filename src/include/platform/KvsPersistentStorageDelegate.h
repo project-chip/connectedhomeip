@@ -29,8 +29,8 @@ namespace chip {
 // Sample version of PersistentStorageDelegate that relies only on a KeyValueStoreManager
 class KvsPersistentStorageDelegate : public PersistentStorageDelegate
 {
-  public:
-    KvsPersistentStorageDelegate() = default;
+public:
+    KvsPersistentStorageDelegate()          = default;
     virtual ~KvsPersistentStorageDelegate() = default;
 
     // No copy, move or assignment.
@@ -104,7 +104,7 @@ class KvsPersistentStorageDelegate : public PersistentStorageDelegate
         return mKvsManager->Delete(key);
     }
 
-  protected:
+protected:
     DeviceLayer::PersistedStorage::KeyValueStoreManager * mKvsManager = nullptr;
 };
 

@@ -64,7 +64,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 
 struct ServerInitParams
 {
-    ServerInitParams() = default;
+    ServerInitParams()          = default;
     virtual ~ServerInitParams() = default;
 
     // Not copyable
@@ -272,8 +272,8 @@ private:
     SecurePairingUsingTestSecret mTestPairing;
     CommissioningWindowManager mCommissioningWindowManager;
 
-    PersistentStorageDelegate *mDeviceStorage;
-    Credentials::GroupDataProvider *mGroupsProvider;
+    PersistentStorageDelegate * mDeviceStorage;
+    Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
