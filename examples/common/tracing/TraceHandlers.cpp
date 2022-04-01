@@ -86,6 +86,7 @@ public:
         std::lock_guard<std::mutex> guard(mLock);
         return (mStream != nullptr);
     }
+
 private:
     mutable std::mutex mLock;
     TraceStream * mStream = nullptr;

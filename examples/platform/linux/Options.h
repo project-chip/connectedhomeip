@@ -25,8 +25,8 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>

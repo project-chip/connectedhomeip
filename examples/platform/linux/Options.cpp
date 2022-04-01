@@ -365,7 +365,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     case kDeviceOption_TraceFile:
-        LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{aValue});
+        LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
         break;
     case kDeviceOption_TraceLog:
         if (atoi(aValue) != 0)

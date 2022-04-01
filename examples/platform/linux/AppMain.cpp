@@ -316,7 +316,7 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
     {
         const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
-        gTraceStream = new chip::trace::TraceStreamFile(traceFilename);
+        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
     }
     else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
     {
