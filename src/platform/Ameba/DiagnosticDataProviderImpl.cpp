@@ -354,6 +354,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     overrunCount = 0;
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return CHIP_NO_ERROR;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
