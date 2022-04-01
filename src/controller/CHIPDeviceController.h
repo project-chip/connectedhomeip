@@ -555,10 +555,7 @@ public:
      *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
      * @return int  The max number of commissionable nodes supported
      */
-    int GetMaxCommissionableNodesSupported()
-    {
-        return kMaxCommissionableNodes;
-    }
+    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -577,10 +574,7 @@ public:
      *   Return the UDC Server instance
      *
      */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer()
-    {
-        return mUdcServer;
-    }
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
@@ -592,10 +586,7 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate)
-    {
-        mPairingDelegate = pairingDelegate;
-    }
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
     // AttributeCache::Callback impl
     void OnDone() override;
