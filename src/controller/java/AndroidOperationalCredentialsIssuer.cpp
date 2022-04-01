@@ -77,6 +77,14 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId,
+                                          const CATValues & cats, chip::Crypto::P256Keypair & keypair,
+                                          chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
+                                          chip::MutableByteSpan & noc)
+{
+    return GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
+}
+
 CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
                                                                                 const CATValues & cats,
                                                                                 const Crypto::P256PublicKey & pubkey,

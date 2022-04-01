@@ -163,9 +163,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(
+            err = gOperationalCredentialsIssuer.GenerateControllerNOCChain(
                 localDeviceId, /* fabricId = */ 1, { { localCommissionerCAT, chip::kUndefinedCAT, chip::kUndefinedCAT } },
-                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+                ephemeralKey, rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;

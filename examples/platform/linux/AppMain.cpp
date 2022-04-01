@@ -466,8 +466,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
-                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateControllerNOCChain(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
+                                                                        ephemeralKey, rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;

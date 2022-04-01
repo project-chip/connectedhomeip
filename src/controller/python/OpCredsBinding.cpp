@@ -71,10 +71,10 @@ public:
 
     CHIP_ERROR Initialize(PersistentStorageDelegate & storageDelegate) { return mExampleOpCredsIssuer.Initialize(storageDelegate); }
 
-    CHIP_ERROR GenerateNOCChain(NodeId nodeId, FabricId fabricId, const CATValues & cats, const Crypto::P256PublicKey & pubKey,
+    CHIP_ERROR GenerateControllerNOCChain(NodeId nodeId, FabricId fabricId, const CATValues & cats, const Crypto::P256Keypair & keypair,
                                 MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
     {
-        return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
+        return mExampleOpCredsIssuer.GenerateControllerNOCChain(nodeId, fabricId, cats, keypair, rcac, icac, noc);
     }
 
 private:
@@ -357,7 +357,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
+    err = context->mAdapter->GenerateControllerNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey, rcacSpan, icacSpan,
                                               nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 

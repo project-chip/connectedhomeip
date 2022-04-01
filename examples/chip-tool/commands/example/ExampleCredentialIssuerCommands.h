@@ -46,7 +46,7 @@ public:
                                           chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
                                           chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) override
     {
-        return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
+        return mOpCredsIssuer.GenerateControllerNOCChain(nodeId, fabricId, cats, keypair, rcac, icac, noc);
     }
 
 private:
