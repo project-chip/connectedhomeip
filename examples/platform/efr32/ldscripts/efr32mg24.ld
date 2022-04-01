@@ -47,7 +47,7 @@
 
  MEMORY
  {
-   FLASH   (rx)  : ORIGIN = 0x8000000, LENGTH = 0x17e000
+   FLASH   (rx)  : ORIGIN = 0x8006000, LENGTH = 0x178000
    RAM     (rwx) : ORIGIN = 0x20000000, LENGTH = 0x40000
  }
 
@@ -177,36 +177,6 @@ SECTIONS
 
   __etext = .;
 
-  /*******************************************************************/
-  /* Define flash block for BLE-simee & chip-nvm3                    */
-  /* simee: 9000H (36k) bytes for BLE nvm3                           */
-  /* chipNvm3_section: 4000H (16k) bytes for chip nvm3.              */
-  /* 8K is reserved for OpenThread's NVM which is mapped directly at */
-  /* the top of flash                                                */
-  /*******************************************************************/
-
-  OPENTHREAD_NVM_SIZE = 8192;
-
-  .nvm_dummy (DSECT):
-  {
-    __nvm3_dummy_begin = .;
-    . = ALIGN (8192);
-    __nvm3_dummy_simee = .;
-    KEEP(*(.simee));
-    . = ALIGN (8192);
-    __nvm3_dummy_chip = .;
-    KEEP(*(chipNvm3_section));
-    . = ALIGN (8192);
-    . += DEFINED(SILABS_WIFI) ? 0 : OPENTHREAD_NVM_SIZE;
-    . = DEFINED(SILABS_WIFI) ? . : ALIGN (8192);
-  } > FLASH
-
-  /* Set NVM to end of FLASH */
-  __nvm3Base = (ORIGIN(FLASH) + LENGTH(FLASH)) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_simee - __nvm3_dummy_begin);
-  __chipNvm3Base = (ORIGIN(FLASH) + LENGTH(FLASH)) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
-
-
-  /*******************************************************************/
 
   .data : AT (__etext)
   {
@@ -265,6 +235,8 @@ SECTIONS
     __HeapLimit = .;
   } > RAM
 
+  __main_flash_end__ = ORIGIN(FLASH) + LENGTH(FLASH);
+
   /* .stack_dummy section doesn't contains any symbols. It is only
    * used for linker to calculate size of stack sections, and assign
    * values to stack symbols later */
@@ -279,11 +251,17 @@ SECTIONS
   __StackLimit = __StackTop - SIZEOF(.stack_dummy);
   PROVIDE(__stack = __StackTop);
 
+   .nvm (DSECT) : {
+    KEEP(*(.simee*))
+  } > FLASH
+
+  linker_nvm_end = __main_flash_end__;
+  linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
+  linker_nvm_size = SIZEOF(.nvm);
+  __nvm3Base = linker_nvm_begin;
+
   /* Check if data + heap + stack exceeds RAM limit */
-  ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+  /*ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")*/
+  ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= __main_flash_end__, "NVM3 is excessing the flash size !")
 
-
-  /* Check if FLASH usage exceeds FLASH size */
-  ASSERT( (ORIGIN(FLASH) + LENGTH(FLASH)) >= (__etext + SIZEOF(.data)), "FLASH memory overflowed !")
-  ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")
 }

@@ -42,6 +42,7 @@
     MatterDoorLockPluginServerInitCallback();                                                                                      \
     MatterElectricalMeasurementPluginServerInitCallback();                                                                         \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
+    MatterFanControlPluginServerInitCallback();                                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterFlowMeasurementPluginServerInitCallback();                                                                               \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \

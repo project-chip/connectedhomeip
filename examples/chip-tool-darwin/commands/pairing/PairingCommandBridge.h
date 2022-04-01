@@ -25,15 +25,38 @@ enum class PairingMode
 {
     QRCode,
     ManualCode,
-    Ethernet
+    Ethernet,
+    Ble,
+};
+
+enum class PairingNetworkType
+{
+    None,
+    WiFi,
+    Thread,
+    Ethernet,
 };
 
 class PairingCommandBridge : public CHIPCommandBridge
 {
 public:
-    PairingCommandBridge(const char * commandName, PairingMode mode) : CHIPCommandBridge(commandName), mPairingMode(mode)
+    PairingCommandBridge(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
+        CHIPCommandBridge(commandName), mPairingMode(mode), mNetworkType(networkType)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        switch (networkType)
+        {
+        case PairingNetworkType::None:
+        case PairingNetworkType::Ethernet:
+            break;
+        case PairingNetworkType::WiFi:
+            AddArgument("ssid", &mSSID);
+            AddArgument("password", &mPassword);
+            break;
+        case PairingNetworkType::Thread:
+            AddArgument("operationalDataset", &mOperationalDataset);
+            break;
+        }
 
         switch (mode)
         {
@@ -49,6 +72,10 @@ public:
             AddArgument("device-remote-ip", &ipAddress);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
+        case PairingMode::Ble:
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            break;
         }
     }
 
@@ -58,10 +85,15 @@ public:
 
 private:
     void PairWithCode(NSError * __autoreleasing * error);
+    void PairWithPayload(NSError * __autoreleasing * error);
     void PairWithIPAddress(NSError * __autoreleasing * error);
     void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;
+    const PairingNetworkType mNetworkType;
+    chip::ByteSpan mOperationalDataset;
+    chip::ByteSpan mSSID;
+    chip::ByteSpan mPassword;
     chip::NodeId mNodeId;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;

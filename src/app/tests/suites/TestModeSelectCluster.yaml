@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Mode Select"
     endpoint: 1
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -27,30 +30,17 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Read CurrentMode"
-      command: "readAttribute"
-      attribute: "CurrentMode"
-      response:
-          value: 0
-
-    - label: "Read OnMode"
-      command: "readAttribute"
-      attribute: "OnMode"
-      response:
-          value: 0
-
-    - label: "Read StartUpMode"
-      command: "readAttribute"
-      attribute: "StartUpMode"
-      response:
-          value: 0
-
     - label: "Read Description"
       command: "readAttribute"
       attribute: "Description"
       response:
           value: "Coffee"
+
+    - label: "Read StandardNamespace"
+      command: "readAttribute"
+      attribute: "StandardNamespace"
+      response:
+          value: 0
 
     - label: "Read SupportedModes"
       command: "readAttribute"
@@ -67,6 +57,24 @@ tests:
               - minLength: 3
               - maxLength: 3
 
+    - label: "Read CurrentMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 0
+
+    - label: "Read StartUpMode"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 0
+
+    - label: "Read OnMode"
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          value: null
+
     - label: "Change to Supported Mode"
       command: "changeToMode"
       arguments:
@@ -79,6 +87,7 @@ tests:
       attribute: "CurrentMode"
       response:
           value: 4
+          saveAs: currentModeBeforeToggle
 
     - label: "Change to Unsupported Mode"
       command: "changeToMode"
@@ -88,3 +97,144 @@ tests:
                 value: 2
       response:
           error: CONSTRAINT_ERROR
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "on"
+
+    - label: "Verify Current Mode does not change when OnMode is null"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: currentModeBeforeToggle
+
+    - label: "Change to Unsupported OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Change OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 7
+
+    - label: "Verify OnMode"
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: OnModeValue
+          value: 7
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "on"
+
+    - label: "Verify Current Mode Changes if OnMode is not null"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: OnModeValue
+
+    - label: "Change to Unsupported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Change to Supported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 7
+
+    - label: "Verify StartUp Mode Change"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 7
+
+    - label: "Change CurrentMode to another value"
+      command: "changeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 0
+
+    - label: "Change On Mode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 4
+
+    - label: "Set StartUpOnOff"
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Verify Current Mode Change based on OnMode, as it overwrites
+          StartUpMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 4
+
+    - label: "Change On Mode to Null"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: null
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Verify Current Mode Change based on new StartUp Mode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 7

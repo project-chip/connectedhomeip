@@ -22,7 +22,6 @@
 
 #if !CHIP_DEVICE_LAYER_NONE
 
-#include <ble/BleLayer.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>

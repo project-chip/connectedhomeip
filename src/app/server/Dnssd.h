@@ -88,7 +88,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
-    void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
+    void SetExtendedDiscoveryTimeoutSecs(int32_t secs);
 
     /// Callback from Extended Discovery Expiration timer
     /// Checks if extended discovery has expired and if so,
@@ -173,7 +173,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// get the current extended discovery timeout (from persistent storage)
-    int16_t GetExtendedDiscoveryTimeoutSecs();
+    int32_t GetExtendedDiscoveryTimeoutSecs();
 
     /// schedule next extended discovery expiration
     CHIP_ERROR ScheduleExtendedDiscoveryExpiration();

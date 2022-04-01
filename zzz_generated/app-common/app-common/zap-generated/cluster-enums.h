@@ -133,6 +133,14 @@ enum class OnOffEffectIdentifier : uint8_t
 using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
 #endif
 
+// Enum for OnOffStartUpOnOff
+enum class OnOffStartUpOnOff : uint8_t
+{
+    kOff                 = 0x00,
+    kOn                  = 0x01,
+    kTogglePreviousOnOff = 0x02,
+};
+
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {
@@ -644,9 +652,6 @@ enum class LogsTransferProtocol : uint8_t
 
 namespace GeneralDiagnostics {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
@@ -658,9 +663,6 @@ enum class BootReasonType : uint8_t
     kSoftwareUpdateCompleted = 0x05,
     kSoftwareReset           = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using BootReasonType                  = EmberAfBootReasonType;
-#endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -941,6 +943,12 @@ namespace BooleanState {
 } // namespace BooleanState
 
 namespace ModeSelect {
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+};
 } // namespace ModeSelect
 
 namespace ShadeConfiguration {

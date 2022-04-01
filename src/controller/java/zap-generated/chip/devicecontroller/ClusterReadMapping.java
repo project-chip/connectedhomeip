@@ -5120,18 +5120,31 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute", readMediaPlaybackClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("mediaPlayback", readMediaPlaybackInteractionInfo);
     Map<String, InteractionInfo> readModeSelectInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readModeSelectCurrentModeCommandParams =
+    Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readModeSelectCurrentModeAttributeInteractionInfo =
+    InteractionInfo readModeSelectDescriptionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ModeSelectCluster) cluster)
-                  .readCurrentModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readDescriptionAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readModeSelectDescriptionCommandParams);
+    readModeSelectInteractionInfo.put(
+        "readDescriptionAttribute", readModeSelectDescriptionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readModeSelectStandardNamespaceCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readModeSelectStandardNamespaceAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ModeSelectCluster) cluster)
+                  .readStandardNamespaceAttribute(
+                      (ChipClusters.ModeSelectCluster.StandardNamespaceAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readModeSelectCurrentModeCommandParams);
+            readModeSelectStandardNamespaceCommandParams);
     readModeSelectInteractionInfo.put(
-        "readCurrentModeAttribute", readModeSelectCurrentModeAttributeInteractionInfo);
+        "readStandardNamespaceAttribute", readModeSelectStandardNamespaceAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readModeSelectSupportedModesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readModeSelectSupportedModesAttributeInteractionInfo =
@@ -5146,42 +5159,44 @@ public class ClusterReadMapping {
             readModeSelectSupportedModesCommandParams);
     readModeSelectInteractionInfo.put(
         "readSupportedModesAttribute", readModeSelectSupportedModesAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readModeSelectOnModeCommandParams =
+    Map<String, CommandParameterInfo> readModeSelectCurrentModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readModeSelectOnModeAttributeInteractionInfo =
+    InteractionInfo readModeSelectCurrentModeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ModeSelectCluster) cluster)
-                  .readOnModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readCurrentModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readModeSelectOnModeCommandParams);
+            readModeSelectCurrentModeCommandParams);
     readModeSelectInteractionInfo.put(
-        "readOnModeAttribute", readModeSelectOnModeAttributeInteractionInfo);
+        "readCurrentModeAttribute", readModeSelectCurrentModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readModeSelectStartUpModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readModeSelectStartUpModeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ModeSelectCluster) cluster)
-                  .readStartUpModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readStartUpModeAttribute(
+                      (ChipClusters.ModeSelectCluster.StartUpModeAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readModeSelectStartUpModeCommandParams);
     readModeSelectInteractionInfo.put(
         "readStartUpModeAttribute", readModeSelectStartUpModeAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams =
+    Map<String, CommandParameterInfo> readModeSelectOnModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readModeSelectDescriptionAttributeInteractionInfo =
+    InteractionInfo readModeSelectOnModeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ModeSelectCluster) cluster)
-                  .readDescriptionAttribute((ChipClusters.CharStringAttributeCallback) callback);
+                  .readOnModeAttribute(
+                      (ChipClusters.ModeSelectCluster.OnModeAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readModeSelectDescriptionCommandParams);
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readModeSelectOnModeCommandParams);
     readModeSelectInteractionInfo.put(
-        "readDescriptionAttribute", readModeSelectDescriptionAttributeInteractionInfo);
+        "readOnModeAttribute", readModeSelectOnModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readModeSelectGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readModeSelectGeneratedCommandListAttributeInteractionInfo =
@@ -5229,6 +5244,18 @@ public class ClusterReadMapping {
             readModeSelectAttributeListCommandParams);
     readModeSelectInteractionInfo.put(
         "readAttributeListAttribute", readModeSelectAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readModeSelectFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readModeSelectFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ModeSelectCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readModeSelectFeatureMapCommandParams);
+    readModeSelectInteractionInfo.put(
+        "readFeatureMapAttribute", readModeSelectFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readModeSelectClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readModeSelectClusterRevisionAttributeInteractionInfo =

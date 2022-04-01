@@ -18,13 +18,13 @@
 
 /**
  * @file
- *   Defines an iterator for iterating all possible paths from a list of ClusterInfo-s according to spec section 8.9.2.2 (Valid
- * Attribute Paths)
+ *   Defines an iterator for iterating all possible paths from a list of AttributePathParams-s according to spec section 8.9.2.2
+ * (Valid Attribute Paths)
  */
 
 #pragma once
 
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -42,18 +42,18 @@ namespace chip {
 namespace app {
 
 /**
- * AttributePathExpandIterator is used to iterate over a linked list of ClusterInfo-s.
+ * AttributePathExpandIterator is used to iterate over a linked list of AttributePathParams-s.
  * The AttributePathExpandIterator is copiable, however, the given cluster info must be valid when calling Next().
  *
- * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for ClusterInfo with
- * wildcards. For ClusterInfo with a concrete path (i.e. does not contain wildcards), AttributePathExpandIterator will emit them
- * as-is.
+ * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for AttributePathParams with
+ * wildcards. For AttributePathParams with a concrete path (i.e. does not contain wildcards), AttributePathExpandIterator will emit
+ * them as-is.
  *
  * The typical use of AttributePathExpandIterator may look like:
  * ConcreteAttributePath path;
- * for (AttributePathExpandIterator iterator(clusterInfo); iterator.Get(path); iterator.Next()) {...}
+ * for (AttributePathExpandIterator iterator(AttributePathParams); iterator.Get(path); iterator.Next()) {...}
  *
- * The iterator does not copy the given ClusterInfo, The given ClusterInfo must be valid when using the iterator.
+ * The iterator does not copy the given AttributePathParams, The given AttributePathParams must be valid when using the iterator.
  * If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be reinitialized.
  *
  * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
@@ -63,17 +63,18 @@ namespace app {
  * - Chunk full, return
  * - In a new chunk, Get()
  *
- * TODO: The ClusterInfo may support a group id, the iterator should be able to call group data provider to expand the group id.
+ * TODO: The AttributePathParams may support a group id, the iterator should be able to call group data provider to expand the group
+ * id.
  */
 class AttributePathExpandIterator
 {
 public:
-    AttributePathExpandIterator(ClusterInfo * aClusterInfo);
+    AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
      *
-     * Returns false if AttributePathExpandIterator has exhausted all paths in the given ClusterInfo list.
+     * Returns false if AttributePathExpandIterator has exhausted all paths in the given AttributePathParams list.
      */
     bool Next();
 
@@ -88,14 +89,23 @@ public:
     }
 
     /**
+     * Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for some
+     * cluster.
+     *
+     * When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide the
+     * client with a consistent state of the cluster.
+     */
+    void ResetCurrentCluster();
+
+    /**
      * Returns if the iterator is valid (not exhausted). An iterator is exhausted if and only if:
      * - Next() is called after iterating last path.
-     * - Iterator is initialized with a null ClusterInfo.
+     * - Iterator is initialized with a null AttributePathParams.
      */
-    inline bool Valid() const { return mpClusterInfo != nullptr; }
+    inline bool Valid() const { return mpAttributePath != nullptr; }
 
 private:
-    ClusterInfo * mpClusterInfo;
+    ObjectList<AttributePathParams> * mpAttributePath;
 
     uint16_t mEndpointIndex, mEndEndpointIndex;
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
@@ -109,16 +119,16 @@ private:
 
     /**
      * Prepare*IndexRange will update mBegin*Index and mEnd*Index variables.
-     * If ClusterInfo contains a wildcard field, it will set mBegin*Index to 0 and mEnd*Index to count.
+     * If AttributePathParams contains a wildcard field, it will set mBegin*Index to 0 and mEnd*Index to count.
      * Or it will set mBegin*Index to the index of the Endpoint/Cluster/Attribute, and mEnd*Index to mBegin*Index + 1.
      *
      * If the Endpoint/Cluster/Attribute does not exist, mBegin*Index will be UINT*_MAX, and mEnd*Inde will be 0.
      *
      * The index can be used with emberAfEndpointFromIndex, emberAfGetNthClusterId and emberAfGetServerAttributeIdByIndex.
      */
-    void PrepareEndpointIndexRange(const ClusterInfo & aClusterInfo);
-    void PrepareClusterIndexRange(const ClusterInfo & aClusterInfo, EndpointId aEndpointId);
-    void PrepareAttributeIndexRange(const ClusterInfo & aClusterInfo, EndpointId aEndpointId, ClusterId aClusterId);
+    void PrepareEndpointIndexRange(const AttributePathParams & aAttributePath);
+    void PrepareClusterIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId);
+    void PrepareAttributeIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId, ClusterId aClusterId);
 };
 } // namespace app
 } // namespace chip

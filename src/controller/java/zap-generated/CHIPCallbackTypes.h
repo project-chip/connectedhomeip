@@ -835,22 +835,26 @@ typedef void (*CHIPMediaPlaybackClusterAttributeListAttributeCallbackType)(
 typedef void (*CHIPMediaPlaybackClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPModeSelectClusterCurrentModeAttributeCallbackType)(
-    void *, chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo::DecodableArgType);
-typedef void (*CHIPModeSelectClusterSupportedModesAttributeCallbackType)(
-    void *, const chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo::DecodableType &);
-typedef void (*CHIPModeSelectClusterOnModeAttributeCallbackType)(
-    void *, chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo::DecodableArgType);
-typedef void (*CHIPModeSelectClusterStartUpModeAttributeCallbackType)(
-    void *, chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPModeSelectClusterDescriptionAttributeCallbackType)(
     void *, chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo::DecodableArgType);
+typedef void (*CHIPModeSelectClusterStandardNamespaceAttributeCallbackType)(
+    void *, chip::app::Clusters::ModeSelect::Attributes::StandardNamespace::TypeInfo::DecodableArgType);
+typedef void (*CHIPModeSelectClusterSupportedModesAttributeCallbackType)(
+    void *, const chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo::DecodableType &);
+typedef void (*CHIPModeSelectClusterCurrentModeAttributeCallbackType)(
+    void *, chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPModeSelectClusterStartUpModeAttributeCallbackType)(
+    void *, chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPModeSelectClusterOnModeAttributeCallbackType)(
+    void *, chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPModeSelectClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::ModeSelect::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPModeSelectClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::ModeSelect::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPModeSelectClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ModeSelect::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPModeSelectClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ModeSelect::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPModeSelectClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ModeSelect::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType)(

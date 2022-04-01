@@ -52,7 +52,8 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TODO: Maybe consider making this configurable?
+// TODO: Maybe consider making this configurable?  See also
+// CHIPControllerAccessControl.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
 
 } // anonymous namespace
@@ -151,6 +152,8 @@ namespace app {
         // Will never be called anyway; we have no attributes.
         return false;
     }
+
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) { return false; }
 
     CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
         TLV::TLVReader & aReader, WriteHandler * aWriteHandler)

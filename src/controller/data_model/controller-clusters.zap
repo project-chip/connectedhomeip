@@ -8518,6 +8518,21 @@
           ],
           "attributes": [
             {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -8544,7 +8559,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "CurrentMode",
+              "name": "Description",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8559,7 +8574,7 @@
               "reportableChange": 0
             },
             {
-              "name": "SupportedModes",
+              "name": "StandardNamespace",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8574,22 +8589,22 @@
               "reportableChange": 0
             },
             {
-              "name": "OnMode",
+              "name": "SupportedModes",
               "code": 2,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "255",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
             },
             {
-              "name": "StartUpMode",
+              "name": "CurrentMode",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -8604,7 +8619,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Description",
+              "name": "StartUpMode",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -8613,6 +8628,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "OnMode",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8668,7 +8698,7 @@
               "code": 65532,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -11460,7 +11490,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11475,7 +11505,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11490,7 +11520,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",

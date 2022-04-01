@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,7 @@ namespace chip {
 enum VendorId : uint16_t
 {
     Common       = 0x0000u,
+    Apple        = 0x1349u,
     Google       = 0x6006u,
     TestVendor1  = 0xFFF1u,
     TestVendor2  = 0xFFF2u,
@@ -49,5 +50,10 @@ enum VendorId : uint16_t
     TestVendor4  = 0xFFF4u,
     NotSpecified = 0xFFFFu
 };
+
+constexpr bool IsTestVendorId(VendorId vid)
+{
+    return (vid >= TestVendor1 && vid <= TestVendor4);
+}
 
 } // namespace chip

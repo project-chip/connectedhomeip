@@ -57,7 +57,7 @@ CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_da
 
 CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
-    return CopySpanToMutableSpan(ByteSpan(DevelopmentCerts::kDevelopmentPAI_Cert_FFF1), out_pai_buffer);
+    return CopySpanToMutableSpan(ByteSpan(DevelopmentCerts::kPaiCert), out_pai_buffer);
 }
 
 CHIP_ERROR ExampleDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)

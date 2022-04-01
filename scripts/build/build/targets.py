@@ -19,6 +19,7 @@ from itertools import combinations
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
+from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739Builder, Cyw30739App, Cyw30739Board
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
@@ -250,6 +251,8 @@ def HostTargets():
         ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool']), separate_event_loop=False),
+    builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), interactive_mode=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
@@ -455,6 +458,15 @@ def K32WTargets():
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
 
 
+def cc13x2x7_26x2x7Targets():
+    target = Target('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+
+    yield target.Extend('lock-ftd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=True)
+    yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
+    yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
+    yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
+
+
 def Cyw30739Targets():
     yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
     yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
@@ -483,6 +495,7 @@ target_generators = [
     InfineonTargets(),
     AmebaTargets(),
     K32WTargets(),
+    cc13x2x7_26x2x7Targets(),
     Cyw30739Targets(),
     QorvoTargets(),
 ]

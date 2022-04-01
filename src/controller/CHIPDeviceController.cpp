@@ -70,8 +70,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <trace/trace.h>
 
@@ -399,189 +397,10 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnPIDReadResponse(void * context, uint16_t value)
-{
-    ChipLogProgress(Controller, "Received PID for the device. Value %d", value);
-    DeviceController * controller       = static_cast<DeviceController *>(context);
-    controller->mSetupPayload.productID = value;
-
-    if (controller->OpenCommissioningWindowInternal() != CHIP_NO_ERROR)
-    {
-        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
-    }
-}
-
-void DeviceController::OnVIDReadResponse(void * context, VendorId value)
-{
-    ChipLogProgress(Controller, "Received VID for the device. Value %d", to_underlying(value));
-
-    DeviceController * controller = static_cast<DeviceController *>(context);
-
-    controller->mSetupPayload.vendorID = value;
-
-    OperationalDeviceProxy * device =
-        controller->mSystemState->CASESessionMgr()->FindExistingSession(controller->GetPeerIdWithCommissioningWindowOpen());
-    if (device == nullptr)
-    {
-        ChipLogError(Controller, "Could not find device for opening commissioning window");
-        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
-        return;
-    }
-
-    constexpr EndpointId kBasicClusterEndpoint = 0;
-    chip::Controller::BasicCluster cluster;
-    cluster.Associate(device, kBasicClusterEndpoint);
-
-    if (cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
-                                                                                     OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Could not read PID for opening commissioning window");
-        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
-    }
-}
-
-void DeviceController::OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogProgress(Controller, "Failed to read VID/PID for the device. error %" CHIP_ERROR_FORMAT, error.Format());
-    OnOpenPairingWindowFailureResponse(context, error);
-}
-
-void DeviceController::OnOpenPairingWindowSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
-{
-    ChipLogProgress(Controller, "Successfully opened pairing window on the device");
-    DeviceController * controller = static_cast<DeviceController *>(context);
-    if (controller->mCommissioningWindowCallback != nullptr)
-    {
-        controller->mCommissioningWindowCallback->mCall(controller->mCommissioningWindowCallback->mContext,
-                                                        controller->mDeviceWithCommissioningWindowOpen, CHIP_NO_ERROR,
-                                                        controller->mSetupPayload);
-    }
-}
-
-void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Failed to open pairing window on the device. Status %s", chip::ErrorStr(error));
-    DeviceController * controller = static_cast<DeviceController *>(context);
-    if (controller->mCommissioningWindowCallback != nullptr)
-    {
-        controller->mCommissioningWindowCallback->mCall(controller->mCommissioningWindowCallback->mContext,
-                                                        controller->mDeviceWithCommissioningWindowOpen, error, SetupPayload());
-    }
-}
-
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
                                                  Spake2pVerifier & outVerifier)
 {
     ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
-                                                                 uint16_t discriminator, CommissioningWindowOption option,
-                                                                 chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
-                                                                 bool readVIDPIDAttributes)
-{
-    mSetupPayload = SetupPayload();
-
-    switch (option)
-    {
-    case CommissioningWindowOption::kOriginalSetupCode:
-    case CommissioningWindowOption::kTokenWithRandomPIN:
-        break;
-    case CommissioningWindowOption::kTokenWithProvidedPIN:
-        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
-        break;
-    default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    mSetupPayload.version               = 0;
-    mSetupPayload.discriminator         = discriminator;
-    mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
-
-    mCommissioningWindowOption         = option;
-    mCommissioningWindowCallback       = callback;
-    mDeviceWithCommissioningWindowOpen = deviceId;
-    mCommissioningWindowTimeout        = timeout;
-    mCommissioningWindowIteration      = iteration;
-
-    if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
-    {
-        OperationalDeviceProxy * device =
-            mSystemState->CASESessionMgr()->FindExistingSession(GetPeerIdWithCommissioningWindowOpen());
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        constexpr EndpointId kBasicClusterEndpoint = 0;
-        chip::Controller::BasicCluster cluster;
-        cluster.Associate(device, kBasicClusterEndpoint);
-        return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
-                                                                                           OnVIDPIDReadFailureResponse);
-    }
-
-    return OpenCommissioningWindowInternal();
-}
-
-CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
-{
-    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mDeviceWithCommissioningWindowOpen);
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    OperationalDeviceProxy * device = mSystemState->CASESessionMgr()->FindExistingSession(GetPeerIdWithCommissioningWindowOpen());
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
-
-    chip::Controller::AdministratorCommissioningCluster cluster;
-    cluster.Associate(device, kAdministratorCommissioningClusterEndpoint);
-
-    if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
-    {
-        // TODO: Salt should be provided as an input or it should be randomly generated when
-        // the PIN is randomly generated.
-        const char kSpake2pKeyExchangeSalt[] = "SPAKE2P Key Salt";
-        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), sizeof(kSpake2pKeyExchangeSalt));
-        bool randomSetupPIN = (mCommissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
-        Spake2pVerifier verifier;
-
-        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, mCommissioningWindowIteration, salt, randomSetupPIN,
-                                                               mSetupPayload.setUpPINCode));
-
-        chip::Spake2pVerifierSerialized serializedVerifier;
-        MutableByteSpan serializedVerifierSpan(serializedVerifier);
-        ReturnErrorOnFailure(verifier.Serialize(serializedVerifierSpan));
-
-        AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout;
-        request.PAKEVerifier         = serializedVerifierSpan;
-        request.discriminator        = mSetupPayload.discriminator;
-        request.iterations           = mCommissioningWindowIteration;
-        request.salt                 = salt;
-
-        // TODO: What should the timed invoke timeout here be?
-        uint16_t timedInvokeTimeoutMs = 10000;
-        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenPairingWindowSuccessResponse,
-                                                   OnOpenPairingWindowFailureResponse, MakeOptional(timedInvokeTimeoutMs)));
-
-        char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
-
-        MutableCharSpan manualCode(payloadBuffer);
-        ReturnErrorOnFailure(ManualSetupPayloadGenerator(mSetupPayload).payloadDecimalStringRepresentation(manualCode));
-        ChipLogProgress(Controller, "Manual pairing code: [%s]", payloadBuffer);
-
-        MutableCharSpan QRCode(payloadBuffer);
-        ReturnErrorOnFailure(QRCodeBasicSetupPayloadGenerator(mSetupPayload).payloadBase38Representation(QRCode));
-        ChipLogProgress(Controller, "SetupQRCode: [%s]", payloadBuffer);
-    }
-    else
-    {
-        AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout;
-        // TODO: What should the timed invoke timeout here be?
-        uint16_t timedInvokeTimeoutMs = 10000;
-        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenPairingWindowSuccessResponse,
-                                                   OnOpenPairingWindowFailureResponse, MakeOptional(timedInvokeTimeoutMs)));
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -1029,15 +848,12 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
+    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
         mDefaultCommissioner->StartCommissioning(this, device);
-    }
-    else
-    {
-        ChipLogProgress(Controller, "OnPairingComplete");
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 }
 
@@ -1200,10 +1016,14 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    // TODO(#13825): If not passed by the signer, the commissioner should
-    // provide its current IPK to the commissionee in the AddNOC command.
+    // The placeholder IPK is not satisfactory, but is there to fill the NocChain struct on error. It will still fail.
     const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    if (!ipk.HasValue())
+    {
+        ChipLogError(Controller, "Did not have an IPK from the OperationalCredentialsIssuer! Cannot commission.");
+        status = CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
     if (commissioner->mState != State::Initialized)
@@ -1255,7 +1075,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
+                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
                                                           const NodeId adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
@@ -1263,7 +1083,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
 
     OperationalCredentials::Commands::AddNOC::Type request;
     request.NOCValue      = nocCertBuf;
-    request.ICACValue     = chip::Optional<ByteSpan>(icaCertBuf);
+    request.ICACValue     = icaCertBuf;
     request.IPKValue      = ipk;
     request.caseAdminNode = adminSubject;
     request.adminVendorId = mVendorId;
@@ -1293,8 +1113,9 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
-    case OperationalCertStatus::kInsufficientPrivilege:
     case OperationalCertStatus::kFabricConflict:
+        return CHIP_ERROR_FABRIC_EXISTS;
+    case OperationalCertStatus::kInsufficientPrivilege:
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
@@ -1899,7 +1720,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
+            actualCountryCodeSize = 2;
+            memset(countryCodeStr, 'X', actualCountryCodeSize);
+            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
@@ -2013,14 +1836,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
-            !params.GetAdminSubject().HasValue())
+        if (!params.GetNoc().HasValue() || !params.GetIpk().HasValue() || !params.GetAdminSubject().HasValue())
         {
             ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value());
         break;
     case CommissioningStage::kWiFiNetworkSetup: {

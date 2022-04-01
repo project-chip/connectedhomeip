@@ -752,19 +752,22 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKe
     return CHIP_NO_ERROR;
 }
 
-/* Operational Group Key Group, Security Salt: "GroupKey v1.0" */
-static const uint8_t kGroupSecuritySalt[] = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
+/* Operational Group Key Group, Security Info: "GroupKey v1.0" */
+static const uint8_t kGroupSecurityInfo[] = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
 
 /* Group Key Derivation Function, Info: "GroupKeyHash" ” */
 static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
 static const uint8_t kGroupKeyHashSalt[0] = {};
 
 /*
-    OperationalGroupKey = Crypto_KDF (
-        InputKey = Epoch Key,
-        Salt = [],
-        Info = Group Security Salt,
-        Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS)
+    OperationalGroupKey =
+        Crypto_KDF
+        (
+            InputKey = Epoch Key,
+            Salt = CompressedFabricIdentifier,
+            Info = "GroupKey v1.0",
+            Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS
+        )
 */
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id, MutableByteSpan & out_key)
 {
@@ -773,7 +776,7 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan 
 
     Crypto::HKDF_sha crypto;
     return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), compressed_fabric_id.data(), compressed_fabric_id.size(),
-                              kGroupSecuritySalt, sizeof(kGroupSecuritySalt), out_key.data(),
+                              kGroupSecurityInfo, sizeof(kGroupSecurityInfo), out_key.data(),
                               Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 }
 

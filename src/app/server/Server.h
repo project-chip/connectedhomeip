@@ -39,7 +39,9 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
+#if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
+#endif
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -67,8 +69,6 @@ public:
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    CHIP_ERROR AddTestCommissioning();
-
     /**
      * @brief Call this function to rejoin existing groups found in the GroupDataProvider
      */
@@ -85,6 +85,8 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
+
+    Credentials::GroupDataProvider * GetGroupDataProvider() { return &mGroupsProvider; }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
@@ -107,7 +109,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server();
+    Server() = default;
 
     static Server sServer;
 
@@ -203,33 +205,33 @@ private:
     public:
         ServerFabricDelegate() {}
 
-        CHIP_ERROR Init(SessionManager * sessionManager)
+        CHIP_ERROR Init(Server * server)
         {
-            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(server != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager = sessionManager;
+            mServer = server;
             return CHIP_NO_ERROR;
         };
 
         void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
         {
             (void) compressedId;
-            if (mSessionManager != nullptr)
-            {
-                mSessionManager->FabricRemoved(fabricIndex);
-            }
-            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            auto & sessionManager = mServer->GetSecureSessionManager();
+            sessionManager.FabricRemoved(fabricIndex);
+
+            Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
+            Access::GetAccessControl().RemoveFabric(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
         void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
     private:
-        SessionManager * mSessionManager = nullptr;
+        Server * mServer = nullptr;
     };
 
 #if CONFIG_NETWORK_LAYER_BLE

@@ -11053,8 +11053,32 @@ public class ChipClusters {
         Integer newMode,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface StandardNamespaceAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.ModeSelectClusterModeOptionStruct> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface StartUpModeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface OnModeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
 
@@ -11085,13 +11109,22 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readCurrentModeAttribute(IntegerAttributeCallback callback) {
-      readCurrentModeAttribute(chipClusterPtr, callback);
+    public void readDescriptionAttribute(CharStringAttributeCallback callback) {
+      readDescriptionAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeCurrentModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeCurrentModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeDescriptionAttribute(
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
+      readStandardNamespaceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStandardNamespaceAttribute(
+        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -11103,7 +11136,34 @@ public class ChipClusters {
       subscribeSupportedModesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readOnModeAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentModeAttribute(IntegerAttributeCallback callback) {
+      readCurrentModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeCurrentModeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeCurrentModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStartUpModeAttribute(StartUpModeAttributeCallback callback) {
+      readStartUpModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeStartUpModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeStartUpModeAttribute(
+        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readOnModeAttribute(OnModeAttributeCallback callback) {
       readOnModeAttribute(chipClusterPtr, callback);
     }
 
@@ -11117,26 +11177,8 @@ public class ChipClusters {
     }
 
     public void subscribeOnModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeOnModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(IntegerAttributeCallback callback) {
-      readStartUpModeAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readDescriptionAttribute(CharStringAttributeCallback callback) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -11166,6 +11208,15 @@ public class ChipClusters {
       subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -11175,11 +11226,23 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readCurrentModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readDescriptionAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void subscribeCurrentModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeDescriptionAttribute(
+        long chipClusterPtr,
+        CharStringAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readStandardNamespaceAttribute(
+        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
+
+    private native void subscribeStandardNamespaceAttribute(
+        long chipClusterPtr,
+        StandardNamespaceAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readSupportedModesAttribute(
         long chipClusterPtr, SupportedModesAttributeCallback callback);
@@ -11190,7 +11253,28 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readOnModeAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readCurrentModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeCurrentModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readStartUpModeAttribute(
+        long chipClusterPtr, StartUpModeAttributeCallback callback);
+
+    private native void writeStartUpModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeStartUpModeAttribute(
+        long chipClusterPtr,
+        StartUpModeAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readOnModeAttribute(long chipClusterPtr, OnModeAttributeCallback callback);
 
     private native void writeOnModeAttribute(
         long chipClusterPtr,
@@ -11199,22 +11283,7 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeOnModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readDescriptionAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void subscribeDescriptionAttribute(
-        long chipClusterPtr,
-        CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
+        long chipClusterPtr, OnModeAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
@@ -11242,6 +11311,12 @@ public class ChipClusters {
         AttributeListAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -11396,7 +11471,8 @@ public class ChipClusters {
     }
 
     public interface NetworkConfigResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex);
 
       void onError(Exception error);
     }

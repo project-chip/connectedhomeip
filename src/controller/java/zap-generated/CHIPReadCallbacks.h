@@ -5036,6 +5036,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPModeSelectStandardNamespaceAttributeCallback
+    : public chip::Callback::Callback<CHIPModeSelectClusterStandardNamespaceAttributeCallbackType>
+{
+public:
+    CHIPModeSelectStandardNamespaceAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPModeSelectStandardNamespaceAttributeCallback();
+
+    static void maybeDestroy(CHIPModeSelectStandardNamespaceAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPModeSelectStandardNamespaceAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPModeSelectStandardNamespaceAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPModeSelectSupportedModesAttributeCallback
     : public chip::Callback::Callback<CHIPModeSelectClusterSupportedModesAttributeCallbackType>
 {
@@ -5061,6 +5091,65 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPModeSelectSupportedModesAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPModeSelectStartUpModeAttributeCallback
+    : public chip::Callback::Callback<CHIPModeSelectClusterStartUpModeAttributeCallbackType>
+{
+public:
+    CHIPModeSelectStartUpModeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPModeSelectStartUpModeAttributeCallback();
+
+    static void maybeDestroy(CHIPModeSelectStartUpModeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPModeSelectStartUpModeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPModeSelectStartUpModeAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPModeSelectOnModeAttributeCallback : public chip::Callback::Callback<CHIPModeSelectClusterOnModeAttributeCallbackType>
+{
+public:
+    CHIPModeSelectOnModeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPModeSelectOnModeAttributeCallback();
+
+    static void maybeDestroy(CHIPModeSelectOnModeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPModeSelectOnModeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPModeSelectOnModeAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5572,7 +5661,8 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(

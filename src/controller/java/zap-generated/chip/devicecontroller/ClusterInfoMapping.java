@@ -4161,13 +4161,18 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, Optional<Integer> NetworkIndex) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
+      CommandResponseInfo NetworkIndexResponseValue =
+          new CommandResponseInfo("NetworkIndex", "Optional<Integer>");
+      responseValues.put(NetworkIndexResponseValue, NetworkIndex);
       callback.onSuccess(responseValues);
     }
 

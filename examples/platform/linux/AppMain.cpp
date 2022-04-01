@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -104,26 +105,26 @@ void OnSignalHandler(int signum)
     // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
     // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
     // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::Unspecified;
+    BootReasonType bootReason = BootReasonType::kUnspecified;
     switch (signum)
     {
     case SIGVTALRM:
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
         break;
     case SIGALRM:
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
         break;
     case SIGILL:
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         break;
     case SIGTRAP:
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
         break;
     case SIGIO:
-        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        bootReason = BootReasonType::kSoftwareUpdateCompleted;
         break;
     case SIGINT:
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -378,6 +379,7 @@ MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 
 CHIP_ERROR InitCommissioner()
 {
@@ -387,6 +389,10 @@ CHIP_ERROR InitCommissioner()
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
+
+    gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+    ReturnErrorOnFailure(gGroupDataProvider.Init());
+    factoryParams.groupDataProvider = &gGroupDataProvider;
 
     params.storageDelegate                = &gServerStorage;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
@@ -416,8 +422,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
-                                                                        rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
+                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -427,6 +433,23 @@ CHIP_ERROR InitCommissioner()
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
+
+    chip::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
+    // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
+    ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                                    compressedFabricIdSpan));
+
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 

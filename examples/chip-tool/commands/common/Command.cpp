@@ -721,3 +721,31 @@ size_t Command::AddArgumentToList(Argument && argument)
     VerifyOrDie(false);
     return 0;
 }
+
+void Command::ResetArguments()
+{
+    for (size_t i = 0; i < mArgs.size(); i++)
+    {
+        const Argument arg      = mArgs[i];
+        const ArgumentType type = arg.type;
+        const uint8_t flags     = arg.flags;
+        if (type == ArgumentType::Vector16 && flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector32 && flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector32 && flags == Argument::kOptional)
+        {
+            auto optionalArgument = static_cast<chip::Optional<std::vector<uint32_t>> *>(arg.value);
+            if (optionalArgument->HasValue())
+            {
+                optionalArgument->Value().clear();
+            }
+        }
+    }
+}

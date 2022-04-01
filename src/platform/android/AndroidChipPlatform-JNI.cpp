@@ -21,6 +21,7 @@
  *      Implementation of JNI bridge for CHIP Device Controller for Android apps
  *
  */
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
@@ -35,6 +36,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
+#include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
 
@@ -255,3 +257,20 @@ exit:
     return result;
 }
 #endif
+
+// for CommissionableDataProvider
+JNI_METHOD(jboolean, updateCommissionableDataProviderData)
+(JNIEnv * env, jclass self, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64, jint spake2pIterationCount,
+ jlong setupPasscode, jint discriminator)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CommissionableDataProviderMgrImpl().Update(env, spake2pVerifierBase64, Spake2pSaltBase64,
+                                                                spake2pIterationCount, setupPasscode, discriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %s", ErrorStr(err));
+        return false;
+    }
+
+    return true;
+}

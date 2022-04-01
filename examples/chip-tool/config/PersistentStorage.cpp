@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,11 +32,12 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace ::chip::Logging;
 
-constexpr const char kDefaultSectionName[] = "Default";
-constexpr const char kPortKey[]            = "ListenPort";
-constexpr const char kLoggingKey[]         = "LoggingLevel";
-constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
-constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
+constexpr const char kDefaultSectionName[]  = "Default";
+constexpr const char kPortKey[]             = "ListenPort";
+constexpr const char kLoggingKey[]          = "LoggingLevel";
+constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
+constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
+constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Detail;
 
 std::string GetFilename(const char * name)
 {
@@ -237,4 +238,30 @@ CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId value)
 {
     uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
     return SyncSetKeyValue(kLocalNodeIdKey, &nodeId, sizeof(nodeId));
+}
+
+CATValues PersistentStorage::GetCommissionerCATs()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CATValues cats;
+    chip::CATValues::Serialized serializedCATs;
+    uint16_t size = chip::CATValues::kSerializedLength;
+    err           = SyncGetKeyValue(kCommissionerCATsKey, serializedCATs, size);
+    if (err == CHIP_NO_ERROR && size == chip::CATValues::kSerializedLength)
+    {
+        err = cats.Deserialize(serializedCATs);
+        if (err == CHIP_NO_ERROR)
+        {
+            return cats;
+        }
+    }
+    return chip::kUndefinedCATs;
+}
+
+CHIP_ERROR PersistentStorage::SetCommissionerCATs(const CATValues & cats)
+{
+    chip::CATValues::Serialized serializedCATs;
+    ReturnErrorOnFailure(cats.Serialize(serializedCATs));
+
+    return SyncSetKeyValue(kCommissionerCATsKey, serializedCATs, sizeof(serializedCATs));
 }

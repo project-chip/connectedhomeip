@@ -181,7 +181,7 @@ protected:
         kFlagDropAckDebug = (1u << 3),
 
         /// When set, signifies there is a message which hasn't been acknowledged.
-        kFlagMesageNotAcked = (1u << 4),
+        kFlagMessageNotAcked = (1u << 4),
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = (1u << 5),
@@ -255,7 +255,7 @@ inline bool ReliableMessageContext::HasRcvdMsgFromPeer() const
 
 inline bool ReliableMessageContext::IsMessageNotAcked() const
 {
-    return mFlags.Has(Flags::kFlagMesageNotAcked);
+    return mFlags.Has(Flags::kFlagMessageNotAcked);
 }
 
 inline bool ReliableMessageContext::ShouldDropAckDebug() const
@@ -295,7 +295,7 @@ inline void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
 
 inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
-    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
+    mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
 }
 
 inline void ReliableMessageContext::SetRequestingFastPollingMode(bool fastPollingMode)

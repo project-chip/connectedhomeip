@@ -40,6 +40,8 @@ using chip::kUndefinedNodeId;
 using chip::Access::AccessControl;
 using chip::Access::AuthMode;
 using chip::Access::Privilege;
+using chip::Access::RequestPath;
+using chip::Access::SubjectDescriptor;
 
 using Entry         = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
@@ -1235,6 +1237,12 @@ public:
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
 public:

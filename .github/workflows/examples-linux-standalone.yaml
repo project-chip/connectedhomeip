@@ -72,7 +72,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/build/build_examples.py --no-log-timestamps --target-glob '*-chip-cert' build"
             - name: Build example Standalone Echo Client
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool_debug
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -90,8 +90,7 @@ jobs:
             - name: Build example Standalone All Clusters Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug \
-                    chip_bypass_rendezvous=true
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-app \
                     out/all_clusters_debug/chip-all-clusters-app \

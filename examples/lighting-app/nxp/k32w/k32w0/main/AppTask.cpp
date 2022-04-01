@@ -127,7 +127,7 @@ CHIP_ERROR AppTask::Init()
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(CharSpan("test.txt"));
+    gImageProcessor.SetOTAImageFile("test.txt");
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the gDownloader and Image Processor objects
