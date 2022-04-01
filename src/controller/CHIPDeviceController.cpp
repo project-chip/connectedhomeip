@@ -1086,7 +1086,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
-                                          const ByteSpan & AttestationSignature, const ByteSpan & dac, const ByteSpan & csrNonce)
+                                          const ByteSpan & AttestationSignature, const ByteSpan & dac, const ByteSpan & pai,
+                                          const ByteSpan & csrNonce)
 {
     MATTER_TRACE_EVENT_SCOPE("ProcessOpCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -1111,7 +1112,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
-                                                             dac, ByteSpan(), &mDeviceNOCChainCallback);
+                                                             dac, pai, &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
@@ -1844,14 +1845,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kGenerateNOCChain: {
-        if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
+        if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
+            !params.GetCSRNonce().HasValue())
         {
             ChipLogError(Controller, "Unable to generate NOC chain parameters");
             return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
         }
         CHIP_ERROR err = ProcessCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
                                     params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
-                                    params.GetCSRNonce().Value());
+                                    params.GetPAI().Value(), params.GetCSRNonce().Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to process Op CSR");
