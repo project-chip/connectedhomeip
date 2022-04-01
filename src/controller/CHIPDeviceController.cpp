@@ -481,7 +481,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     if (device != nullptr && device->IsSessionSetupInProgress())
     {
         ChipLogDetail(Controller, "Setup in progress, stopping setup before shutting down");
-        PairingFailed(CHIP_ERROR_CONNECTION_ABORTED);
+        OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
     }
     // TODO: If we have a commissioning step in progress, is there a way to cancel that callback?
 
@@ -812,27 +812,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    // Need to null out mDeviceInPASEEstablishment before maybe trying to
-    // establish PASE again, so EstablishPASEConnection won't error out.
-    auto * oldDeviceInPASEEstablishment = mDeviceInPASEEstablishment;
-    mDeviceInPASEEstablishment          = nullptr;
-
-    if (mSetUpCodePairer.TryNextRendezvousParameters())
-    {
-        ChipLogProgress(Controller, "Ignoring PASE error; will try commissioning over a different transport");
-        // We don't need oldDeviceInPASEEstablishment anymore.
-        ReleaseCommissioneeDevice(oldDeviceInPASEEstablishment);
-        return;
-    }
-
-    // Reset mDeviceInPASEEstablishment because PairingFailed checks for that to
-    // send the right notifications.
-    mDeviceInPASEEstablishment = oldDeviceInPASEEstablishment;
-    PairingFailed(err);
-}
-
-void DeviceCommissioner::PairingFailed(CHIP_ERROR err)
-{
+    // PASE session establishment failure.
     mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
     if (mPairingDelegate != nullptr)
@@ -851,7 +831,7 @@ void DeviceCommissioner::OnSessionEstablished()
     // We are in the callback for this pairing. Reset so we can pair another device.
     mDeviceInPASEEstablishment = nullptr;
 
-    VerifyOrReturn(device != nullptr, PairingFailed(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+    VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
     PASESession * pairing = &device->GetPairing();
 
@@ -862,21 +842,18 @@ void DeviceCommissioner::OnSessionEstablished()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        PairingFailed(err);
+        OnSessionEstablishmentError(err);
         return;
     }
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
+    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
         mDefaultCommissioner->StartCommissioning(this, device);
-    }
-    else
-    {
-        ChipLogProgress(Controller, "OnPairingComplete");
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 }
 

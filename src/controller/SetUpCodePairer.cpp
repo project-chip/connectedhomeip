@@ -162,10 +162,10 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
-    if (mWaitingForConnection)
+    if (mWaitingForPASE)
     {
-        // Nothing to do.  Just wait until we either succeed at that connection
-        // or fail and get asked to try another device.
+        // Nothing to do.  Just wait until we either succeed or fail at that
+        // PASE session establishment.
         return false;
     }
 
@@ -189,6 +189,9 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         ChipLogProgress(Controller, "Attempting PASE connection to %s", buf);
 #endif // CHIP_PROGRESS_LOGGING
 
+        // Handle possibly-sync call backs from attempts to establish PASE.
+        ExpectPASEEstablishment();
+
         CHIP_ERROR err;
         if (mConnectionType == SetupCodePairerBehaviour::kCommission)
         {
@@ -198,12 +201,15 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         {
             err = mCommissioner->EstablishPASEConnection(mRemoteId, params);
         }
+
         LogErrorOnFailure(err);
         if (err == CHIP_NO_ERROR)
         {
-            mWaitingForConnection = true;
             return true;
         }
+
+        // Failed to start establishing PASE.
+        PASEEstablishmentComplete();
     }
 
     return false;
@@ -284,12 +290,6 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
 bool SetUpCodePairer::TryNextRendezvousParameters()
 {
-    // Don't call PairDevice again; just do PASE as needed.  If we called
-    // PairDevice before and PASE succeeds, the commmissioning that's been
-    // queued up will happen.
-    mConnectionType       = SetupCodePairerBehaviour::kPaseOnly;
-    mWaitingForConnection = false;
-
     if (ConnectToDiscoveredDevice())
     {
         ChipLogProgress(Controller, "Trying connection to commissionee over different transport");
@@ -318,6 +318,92 @@ void SetUpCodePairer::ResetDiscoveryState()
     for (auto & params : mDiscoveredParameters)
     {
         params = RendezvousParameters();
+    }
+}
+
+void SetUpCodePairer::ExpectPASEEstablishment()
+{
+    mWaitingForPASE = true;
+    auto * delegate = mCommissioner->GetPairingDelegate();
+    if (this == delegate)
+    {
+        // This should really not happen, but if it does, do nothing, to avoid
+        // delegate loops.
+        return;
+    }
+
+    mPairingDelegate = delegate;
+    mCommissioner->RegisterPairingDelegate(this);
+}
+
+void SetUpCodePairer::PASEEstablishmentComplete()
+{
+    mWaitingForPASE = false;
+    mCommissioner->RegisterPairingDelegate(mPairingDelegate);
+    mPairingDelegate = nullptr;
+}
+
+void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
+{
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnStatusUpdate(status);
+    }
+}
+
+void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
+{
+    // Save the pairing delegate so we can notify it.  We want to notify it
+    // _after_ we restore the state on the commissioner, in case the delegate
+    // ends up immediately calling back into the commissioner again when
+    // notified.
+    auto * pairingDelegate = mPairingDelegate;
+    PASEEstablishmentComplete();
+
+    if (CHIP_NO_ERROR == error)
+    {
+        // StopConnectOverBle calls CancelBleIncompleteConnection, which will
+        // cancel connections that are in fact completed. In particular, if we
+        // just established PASE over BLE calling StopConnectOverBle here
+        // unconditionally would cancel the BLE connection underlying the PASE
+        // session.  So make sure to only call StopConnectOverBle if we're still
+        // waiting to hear back on the BLE discovery bits.
+        if (mWaitingForDiscovery[kBLETransport])
+        {
+            StopConnectOverBle();
+        }
+        StopConnectOverIP();
+        StopConnectOverSoftAP();
+        ResetDiscoveryState();
+        pairingDelegate->OnPairingComplete(error);
+        return;
+    }
+
+    // We failed to establish PASE.  Try the next thing we have discovered, if
+    // any.
+    if (TryNextRendezvousParameters())
+    {
+        // Keep waiting until that finishes.  Don't call OnPairingComplete yet.
+        return;
+    }
+
+    pairingDelegate->OnPairingComplete(error);
+}
+
+void SetUpCodePairer::OnPairingDeleted(CHIP_ERROR error)
+{
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnPairingDeleted(error);
+    }
+}
+
+void SetUpCodePairer::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
+{
+    // Not really expecting this, but handle it anyway.
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningComplete(deviceId, error);
     }
 }
 
