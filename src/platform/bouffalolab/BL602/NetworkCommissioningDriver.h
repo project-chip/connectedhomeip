@@ -106,7 +106,8 @@ public:
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                              uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
