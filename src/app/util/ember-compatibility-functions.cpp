@@ -250,8 +250,8 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
 
         CHIP_ERROR err = commandHandler->EnumerateAcceptedCommands(
             aCommandPath,
-            [](CommandId command, void * context) -> Loop {
-                auto * ctx = static_cast<Context *>(context);
+            [](CommandId command, void * closure) -> Loop {
+                auto * ctx = static_cast<Context *>(closure);
                 if (ctx->targetCommand == command)
                 {
                     ctx->commandExists = true;
@@ -436,8 +436,8 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
             } context{ encoder, CHIP_NO_ERROR };
             CHIP_ERROR err = (commandHandler->*aEnumerator)(
                 aClusterPath,
-                [](CommandId command, void * context) -> Loop {
-                    auto * ctx = static_cast<Context *>(context);
+                [](CommandId command, void * closure) -> Loop {
+                    auto * ctx = static_cast<Context *>(closure);
                     ctx->err   = ctx->commandIdEncoder.Encode(command);
                     if (ctx->err != CHIP_NO_ERROR)
                     {
