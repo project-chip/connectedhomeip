@@ -61,7 +61,7 @@ public:
         return localSessionId;
     }
 
-    SessionHolder & GetSecureSessionHolder() { return mSecureSessionHolder; }
+    const SessionHolder & GetSecureSessionHolder() const { return mSecureSessionHolder; }
 
     uint16_t GetPeerSessionId() const
     {
