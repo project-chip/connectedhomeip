@@ -166,6 +166,9 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-lighting
+
 # Generating cc13x2x7_26x2x7-lock-ftd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
 
@@ -897,9 +900,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating qpg-shell
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-shell
 
-# Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-lighting
-
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
 export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
@@ -1127,6 +1127,9 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building bl602-light
+ninja -C {out}/bl602-light
 
 # Building cc13x2x7_26x2x7-lock-ftd
 ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
@@ -1765,6 +1768,3 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light
-
-# Building bl602-light
-ninja -C {out}/bl602-light
