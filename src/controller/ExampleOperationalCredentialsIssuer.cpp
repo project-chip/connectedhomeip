@@ -183,7 +183,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    // At this point, Credential issues may wish to validate the CSR information
+    // At this point, Credential issuer may wish to validate the CSR information
     (void) attestationChallenge;
     (void) csrNonce;
 
