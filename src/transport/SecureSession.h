@@ -84,7 +84,7 @@ public:
      * @brief
      *   Construct a secure session to associate with a pending secure
      *   session establishment attempt.  A pending secure session object
-     *   receives a session ID, but no other state.
+     *   receives a local session ID, but no other state.
      */
     SecureSession(uint16_t localSessionId) :
         SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
