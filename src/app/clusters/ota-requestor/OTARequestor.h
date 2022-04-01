@@ -42,7 +42,7 @@ public:
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
 
-    EmberAfStatus HandleAnnounceOTAProvider(
+    void HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 

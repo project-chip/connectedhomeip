@@ -156,8 +156,11 @@ public:
     // Reset any relevant states
     virtual void Reset(void) = 0;
 
-    // Handler for the AnnounceOTAProvider command
-    virtual EmberAfStatus HandleAnnounceOTAProvider(
+    /**
+     * Called to handle an AnnounceOTAProvider command and is responsible for sending the status. The caller is responsible for
+     * validating fields in the command.
+     */
+    virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
