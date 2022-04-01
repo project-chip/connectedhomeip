@@ -53,7 +53,7 @@ public:
     Optional<uint16_t> GetLocalSessionId() const
     {
         Optional<uint16_t> localSessionId;
-        VerifyOrExit(mSecureSessionHolder, localSessionId = Optional<uint16_t>::Missing());
+        VerifyOrExit(mSecureSessionHolder, localSessionId = NullOptional);
         VerifyOrExit(mSecureSessionHolder->GetSessionType() == Transport::Session::SessionType::kSecure,
                      localSessionId = Optional<uint16_t>::Missing());
         localSessionId.SetValue(mSecureSessionHolder->AsSecureSession()->GetLocalSessionId());
