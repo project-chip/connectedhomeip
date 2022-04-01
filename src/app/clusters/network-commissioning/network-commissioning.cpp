@@ -411,8 +411,8 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
 
     if (commissioningError == Status::kSuccess)
     {
-        // TODO: Pass the actual network id to device control server.
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(ByteSpan());
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(
+            ByteSpan(mLastNetworkID, mLastNetworkIDLen));
     }
 }
 
