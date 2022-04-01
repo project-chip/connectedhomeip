@@ -45,7 +45,7 @@ esp32-qemu-tests
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock
-k32w-light-release
+k32w-light-release-no-ota
 k32w-lock-release
 k32w-shell-release
 mbed-CY8CPROTO_062_4343W-all-clusters-release

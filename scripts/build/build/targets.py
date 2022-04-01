@@ -451,8 +451,8 @@ def K32WTargets():
     #    gen/include/lwip/lwip_buildconfig.h
     yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
 
-    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
-    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT, tokenizer=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-ota', app=K32WApp.LIGHT, release=True, disable_ble=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")

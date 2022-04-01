@@ -99,6 +99,11 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
     return 1024;
 }
 
+void GenericOTARequestorDriver::SetMaxDownloadBlockSize(uint16_t blockSize)
+{
+    maxDownloadBlockSize = blockSize;
+}
+
 void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
 {
     static_cast<GenericOTARequestorDriver *>(appState)->SendQueryImage();

@@ -55,7 +55,9 @@ class K32WBuilder(GnBuilder):
                  app: K32WApp = K32WApp.LIGHT,
                  release: bool = False,
                  low_power: bool = False,
-                 tokenizer: bool = False):
+                 tokenizer: bool = False,
+                 disable_ble: bool = False,
+                 disable_ota: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -64,6 +66,8 @@ class K32WBuilder(GnBuilder):
         self.low_power = low_power
         self.tokenizer = tokenizer
         self.release = release
+        self.disable_ble = disable_ble
+        self.disable_ota = disable_ota
 
     def GnBuildArgs(self):
         args = [
@@ -80,6 +84,12 @@ class K32WBuilder(GnBuilder):
 
         if self.release:
             args.append('is_debug=false')
+
+        if self.disable_ble:
+            args.append('chip_enable_ble=false')
+
+        if self.disable_ota:
+            args.append('chip_enable_ota_requestor=false')
 
         return args
 
