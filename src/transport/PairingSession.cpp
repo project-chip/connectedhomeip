@@ -23,7 +23,7 @@
 
 namespace chip {
 
-CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, Optional<uint16_t> sessionId)
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId)
 {
     mSecureSessionHolder = sessionManager.AllocateSession(sessionId);
     VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_NO_MEMORY);
@@ -32,7 +32,9 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
 {
-    return AllocateSecureSession(sessionManager, NullOptional);
+    mSecureSessionHolder = sessionManager.AllocateSession();
+    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_NO_MEMORY);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,

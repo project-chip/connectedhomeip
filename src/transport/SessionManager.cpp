@@ -382,21 +382,17 @@ exit:
     return holder;
 }
 
-SessionHolder SessionManager::AllocateSession(Optional<uint16_t> sessionId)
+SessionHolder SessionManager::AllocateSession(uint16_t sessionId)
 {
-    if (!sessionId.HasValue())
-    {
-        return AllocateSession();
-    }
     // If we forego SessionManager session ID allocation, we can have a
     // collission.  In case of such a collission, we must evict first.
-    Optional<SessionHandle> oldSession = mSecureSessions.FindSecureSessionByLocalKey(sessionId.Value());
+    Optional<SessionHandle> oldSession = mSecureSessions.FindSecureSessionByLocalKey(sessionId);
     if (oldSession.HasValue())
     {
         mSecureSessions.ReleaseSession(oldSession.Value()->AsSecureSession());
     }
     SessionHolder holder;
-    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSession(sessionId.Value());
+    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSession(sessionId);
     VerifyOrExit(session.HasValue(), holder = holder);
     holder.Grab(session.Value());
 exit:

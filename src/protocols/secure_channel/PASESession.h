@@ -279,13 +279,13 @@ public:
     {
         // Do not set to 0 to prevent unwanted unsecured session
         // since the session type is unknown.
-        AllocateSecureSession(sessionManager, MakeOptional(mLocalSessionId));
+        AllocateSecureSession(sessionManager, mLocalSessionId);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
         PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
     {
-        AllocateSecureSession(sessionManager, MakeOptional(localSessionId));
+        AllocateSecureSession(sessionManager, localSessionId);
         SetPeerSessionId(peerSessionId);
     }
 

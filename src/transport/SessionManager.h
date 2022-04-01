@@ -179,10 +179,13 @@ public:
      * @brief
      *   Allocate a secure session in the secure session table at the specified
      *   session ID.  If the session ID collides with an existing session, evict
-     *   it.  This variant of the interface may be used in testing in cases
-     *   where session IDs may need to be predetermined.
+     *   it.  This variant of the interface may be used in test scenarios where
+     *   session IDs need to be predetermined.
+     *
+     * @param localSessionId
+     * @return SessionHolder with a reference to a SecureSession on success, else an empty SessionHolder
      */
-    SessionHolder AllocateSession(Optional<uint16_t> localSessionId);
+    SessionHolder AllocateSession(uint16_t localSessionId);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);

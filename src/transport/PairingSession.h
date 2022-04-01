@@ -102,19 +102,17 @@ public:
 
 protected:
     /**
-     * Allocate a secure session object from the passed session manager for the
-     * pending session establishment operation.
+     * Allocate a secure session object from the passed session manager with the
+     * specified session ID.
      *
-     * The optional session ID argument may be passed for testing scenarios
-     * where the session ID must be predetermined.  But in most cases, it's
-     * better to leave session ID assignment to the session manager, which can
-     * select a non-colliding ID on our behalf.
-     *
+     * This variant of the interface may be used in test scenarios where
+     * session IDs need to be predetermined.
+
      * @param sessionManager session manager from which to allocate a secure session object
-     * @param sessionId optional argument to specify the session ID of the allocated session
+     * @param sessionId caller-requested session ID
      * @return CHIP_ERROR The outcome of the attempted allocation
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, Optional<uint16_t> sessionId);
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId);
 
     /**
      * Allocate a secure session object from the passed session manager for the
