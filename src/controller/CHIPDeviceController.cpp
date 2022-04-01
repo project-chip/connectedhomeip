@@ -848,15 +848,12 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
+    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
         mDefaultCommissioner->StartCommissioning(this, device);
-    }
-    else
-    {
-        ChipLogProgress(Controller, "OnPairingComplete");
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 }
 
@@ -1019,10 +1016,14 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    // TODO(#13825): If not passed by the signer, the commissioner should
-    // provide its current IPK to the commissionee in the AddNOC command.
+    // The placeholder IPK is not satisfactory, but is there to fill the NocChain struct on error. It will still fail.
     const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    if (!ipk.HasValue())
+    {
+        ChipLogError(Controller, "Did not have an IPK from the OperationalCredentialsIssuer! Cannot commission.");
+        status = CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
     if (commissioner->mState != State::Initialized)
@@ -1074,7 +1075,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
+                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
                                                           const NodeId adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
@@ -1082,7 +1083,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
 
     OperationalCredentials::Commands::AddNOC::Type request;
     request.NOCValue      = nocCertBuf;
-    request.ICACValue     = chip::Optional<ByteSpan>(icaCertBuf);
+    request.ICACValue     = icaCertBuf;
     request.IPKValue      = ipk;
     request.caseAdminNode = adminSubject;
     request.adminVendorId = mVendorId;
@@ -1719,7 +1720,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
+            actualCountryCodeSize = 2;
+            memset(countryCodeStr, 'X', actualCountryCodeSize);
+            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
@@ -1833,14 +1836,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
-            !params.GetAdminSubject().HasValue())
+        if (!params.GetNoc().HasValue() || !params.GetIpk().HasValue() || !params.GetAdminSubject().HasValue())
         {
             ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value());
         break;
     case CommissioningStage::kWiFiNetworkSetup: {

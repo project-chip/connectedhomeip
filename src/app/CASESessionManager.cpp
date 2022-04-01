@@ -21,8 +21,10 @@
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer)
+CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params)
 {
+    ReturnErrorOnFailure(params.sessionInitParams.Validate());
+    mConfig = params;
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 

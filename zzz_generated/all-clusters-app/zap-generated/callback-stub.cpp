@@ -89,6 +89,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case ZCL_FAN_CONTROL_CLUSTER_ID:
+        emberAfFanControlClusterInitCallback(endpoint);
+        break;
     case ZCL_FIXED_LABEL_CLUSTER_ID:
         emberAfFixedLabelClusterInitCallback(endpoint);
         break;
@@ -320,6 +323,11 @@ void __attribute__((weak)) emberAfElectricalMeasurementClusterInitCallback(Endpo
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

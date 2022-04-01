@@ -22,6 +22,7 @@
 #include "Command.h"
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
+#include <credentials/GroupDataProviderImpl.h>
 
 #pragma once
 
@@ -51,6 +52,9 @@ public:
     using NodeId                 = ::chip::NodeId;
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
+
+    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
         Command(commandName), mCredIssuerCmds(credIssuerCmds)
@@ -91,6 +95,7 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

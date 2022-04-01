@@ -35,6 +35,7 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -46,7 +47,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
-
 using namespace chip::DeviceLayer;
 
 using chip::kMinValidFabricIndex;
@@ -70,6 +70,15 @@ void StopEventLoop(intptr_t arg)
     }
 }
 
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+    }
+} sDeviceTypeResolver;
+
 } // namespace
 
 namespace chip {
@@ -85,26 +94,11 @@ static ::chip::PersistedCounter sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-Server::Server() :
-    mCASESessionManager(CASESessionManagerConfig {
-        .sessionInitParams =  {
-            .sessionManager = &mSessions,
-            .exchangeMgr    = &mExchangeMgr,
-            .idAllocator    = &mSessionIDAllocator,
-            .fabricTable    = &mFabrics,
-            .clientPool     = &mCASEClientPool,
-        },
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache          = nullptr,
-#endif
-        .devicePool        = &mDevicePool,
-    })
-{}
-
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    CASESessionManagerConfig caseSessionManagerConfig;
 
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
@@ -142,7 +136,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
     VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
 
-    err = mAccessControl.Init(accessDelegate);
+    err = mAccessControl.Init(accessDelegate, sDeviceTypeResolver);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
@@ -178,7 +172,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage, &GetFabricTable());
     SuccessOrExit(err);
 
-    err = mFabricDelegate.Init(&mSessions);
+    err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
     mFabrics.AddFabricDelegate(&mFabricDelegate);
 
@@ -211,7 +205,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if defined(CHIP_APP_USE_ECHO)
-    err = InitEchoHandler(&gExchangeMgr);
+    err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
 #endif
 
@@ -243,14 +237,30 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
+    caseSessionManagerConfig = {
+        .sessionInitParams =  {
+            .sessionManager    = &mSessions,
+            .exchangeMgr       = &mExchangeMgr,
+            .idAllocator       = &mSessionIDAllocator,
+            .fabricTable       = &mFabrics,
+            .clientPool        = &mCASEClientPool,
+            .groupDataProvider = &mGroupsProvider,
+        },
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache          = nullptr,
+#endif
+        .devicePool        = &mDevicePool,
+    };
+
+    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
+    SuccessOrExit(err);
+
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
-                                                    &mSessions, &mFabrics);
+                                                    &mSessions, &mFabrics, &mGroupsProvider);
     SuccessOrExit(err);
-
-    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them

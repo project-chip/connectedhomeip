@@ -43,7 +43,7 @@
 #include <system/SystemConfig.h>
 
 /* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-//#include "InetConfig.h"
+// #include "InetConfig.h"
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"
@@ -1511,12 +1511,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
- * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
- * Binds to number of GroupState entries to support per fabric
+ * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#endif
+
+#if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
+#error "Please ensure CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC > 0 to support at least the IPK."
 #endif
 
 /**
@@ -1784,6 +1788,30 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 #define CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST 0
 #endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
+/*
+ * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+ *
+ * @brief This buffer will used for holding debug text when handling synchronous invokes (AddOrUpdate / Reorder / Remove). Since we
+ * don't set this value for most cases and on most platforms, this value can be 0 to always ignore such field.
+ */
+#ifndef CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+#define CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE 64
+#endif // CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+
+/**
+ *  @def CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+ *
+ *  If 1, IM status codes, when logged, will be formatted as "0xNN (NameOfCode)"
+ *  If 0, IM status codes, when logged, will be formatted as "0xNN" In either
+ *  case, the macro ChipLogFormatIMStatus expands to a suitable printf format
+ *  string, which already includes the '%' in it, to be used with
+ *  ChipLogValueIMStatus(status).
+ */
+
+#ifndef CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+#define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 0
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 
 /**
  * @}
