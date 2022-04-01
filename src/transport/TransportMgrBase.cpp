@@ -59,8 +59,10 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
 {
     if (msg->TotalLength() > CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE)
     {
+#if CHIP_ERROR_LOGGING
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrBuffer);
+#endif // CHIP_ERROR_LOGGING
         ChipLogError(Inet, "Oversize message (%u bytes) from %s dropped.", msg->TotalLength(), addrBuffer);
         return;
     }
