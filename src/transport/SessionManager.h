@@ -179,7 +179,8 @@ public:
      * @brief
      *   Allocate a secure session in the secure session table at the specified
      *   session ID.  If the session ID collides with an existing session, evict
-     *   it.
+     *   it.  This variant of the interface is primarily useful in testing,
+     *   where session IDs may need to be predetermined.
      */
     SessionHolder AllocateSession(uint16_t localSessionId);
 

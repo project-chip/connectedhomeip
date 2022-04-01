@@ -70,7 +70,12 @@ public:
     /**
      * Allocates a new secure session out of the internal resource pool with the
      * specified session ID.  The returned secure session will not become active
-     * until the call to SecureSession::Activate.
+     * until the call to SecureSession::Activate.  If there is a resident
+     * session at the passed ID, an empty Optional will be returned to signal
+     * the error.
+     *
+     * This variant of the interface is primarily useful in testing, where
+     * session IDs may need to be predetermined.
      *
      * @returns allocated session on success, else failure
      */
