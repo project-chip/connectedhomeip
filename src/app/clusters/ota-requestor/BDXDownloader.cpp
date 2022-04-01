@@ -115,6 +115,9 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mPrevBlockCounter = 0;
+
+    // Note that due to the nature of this timer function, the actual time taken to detect a stalled BDX connection might be
+    // anywhere in the range of [mTimeout, 2*mTimeout)
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
