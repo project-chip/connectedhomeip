@@ -91,7 +91,7 @@ public:
      * Allocates a new secure session out of the internal resource pool with a
      * non-colliding session ID and increments mNextSessionId to give a clue to
      * the allocator for the next allocation.  The secure session session will
-     * become active unitl the call to SecureSession::Activate.
+     * not become active until the call to SecureSession::Activate.
      *
      * @returns allocated session on success, else failure
      */
