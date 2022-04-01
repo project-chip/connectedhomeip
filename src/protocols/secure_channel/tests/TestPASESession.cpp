@@ -35,6 +35,12 @@
 #include <stdarg.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
+// This test suite pushes multiple PASESession objects onto the stack for the
+// purposes of testing device-to-device communication.  However, in the real
+// world, these won't live in a single device's memory.  Hence, disable stack
+// warning.
+#pragma GCC diagnostic ignored "-Wstack-usage="
+
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
