@@ -70,8 +70,8 @@ using namespace ::chip::DeviceLayer;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG                  = "all-clusters-app";
-const uint32_t delayNotifySeconds = 10;
+const char * TAG                    = "all-clusters-app";
+const uint32_t delayConfirmImageSec = 10;
 
 static DeviceCallbacks EchoCallbacks;
 
@@ -115,7 +115,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.DelayNotifyUpdateAppliedAction(delayNotifySeconds);
+    gRequestorUser.SetDelayConfirmCurrentImageSec(delayConfirmImageSec);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 #endif
 }

@@ -58,8 +58,8 @@ OTAImageProcessorImpl gImageProcessor;
 
 LEDWidget AppLED;
 
-static const char * TAG           = "light-app";
-const uint32_t delayNotifySeconds = 10;
+static const char * TAG             = "light-app";
+const uint32_t delayConfirmImageSec = 10;
 
 static DeviceCallbacks EchoCallbacks;
 namespace {
@@ -81,7 +81,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.DelayNotifyUpdateAppliedAction(delayNotifySeconds);
+    gRequestorUser.SetDelayConfirmCurrentImageSec(delayConfirmImageSec);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 #endif
 }

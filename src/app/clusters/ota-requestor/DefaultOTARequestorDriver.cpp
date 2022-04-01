@@ -48,8 +48,8 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
-System::Clock::Seconds32 mDelayNotifyUpdateAppliedSeconds =
-    System::Clock::Seconds32(0); // Delay before sending notify update applied command
+System::Clock::Seconds32 mDelayConfirmCurrentImageSec =
+    System::Clock::Seconds32(0); // Delay before confirming current image (in seconds)
 
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
@@ -58,9 +58,9 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 } // namespace
 
-void GenericOTARequestorDriver::DelayNotifyUpdateAppliedAction(uint32_t seconds)
+void GenericOTARequestorDriver::SetDelayConfirmCurrentImageSec(uint32_t seconds)
 {
-    mDelayNotifyUpdateAppliedSeconds = System::Clock::Seconds32(seconds);
+    mDelayConfirmCurrentImageSec = System::Clock::Seconds32(seconds);
 }
 
 void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
@@ -72,7 +72,7 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     if (mImageProcessor->IsFirstImageRun())
     {
         ScheduleDelayedAction(
-            mDelayNotifyUpdateAppliedSeconds,
+            mDelayConfirmCurrentImageSec,
             [](System::Layer *, void * context) {
                 CHIP_ERROR error = ToDriver(context)->mImageProcessor->ConfirmCurrentImage();
                 if (error != CHIP_NO_ERROR)
