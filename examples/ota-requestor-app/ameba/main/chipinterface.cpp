@@ -23,6 +23,7 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -65,14 +66,21 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-namespace {
+namespace { // Network Commissioning
+constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
 app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
+                                      &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
 } // namespace
 
 void NetWorkCommissioningInstInit()
 {
     sWiFiNetworkCommissioningInstance.Init();
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
 static DeviceCallbacks EchoCallbacks;
@@ -86,14 +94,13 @@ AmebaOTAImageProcessor gImageProcessor;
 extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
 }
 
 extern "C" void amebaApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-
-    static_cast<OTARequestor *>(GetRequestorInstance())->ApplyUpdate();
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
 static void InitOTARequestor(void)
@@ -117,14 +124,14 @@ static void InitOTARequestor(void)
 
 static void InitServer(intptr_t context)
 {
+    InitOTARequestor();
+
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
-
-    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)

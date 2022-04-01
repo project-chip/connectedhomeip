@@ -100,18 +100,6 @@ private:
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
     CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
