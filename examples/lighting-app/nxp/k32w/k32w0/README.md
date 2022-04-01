@@ -474,4 +474,19 @@ doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupd
 -   Due to some MDNS issues, the commissoning of the OTA Provider Application
     may fail. Please make sure that the SRP cache is disabled (_ot-ctl srp
     server disable_) on the openthread border router while commissioning the OTA
-    Provider Application.
+    Provider Application;
+-   No other Docker image should be running (e.g.: Docker image
+    needed by Test Harness) except the OTBR one. A docker image can be killed
+    using the command:
+```
+doru@computer1:~/connectedhomeip$ : sudo docker kill $container_id
+```
+-   In order to avoid MDNS issues, only one interface should be active at one time.
+    E.g.: if WiFi is used then disable the Ethernet interface and also disable
+    multicast on that interface:
+```
+doru@computer1:~/connectedhomeip$ sudo ip link set dev eth0 down
+doru@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
+```
+-   If OTBR Docker image is used, then the "-B" parameter should point to the
+    interface used for the backbone.
