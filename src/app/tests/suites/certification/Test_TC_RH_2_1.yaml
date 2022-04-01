@@ -46,15 +46,28 @@ tests:
               minValue: 0
               maxValue: 9999
 
-    - label: "Reads constraints of attribute: MaxMeasuredValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "max measured value"
-      response:
-          constraints:
-              type: int16
-              minValue: 1
-              maxValue: 10000
+    - label:
+          "Read MaxMeasuredValue attribute from the DUT and Verify that the DUT
+          response with an int16 value,response value should be in the range of
+          1 to 10000"
+      verification: |
+          ./chip-tool relativehumiditymeasurement read max-measured-value 1 1
+
+          verify that you see something like this:
+
+          [1643289012.569725][12931:12936] CHIP:DMG:                   }
+          [1643289012.569805][12931:12936] CHIP:DMG:
+          [1643289012.569883][12931:12936] CHIP:DMG:     Data = 10000,
+          [1643289012.569957][12931:12936] CHIP:DMG:                         }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads constraints of attribute: Tolerance"
       optional: true

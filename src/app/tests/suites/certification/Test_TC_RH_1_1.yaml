@@ -28,21 +28,25 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12190 as per spec default value is 3 but expecting 2
-    #referring default value of Water Content Measurement
-    - label: "read the global attribute: ClusterRevision"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 3
+    - label:
+          "Read ClusterRevision attribute from the DUT and Verify that the DUT
+          response indicates ClusterRevision attribute has the value 3"
+      verification: |
+          ./chip-tool relativehumiditymeasurement read cluster-revision 1 1
 
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          constraints:
-              type: uint16
+          verify that you see something like this:
+
+          [1643287333.135402][12177:12182] CHIP:DMG:  Data = 3,
+          [1643287333.135504][12177:12182] CHIP:DMG:                         }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "LifetimeEnergyConsumed"
+              - name: "expectedValue"
+                value: 3
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -51,14 +55,20 @@ tests:
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

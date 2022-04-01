@@ -64,30 +64,65 @@ tests:
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read AcceptedCommandList attribute from the DUT and Verify that the
+          DUT response provides a list of supported commands,This list SHALL
+          include all the mandatory commands."
+      verification: |
+          ./chip-tool onoff read accepted-generated-command-list 1 1
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
+          [...]
+          [1646045691.415739][36078:36083] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFF9DataVersion: 1805855192
+          [1646045691.415819][36078:36083] CHIP:TOO:   AcceptedCommandList: 6 entries
+          [1646045691.415876][36078:36083] CHIP:TOO:     [1]: 0
+          [1646045691.415901][36078:36083] CHIP:TOO:     [2]: 1
+          [1646045691.415925][36078:36083] CHIP:TOO:     [3]: 2
+          [1646045691.415950][36078:36083] CHIP:TOO:     [4]: 64
+          [1646045691.415973][36078:36083] CHIP:TOO:     [5]: 65
+          [1646045691.415997][36078:36083] CHIP:TOO:     [6]: 66
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read GeneratedCommandList attribute from the DUT and Verify that the
+          DUT response provides a list of supported commands."
+      verification: |
+          ./chip-tool onoff read generated-command-list 1 1
+
+          [...]
+          [1646045725.838216][36086:36091] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFF8DataVersion: 1805855192
+          [1646045725.838297][36086:36091] CHIP:TOO:   GeneratedCommandList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"

@@ -116,7 +116,6 @@ function getTests()
   ];
 
   const MediaControl = [
-    'Test_TC_MC_1_1',
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
@@ -143,7 +142,6 @@ function getTests()
   ];
 
   const OnOff = [
-    'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
@@ -161,13 +159,9 @@ function getTests()
   const PumpConfigurationControl = [
     'Test_TC_PCC_1_1',
     'Test_TC_PCC_2_1',
-    'Test_TC_PCC_2_2',
-    'Test_TC_PCC_2_3',
   ];
 
   const RelativeHumidityMeasurement = [
-    'Test_TC_RH_1_1',
-    'Test_TC_RH_2_1',
     'Test_TC_RH_2_2',
   ];
 
@@ -177,7 +171,6 @@ function getTests()
   ];
 
   const TemperatureMeasurement = [
-    'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
     'Test_TC_TM_2_2',
   ];
@@ -189,7 +182,6 @@ function getTests()
   ];
 
   const ThermostatUserConfiguration = [
-    'Test_TC_TSUIC_1_1',
     'Test_TC_TSUIC_2_1',
     'Test_TC_TSUIC_2_2',
   ];

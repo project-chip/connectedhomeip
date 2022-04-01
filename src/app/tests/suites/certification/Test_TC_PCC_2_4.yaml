@@ -70,12 +70,24 @@ tests:
       arguments:
           value: 1
 
-    - label: "Reads the attribute: LifetimeEnergyConsumed"
-      disabled: true
-      command: "readAttribute"
-      attribute: "LifetimeEnergyConsumed"
-      response:
-          value: 1
+    - label:
+          "Read LifetimeEnergyConsumed attribute from the DUT and Verify that
+          the DUT response indicates LifetimeEnergyConsumed attribute has the
+          value 1"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read lifetime-energy-consumed 1 1
+
+          Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_0017DataVersion: 1358659838
+          [1646143138.441217][3828:3833] CHIP:TOO:   LifetimeEnergyConsumed: 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter LifetimeEnergyConsumed attribute value"
+              - name: "expectedValue"
+                value: 1
 
     - label: "Write 2 to the LifetimeEnergyConsumed attribute to DUT"
       command: "writeAttribute"
