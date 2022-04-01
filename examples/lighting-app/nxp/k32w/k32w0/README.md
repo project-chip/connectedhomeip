@@ -495,5 +495,5 @@ doru@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 -   If OTBR Docker image is used, then the "-B" parameter should point to the
     interface used for the backbone.
 
--   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected. Otherwise,
-    issues related to BLE-WiFi combo may appear.
+-   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
+    Otherwise, issues related to BLE-WiFi combo may appear.
