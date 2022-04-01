@@ -73,4 +73,3 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 tizen-arm-light
-bl602-light
