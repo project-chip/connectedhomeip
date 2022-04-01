@@ -205,7 +205,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if defined(CHIP_APP_USE_ECHO)
-    err = InitEchoHandler(&gExchangeMgr);
+    err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
 #endif
 
