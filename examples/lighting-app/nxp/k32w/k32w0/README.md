@@ -27,13 +27,10 @@ network.
     -   [Detokenizer script](#detokenizer)
     -   [Notes](#detokenizer-notes)
     -   [Known issues](#detokenizer-known-issues)
--   [OTA](#ota)
-    -   [Writing the SSBL](#ssbl)
-    -   [Writing the PSECT](#psect)
-    -   [Writing the application](#appwrite)
-    -   [OTA Testing](#otatesting)
-    -   [Known issues](#otaissues)
-<hr>
+-   [OTA](#ota) - [Writing the SSBL](#ssbl) - [Writing the PSECT](#psect) -
+    [Writing the application](#appwrite) - [OTA Testing](#otatesting) -
+    [Known issues](#otaissues)
+    <hr>
 
 <a name="intro"></a>
 
