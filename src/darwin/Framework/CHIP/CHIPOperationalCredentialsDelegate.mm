@@ -353,7 +353,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
     const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-    const ByteSpan & PAA, Callback::Callback<OnNOCChainGeneration> * onCompletion)
+    Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {

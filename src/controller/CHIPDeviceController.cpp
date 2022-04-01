@@ -1111,7 +1111,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
-                                                             dac, ByteSpan(), ByteSpan(), &mDeviceNOCChainCallback);
+                                                             dac, ByteSpan(), &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,

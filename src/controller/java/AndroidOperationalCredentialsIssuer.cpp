@@ -123,7 +123,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
 CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                                                  const ByteSpan & attestationSignature,
                                                                  const ByteSpan & attestationChallenge, const ByteSpan & DAC,
-                                                                 const ByteSpan & PAI, const ByteSpan & PAA,
+                                                                 const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;

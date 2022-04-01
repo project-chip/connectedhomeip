@@ -57,14 +57,13 @@ public:
      * @param[in] attestationChallenge Attestation challenge as per 11.18.5.7
      * @param[in] DAC                  Device attestation certificate received from the device being commissioned
      * @param[in] PAI                  Product Attestation Intermediate certificate
-     * @param[in] PAA                  Product Attestation Authority certificate
      * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                         const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
-                                        const ByteSpan & DAC, const ByteSpan & PAI, const ByteSpan & PAA,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**

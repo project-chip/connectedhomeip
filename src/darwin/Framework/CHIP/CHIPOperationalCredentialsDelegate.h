@@ -47,7 +47,7 @@ public:
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk);
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-        const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI, const ByteSpan & PAA,
+        const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
         Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
