@@ -58,7 +58,8 @@ class Bl602Builder(GnBuilder):
                  app: Bl602App = Bl602App.LIGHT,
                  board: Bl602Board = Bl602Board.BL602BOARD):
         super(Bl602Builder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'bouffalolab', 'bl602'),
+            root=os.path.join(root, 'examples',
+                              app.ExampleName(), 'bouffalolab', 'bl602'),
             runner=runner)
 
         self.app = app

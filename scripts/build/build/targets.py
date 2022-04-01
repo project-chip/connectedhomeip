@@ -488,7 +488,7 @@ def Bl602Targets():
     target = Target('bl602', Bl602Builder)
 
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
-    
+
 
 ALL = []
 
