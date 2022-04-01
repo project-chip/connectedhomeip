@@ -356,3 +356,12 @@ is_debug
 show_qr_code
 
     $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
