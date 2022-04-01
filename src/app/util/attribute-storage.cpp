@@ -198,7 +198,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return 0xFFFF;
 }
 
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep, uint16_t deviceId,
                                         uint8_t deviceVersion, const Span<DataVersion> & dataVersionStorage)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
