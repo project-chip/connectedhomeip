@@ -63,7 +63,9 @@ app::Clusters::NetworkCommissioning::Instance
 
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
+    (void) initParams.InitBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
