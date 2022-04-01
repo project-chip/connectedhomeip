@@ -418,7 +418,7 @@ public:
      * Indicates the start of a series of list operations. This function will be called before the first Write operation of a series
      * of consequence attribute data of the same attribute.
      *
-     * 1) This function won't be called if the user writes a null value to a list attribute.
+     * 1) This function won't be called if the client tries to set a nullable list attribute to null.
      * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
      * of the same attribute.
      *
@@ -430,11 +430,10 @@ public:
      * Indicates the end of a series of list operations. This function will be called after the last Write operation of a series
      * of consequence attribute data of the same attribute.
      *
-     * 1) This function won't be called if the user writes a null value to a list attribute.
+     * 1) This function won't be called if the client tries to set a nullable list attribute to null.
      * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
      * of the same attribute.
      * 3) When aWriteWasSuccessful is true, the data written must be consistent or the list is untouched.
-     * 4) When aWriteWasSuccessful is false, the list might be untouched.
      *
      * @param [in] aPath indicates the path of the modified list
      * @param [in] aWriteWasSuccessful indicates whether the delivered list is complete.
