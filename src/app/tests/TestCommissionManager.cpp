@@ -52,7 +52,10 @@ void InitializeChip(nlTestSuite * suite)
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
 
-    err = Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    err = chip::Server::GetInstance().Init(initParams);
+
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
 
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();

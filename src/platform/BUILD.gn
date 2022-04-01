@@ -290,6 +290,7 @@ if (chip_device_platform != "none") {
       "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
+      "../include/platform/KvsPersistentStorageDelegate.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
       "../include/platform/TestOnlyCommissionableDataProvider.h",

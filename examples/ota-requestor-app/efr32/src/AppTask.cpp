@@ -127,7 +127,9 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config

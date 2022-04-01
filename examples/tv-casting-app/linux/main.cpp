@@ -141,7 +141,10 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Enter commissioning mode, open commissioning window
-    Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));

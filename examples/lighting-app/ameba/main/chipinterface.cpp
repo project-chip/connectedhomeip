@@ -167,7 +167,9 @@ static void InitServer(intptr_t context)
 #endif
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

@@ -109,7 +109,10 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(&sCallbacks);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    initParams.appDelegate = &sCallbacks
+    chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);

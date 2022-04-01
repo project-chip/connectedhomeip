@@ -88,7 +88,9 @@ void NetWorkCommissioningInstInit()
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void)initParams.InitBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
