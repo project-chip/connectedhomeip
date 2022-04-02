@@ -145,7 +145,8 @@ exit:
     {
         if (globalStatus != InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to open commissioning window. Global status %d", to_underlying(globalStatus));
+            ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
         }
         commandObj->AddStatus(commandPath, globalStatus);
     }
@@ -191,7 +192,8 @@ exit:
     {
         if (globalStatus != InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to open commissioning window. Global status %d", to_underlying(globalStatus));
+            ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
         }
         commandObj->AddStatus(commandPath, globalStatus);
     }
