@@ -267,32 +267,37 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         bool hasEncodeDataVersionList = false;
         if (!attributePaths.empty())
         {
+            uint32_t number = 0;
+            TLV::TLVWriter backup;
+            request.Checkpoint(backup);
             if (!dataVersionFilters.empty())
             {
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                                   aReadPrepareParams.mEnableCachedDataVersionFilter));
-                hasEncodeDataVersionList = true;
+                ReturnErrorOnFailure(
+                    GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, number));
+                if (number == 0)
+                {
+                    request.Rollback(backup);
+                }
+                else
+                {
+                    hasEncodeDataVersionList = true;
+                }
             }
             else
             {
-                if (aReadPrepareParams.mEnableCachedDataVersionFilter)
+                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+                ReturnErrorOnFailure(request.GetError());
+                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
                 {
-                    TLV::TLVWriter backup;
-                    request.Checkpoint(backup);
-                    DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                    ReturnErrorOnFailure(request.GetError());
-                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-                    {
-                        request.Rollback(backup);
-                    }
-                    else
-                    {
-                        ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                        hasEncodeDataVersionList = true;
-                    }
+                    request.Rollback(backup);
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                    hasEncodeDataVersionList = true;
                 }
             }
         }
@@ -352,8 +357,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
 
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
-                                                     const Span<DataVersionFilter> & aDataVersionFilters,
-                                                     bool aEnableCachedDataVersionFilter)
+                                                     const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
 {
     for (auto & filter : aDataVersionFilters)
     {
@@ -381,11 +385,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB().GetError());
         VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
-    }
-
-    if (aEnableCachedDataVersionFilter)
-    {
-        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
+        aNumber++;
     }
 
     ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
@@ -930,33 +930,38 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     bool hasEncodeDataVersionList = false;
     if (!attributePaths.empty())
     {
+        uint32_t number = 0;
+        TLV::TLVWriter backup;
+        request.Checkpoint(backup);
         if (!dataVersionFilters.empty())
         {
             DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
             ReturnErrorOnFailure(request.GetError());
-            ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                               aReadPrepareParams.mEnableCachedDataVersionFilter));
-            hasEncodeDataVersionList = true;
+            ReturnErrorOnFailure(
+                GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, number));
+            if (number == 0)
+            {
+                request.Rollback(backup);
+            }
+            else
+            {
+                hasEncodeDataVersionList = true;
+            }
         }
         else
         {
-            if (aReadPrepareParams.mEnableCachedDataVersionFilter)
-            {
-                TLV::TLVWriter backup;
-                request.Checkpoint(backup);
-                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                ReturnErrorOnFailure(request.GetError());
+            DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+            ReturnErrorOnFailure(request.GetError());
 
-                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-                {
-                    request.Rollback(backup);
-                }
-                else
-                {
-                    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                    hasEncodeDataVersionList = true;
-                }
+            if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
+            {
+                request.Rollback(backup);
+            }
+            else
+            {
+                ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+                ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                hasEncodeDataVersionList = true;
             }
         }
     }

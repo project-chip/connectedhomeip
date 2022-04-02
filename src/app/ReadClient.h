@@ -168,8 +168,8 @@ public:
 
         /**
          * This function is invoked when constructing read/subscribeRequest, where the ReadClient would use cached cluster data
-         * version to construct data version filter list. When the particular cached cluster data version does not intersect with user
-         * provided attribute paths, that cached one would be skipped. When encoded cluster data version filters exceeds the
+         * version to construct data version filter list. When the particular cached cluster data version does not intersect with
+         * user provided attribute paths, that cached one would be skipped. When encoded cluster data version filters exceeds the
          * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
          * return the number of successful encoded data version filters.
          */
@@ -319,8 +319,7 @@ private:
                                       const Span<AttributePathParams> & aAttributePaths);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                              const Span<AttributePathParams> & aAttributePaths,
-                                             const Span<DataVersionFilter> & aDataVersionFilters,
-                                             bool aEnableCachedDataVersionFilter);
+                                             const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

@@ -627,11 +627,11 @@ void TestSortConcreteDataAttributePathWithSize(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(gSuite, 1 == clusterSet.size());
     clusterSet.clear();
     cluster1.mEndpointId = 1;
-    cluster1.mSize = 2;
+    cluster1.mSize       = 2;
     cluster2.mEndpointId = 2;
-    cluster2.mSize = 4;
+    cluster2.mSize       = 4;
     cluster3.mEndpointId = 3;
-    cluster3.mSize = 1;
+    cluster3.mSize       = 1;
     clusterSet.insert(cluster1);
     clusterSet.insert(cluster2);
     clusterSet.insert(cluster3);
