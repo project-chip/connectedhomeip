@@ -21,6 +21,7 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
+#import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIP.h>
 #import <CHIP/CHIPSetupPayload.h>
 
@@ -82,6 +83,14 @@
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) CHIPSetupPayload * setupPayload;
 @property (strong, nonatomic) DeviceSelector * deviceList;
+@end
+
+@interface CHIPToolDeviceAttestationDelegate : NSObject <CHIPDeviceAttestationDelegate>
+
+@property (weak, nonatomic) QRCodeViewController* viewController;
+
+- (instancetype)initWithViewController:(QRCodeViewController *)viewController;
+
 @end
 
 @implementation QRCodeViewController {
@@ -488,6 +497,8 @@
             });
         } else {
             CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+            params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
+            params.failSafeExpiryTimeoutSecs = @600;
             NSError * error;
             if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
                 NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
@@ -654,6 +665,8 @@
     CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
     params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+    params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
+    params.failSafeExpiryTimeoutSecs = @600;
 
     uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
 
@@ -1083,5 +1096,45 @@
 }
 
 @synthesize description;
+
+@end
+
+@implementation CHIPToolDeviceAttestationDelegate
+
+- (instancetype)initWithViewController:(QRCodeViewController *)viewController
+{
+    if (self = [super init]) {
+        _viewController = viewController;
+    }
+    return self;
+}
+
+- (void)onDeviceAttestation:(CHIPDeviceController *)controller
+                   deviceId:(uint64_t)deviceId
+            failedWithError:(NSError * _Nonnull)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController * alertController =
+            [UIAlertController alertControllerWithTitle:@"Device Attestation"
+                                                message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
+                                         preferredStyle:UIAlertControllerStyleAlert];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"No"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              NSError *err;
+                                                              [controller continueCommissioningDevice:deviceId ignoreAttestationFailure:NO error:&err];
+                                                          }]];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Continue"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              NSError *err;
+                                                              [controller continueCommissioningDevice:deviceId ignoreAttestationFailure:YES error:&err];
+                                                          }]];
+
+        [self.viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
 
 @end

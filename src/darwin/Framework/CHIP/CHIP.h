@@ -33,6 +33,7 @@
 #import <CHIP/CHIPSetupPayload.h>
 #import <CHIP/CHIPStructsObjc.h>
 #import <CHIP/CHIPThreadOperationalDataset.h>
+#import <CHIP/CHIPDeviceAttestationDelegate.h>
 
 #import <Foundation/Foundation.h>
 //! Project version number for CHIP.
