@@ -429,6 +429,7 @@ client cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute boolean supportsConcurrentConnection = 4;
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -438,14 +439,12 @@ client cluster GeneralCommissioning = 48 {
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
     INT64U breadcrumb = 1;
-    INT32U timeoutMs = 2;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location = 0;
+    RegulatoryLocationType newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
-    INT32U timeoutMs = 3;
   }
 
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -476,6 +475,7 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute boolean supportsConcurrentConnection = 4;
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -485,14 +485,12 @@ server cluster GeneralCommissioning = 48 {
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
     INT64U breadcrumb = 1;
-    INT32U timeoutMs = 2;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location = 0;
+    RegulatoryLocationType newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
-    INT32U timeoutMs = 3;
   }
 
   response struct ArmFailSafeResponse {

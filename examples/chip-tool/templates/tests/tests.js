@@ -545,6 +545,7 @@ function getTests()
     'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
