@@ -26,7 +26,6 @@
 #pragma once
 
 #include <lwipopts.h>
-#include <stdint.h>
 
 // ==================== Platform Adaptations ====================
 
