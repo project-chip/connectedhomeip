@@ -44,6 +44,7 @@
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -414,6 +415,17 @@ public:
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
     CHIP_ERROR Commission(NodeId remoteDeviceId);
 
+    /**
+     * @brief
+     *   This function instructs the commissioner to proceed to the next stage of commissioning after
+     *   attestation failure is reported to an installed attestation delegate.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] attestationResult     The attestation result to use instead of whatever the device
+     *                                  attestation verifier came up with. May be a success or an error result.
+     */
+    CHIP_ERROR ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId, chip::Credentials::AttestationVerificationResult attestationResult);
+
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
@@ -555,6 +567,7 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 
@@ -615,6 +628,7 @@ private:
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, CHIP_ERROR error);
 
+    void ExtendArmFailSafeForFailedDeviceAttestation(Credentials::AttestationVerificationResult result);
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
         void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
@@ -674,6 +688,9 @@ private:
                                  const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
     void DisarmDone();
+    static void OnArmFailSafeExtendedForFailedDeviceAttestation(void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnFailedToExtendedArmFailSafeFailedDeviceAttestation(void * context, CHIP_ERROR error);
 
     /**
      * @brief
@@ -767,6 +784,7 @@ private:
 
     Platform::UniquePtr<app::AttributeCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    Credentials::AttestationVerificationResult mAttestationResult;
 };
 
 } // namespace Controller
