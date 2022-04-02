@@ -764,6 +764,18 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager & sessionManager, int max)
+{
+    // Allocate + free a pseudo-random number of sessions to create a
+    // pseudo-random offset in mNextSessionId.
+    for (int i = 0; i < rand() % max; ++i)
+    {
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        sessionManager.ExpirePairing(handle.Value());
+    }
+}
+
 void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
@@ -802,6 +814,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         prevSessionId = sessionId;
     }
 
+    // Reconstruct the Session Manager to reset state.
     sessionManager.~SessionManager();
     new (&sessionManager) SessionManager();
 
@@ -818,6 +831,49 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
         sessionManager.ExpirePairing(handle.Value());
+    }
+
+    // Verify that the allocator does not give colliding IDs.
+    for (int i = 0; i < 3; ++i)
+    {
+        // Allocate some session handles at pseudo-random offsets in the session
+        // ID space.
+        constexpr size_t numHandles = CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE - 1;
+        Optional<SessionHandle> handles[numHandles];
+        uint16_t sessionIds[numHandles];
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            handles[h] = sessionManager.AllocateSession();
+            NL_TEST_ASSERT(inSuite, handles[h].HasValue());
+            sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
+            RandomSessionIdAllocatorOffset(inSuite, sessionManager, 5000);
+        }
+
+        // Verify that none collide each other.
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            NL_TEST_ASSERT(inSuite, sessionIds[h] != sessionIds[(h + 1) % numHandles]);
+        }
+
+        // Allocate through the entire session ID space and verify that none of
+        // these collide either.
+        for (int j = 0; j < UINT16_MAX; ++j)
+        {
+            auto handle = sessionManager.AllocateSession();
+            NL_TEST_ASSERT(inSuite, handle.HasValue());
+            auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
+            for (size_t h = 0; h < numHandles; ++h)
+            {
+                NL_TEST_ASSERT(inSuite, potentialCollision != sessionIds[h]);
+            }
+            sessionManager.ExpirePairing(handle.Value());
+        }
+
+        // Free our allocated sessions.
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            sessionManager.ExpirePairing(handles[h].Value());
+        }
     }
 
     sessionManager.Shutdown();
