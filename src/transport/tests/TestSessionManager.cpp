@@ -768,7 +768,8 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
 {
     // Allocate + free a pseudo-random number of sessions to create a
     // pseudo-random offset in mNextSessionId.
-    for (int i = 0; i < rand() % max; ++i)
+    const int bound = rand() % max;
+    for (int i = 0; i < bound; ++i)
     {
         auto handle = sessionManager.AllocateSession();
         NL_TEST_ASSERT(inSuite, handle.HasValue());
