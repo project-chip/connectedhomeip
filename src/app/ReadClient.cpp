@@ -271,7 +271,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             {
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters));
+                ReturnErrorOnFailure(
+                    GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters));
                 hasEncodeDataVersionList = true;
             }
             else
@@ -291,7 +292,6 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                     hasEncodeDataVersionList = true;
                 }
             }
-
         }
 
         if (!hasEncodeDataVersionList)

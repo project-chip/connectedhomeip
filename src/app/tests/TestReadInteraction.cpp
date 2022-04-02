@@ -237,7 +237,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == kTestClusterId && (aPath.mEndpointId == kTestEndpointId || aPath.mEndpointId == kTestEndpointId2 || aPath.mEndpointId == kTestEndpointId3)))
+    if (!(aPath.mClusterId == kTestClusterId &&
+          (aPath.mEndpointId == kTestEndpointId || aPath.mEndpointId == kTestEndpointId2 || aPath.mEndpointId == kTestEndpointId3)))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -1785,8 +1786,8 @@ void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFi
     dataVersionFilters[0].mEndpointId = kTestEndpointId;
     dataVersionFilters[0].mClusterId  = kTestClusterId;
     dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion2);
-    readPrepareParams.mpDataVersionFilterList        = dataVersionFilters;
-    readPrepareParams.mDataVersionFilterListSize     = 1;
+    readPrepareParams.mpDataVersionFilterList    = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize = 1;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -1987,7 +1988,8 @@ void TestReadInteraction::TestReadWithAttributeSortingCachePartialRollbackDataVe
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFilterRollback(nlTestSuite * apSuite,
+                                                                                             void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -2030,8 +2032,8 @@ void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFi
     dataVersionFilters[0].mEndpointId = kTestEndpointId;
     dataVersionFilters[0].mClusterId  = kTestClusterId;
     dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion2);
-    readPrepareParams.mpDataVersionFilterList        = dataVersionFilters;
-    readPrepareParams.mDataVersionFilterListSize     = 1;
+    readPrepareParams.mpDataVersionFilterList    = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize = 1;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

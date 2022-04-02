@@ -62,8 +62,7 @@ struct ConcreteClusterPathWithSize : public ConcreteClusterPath
     }
     ConcreteClusterPathWithSize() {}
     DataVersion mDataVersion = 0;
-    uint32_t mSize = 0;
-
+    uint32_t mSize           = 0;
 };
 
 } // namespace app
