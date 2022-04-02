@@ -834,7 +834,8 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     }
 
     // Verify that the allocator does not give colliding IDs.
-    for (int i = 0; i < 3; ++i)
+    constexpr int collisionTestIterations = 1;
+    for (int i = 0; i < collisionTestIterations; ++i)
     {
         // Allocate some session handles at pseudo-random offsets in the session
         // ID space.
@@ -843,10 +844,11 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         uint16_t sessionIds[numHandles];
         for (size_t h = 0; h < numHandles; ++h)
         {
-            handles[h] = sessionManager.AllocateSession();
+            constexpr int maxOffset = 5000;
+            handles[h]              = sessionManager.AllocateSession();
             NL_TEST_ASSERT(inSuite, handles[h].HasValue());
             sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
-            RandomSessionIdAllocatorOffset(inSuite, sessionManager, 5000);
+            RandomSessionIdAllocatorOffset(inSuite, sessionManager, maxOffset);
         }
 
         // Verify that none collide each other.
