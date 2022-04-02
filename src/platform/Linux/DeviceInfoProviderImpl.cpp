@@ -28,14 +28,13 @@ namespace chip {
 namespace DeviceLayer {
 
 namespace {
-const char kConfigNamespace_ChipDeviceInfo[] = "chip-device-information";
-constexpr TLV::Tag kLabelNameTag             = TLV::ContextTag(0);
-constexpr TLV::Tag kLableValueTag            = TLV::ContextTag(1);
+constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
+constexpr TLV::Tag kLableValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
 CHIP_ERROR DeviceInfoProviderImpl::Init()
 {
-    return mStorage.Init(kConfigNamespace_ChipDeviceInfo);
+    return mStorage.Init(CHIP_DEVICE_INFO_PATH);
 }
 
 DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
@@ -137,8 +136,9 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     ReturnErrorOnFailure(writer.PutString(kLabelNameTag, userLabel.label));
     ReturnErrorOnFailure(writer.PutString(kLableValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
+    ReturnErrorOnFailure(mStorage.WriteValueBin(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten()));
 
-    return mStorage.WriteValueBin(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten());
+    return mStorage.Commit();
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)

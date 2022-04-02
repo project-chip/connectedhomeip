@@ -69,8 +69,8 @@ public:
     const char * GroupControlCounter() { return Format("g/gcc"); }
 
     // Device Information Provider
-    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("e/%x/ulc", endpoint); }
-    const char * UserLabelIndexKey(EndpointId endpoint, size_t index) { return Format("e/%x/ulc/%lx", endpoint, index); }
+    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("a/%" PRIx16, endpoint); }
+    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("a/%" PRIx16 "/%" PRIx32, endpoint, index); }
 
     // Group Data Provider
 
