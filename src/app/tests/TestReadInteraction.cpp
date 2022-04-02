@@ -1708,8 +1708,6 @@ void TestReadInteraction::TestReadWithAttributeCache(nlTestSuite * apSuite, void
 
     readPrepareParams.mAttributePathParamsListSize = 3;
 
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
-
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     {
@@ -1789,7 +1787,6 @@ void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFi
     dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion2);
     readPrepareParams.mpDataVersionFilterList        = dataVersionFilters;
     readPrepareParams.mDataVersionFilterListSize     = 1;
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -1862,8 +1859,6 @@ void TestReadInteraction::TestReadWithAttributeCacheRollbackDataVersionList(nlTe
     readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
 
     readPrepareParams.mAttributePathParamsListSize = 2;
-
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -1959,8 +1954,6 @@ void TestReadInteraction::TestReadWithAttributeSortingCachePartialRollbackDataVe
 
     readPrepareParams.mAttributePathParamsListSize = 7;
 
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
-
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     {
@@ -2039,7 +2032,6 @@ void TestReadInteraction::TestReadWithAttributeCacheWithUserDefinedDataVersionFi
     dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion2);
     readPrepareParams.mpDataVersionFilterList        = dataVersionFilters;
     readPrepareParams.mDataVersionFilterListSize     = 1;
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -2116,8 +2108,6 @@ void TestReadInteraction::TestSubscribeWithAttributeCache(nlTestSuite * apSuite,
 
     readPrepareParams.mMinIntervalFloorSeconds   = 2;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
-
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
 
     printf("\nAttributeCache Test: Send first subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -2201,8 +2191,6 @@ void TestReadInteraction::TestSubscribeWithAttributeCacheWithUserDefinedDataVers
 
     readPrepareParams.mMinIntervalFloorSeconds   = 2;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
-
-    readPrepareParams.mEnableCachedDataVersionFilter = true;
 
     printf("\nAttributeCache Test: Send first read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

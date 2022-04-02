@@ -271,30 +271,27 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             {
                 DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
                 ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                                   aReadPrepareParams.mEnableCachedDataVersionFilter));
+                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters));
                 hasEncodeDataVersionList = true;
             }
             else
             {
-                if (aReadPrepareParams.mEnableCachedDataVersionFilter)
+                TLV::TLVWriter backup;
+                request.Checkpoint(backup);
+                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+                ReturnErrorOnFailure(request.GetError());
+                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
                 {
-                    TLV::TLVWriter backup;
-                    request.Checkpoint(backup);
-                    DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                    ReturnErrorOnFailure(request.GetError());
-                    if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-                    {
-                        request.Rollback(backup);
-                    }
-                    else
-                    {
-                        ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                        hasEncodeDataVersionList = true;
-                    }
+                    request.Rollback(backup);
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                    hasEncodeDataVersionList = true;
                 }
             }
+
         }
 
         if (!hasEncodeDataVersionList)
@@ -352,8 +349,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
 
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
-                                                     const Span<DataVersionFilter> & aDataVersionFilters,
-                                                     bool aEnableCachedDataVersionFilter)
+                                                     const Span<DataVersionFilter> & aDataVersionFilters)
 {
     for (auto & filter : aDataVersionFilters)
     {
@@ -381,11 +377,6 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB().GetError());
         VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
-    }
-
-    if (aEnableCachedDataVersionFilter)
-    {
-        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
     }
 
     ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
@@ -934,29 +925,25 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         {
             DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
             ReturnErrorOnFailure(request.GetError());
-            ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters,
-                                                               aReadPrepareParams.mEnableCachedDataVersionFilter));
+            ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters));
             hasEncodeDataVersionList = true;
         }
         else
         {
-            if (aReadPrepareParams.mEnableCachedDataVersionFilter)
-            {
-                TLV::TLVWriter backup;
-                request.Checkpoint(backup);
-                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                ReturnErrorOnFailure(request.GetError());
+            TLV::TLVWriter backup;
+            request.Checkpoint(backup);
+            DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+            ReturnErrorOnFailure(request.GetError());
 
-                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-                {
-                    request.Rollback(backup);
-                }
-                else
-                {
-                    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                    hasEncodeDataVersionList = true;
-                }
+            if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
+            {
+                request.Rollback(backup);
+            }
+            else
+            {
+                ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+                ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+                hasEncodeDataVersionList = true;
             }
         }
     }

@@ -319,8 +319,7 @@ private:
                                       const Span<AttributePathParams> & aAttributePaths);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                              const Span<AttributePathParams> & aAttributePaths,
-                                             const Span<DataVersionFilter> & aDataVersionFilters,
-                                             bool aEnableCachedDataVersionFilter);
+                                             const Span<DataVersionFilter> & aDataVersionFilters);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

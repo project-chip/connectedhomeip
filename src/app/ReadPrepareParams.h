@@ -68,7 +68,6 @@ struct ReadPrepareParams
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mpDataVersionFilterList            = other.mpDataVersionFilterList;
         mDataVersionFilterListSize         = other.mDataVersionFilterListSize;
-        mEnableCachedDataVersionFilter     = other.mEnableCachedDataVersionFilter;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
@@ -94,7 +93,6 @@ struct ReadPrepareParams
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mpDataVersionFilterList            = other.mpDataVersionFilterList;
         mDataVersionFilterListSize         = other.mDataVersionFilterListSize;
-        mEnableCachedDataVersionFilter     = other.mEnableCachedDataVersionFilter;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
