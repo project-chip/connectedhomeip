@@ -22,6 +22,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -164,6 +165,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() &&
                             commissioningTimeout >= mMinCommissioningTimeoutOverride.ValueOr(MinCommissioningTimeout()),
                         CHIP_ERROR_INVALID_ARGUMENT);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(commissioningTimeout, HandleCommissioningWindowTimeout, this));
 
