@@ -147,16 +147,16 @@ public:
             mGroupDataProvider != nullptr;
     };
 
-    System::Layer * SystemLayer() { return mSystemLayer; };
-    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() { return mTCPEndPointManager; };
-    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() { return mUDPEndPointManager; };
-    DeviceTransportMgr * TransportMgr() { return mTransportMgr; };
-    SessionManager * SessionMgr() { return mSessionMgr; };
-    Messaging::ExchangeManager * ExchangeMgr() { return mExchangeMgr; }
-    secure_channel::MessageCounterManager * MessageCounterManager() { return mMessageCounterManager; };
-    FabricTable * Fabrics() { return mFabrics; };
+    System::Layer * SystemLayer() const { return mSystemLayer; };
+    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };
+    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() const { return mUDPEndPointManager; };
+    DeviceTransportMgr * TransportMgr() const { return mTransportMgr; };
+    SessionManager * SessionMgr() const { return mSessionMgr; };
+    Messaging::ExchangeManager * ExchangeMgr() const { return mExchangeMgr; }
+    secure_channel::MessageCounterManager * MessageCounterManager() const { return mMessageCounterManager; };
+    FabricTable * Fabrics() const { return mFabrics; };
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * BleLayer() { return mBleLayer; };
+    Ble::BleLayer * BleLayer() const { return mBleLayer; };
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     SessionIDAllocator * SessionIDAlloc() const { return mSessionIDAllocator; }
