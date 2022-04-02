@@ -130,7 +130,7 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
     mDelegate = delegate;
     ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(SecureChannel, "Assigned local session key ID %d", GetLocalSessionId().Value());
+    ChipLogDetail(SecureChannel, "Assigned local session key ID %u", GetLocalSessionId().Value());
 
     ReturnErrorCodeIf(setupCode >= (1 << kSetupPINCodeFieldLengthInBits), CHIP_ERROR_INVALID_ARGUMENT);
     mSetupPINCode = setupCode;

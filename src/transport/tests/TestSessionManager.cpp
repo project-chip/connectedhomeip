@@ -806,8 +806,9 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     new (&sessionManager) SessionManager();
 
     prevSessionId = 0;
-    // Verify that we increment session ID by 1 for each allocation, except for
-    // the wraparound case where we skip session ID 0.
+    // Verify that we increment session ID by 1 for each allocation (except for
+    // the wraparound case where we skip session ID 0), even when allocated
+    // sessions are immediately freed.
     for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
     {
         auto handle = sessionManager.AllocateSession();

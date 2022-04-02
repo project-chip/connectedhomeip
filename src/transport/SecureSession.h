@@ -82,8 +82,8 @@ public:
 
     /**
      * @brief
-     *   Construct a secure session to associate with a pending secure
-     *   session establishment attempt.  A pending secure session object
+     *   Construct a secure session object to associate with a pending secure
+     *   session establishment attempt.  The object for the pending session
      *   receives a local session ID, but no other state.
      */
     SecureSession(uint16_t localSessionId) :
@@ -91,9 +91,10 @@ public:
     {}
 
     /**
-     * Activate a pending Secure Session that had been reserved during CASE or
-     * PASE, setting internal state according to the parameters used and
-     * discovered during session establishment.
+     * @brief
+     *   Activate a pending Secure Session that had been reserved during CASE or
+     *   PASE, setting internal state according to the parameters used and
+     *   discovered during session establishment.
      */
     void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                   const ReliableMessageProtocolConfig & config)

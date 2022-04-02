@@ -270,14 +270,14 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
     {
-        // Do not set to 0 to prevent unwanted unsecured session
+        // Do not set to 0 to prevent an unwanted unsecured session
         // since the session type is unknown.
         SetPeerSessionId(1);
     }
 
     void Init(SessionManager & sessionManager)
     {
-        // Do not set to 0 to prevent unwanted unsecured session
+        // Do not set to 0 to prevent an unwanted unsecured session
         // since the session type is unknown.
         AllocateSecureSession(sessionManager, mLocalSessionId);
     }
@@ -297,7 +297,7 @@ public:
     }
 
 private:
-    // Do not set to 0 to prevent unwanted unsecured session
+    // Do not set to 0 to prevent an unwanted unsecured session
     // since the session type is unknown.
     uint16_t mLocalSessionId = 1;
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;

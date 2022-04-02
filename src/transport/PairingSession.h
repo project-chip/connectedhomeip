@@ -102,6 +102,15 @@ public:
 
 protected:
     /**
+     * Allocate a secure session object from the passed session manager for the
+     * pending session establishment operation.
+     *
+     * @param sessionManager session manager from which to allocate a secure session object
+     * @return CHIP_ERROR The outcome of the allocation attempt
+     */
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+
+    /**
      * Allocate a secure session object from the passed session manager with the
      * specified session ID.
      *
@@ -110,18 +119,9 @@ protected:
 
      * @param sessionManager session manager from which to allocate a secure session object
      * @param sessionId caller-requested session ID
-     * @return CHIP_ERROR The outcome of the attempted allocation
+     * @return CHIP_ERROR The outcome of the allocation attempt
      */
     CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId);
-
-    /**
-     * Allocate a secure session object from the passed session manager for the
-     * pending session establishment operation.
-     *
-     * @param sessionManager session manager from which to allocate a secure session object
-     * @return CHIP_ERROR The outcome of the attempted allocation
-     */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
 
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
