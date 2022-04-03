@@ -128,7 +128,7 @@ void ReliableMessageMgr::ExecuteActions()
         uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
 #endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
-        if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS || !entry->ec->HasSessionHandle())
+        if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             ChipLogError(ExchangeManager,
                          "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
