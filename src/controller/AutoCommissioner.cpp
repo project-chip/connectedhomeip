@@ -121,7 +121,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSecurePairing:
         return CommissioningStage::kReadCommissioningInfo;
     case CommissioningStage::kReadCommissioningInfo:
-        if (mDeviceCommissioningInfo.general.breadcrumb > 0)
+        if (mDeviceCommissioningInfo.general.breadcrumb >= CommissioningStage::kSendNOC)
         {
             // We failed on network setup or later, the node failsafe has not been re-armed and the breadcrumb has not been reset.
             // Per the spec, we restart from after adding the NOC.
@@ -320,6 +320,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 {
     CompletionStatus completionStatus;
     completionStatus.err = err;
+    ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
+                    err.AsString());
     if (err != CHIP_NO_ERROR)
     {
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
@@ -343,9 +345,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
     else
     {
-        ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
-                        err.AsString());
-
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadCommissioningInfo:

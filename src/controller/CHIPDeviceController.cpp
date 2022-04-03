@@ -542,7 +542,6 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Transport::PeerAddress & peerAddress)
 {
-    // Q: can we distinguish BLE sessions?
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
         if (deviceProxy->GetPeerAddress() == peerAddress)
@@ -622,6 +621,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     MATTER_TRACE_EVENT_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
+    CommissioneeDeviceProxy * current  = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
@@ -658,14 +658,31 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                                                   params.GetPeerAddress().GetInterface());
     }
 
-    if (FindCommissioneeDevice(peerAddress) != nullptr)
+    current = FindCommissioneeDevice(peerAddress);
+    if (current != nullptr)
     {
-        // We already have an open connection to this device, call the callback immediately and early return.
-        if (mPairingDelegate)
+
+        if (current->IsSecureConnected())
         {
-            mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+            if (mPairingDelegate)
+            {
+                // We already have an open secure session to this device, call the callback immediately and early return.
+                mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+            }
+            return CHIP_NO_ERROR;
         }
-        return CHIP_NO_ERROR;
+        else if (current->IsSessionSetupInProgress())
+        {
+            // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when connection
+            // completes
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            // Something has gone strange. Delete the old device, try again.
+            ChipLogError(Controller, "Found unconnected device, removing");
+            ReleaseCommissioneeDevice(current);
+        }
     }
 
     device = mCommissioneeDevicePool.CreateObject();
@@ -1334,8 +1351,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 {
     commissioningCompletionStatus = completionStatus;
     if (completionStatus.err == CHIP_NO_ERROR ||
-        (completionStatus.failedStage.HasValue() &&
-         chip::to_underlying(completionStatus.failedStage.Value()) >= chip::to_underlying(kWiFiNetworkSetup)))
+        (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup))
     {
         // If we Completed successfully, send the callbacks, we're done.
         // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.

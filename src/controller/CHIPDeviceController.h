@@ -670,9 +670,8 @@ private:
     static void OnCommissioningCompleteResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
-    static void
-    OnDisarmFailsafe(void * context,
-                     const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnDisarmFailsafe(void * context,
+                                 const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
     void DisarmDone();
 
@@ -724,7 +723,18 @@ private:
     }
 
     static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
+
+    // Sends commissioning complete callbacks to the delegate depending on the status. Sends
+    // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
     void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
+
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate.
+    // It does not disarm the failsafe or close the pase connection.
+    // For failures up to AddNOC, sends a command to disarm the
+    // failsafe, then sends completion report with the CommissioningDelegate and callbacks to the PairingDelegate upon arm failsafe
+    // command completion.
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;

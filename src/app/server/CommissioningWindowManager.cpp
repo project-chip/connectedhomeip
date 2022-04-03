@@ -59,16 +59,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(AppServer, "Failsafe timer expired");
-#if CONFIG_NETWORK_LAYER_BLE
-        mServer->GetBleLayerObject()->CloseAllBleConnections();
-#endif
-        if (mFailedCommissioningAttempts++ < kMaxFailedCommissioningAttempts)
-        {
-            // If the number of commissioning attempts has not exceeded maximum
-            // retries, let's start listening for commissioning connections again.
-            ChipLogProgress(Controller, "listening for pase mFailedCommissioningAttempts = %d", (int) mFailedCommissioningAttempts);
-            AdvertiseAndListenForPASE();
-        }
+        HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -110,9 +101,13 @@ void CommissioningWindowManager::Cleanup()
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
-    mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
+    HandleFailedAttempt(err);
+}
 
+void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
+{
+    mFailedCommissioningAttempts++;
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif

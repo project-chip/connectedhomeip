@@ -206,7 +206,7 @@ public:
 
     // Status to send when calling CommissioningComplete on the PairingDelegate during the kCleanup step. The AutoCommissioner uses
     // this to pass through any error messages received during commissioning.
-    CompletionStatus GetCompletionStatus() { return completionStatus; }
+    const CompletionStatus & GetCompletionStatus() const { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
@@ -320,7 +320,7 @@ public:
         mLocationCapability = MakeOptional(capability);
         return *this;
     }
-    void SetCompletionStatus(CompletionStatus status) { completionStatus = status; }
+    void SetCompletionStatus(const CompletionStatus & status) { completionStatus = status; }
 
 private:
     // Items that can be set by the commissioner
