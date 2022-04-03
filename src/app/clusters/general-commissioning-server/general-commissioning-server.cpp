@@ -97,6 +97,9 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case SupportsConcurrentConnection::Id: {
         return ReadSupportsConcurrentConnection(aEncoder);
     }
+    case Breadcrumb::Id: {
+        return aEncoder.Encode(DeviceLayer::DeviceControlServer::DeviceControlSvr().GetBreadcrumb());
+    }
     default: {
         break;
     }
@@ -178,6 +181,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         }
         response.errorCode = CommissioningError::kOk;
         commandObj->AddResponse(commandPath, response);
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(commandData.breadcrumb);
     }
     else
     {
