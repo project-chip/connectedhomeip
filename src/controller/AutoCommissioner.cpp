@@ -121,8 +121,9 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSecurePairing:
         return CommissioningStage::kReadCommissioningInfo;
     case CommissioningStage::kReadCommissioningInfo:
-        if (mDeviceCommissioningInfo.general.breadcrumb >= CommissioningStage::kSendNOC)
+        if (mDeviceCommissioningInfo.general.breadcrumb > 0)
         {
+            // If the breadcrumb is 0, the failsafe was disarmed.
             // We failed on network setup or later, the node failsafe has not been re-armed and the breadcrumb has not been reset.
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
