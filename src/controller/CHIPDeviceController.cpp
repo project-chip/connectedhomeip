@@ -1360,10 +1360,20 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     commissioningCompletionStatus = completionStatus;
-    if (completionStatus.err == CHIP_NO_ERROR ||
-        (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup))
+    if (completionStatus.err == CHIP_NO_ERROR)
     {
-        // If we Completed successfully, send the callbacks, we're done.
+
+        CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
+        if (commissionee != nullptr)
+        {
+            ReleaseCommissioneeDevice(commissionee);
+        }
+        // Send the callbacks, we're done.
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
+    }
+    else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)
+    {
         // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.
         // We do not need to reset the failsafe here because we want to keep everything on the device up to this point, so just
         // send the completion callbacks.
@@ -1483,16 +1493,21 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
             commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
         }
     }
-    else if (commissioner->mPairingDelegate != nullptr)
+    else
     {
-        commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-    }
-
-    // Release any CommissioneeDeviceProxies we have here as we now have an OperationalDeviceProxy.
-    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
-    if (commissionee != nullptr)
-    {
-        commissioner->ReleaseCommissioneeDevice(commissionee);
+        if (commissioner->mPairingDelegate != nullptr)
+        {
+            commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+        }
+        // Only release the pase session if we're not commissioning. If we're commissioning, we're going to hold onto that pase
+        // session until we send the commissioning complete command just in case it fails and we need to go back to the pase
+        // connection to re-setup the network. This is unlikely, given that we just connected over the operational network, but is
+        // required by the spec.
+        CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
+        if (commissionee != nullptr)
+        {
+            commissioner->ReleaseCommissioneeDevice(commissionee);
+        }
     }
 }
 
@@ -1513,14 +1528,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
     }
-    // TODO: Determine if we really want the PASE session removed here. See #16089.
-    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
-    if (commissionee != nullptr)
-    {
-        commissioner->ReleaseCommissioneeDevice(commissionee);
-    }
 
-    commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
         commissioner->mCommissioningDelegate != nullptr)
     {
@@ -1530,6 +1538,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
     }
+    commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
 }
 
 // AttributeCache::Callback impl
