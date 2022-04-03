@@ -252,7 +252,7 @@ class BaseTestHelper:
 
         self.logger.info("Setting failsafe on CASE connection")
         err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1, timeoutMs=1000), blocking=True)
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
         if err != 0:
             self.logger.error(
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
@@ -296,7 +296,7 @@ class BaseTestHelper:
 
         self.logger.info("Disarming failsafe on CASE connection")
         err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=0, breadcrumb=1, timeoutMs=1000), blocking=True)
+                                         0, 0, dict(expiryLengthSeconds=0, breadcrumb=1), blocking=True)
         if err != 0:
             self.logger.error(
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
@@ -315,7 +315,7 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to arm failsafe over CASE - this should fail since the commissioning window is open")
         err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1, timeoutMs=1000), blocking=True)
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
         if err != 0:
             self.logger.error(
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
