@@ -71,7 +71,7 @@ struct ServerInitParams
     ServerInitParams(const ServerInitParams &) = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
-    // App delegate to handle some lifecycle events
+    // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
@@ -81,15 +81,38 @@ struct ServerInitParams
     Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
 
     // Persistent storage delegate: MUST be injected. Used to maintain storage by much common code.
+    // Must be initialized before being provided.
     PersistentStorageDelegate * persistentStorageDelegate = nullptr;
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
-    // Protection Key (IPK) for case
+    // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
-    // Access control delegate: MUST be injected. Used to look-up access control rules
+    // Access control delegate: MUST be injected. Used to look up access control rules. Must be
+    // initialized before being provided
     Access::AccessControl::Delegate * accessDelegate = nullptr;
 };
 
-// Transitional pre-injection version of ServierInitParams
+/**
+ * Transitional version of ServerInitParams to assist SDK integrators in
+ * transitioning to injecting product/platform-owned resources. This version
+ * of `ServerInitParams` statically owns and initializes (via the
+ * `InitializeStaticResourcesBeforeServerInit()` method). This is to reduce the
+ * amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
+ * main.cpp) for the transition.
+ *
+ * ACTION ITEM FOR TRANSITION: While this could be used indefinitely, it does not
+ * examplify orderly management of application-injected resources. It is recommended
+ * to instead:
+ *   - Use the basic ServerInitParams in every application
+ *   - Have every application own an instance of the resources being injected in its own
+ *     state (e.g. an implementation of PersistentStorageDelegate and GroupDataProvider
+ *     interfaces).
+ *   - Initialize the injected resources prior to calling Server::Init()
+ *   - De-initialize the injected resources after calling Server::Shutdown()
+ *
+ * WARNING: DO NOT replicate the pattern shown here of having a subclass of ServerInitParams
+ *          own the resources. This was done to reduce the amount of change to existing
+ *          examples, prior to updating each example to do the transition work presented above.
+ */
 struct CommonCaseDeviceServerInitParams : public ServerInitParams
 {
     CommonCaseDeviceServerInitParams() = default;
@@ -98,7 +121,16 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
-    virtual CHIP_ERROR InitBeforeServerInit()
+    /**
+     * Call this before Server::Init() to initialize the internally-owned resources.
+     * Server::Init() will fail if this is not done, since several params required to
+     * be non-null will be null without calling this method. ** See the transition method
+     * in the outer comment of this class **.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR value from APIs called to initialize
+     *         resources on failure.
+     */
+    virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
@@ -118,20 +150,27 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
         return CHIP_NO_ERROR;
     }
-
-    virtual void Shutdown()
-    {
-        if (accessDelegate != nullptr)
-        {
-            accessDelegate->Finish();
-        }
-        if (groupDataProvider != nullptr)
-        {
-            groupDataProvider->Finish();
-        }
-    }
 };
 
+/**
+ * The `Server` singleton class is an aggregate for all the resources needed to run a
+ * Node that is both Commissionable and mainly used as an end-node with server clusters.
+ * In other words, it aggregates the state needed for the type of Node used for most
+ * products that are not mainly controller/administrator role.
+ *
+ * This sington class expects `ServerInitParams` initialization parameters but does not
+ * own the resources injected from `ServerInitParams`. Any object pointers/references
+ * passed in ServerInitParams must be pre-initialized externally, and shutdown/finalized
+ * after `Server::Shutdown()` is called.
+ *
+ * TODO: Separate lifecycle ownership for some more capabilities that should not belong to
+ *       common logic, such as `DispatchShutDownAndStopEventLoop`.
+ *
+ * TODO: Replace all uses of GetInstance() to "reach in" to this state from all cluster
+ *       server common logic that deal with global node state with either a common NodeState
+ *       compatible with OperationalDeviceProxy/DeviceProxy, or with injection at common
+ *       SDK logic init.
+ */
 class Server
 {
 public:

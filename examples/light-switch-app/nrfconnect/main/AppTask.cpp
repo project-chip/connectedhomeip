@@ -160,7 +160,7 @@ CHIP_ERROR AppTask::Init()
     // Print initial configs
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     static chip::CommonCaseDeviceServerInitParams initParams;
-    ReturnErrorOnFailure(initParams.InitBeforeServerInit());
+    ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();

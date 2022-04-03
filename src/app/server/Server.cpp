@@ -108,7 +108,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
+    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
     SuccessOrExit(err = mCommissioningWindowManager.Init(this));
@@ -349,7 +349,7 @@ void Server::Shutdown()
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
 
-    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
+    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
 

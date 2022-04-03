@@ -65,7 +65,7 @@ app::Clusters::NetworkCommissioning::Instance
 static void InitServer(intptr_t context)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitBeforeServerInit();
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

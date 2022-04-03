@@ -163,7 +163,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitBeforeServerInit();
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

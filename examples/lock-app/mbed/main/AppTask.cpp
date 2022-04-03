@@ -119,7 +119,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitBeforeServerInit();
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     error = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)

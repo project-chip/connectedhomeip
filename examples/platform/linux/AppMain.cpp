@@ -231,6 +231,8 @@ void Cleanup()
     }
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
 } // namespace
@@ -692,7 +694,7 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 void ChipLinuxAppMainLoop()
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitBeforeServerInit() == CHIP_NO_ERROR);
+    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();

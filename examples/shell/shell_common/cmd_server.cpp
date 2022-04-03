@@ -57,7 +57,7 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitBeforeServerInit();
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.operationalServicePort        = sServerPortOperational;
     initParams.userDirectedCommissioningPort = sServerPortCommissioning;
 
