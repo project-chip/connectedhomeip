@@ -556,6 +556,16 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
 
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
+    // TODO: Call CloseSession here see #16440 and #16805 (blocking)
+
+#if CONFIG_NETWORK_LAYER_BLE
+    if (mSystemState->BleLayer() != nullptr && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        // We only support one BLE connection, so if this is BLE, close it
+        ChipLogProgress(Discovery, "Closing all BLE connections");
+        mSystemState->BleLayer()->CloseAllBleConnections();
+    }
+#endif
     mCommissioneeDevicePool.ReleaseObject(device);
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)

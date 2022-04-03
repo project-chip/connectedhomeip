@@ -155,10 +155,7 @@ void CommissioneeDeviceProxy::Reset()
     mState              = ConnectionState::NotConnected;
     mSessionManager     = nullptr;
     mUDPEndPointManager = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = nullptr;
-#endif
-    mExchangeMgr = nullptr;
+    mExchangeMgr        = nullptr;
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
