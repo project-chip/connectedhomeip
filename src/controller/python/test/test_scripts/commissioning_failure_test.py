@@ -97,7 +97,7 @@ def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        for testFailureStage in range(3, 17):
+        for testFailureStage in range(3, 18):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
@@ -106,7 +106,7 @@ def main():
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
-        for testFailureStage in range(3, 17):
+        for testFailureStage in range(3, 18):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
