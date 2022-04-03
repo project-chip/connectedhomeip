@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalDeviceProxy.h>
@@ -293,7 +293,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
                                       public SessionEstablishmentDelegate,
-                                      public app::AttributeCache::Callback
+                                      public app::ClusterStateCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -549,7 +549,7 @@ public:
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
-    // AttributeCache::Callback impl
+    // ClusterStateCache::Callback impl
     void OnDone() override;
 
     // Commissioner will establish new device connections after PASE.
@@ -732,7 +732,7 @@ private:
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
 
-    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 

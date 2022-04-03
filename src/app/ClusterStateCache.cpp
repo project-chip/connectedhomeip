@@ -17,14 +17,14 @@
  */
 
 #include "system/SystemPacketBuffer.h"
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <tuple>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     AttributeState state;
     System::PacketBufferHandle handle;
@@ -66,14 +66,14 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-void AttributeCache::OnReportBegin()
+void ClusterStateCache::OnReportBegin()
 {
     mChangedAttributeSet.clear();
     mAddedEndpoints.clear();
     mCallback.OnReportBegin();
 }
 
-void AttributeCache::OnReportEnd()
+void ClusterStateCache::OnReportEnd()
 {
     std::set<std::tuple<EndpointId, ClusterId>> changedClusters;
 
@@ -100,7 +100,7 @@ void AttributeCache::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
     // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the
@@ -130,7 +130,7 @@ void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TL
     mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
 
-CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
+CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
 
@@ -151,7 +151,7 @@ CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReade
     return CHIP_NO_ERROR;
 }
 
-AttributeCache::EndpointState * AttributeCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err)
+ClusterStateCache::EndpointState * ClusterStateCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err)
 {
     auto endpointIter = mCache.find(endpointId);
     if (endpointIter == mCache.end())
@@ -164,7 +164,7 @@ AttributeCache::EndpointState * AttributeCache::GetEndpointState(EndpointId endp
     return &endpointIter->second;
 }
 
-AttributeCache::ClusterState * AttributeCache::GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err)
+ClusterStateCache::ClusterState * ClusterStateCache::GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err)
 {
     auto endpointState = GetEndpointState(endpointId, err);
     if (err != CHIP_NO_ERROR)
@@ -183,7 +183,7 @@ AttributeCache::ClusterState * AttributeCache::GetClusterState(EndpointId endpoi
     return &clusterState->second;
 }
 
-AttributeCache::AttributeState * AttributeCache::GetAttributeState(EndpointId endpointId, ClusterId clusterId,
+ClusterStateCache::AttributeState * ClusterStateCache::GetAttributeState(EndpointId endpointId, ClusterId clusterId,
                                                                    AttributeId attributeId, CHIP_ERROR & err)
 {
     auto clusterState = GetClusterState(endpointId, clusterId, err);
@@ -203,7 +203,7 @@ AttributeCache::AttributeState * AttributeCache::GetAttributeState(EndpointId en
     return &attributeState->second;
 }
 
-CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
+CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
 {
     CHIP_ERROR err;
 

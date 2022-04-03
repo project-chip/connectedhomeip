@@ -60,7 +60,7 @@ namespace app {
  * **NOTE** This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
  *
  */
-class AttributeCache : protected ReadClient::Callback
+class ClusterStateCache : protected ReadClient::Callback
 {
 public:
     class Callback : public ReadClient::Callback
@@ -69,23 +69,23 @@ public:
         /*
          * Called anytime an attribute value has changed in the cache
          */
-        virtual void OnAttributeChanged(AttributeCache * cache, const ConcreteAttributePath & path){};
+        virtual void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path){};
 
         /*
          * Called anytime any attribute in a cluster has changed in the cache
          */
-        virtual void OnClusterChanged(AttributeCache * cache, EndpointId endpointId, ClusterId clusterId){};
+        virtual void OnClusterChanged(ClusterStateCache * cache, EndpointId endpointId, ClusterId clusterId){};
 
         /*
          * Called anytime an endpoint was added to the cache
          */
-        virtual void OnEndpointAdded(AttributeCache * cache, EndpointId endpointId){};
+        virtual void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId){};
     };
 
-    AttributeCache(Callback & callback) : mCallback(callback), mBufferedReader(*this) {}
+    ClusterStateCache(Callback & callback) : mCallback(callback), mBufferedReader(*this) {}
 
     /*
-     * When registering as a callback to the ReadClient, the AttributeCache cannot not be passed as a callback
+     * When registering as a callback to the ReadClient, the ClusterStateCache cannot not be passed as a callback
      * directly. Instead, utilize this method below to correctly set up the callback chain such that
      * the buffered reader is the first callback in the chain before calling into cache subsequently.
      */

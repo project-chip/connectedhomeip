@@ -102,7 +102,7 @@ DENY: Set[str] = {
 ALLOW: Dict[str, Set[str]] = {
 
     # Not intended for embedded clients (#11705).
-    'src/app/AttributeCache.h': {'list', 'map', 'set', 'vector'},
+    'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector'},
     'src/app/BufferedReadCallback.h': {'vector'},
 
     # Itself in DENY.

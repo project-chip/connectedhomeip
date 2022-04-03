@@ -36,8 +36,8 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
-    "AttributeCache.cpp",
-    "AttributeCache.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",

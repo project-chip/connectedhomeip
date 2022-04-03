@@ -53,7 +53,7 @@ using namespace chip;
 }
 
 static CHIP_ERROR AppendAttibuteValueToArray(
-    const chip::app::ConcreteAttributePath & path, chip::app::AttributeCache * cache, NSMutableArray * array)
+    const chip::app::ConcreteAttributePath & path, chip::app::ClusterStateCache * cache, NSMutableArray * array)
 {
     chip::TLV::TLVReader reader;
     CHIP_ERROR err = cache->Get(path, reader);
