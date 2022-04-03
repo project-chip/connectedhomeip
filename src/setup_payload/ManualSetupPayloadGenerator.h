@@ -70,6 +70,25 @@ public:
     // Populates decimal string representation of the payload into outDecimalString.
     // Wrapper for using std::string.
     CHIP_ERROR payloadDecimalStringRepresentation(std::string & outDecimalString);
+
+    /**
+     * This function disables internal checks about the validity of the generated payload.
+     * It allows using the generator to generate invalid payloads.
+     * Default is false.
+     */
+    void SetAllowInvalidPayload(bool allow) { mAllowInvalidPayload = allow; }
+
+    /**
+     * This function allow forcing the generation of a short code when the commissioning
+     * flow is not standard by ignoring the vendor id and product id informations but with
+     * the VID/PID present flag set.
+     * Default is false.
+     */
+    void SetForceShortCode(bool useShort) { mForceShortCode = useShort; }
+
+private:
+    bool mAllowInvalidPayload = false;
+    bool mForceShortCode      = false;
 };
 
 } // namespace chip

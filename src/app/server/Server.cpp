@@ -25,7 +25,9 @@
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BLEEndPoint.h>
+#endif
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -33,6 +35,7 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -44,29 +47,19 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
-
 using namespace chip::DeviceLayer;
 
 using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 using chip::Inet::IPAddressType;
+#if CONFIG_NETWORK_LAYER_BLE
 using chip::Transport::BleListenParameters;
+#endif
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
 namespace {
-
-constexpr bool isRendezvousBypassed()
-{
-#if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
-    return true;
-#elif defined(CONFIG_RENDEZVOUS_MODE)
-    return static_cast<RendezvousInformationFlag>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlag::kNone;
-#else
-    return false;
-#endif
-}
 
 void StopEventLoop(intptr_t arg)
 {
@@ -76,6 +69,15 @@ void StopEventLoop(intptr_t arg)
         ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+    }
+} sDeviceTypeResolver;
 
 } // namespace
 
@@ -92,26 +94,11 @@ static ::chip::PersistedCounter sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-Server::Server() :
-    mCASESessionManager(CASESessionManagerConfig {
-        .sessionInitParams =  {
-            .sessionManager = &mSessions,
-            .exchangeMgr    = &mExchangeMgr,
-            .idAllocator    = &mSessionIDAllocator,
-            .fabricTable    = &mFabrics,
-            .clientPool     = &mCASEClientPool,
-        },
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache          = nullptr,
-#endif
-        .devicePool        = &mDevicePool,
-    })
-{}
-
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    CASESessionManagerConfig caseSessionManagerConfig;
 
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
@@ -149,7 +136,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
     VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
 
-    err = mAccessControl.Init(accessDelegate);
+    err = mAccessControl.Init(accessDelegate, sDeviceTypeResolver);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
@@ -157,9 +144,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mSecuredServicePort)
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
                                .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
@@ -185,7 +172,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage, &GetFabricTable());
     SuccessOrExit(err);
 
-    err = mFabricDelegate.Init(&mSessions);
+    err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
     mFabrics.AddFabricDelegate(&mFabricDelegate);
 
@@ -218,16 +205,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if defined(CHIP_APP_USE_ECHO)
-    err = InitEchoHandler(&gExchangeMgr);
+    err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
 #endif
 
-    if (isRendezvousBypassed())
-    {
-        ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
-        SuccessOrExit(err = AddTestCommissioning());
-    }
-    else if (GetFabricTable().FabricCount() != 0)
+    if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
@@ -255,20 +237,39 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
-                                                    &mSessions, &mFabrics);
+    caseSessionManagerConfig = {
+        .sessionInitParams =  {
+            .sessionManager    = &mSessions,
+            .exchangeMgr       = &mExchangeMgr,
+            .idAllocator       = &mSessionIDAllocator,
+            .fabricTable       = &mFabrics,
+            .clientPool        = &mCASEClientPool,
+            .groupDataProvider = &mGroupsProvider,
+        },
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache          = nullptr,
+#endif
+        .devicePool        = &mDevicePool,
+    };
+
+    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
+#if CONFIG_NETWORK_LAYER_BLE
+                                                    chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+#endif
+                                                    &mSessions, &mFabrics, &mGroupsProvider);
+    SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
     //
-    // This is disabled for thread device because the same code is already present for thread devices in
+    // Thread LWIP devices using dedicated Inet endpoint implementations are excluded because they call this function from:
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     RejoinExistingMulticastGroups();
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
     PlatformMgr().HandleServerStarted();
 
@@ -391,34 +392,5 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-CHIP_ERROR Server::AddTestCommissioning()
-{
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    PASESession * testSession = nullptr;
-    PASESessionSerializable serializedTestSession;
-    SessionHolder session;
-
-    mTestPairing.ToSerializable(serializedTestSession);
-
-    testSession = chip::Platform::New<PASESession>();
-    testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() },
-                                             chip::kTestControllerNodeId, testSession, CryptoContext::SessionRole::kResponder,
-                                             kMinValidFabricIndex));
-
-exit:
-    if (testSession)
-    {
-        testSession->Clear();
-        chip::Platform::Delete(testSession);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        mFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
-    }
-    return err;
-}
 
 } // namespace chip

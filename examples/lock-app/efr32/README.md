@@ -297,3 +297,36 @@ tracking code inside the `trackAlloc` and `trackFree` function
 For the description of Software Update process with EFR32 example applications
 see
 [EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options :
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50

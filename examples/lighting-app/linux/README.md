@@ -130,7 +130,7 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    `python3 -m chip_rpc.console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
 -   Then you can Get and Set the light using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`

@@ -3154,9 +3154,9 @@ struct TypeInfo
 namespace StartUpOnOff {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
@@ -11002,6 +11002,7 @@ enum class Fields
 {
     kNetworkingStatus = 0,
     kDebugText        = 1,
+    kNetworkIndex     = 2,
 };
 
 struct Type
@@ -11012,7 +11013,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11028,7 +11030,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NetworkConfigResponse
@@ -16958,18 +16961,31 @@ public:
 
 namespace Attributes {
 
-namespace CurrentMode {
+namespace Description {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 32; }
+};
+} // namespace Description
+namespace StandardNamespace {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentMode
+} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -16984,7 +17000,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedModes
-namespace OnMode {
+namespace CurrentMode {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16992,35 +17008,34 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace OnMode
+} // namespace CurrentMode
 namespace StartUpMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpMode
-namespace Description {
+namespace OnMode {
 struct TypeInfo
 {
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
 };
-} // namespace Description
+} // namespace OnMode
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -17090,11 +17105,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::OnMode::TypeInfo::DecodableType onMode           = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

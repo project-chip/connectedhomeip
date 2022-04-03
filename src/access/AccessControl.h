@@ -32,6 +32,17 @@ class AccessControl
 {
 public:
     /**
+     * Used by access control to determine if a device type resolves to an endpoint.
+     */
+    struct DeviceTypeResolver
+    {
+    public:
+        virtual ~DeviceTypeResolver() = default;
+
+        virtual bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) = 0;
+    };
+
+    /**
      * Handle to an entry in the access control list.
      *
      * Must be prepared (`AccessControl::PrepareEntry`) or read (`AccessControl::ReadEntry`) before first use.
@@ -341,12 +352,19 @@ public:
         // Iteration
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_NO_ERROR; }
 
+        // Check
+        // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,
+        // CHIP_ERROR_NOT_IMPLEMENTED to use the default check algorithm (against entries),
+        // or any other CHIP_ERROR if another error occurred.
+        virtual CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                 Privilege requestPrivilege)
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
+
         // Listening
         virtual void SetListener(Listener & listener) { mListener = &listener; }
         virtual void ClearListener() { mListener = nullptr; }
-
-        // TODO(#13867): this will go away
-        virtual bool TemporaryCheckOverride() const { return false; }
 
     private:
         Listener * mListener = nullptr;
@@ -369,12 +387,10 @@ public:
     /**
      * Initialize the access control module. Must be called before first use.
      *
-     * @param delegate - The delegate to use for acces control
-     *
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if called more than once,
      *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null, or other fatal error.
      */
-    CHIP_ERROR Init(AccessControl::Delegate * delegate);
+    CHIP_ERROR Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver);
 
     /**
      * Deinitialize the access control module. Must be called when finished.
@@ -461,6 +477,8 @@ public:
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
+    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex);
+
     /**
      * Iterates over entries in the access control list.
      *
@@ -489,6 +507,8 @@ private:
     bool IsValid(const Entry & entry);
 
     Delegate * mDelegate = nullptr;
+
+    DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 };
 
 /**

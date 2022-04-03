@@ -26,6 +26,7 @@
 
 #define WC_PERCENT100THS_MIN_OPEN 0
 #define WC_PERCENT100THS_MAX_CLOSED 10000
+#define WC_PERCENT100THS_MIDDLE 5000
 
 namespace chip {
 namespace app {
@@ -67,13 +68,13 @@ enum class OperationalState : uint8_t
 };
 static_assert(sizeof(OperationalState) == sizeof(uint8_t), "OperationalState Size is not correct");
 
+// Decoded components of the OperationalStatus attribute
 struct OperationalStatus
 {
-    OperationalState global : 2; // bit 0-1 M
-    OperationalState lift : 2;   // bit 2-3 LF
-    OperationalState tilt : 2;   // bit 4-5 TL
+    OperationalState global; // bit 0-1 M
+    OperationalState lift;   // bit 2-3 LF
+    OperationalState tilt;   // bit 4-5 TL
 };
-static_assert(sizeof(OperationalStatus) == sizeof(uint8_t), "OperationalStatus Size is not correct");
 
 struct SafetyStatus
 {
@@ -125,6 +126,7 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
 
 void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type);
 EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint);
@@ -142,11 +144,11 @@ bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
-void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths);
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
-void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths);
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 } // namespace WindowCovering
 } // namespace Clusters

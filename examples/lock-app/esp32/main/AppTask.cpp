@@ -103,7 +103,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
-    UpdateClusterState();
+    chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -462,7 +462,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /* if unlocked then it locked it first*/
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 

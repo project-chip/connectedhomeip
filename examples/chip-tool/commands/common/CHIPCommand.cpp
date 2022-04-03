@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -29,6 +30,8 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
@@ -36,8 +39,29 @@ constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
 
-CHIP_ERROR CHIPCommand::Run()
+namespace {
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
 {
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    if (attestationTrustStore.IsInitialized())
+    {
+        return &attestationTrustStore;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+} // namespace
+
+CHIP_ERROR CHIPCommand::MaybeSetUpStack()
+{
+    if (IsInteractive())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     StartTracing();
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -48,8 +72,20 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
 
     chip::Controller::FactoryInitParams factoryInitParams;
+
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
-    uint16_t port                              = mDefaultStorage.GetListenPort();
+
+    // Init group data provider that will be used for all group keys and IPKs for the
+    // chip-tool-configured fabrics. This is OK to do once since the fabric tables
+    // and the DeviceControllerFactory all "share" in the same underlying data.
+    // Different commissioner implementations may want to use alternate implementations
+    // of GroupDataProvider for injection through factoryInitParams.
+    mGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    ReturnLogErrorOnFailure(mGroupDataProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&mGroupDataProvider);
+    factoryInitParams.groupDataProvider = &mGroupDataProvider;
+
+    uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)
     {
         // Make sure different commissioners run on different ports.
@@ -58,16 +94,26 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    // TODO(issue #15209): Replace this trust store with file-based trust store
-    const chip::Credentials::AttestationTrustStore * trustStore = chip::Credentials::GetTestAttestationTrustStore();
+    const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
+        ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
+        : chip::Credentials::GetTestAttestationTrustStore();
+    ;
+    if (mPaaTrustStorePath.HasValue() && trustStore == nullptr)
+    {
+        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
+        ChipLogError(chipTool,
+                     "Please specify a valid path containing trusted PAA certificates using [--paa-trust-store-path paa/file/path] "
+                     "argument");
+
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
-    // Initialize Group Data
-    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider(mDefaultStorage));
+    // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
         chip::FabricInfo * fabric = it->second->GetFabricInfo();
@@ -76,13 +122,29 @@ CHIP_ERROR CHIPCommand::Run()
             uint8_t compressed_fabric_id[sizeof(uint64_t)];
             chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
             ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
-            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            ReturnLogErrorOnFailure(
+                chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+            // key is the same, but the derived keys will be different for each fabric.
+            // This has to be done here after we know the Compressed Fabric ID of all
+            // chip-tool-managed fabrics
+            chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(),
+                                                                            defaultIpk, compressed_fabric_id_span));
         }
     }
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
-    CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
-    Shutdown();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::MaybeTearDownStack()
+{
+    if (IsInteractive())
+    {
+        return CHIP_NO_ERROR;
+    }
 
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
@@ -95,6 +157,20 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
 
     StopTracing();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::Run()
+{
+    ReturnErrorOnFailure(MaybeSetUpStack());
+
+    CHIP_ERROR err = StartWaiting(GetWaitDuration());
+
+    Shutdown();
+
+    ReturnErrorOnFailure(MaybeTearDownStack());
+
     return err;
 }
 
@@ -107,7 +183,7 @@ void CHIPCommand::StartTracing()
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
-    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
     }
@@ -224,6 +300,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+                                                                            mCommissionerStorage.GetCommissionerCATs(),
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;
@@ -231,7 +308,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate                = &mCommissionerStorage;
+    commissionerParams.storageDelegate = &mCommissionerStorage;
+    // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
@@ -262,17 +340,38 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 {
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     // ServiceEvents() calls StartEventLoopTask(), which is paired with the StopEventLoopTask() below.
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().ServiceEvents());
-    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+    if (!IsInteractive())
     {
-        std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-        if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
+        ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().ServiceEvents());
+    }
+
+    if (duration.count() == 0)
+    {
+        mCommandExitStatus = RunCommand();
+    }
+    else
+    {
         {
-            mCommandExitStatus = CHIP_ERROR_TIMEOUT;
+            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+            mWaitingForResponse = true;
+        }
+
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+        {
+            std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+            if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
+            {
+                mCommandExitStatus = CHIP_ERROR_TIMEOUT;
+            }
         }
     }
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    if (!IsInteractive())
+    {
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    }
 #else
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP

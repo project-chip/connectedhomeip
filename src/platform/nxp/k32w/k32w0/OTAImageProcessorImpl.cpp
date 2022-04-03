@@ -28,7 +28,7 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mImageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -51,7 +51,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mImageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -95,7 +95,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     if (gOtaSuccess_c == OTA_ClientInit())
     {
-        if (gOtaSuccess_c == OTA_StartImage(imageProcessor->mImageFile.size()))
+        if (gOtaSuccess_c == OTA_StartImage(strlen(imageProcessor->mImageFile)))
         {
             imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
         }
@@ -110,7 +110,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    remove(imageProcessor->mImageFile.data());
+    remove(imageProcessor->mImageFile);
     imageProcessor->ReleaseBlock();
 }
 

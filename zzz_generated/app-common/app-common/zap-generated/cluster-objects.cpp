@@ -7760,6 +7760,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)), networkingStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDebugText)), debugText));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkIndex)), networkIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7780,6 +7781,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kDebugText):
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            break;
+        case to_underlying(Fields::kNetworkIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
             break;
         default:
             break;
@@ -11696,20 +11700,23 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentMode));
+    case Attributes::Description::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, description));
+        break;
+    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
         break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
-    case Attributes::OnMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, onMode));
+    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentMode));
         break;
     case Attributes::StartUpMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startUpMode));
         break;
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
+    case Attributes::OnMode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, onMode));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));

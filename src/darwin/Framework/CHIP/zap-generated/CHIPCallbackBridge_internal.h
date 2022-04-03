@@ -148,6 +148,9 @@ typedef void (*NullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback
 typedef void (*OnOffClusterOnOffEffectIdentifierAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffEffectIdentifier);
 typedef void (*NullableOnOffClusterOnOffEffectIdentifierAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> &);
+typedef void (*OnOffClusterOnOffStartUpOnOffAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffStartUpOnOff);
+typedef void (*NullableOnOffClusterOnOffStartUpOnOffAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> &);
 typedef void (*LevelControlClusterMoveModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::MoveMode);
 typedef void (*NullableLevelControlClusterMoveModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> &);
@@ -9086,6 +9089,64 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffClusterOnOffStartUpOnOffAttributeCallback>
+{
+public:
+    CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffClusterOnOffStartUpOnOffAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value);
+};
+
+class CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
+{
+public:
+    CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>
+{
+public:
+    CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value);
+};
+
+class CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
+    : public CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
+{
+public:
+    CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

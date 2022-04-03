@@ -24,6 +24,9 @@ namespace chip {
 // The largest value of the 12-bit Payload discriminator
 constexpr uint16_t kMaxDiscriminatorValue = 0xFFF;
 
+constexpr uint32_t kMinSetupPasscode = 1;
+constexpr uint32_t kMaxSetupPasscode = 0x5F5E0FE;
+
 namespace DeviceLayer {
 
 class CommissionableDataProvider

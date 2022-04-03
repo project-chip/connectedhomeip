@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -58,6 +59,10 @@
 #if defined(PW_RPC_ENABLED)
 #include <CommonRpc.h>
 #endif
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #include <signal.h>
 
@@ -88,6 +93,13 @@ static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 #endif
 
 namespace {
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+chip::trace::TraceStream * gTraceStream = nullptr;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -104,26 +116,26 @@ void OnSignalHandler(int signum)
     // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
     // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
     // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::Unspecified;
+    BootReasonType bootReason = BootReasonType::kUnspecified;
     switch (signum)
     {
     case SIGVTALRM:
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
         break;
     case SIGALRM:
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
         break;
     case SIGILL:
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         break;
     case SIGTRAP:
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
         break;
     case SIGIO:
-        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        bootReason = BootReasonType::kSoftwareUpdateCompleted;
         break;
     case SIGINT:
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -207,8 +219,18 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator);
 }
 
-// To hold SPAKE2+ verifier, discriminator, passcode
-LinuxCommissionableDataProvider gCommissionableDataProvider;
+void Cleanup()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (gTraceStream != nullptr)
+    {
+        delete gTraceStream;
+        gTraceStream = nullptr;
+    }
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+}
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -290,6 +312,23 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
+    {
+        const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
+        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
+    }
+    else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
+    {
+        gTraceStream = new chip::trace::TraceStreamLog();
+    }
+    chip::trace::InitTrace();
+    if (gTraceStream != nullptr)
+    {
+        chip::trace::SetTraceStream(gTraceStream);
+    }
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
@@ -319,6 +358,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
+        Cleanup();
+
         // End the program with non zero error code to indicate a error.
         return 1;
     }
@@ -378,6 +419,7 @@ MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 
 CHIP_ERROR InitCommissioner()
 {
@@ -387,6 +429,10 @@ CHIP_ERROR InitCommissioner()
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
+
+    gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+    ReturnErrorOnFailure(gGroupDataProvider.Init());
+    factoryParams.groupDataProvider = &gGroupDataProvider;
 
     params.storageDelegate                = &gServerStorage;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
@@ -416,8 +462,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
-                                                                        rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
+                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -427,6 +473,23 @@ CHIP_ERROR InitCommissioner()
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
+
+    chip::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
+    // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
+    ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                                    compressedFabricIdSpan));
+
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
@@ -681,4 +744,6 @@ void ChipLinuxAppMainLoop()
     Server::GetInstance().Shutdown();
 
     DeviceLayer::PlatformMgr().Shutdown();
+
+    Cleanup();
 }

@@ -66,10 +66,11 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-class DummyDelegate : public ReadHandler::Callback
+class DummyDelegate : public ReadHandler::ManagementCallback
 {
 public:
     void OnDone(ReadHandler & apHandler) override {}
+    chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
 };
 
 void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
@@ -120,17 +121,17 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ClusterInfo * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
-    clusterInfo->mAttributeId = 1;
+    AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
+    clusterInfo->mAttributeId         = 1;
 
     {
-        chip::app::ClusterInfo testClusterInfo;
+        AttributePathParams testClusterInfo;
         testClusterInfo.mAttributeId = 3;
         NL_TEST_ASSERT(apSuite,
                        !InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
     }
     {
-        chip::app::ClusterInfo testClusterInfo;
+        AttributePathParams testClusterInfo;
         testClusterInfo.mAttributeId = 1;
         testClusterInfo.mListIndex   = 2;
         NL_TEST_ASSERT(apSuite,

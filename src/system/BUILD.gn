@@ -59,7 +59,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_WITH_NLFAULTINJECTION=${chip_with_nlfaultinjection}",
     "CHIP_SYSTEM_CONFIG_USE_DISPATCH=${chip_system_config_use_dispatch}",
     "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
-    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP=${chip_system_config_use_open_thread_udp}",
+    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT=${chip_system_config_use_open_thread_inet_endpoints}",
     "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
@@ -115,7 +115,10 @@ source_set("system_config_header") {
     "${chip_root}/src:includes",
   ]
 
-  public_deps = [ ":system_buildconfig" ]
+  public_deps = [
+    ":system_buildconfig",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
 
   if (target_cpu != "esp32") {
     if (chip_system_config_use_lwip) {

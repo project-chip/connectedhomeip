@@ -44,13 +44,12 @@ tests:
       response:
           constraints:
               type: string
-              maxLenght: 32
+              maxLength: 32
 
     - label: "Reads the VendorID attribute"
       command: "readAttribute"
       attribute: "VendorID"
       response:
-          value: 0
           constraints:
               type: vendor-id
               saveAs: vendorID

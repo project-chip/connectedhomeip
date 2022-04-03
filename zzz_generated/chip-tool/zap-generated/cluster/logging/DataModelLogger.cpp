@@ -3897,6 +3897,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkIndex", indent + 1, value.networkIndex));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -7243,30 +7244,35 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ModeSelect::Id: {
         switch (path.mAttributeId)
         {
-        case ModeSelect::Attributes::CurrentMode::Id: {
-            uint8_t value;
+        case ModeSelect::Attributes::Description::Id: {
+            chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentMode", 1, value);
+            return DataModelLogger::LogValue("Description", 1, value);
+        }
+        case ModeSelect::Attributes::StandardNamespace::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StandardNamespace", 1, value);
         }
         case ModeSelect::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case ModeSelect::Attributes::OnMode::Id: {
+        case ModeSelect::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
         case ModeSelect::Attributes::StartUpMode::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case ModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
+        case ModeSelect::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
+            return DataModelLogger::LogValue("OnMode", 1, value);
         }
         case ModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7567,7 +7573,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OffWaitTime", 1, value);
         }
         case OnOff::Attributes::StartUpOnOff::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpOnOff", 1, value);
         }

@@ -21,9 +21,11 @@ config:
 
 tests:
     - label: "if (PICS_WIFI) DUT reads MaxNetworks attribute on TH"
-      verification: "./chip-tool networkcommissioning read max-networks 1 0"
+      verification: |
+          ./chip-tool networkcommissioning read max-networks 1 0
       disabled: true
 
     - label: "if (PICS_WIFI) DUT reads Networks attribute on TH"
-      verification: "./chip-tool networkcommissioning read networks 1 0"
+      verification: |
+          ./chip-tool networkcommissioning read networks 1 0
       disabled: true

@@ -35,6 +35,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
@@ -56,11 +57,11 @@ struct TVExampleDeviceType
     uint16_t id;
 };
 
-constexpr TVExampleDeviceType kKnownDeviceTypes[]    = { { "video-player", 35 }, { "dimmable-light", 257 } };
-constexpr int kKnownDeviceTypesCount                 = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
-constexpr uint16_t kOptionDeviceType                 = 't';
-constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;
-constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
+constexpr TVExampleDeviceType kKnownDeviceTypes[]              = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr int kKnownDeviceTypesCount                           = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
+constexpr uint16_t kOptionDeviceType                           = 't';
+constexpr System::Clock::Seconds16 kCommissioningWindowTimeout = System::Clock::Seconds16(3 * 60);
+constexpr uint32_t kCommissionerDiscoveryTimeoutInMs           = 5 * 1000;
 
 // TODO: Accept these values over CLI
 const char * kContentUrl         = "https://www.test.com/videoid";
@@ -143,7 +144,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     Server::GetInstance().Init();
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeoutInSec));
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();

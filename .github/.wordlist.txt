@@ -56,7 +56,9 @@ apk
 AppConfig
 AppImpl
 ApplianceControl
+applianceeventsandalert
 ApplianceIdentification
+appliancestatistics
 ApplicationBasic
 ApplicationId
 ApplicationIdentifier
@@ -95,6 +97,7 @@ ATWC
 AudioOutput
 auth
 AuthMode
+autoApplyImage
 autocompletion
 autoconnect
 autocrlf
@@ -246,6 +249,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+commissionables
 CommissioningFlow
 commondatastorage
 CONF
@@ -478,6 +482,7 @@ fb
 fbb
 fbd
 FC
+FCJ
 FDDE
 fddead
 fde
@@ -611,6 +616,7 @@ InetLayer
 Infineon
 ini
 init
+InitArgs
 inlined
 InputLoop
 installDebug
@@ -859,6 +865,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
@@ -894,6 +901,7 @@ OTADownloader
 otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
+OTAImageProcessorImpl
 OTAImageProcessorInterface
 OTAProvider
 OTAProviderIpAddress
@@ -912,6 +920,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -1113,6 +1122,7 @@ showDocumentation
 shubhamdp
 SIGINT
 SiLabs
+Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
@@ -1170,9 +1180,11 @@ subtype
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+suppressResponse
 svg
 SVR
 SWD
+SWU
 symlinks
 sysconfdir
 SysConfig
@@ -1245,6 +1257,7 @@ TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
 transitionTime
+TransferSession
 TransportMgrBase
 TrustedRootCertificates
 TSG
@@ -1351,12 +1364,14 @@ xab
 xaver
 xb
 xbef
+xBEEF
 xc
 xcd
 Xcode
 xcodeproj
 xcworkspace
 xd
+xDEAD
 xDEADBEEF
 xdeadbeefcafe
 xds
@@ -1435,3 +1450,4 @@ UTF
 localedef
 nameserver
 nmcli
+tsan

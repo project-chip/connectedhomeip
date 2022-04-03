@@ -26,8 +26,9 @@
 
 #include <platform/EFR32/DiagnosticDataProviderImpl.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
 
@@ -44,8 +45,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    err = Internal::EFR32Config::Init();
+    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 

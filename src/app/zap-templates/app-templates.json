@@ -93,6 +93,11 @@
             "path": "templates/app/MatterIDL.zapt",
             "name": "Human-readable Matter IDL",
             "output": "Clusters.matter"
+        },
+        {
+            "path": "templates/app/access.zapt",
+            "name": "Matter access definitions",
+            "output": "access.h"
         }
     ]
 }

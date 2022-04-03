@@ -84,7 +84,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -96,7 +96,7 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, ctypes.c_char_p(None if len(paaTrustStorePath) is 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
         if res != 0:
@@ -556,6 +556,188 @@ class ChipDeviceController():
             raise self._ChipStack.ErrorToException(res)
         return await future
 
+    def _parseAttributePathTuple(self, pathTuple: typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Attribute present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Wildcard attribute id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+    ]):
+        endpoint = None
+        cluster = None
+        attribute = None
+
+        if pathTuple == ('*') or pathTuple == ():
+            # Wildcard
+            pass
+        elif type(pathTuple) is not tuple:
+            if type(pathTuple) is int:
+                endpoint = pathTuple
+            elif issubclass(pathTuple, ClusterObjects.Cluster):
+                cluster = pathTuple
+            elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):
+                attribute = pathTuple
+            else:
+                raise ValueError("Unsupported Attribute Path")
+        else:
+            # endpoint + (cluster) attribute / endpoint + cluster
+            endpoint = pathTuple[0]
+            if issubclass(pathTuple[1], ClusterObjects.Cluster):
+                cluster = pathTuple[1]
+            elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):
+                attribute = pathTuple[1]
+            else:
+                raise ValueError("Unsupported Attribute Path")
+        return ClusterAttribute.AttributePath(
+            EndpointId=endpoint, Cluster=cluster, Attribute=attribute)
+
+    def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
+        endpoint = None
+        cluster = None
+
+        # endpoint + (cluster) attribute / endpoint + cluster
+        endpoint = pathTuple[0]
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):
+            cluster = pathTuple[1]
+        else:
+            raise ValueError("Unsupported Cluster Path")
+        dataVersion = pathTuple[2]
+        return ClusterAttribute.DataVersionFilter(
+            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
+
+    def _parseEventPathTuple(self, pathTuple: typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[str, int],  # all wildcard with urgency set
+        typing.Tuple[int, int],  # Endpoint,
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
+        # Wildcard endpoint, Cluster + Event present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
+        # Wildcard event id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
+        # Concrete path
+        typing.Tuple[int,
+                     typing.Type[ClusterObjects.ClusterEvent], int]
+    ]):
+        endpoint = None
+        cluster = None
+        event = None
+        urgent = False
+        if pathTuple in [('*'), ()]:
+            # Wildcard
+            pass
+        elif type(pathTuple) is not tuple:
+            print(type(pathTuple))
+            if type(pathTuple) is int:
+                endpoint = pathTuple
+            elif issubclass(pathTuple, ClusterObjects.Cluster):
+                cluster = pathTuple
+            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):
+                event = pathTuple
+            else:
+                raise ValueError("Unsupported Event Path")
+        else:
+            if pathTuple[0] == '*':
+                urgent = pathTuple[-1]
+                pass
+            else:
+                # endpoint + (cluster) event / endpoint + cluster
+                endpoint = pathTuple[0]
+                if issubclass(pathTuple[1], ClusterObjects.Cluster):
+                    cluster = pathTuple[1]
+                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):
+                    event = pathTuple[1]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+                urgent = pathTuple[-1]
+        return ClusterAttribute.EventPath(
+            EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent)
+
+    async def Read(self, nodeid: int, attributes: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Attribute present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Wildcard attribute id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+    ]] = None, dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, events: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[str, int],  # all wildcard with urgency set
+        typing.Tuple[int, int],  # Endpoint,
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
+        # Wildcard endpoint, Cluster + Event present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
+        # Wildcard event id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
+        # Concrete path
+        typing.Tuple[int,
+                     typing.Type[ClusterObjects.ClusterEvent], int]
+    ]] = None,
+            returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+        '''
+        Read a list of attributes and/or events from a target node
+
+        nodeId: Target's Node ID
+        attributes: A list of tuples of varying types depending on the type of read being requested:
+            (endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
+            (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Attribute = *
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
+
+            The cluster and attributes specified above are to be selected from the generated cluster objects.
+
+            e.g.
+                ReadAttribute(1, [ 1 ] ) -- case 4 above.
+                ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
+                ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+
+        dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
+
+        events: A list of tuples of varying types depending on the type of read being requested:
+            (endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,    Cluster = specific,   Event = specific, Urgent = True/False
+            (endpoint, Clusters.ClusterA, urgent):              Endpoint = specific,    Cluster = specific,   Event = *, Urgent = True/False
+            (Clusters.ClusterA.EventA, urgent):                 Endpoint = *,           Cluster = specific,   Event = specific, Urgent = True/False
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *, Urgent = True/False
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *, Urgent = True/False
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *, Urgent = True/False
+
+        returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
+                             a single cluster-wide cluster object.
+
+        reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
+            When not provided, a read request will be sent.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        attributePaths = [self._parseAttributePathTuple(
+            v) for v in attributes] if attributes else None
+        clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
+            v) for v in dataVersionFilters] if dataVersionFilters else None
+        eventPaths = [self._parseEventPathTuple(
+            v) for v in events] if events else None
+
+        res = self._ChipStack.Call(
+            lambda: ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject, subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+        return await future
+
     async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -569,7 +751,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
     ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
-        Read a list of attributes from a target node
+        Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
         nodeId: Target's Node ID
         attributes: A list of tuples of varying types depending on the type of read being requested:
@@ -593,62 +775,11 @@ class ChipDeviceController():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        self.CheckIsActive()
-
-        eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
-
-        device = self.GetConnectedDeviceSync(nodeid)
-        attrs = []
-        filters = []
-        for v in attributes:
-            endpoint = None
-            cluster = None
-            attribute = None
-            if v == ('*') or v == ():
-                # Wildcard
-                pass
-            elif type(v) is not tuple:
-                if type(v) is int:
-                    endpoint = v
-                elif issubclass(v, ClusterObjects.Cluster):
-                    cluster = v
-                elif issubclass(v, ClusterObjects.ClusterAttributeDescriptor):
-                    attribute = v
-                else:
-                    raise ValueError("Unsupported Attribute Path")
-            else:
-                # endpoint + (cluster) attribute / endpoint + cluster
-                endpoint = v[0]
-                if issubclass(v[1], ClusterObjects.Cluster):
-                    cluster = v[1]
-                elif issubclass(v[1], ClusterAttribute.ClusterAttributeDescriptor):
-                    attribute = v[1]
-                else:
-                    raise ValueError("Unsupported Attribute Path")
-            attrs.append(ClusterAttribute.AttributePath(
-                EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
-        if dataVersionFilters != None:
-            for v in dataVersionFilters:
-                endpoint = None
-                cluster = None
-
-                # endpoint + (cluster) attribute / endpoint + cluster
-                endpoint = v[0]
-                if issubclass(v[1], ClusterObjects.Cluster):
-                    cluster = v[1]
-                else:
-                    raise ValueError("Unsupported Cluster Path")
-                dataVersion = v[2]
-                filters.append(ClusterAttribute.DataVersionFilter(
-                    EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion))
-            else:
-                filters = None
-        res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, filters, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-        return await future
+        res = await self.Read(nodeid, attributes=attributes, dataVersionFilters=dataVersionFilters, returnClusterObject=returnClusterObject, reportInterval=reportInterval, fabricFiltered=fabricFiltered)
+        if isinstance(res, ClusterAttribute.SubscriptionTransaction):
+            return res
+        else:
+            return res.attributes
 
     async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
@@ -664,7 +795,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
     ]], reportInterval: typing.Tuple[int, int] = None):
         '''
-        Read a list of events from a target node
+        Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
         nodeId: Target's Node ID
         events: A list of tuples of varying types depending on the type of read being requested:
@@ -685,53 +816,11 @@ class ChipDeviceController():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        self.CheckIsActive()
-
-        eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
-
-        device = self.GetConnectedDeviceSync(nodeid)
-        eves = []
-        for v in events:
-            endpoint = None
-            cluster = None
-            event = None
-            urgent = False
-            if v in [('*'), ()]:
-                # Wildcard
-                pass
-            elif type(v) is not tuple:
-                print(type(v))
-                if type(v) is int:
-                    endpoint = v
-                elif issubclass(v, ClusterObjects.Cluster):
-                    cluster = v
-                elif issubclass(v, ClusterObjects.ClusterEvent):
-                    event = v
-                else:
-                    raise ValueError("Unsupported Event Path")
-            else:
-                if v[0] == '*':
-                    urgent = v[-1]
-                    pass
-                else:
-                    # endpoint + (cluster) event / endpoint + cluster
-                    endpoint = v[0]
-                    if issubclass(v[1], ClusterObjects.Cluster):
-                        cluster = v[1]
-                    elif issubclass(v[1], ClusterAttribute.ClusterEvent):
-                        event = v[1]
-                    else:
-                        raise ValueError("Unsupported Attribute Path")
-                    urgent = v[-1]
-            eves.append(ClusterAttribute.EventPath(
-                EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent))
-        res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-        outcome = await future
-        return await future
+        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval)
+        if isinstance(res, ClusterAttribute.SubscriptionTransaction):
+            return res
+        else:
+            return res.events
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         self.CheckIsActive()

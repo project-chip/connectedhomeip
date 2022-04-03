@@ -809,7 +809,7 @@ namespace Inet {
 class UDPEndPointImplLwIP;
 } // namespace Inet
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 // TODO : Temp Implementation issue : 13085
 // Still use LwIP buffer even if using OpenThread UDP implementation
 // since decoupling of LwIP from OpenThread is still in progress
@@ -835,7 +835,7 @@ private:
      */
     static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
     friend class Inet::UDPEndPointImplLwIP;
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     // TODO : Temp Implementation issue : 13085
     // Still use LwIP buffer even if using OpenThread UDP implementation
     // since decoupling of LwIP from OpenThread is still in progress

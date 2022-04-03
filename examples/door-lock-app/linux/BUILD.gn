@@ -20,6 +20,7 @@ executable("chip-door-lock-app") {
     "main.cpp",
     "src/LockEndpoint.cpp",
     "src/LockManager.cpp",
+    "src/ZCLDoorLockCallbacks.cpp",
   ]
 
   deps = [

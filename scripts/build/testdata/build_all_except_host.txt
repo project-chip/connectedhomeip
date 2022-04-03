@@ -166,6 +166,18 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating cc13x2x7_26x2x7-lock-ftd
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
+
+# Generating cc13x2x7_26x2x7-lock-mtd
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=false' {out}/cc13x2x7_26x2x7-lock-mtd
+
+# Generating cc13x2x7_26x2x7-pump
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump
+
+# Generating cc13x2x7_26x2x7-pump-controller
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-controller-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump-controller
+
 # Generating cyw30739-cyw930739m2evb_01-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
 
@@ -943,6 +955,8 @@ ninja -C {out}/android-arm-chip-tv-casting-app
 # Prepare Native libs android-arm-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
 
+cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
+
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
@@ -950,6 +964,8 @@ cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -1027,6 +1043,8 @@ ninja -C {out}/android-arm64-chip-tv-casting-app
 # Prepare Native libs android-arm64-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
 
+cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
@@ -1034,6 +1052,8 @@ cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -1104,6 +1124,18 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building cc13x2x7_26x2x7-lock-ftd
+ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
+
+# Building cc13x2x7_26x2x7-lock-mtd
+ninja -C {out}/cc13x2x7_26x2x7-lock-mtd
+
+# Building cc13x2x7_26x2x7-pump
+ninja -C {out}/cc13x2x7_26x2x7-pump
+
+# Building cc13x2x7_26x2x7-pump-controller
+ninja -C {out}/cc13x2x7_26x2x7-pump-controller
 
 # Building cyw30739-cyw930739m2evb_01-light
 ninja -C {out}/cyw30739-cyw930739m2evb_01-light

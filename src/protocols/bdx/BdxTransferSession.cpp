@@ -64,23 +64,9 @@ TransferSession::TransferSession()
     mSuppportedXferOpts.ClearAll();
 }
 
-void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
+void TransferSession::PollOutput(OutputEvent & event)
 {
     event = OutputEvent(OutputEventType::kNone);
-
-    if (mShouldInitTimeoutStart)
-    {
-        mTimeoutStartTime       = curTime;
-        mShouldInitTimeoutStart = false;
-    }
-
-    if (mAwaitingResponse && ((curTime - mTimeoutStartTime) >= mTimeout))
-    {
-        event             = OutputEvent(OutputEventType::kTransferTimeout);
-        mState            = TransferState::kErrorState;
-        mAwaitingResponse = false;
-        return;
-    }
 
     switch (mPendingOutput)
     {
@@ -94,8 +80,7 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         event = OutputEvent::StatusReportEvent(OutputEventType::kStatusReceived, mStatusReportData);
         break;
     case OutputEventType::kMsgToSend:
-        event             = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
-        mTimeoutStartTime = curTime;
+        event = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
         break;
     case OutputEventType::kInitReceived:
         event = OutputEvent::TransferInitEvent(mTransferRequestData, std::move(mPendingMsgHandle));
@@ -134,12 +119,11 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
     mPendingOutput = OutputEventType::kNone;
 }
 
-CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout)
+CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    mRole    = role;
-    mTimeout = timeout;
+    mRole = role;
 
     // Set transfer parameters. They may be overridden later by an Accept message
     mSuppportedXferOpts    = initData.TransferCtlFlags;
@@ -177,13 +161,12 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
 }
 
 CHIP_ERROR TransferSession::WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                            uint16_t maxBlockSize, System::Clock::Timeout timeout)
+                                            uint16_t maxBlockSize)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // Used to determine compatibility with any future TransferInit parameters
     mRole                  = role;
-    mTimeout               = timeout;
     mSuppportedXferOpts    = xferControlOpts;
     mMaxSupportedBlockSize = maxBlockSize;
 
@@ -422,22 +405,16 @@ void TransferSession::Reset()
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mTimeout                = System::Clock::kZero;
-    mTimeoutStartTime       = System::Clock::kZero;
-    mShouldInitTimeoutStart = true;
-    mAwaitingResponse       = false;
+    mAwaitingResponse = false;
 }
 
-CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
-                                                  System::Clock::Timestamp curTime)
+CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (payloadHeader.HasProtocol(Protocols::BDX::Id))
     {
         ReturnErrorOnFailure(HandleBdxMessage(payloadHeader, std::move(msg)));
-
-        mTimeoutStartTime = curTime;
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
     {

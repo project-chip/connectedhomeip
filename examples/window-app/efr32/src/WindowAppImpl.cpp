@@ -26,7 +26,9 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
+#endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
@@ -413,7 +415,7 @@ void WindowAppImpl::UpdateLCD()
     if (mState.isThreadProvisioned)
 #else
     if (mState.isWiFiProvisioned)
-#endif
+#endif // CHIP_ENABLE_OPENTHREAD
     {
         Cover & cover = GetCover();
         chip::app::DataModel::Nullable<uint16_t> lift;
@@ -431,6 +433,7 @@ void WindowAppImpl::UpdateLCD()
             LcdPainter::Paint(type, static_cast<uint8_t>(lift.Value()), static_cast<uint8_t>(tilt.Value()), mIcon);
         }
     }
+#ifdef QR_CODE_ENABLED
     else
     {
         if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
@@ -438,7 +441,8 @@ void WindowAppImpl::UpdateLCD()
             LCDWriteQRCode((uint8_t *) mQRCode.c_str());
         }
     }
-#endif
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
 }
 
 void WindowAppImpl::OnMainLoop()

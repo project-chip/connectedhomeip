@@ -26,4 +26,3 @@ ti_simplelink_board = "LP_CC2652R7"
 
 # BLE options
 chip_config_network_layer_ble = true
-chip_bypass_rendezvous = false

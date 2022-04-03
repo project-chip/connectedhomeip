@@ -215,6 +215,10 @@ protected:
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+            if (mKeepSubscriptions.HasValue())
+            {
+                params.mKeepSubscriptions = mKeepSubscriptions.Value();
+            }
         }
 
         mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
@@ -289,6 +293,7 @@ protected:
         chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
         params.mpEventPathParamsList        = eventPathParams;
         params.mEventPathParamsListSize     = pathsCount;
+        params.mEventNumber                 = mEventNumber.ValueOr(0);
         params.mpAttributePathParamsList    = nullptr;
         params.mAttributePathParamsListSize = 0;
 
@@ -296,6 +301,10 @@ protected:
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+            if (mKeepSubscriptions.HasValue())
+            {
+                params.mKeepSubscriptions = mKeepSubscriptions.Value();
+            }
         }
 
         mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
@@ -316,6 +325,11 @@ protected:
     // mFabricFiltered is really only used by the attribute commands, but we end
     // up needing it in our class's shared code.
     chip::Optional<bool> mFabricFiltered;
+
+    // mKeepSubscriptions is really only used by the subscribe commands, but we end
+    // up needing it in our class's shared code.
+    chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<chip::EventNumber> mEventNumber;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
@@ -376,8 +390,8 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -388,8 +402,8 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -402,8 +416,8 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -416,26 +430,23 @@ public:
                                               mDataVersion);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
 
     void OnAttributeSubscription() override
     {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnAttributeSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+        // The ReadClient instance can not be released directly into the OnAttributeSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -445,7 +456,6 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
-    bool mWait;
 };
 
 class ReadEvent : public ReportCommand
@@ -455,6 +465,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -462,6 +473,7 @@ public:
         ReportCommand("read-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -471,6 +483,7 @@ public:
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -496,7 +509,8 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -506,7 +520,8 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -518,7 +533,8 @@ public:
         AddArgument("attr-name", eventName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -530,26 +546,23 @@ public:
                                           chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
 
     void OnEventSubscription() override
     {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnEventSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+        // The ReadClient instance can not be released directly into the OnEventSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -558,5 +571,4 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };
