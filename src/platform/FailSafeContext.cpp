@@ -188,8 +188,11 @@ CHIP_ERROR FailSafeContext::DeleteFromStorage()
 
 void FailSafeContext::ForceFailSafeTimerExpiry()
 {
+    if (!IsFailSafeArmed())
+    {
+        return;
+    }
     FailSafeTimerExpired();
-    DisarmFailSafe();
 }
 
 } // namespace DeviceLayer
