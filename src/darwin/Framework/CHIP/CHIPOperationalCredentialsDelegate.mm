@@ -351,9 +351,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     return NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc);
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
-    const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-    Callback::Callback<OnNOCChainGeneration> * onCompletion)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {
