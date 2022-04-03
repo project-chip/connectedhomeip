@@ -102,7 +102,6 @@ def main():
 
     FailIfNot(test.TestFailsafe(nodeid=1), "Failed failsafe test")
 
-
     timeoutTicker.stop()
 
     logger.info("Test finished")
