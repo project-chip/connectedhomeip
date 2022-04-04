@@ -27782,92 +27782,96 @@ public:
             err = TestThWritesAValueOf0ToStartUpOnOffAttributeOfDut_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Power off DUT\n");
-            err = TestPowerOffDut_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH reads the StartUpOnOff attribute from the DUT\n");
+            err = TestThReadsTheStartUpOnOffAttributeFromTheDut_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Power off DUT\n");
+            err = TestPowerOffDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : TH writes a value of 1 to StartUpOnOff attribute of DUT\n");
-            err = TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Power off DUT\n");
-            err = TestPowerOffDut_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : TH writes a value of 1 to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Power off DUT\n");
+            err = TestPowerOffDut_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : TH writes a value of 2 to StartUpOnOff attribute of DUT\n");
-            err = TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Power off DUT\n");
-            err = TestPowerOffDut_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : TH writes a value of 2 to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Power off DUT\n");
+            err = TestPowerOffDut_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Power off DUT\n");
-            err = TestPowerOffDut_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Power off DUT\n");
+            err = TestPowerOffDut_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : TH writes NULL to StartUpOnOff attribute of DUT\n");
-            err = TestThWritesNullToStartUpOnOffAttributeOfDut_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_17();
             break;
         case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Power off DUT\n");
-            err = TestPowerOffDut_18();
+            ChipLogProgress(chipTool, " ***** Test Step 18 : TH writes NULL to StartUpOnOff attribute of DUT\n");
+            err = TestThWritesNullToStartUpOnOffAttributeOfDut_18();
             break;
         case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_19();
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Power off DUT\n");
+            err = TestPowerOffDut_19();
             break;
         case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_20();
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_20();
             break;
         case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : TH sends Off command to DUT\n");
-            err = TestThSendsOffCommandToDut_21();
+            ChipLogProgress(chipTool, " ***** Test Step 21 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_21();
             break;
         case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Power off DUT\n");
-            err = TestPowerOffDut_22();
+            ChipLogProgress(chipTool, " ***** Test Step 22 : TH sends Off command to DUT\n");
+            err = TestThSendsOffCommandToDut_22();
             break;
         case 23:
-            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait 1000ms For device to reboot\n");
-            err = TestWait1000msForDeviceToReboot_23();
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Power off DUT\n");
+            err = TestPowerOffDut_23();
             break;
         case 24:
-            ChipLogProgress(chipTool, " ***** Test Step 24 : TH reads the OnOff attribute from the DUT\n");
-            err = TestThReadsTheOnOffAttributeFromTheDut_24();
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : TH reads the OnOff attribute from the DUT\n");
+            err = TestThReadsTheOnOffAttributeFromTheDut_25();
             break;
         }
 
@@ -27884,7 +27888,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 25;
+    const uint16_t mTestCount = 26;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -27935,19 +27939,42 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_3()
+    CHIP_ERROR TestThReadsTheStartUpOnOffAttributeFromTheDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStartUpOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"TH reads the StartUpOnOff attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StartUpOnOff", actualValue));
+                VerifyOrReturn(CheckValue("StartUpOnOff", actualValue, 0));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestPowerOffDut_4()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_4()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_5()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_5()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -27969,7 +27996,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_6()
+    CHIP_ERROR TestThWritesAValueOf1ToStartUpOnOffAttributeOfDut_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -27989,19 +28016,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_7()
+    CHIP_ERROR TestPowerOffDut_8()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_8()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_9()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_9()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28023,7 +28050,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_10()
+    CHIP_ERROR TestThWritesAValueOf2ToStartUpOnOffAttributeOfDut_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28043,19 +28070,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_11()
+    CHIP_ERROR TestPowerOffDut_12()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_12()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_13()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_13()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28077,19 +28104,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_14()
+    CHIP_ERROR TestPowerOffDut_15()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_15()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_16()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_16()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_17()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28111,7 +28138,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThWritesNullToStartUpOnOffAttributeOfDut_17()
+    CHIP_ERROR TestThWritesNullToStartUpOnOffAttributeOfDut_18()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28131,19 +28158,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_18()
+    CHIP_ERROR TestPowerOffDut_19()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_19()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_20()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_20()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_21()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28165,7 +28192,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThSendsOffCommandToDut_21()
+    CHIP_ERROR TestThSendsOffCommandToDut_22()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28182,19 +28209,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPowerOffDut_22()
+    CHIP_ERROR TestPowerOffDut_23()
     {
         Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait1000msForDeviceToReboot_23()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_24()
     {
-        WaitForMs(1000);
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_24()
+    CHIP_ERROR TestThReadsTheOnOffAttributeFromTheDut_25()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];

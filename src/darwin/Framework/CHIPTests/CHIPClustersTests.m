@@ -19821,7 +19821,32 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000003_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the StartUpOnOff attribute from the DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TH reads the StartUpOnOff attribute from the DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OO_2_4_000004_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -19829,15 +19854,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000004_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000005_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000005_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
@@ -19861,7 +19886,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000006_WriteAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000007_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH writes a value of 1 to StartUpOnOff attribute of DUT"];
 
@@ -19883,7 +19908,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000007_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000008_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -19891,15 +19916,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000008_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000009_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000009_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
@@ -19923,7 +19948,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000010_WriteAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000011_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH writes a value of 2 to StartUpOnOff attribute of DUT"];
 
@@ -19945,7 +19970,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000011_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000012_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -19953,15 +19978,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000012_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000013_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000013_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000014_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
@@ -19985,7 +20010,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000014_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000015_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -19993,15 +20018,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000015_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000016_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000016_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000017_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
@@ -20025,7 +20050,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000017_WriteAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000018_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH writes NULL to StartUpOnOff attribute of DUT"];
 
@@ -20047,7 +20072,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000018_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000019_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -20055,15 +20080,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000019_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000020_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000020_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000021_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
@@ -20087,7 +20112,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000021_Off
+- (void)testSendClusterTest_TC_OO_2_4_000022_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH sends Off command to DUT"];
 
@@ -20106,7 +20131,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000022_Reboot
+- (void)testSendClusterTest_TC_OO_2_4_000023_Reboot
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Power off DUT"];
 
@@ -20114,15 +20139,15 @@ NSNumber * _Nonnull OccupancyValue;
     Reboot(expectation, queue, 3840);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000023_WaitForMs
+- (void)testSendClusterTest_TC_OO_2_4_000024_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms For device to reboot"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_2_4_000024_ReadAttribute
+- (void)testSendClusterTest_TC_OO_2_4_000025_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads the OnOff attribute from the DUT"];
 
