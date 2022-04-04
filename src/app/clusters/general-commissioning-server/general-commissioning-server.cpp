@@ -164,6 +164,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
 
     FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
 
+    // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+    // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
     if (!failSafeContext.IsFailSafeBusy() &&
         (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {

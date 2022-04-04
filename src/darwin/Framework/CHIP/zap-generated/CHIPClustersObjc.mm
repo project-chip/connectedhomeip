@@ -27476,7 +27476,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
     request.operationalDataset = [self asByteSpan:params.operationalDataset];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27494,7 +27497,10 @@ using namespace chip::app::Clusters;
     NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
     request.ssid = [self asByteSpan:params.ssid];
     request.credentials = [self asByteSpan:params.credentials];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27511,7 +27517,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     NetworkCommissioning::Commands::ConnectNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27528,7 +27537,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     NetworkCommissioning::Commands::RemoveNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27546,7 +27558,10 @@ using namespace chip::app::Clusters;
     NetworkCommissioning::Commands::ReorderNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.networkIndex = params.networkIndex.unsignedCharValue;
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -27563,7 +27578,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     NetworkCommissioning::Commands::ScanNetworks::Type request;
     request.ssid = [self asByteSpan:params.ssid];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+    if (params.breadcrumb != nil) {
+        auto & definedValue_0 = request.breadcrumb.Emplace();
+        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    }
 
     new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {

@@ -38,7 +38,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -51,7 +50,6 @@ struct DeviceProxyInitParams
 {
     SessionManager * sessionManager                    = nullptr;
     Messaging::ExchangeManager * exchangeMgr           = nullptr;
-    SessionIDAllocator * idAllocator                   = nullptr;
     FabricTable * fabricTable                          = nullptr;
     CASEClientPoolDelegate * clientPool                = nullptr;
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
@@ -62,7 +60,6 @@ struct DeviceProxyInitParams
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);

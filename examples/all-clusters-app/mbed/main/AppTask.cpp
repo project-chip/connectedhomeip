@@ -63,7 +63,9 @@ int AppTask::Init()
         0);
 
     // Init ZCL Data Model and start server
-    error = Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    error = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());

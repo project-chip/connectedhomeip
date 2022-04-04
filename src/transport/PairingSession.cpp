@@ -23,6 +23,22 @@
 
 namespace chip {
 
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId)
+{
+    auto handle = sessionManager.AllocateSession(sessionId);
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
+    mSecureSessionHolder.Grab(handle.Value());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
+{
+    auto handle = sessionManager.AllocateSession();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
+    mSecureSessionHolder.Grab(handle.Value());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
                                                TLV::TLVWriter & tlvWriter)
 {

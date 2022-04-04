@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <controller/CommissioningDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
@@ -68,6 +69,12 @@ public:
      *   Called when the commissioning process is complete (with success or error)
      */
     virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}
+    virtual void OnCommissioningSuccess(PeerId peerId) {}
+    virtual void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
+                                        Optional<Credentials::AttestationVerificationResult> additionalErrorInfo)
+    {}
+
+    virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
 };
 
 } // namespace Controller

@@ -235,6 +235,29 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
+    def TestCommissionFailure(self, nodeid: int, failAfter: int):
+        self.devCtrl.ResetTestCommissioner()
+        a = self.devCtrl.SetTestCommissionerSimulateFailureOnStage(failAfter)
+        if not a:
+            # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
+            return True
+
+        self.logger.info(
+            "Commissioning device, expecting failure after stage {}".format(failAfter))
+        self.devCtrl.Commission(nodeid)
+        return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
+
+    def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
+        self.devCtrl.ResetTestCommissioner()
+        a = self.devCtrl.SetTestCommissionerSimulateFailureOnReport(failAfter)
+        if not a:
+            # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
+            return True
+        self.logger.info(
+            "Commissioning device, expecting failure on report for stage {}".format(failAfter))
+        self.devCtrl.Commission(nodeid)
+        return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
+
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))
         if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
