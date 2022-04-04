@@ -519,7 +519,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
             uint8_t buffer[kExtensionDataMaxLength] = { 0 };
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
             CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(fabric.GetFabricIndex()), buffer, size);
-            VerifyOrDie(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL);
+            ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
             if (errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 continue;
@@ -636,7 +636,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     uint8_t buffer[kExtensionDataMaxLength] = { 0 };
     uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
     CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), buffer, size);
-    VerifyOrDie(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(errStorage != CHIP_NO_ERROR && errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
 
     if (!aPath.IsListItemOperation())
@@ -665,7 +665,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             {
                 ReturnErrorOnFailure(iterator.GetStatus());
                 // If counted an item, iterator doesn't return it, iterator has no error, that's bad.
-                VerifyOrDie(true);
+                return CHIP_ERROR_INCORRECT_STATE;
             }
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
