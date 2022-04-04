@@ -70,6 +70,7 @@ public:
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder);
 };
 
 GeneralCommissioningAttrAccess gAttrAccess;
@@ -92,6 +93,9 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     }
     case BasicCommissioningInfo::Id: {
         return ReadBasicCommissioningInfo(aEncoder);
+    }
+    case SupportsConcurrentConnection::Id: {
+        return ReadSupportsConcurrentConnection(aEncoder);
     }
     default: {
         break;
@@ -126,6 +130,17 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeV
     basicCommissioningInfo.failSafeExpiryLengthSeconds = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
 
     return aEncoder.Encode(basicCommissioningInfo);
+}
+
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
+{
+    SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+
+    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+    // the CommissioningParameters at the beginning of commissioning flow.
+    supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC) != 0;
+
+    return aEncoder.Encode(supportsConcurrentConnection);
 }
 
 } // anonymous namespace
@@ -215,7 +230,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
-    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode,
+                                             commandData.breadcrumb),
                  Failure);
 
     Commands::SetRegulatoryConfigResponse::Type response;

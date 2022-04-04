@@ -113,7 +113,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
-    mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage = initParams.persistentStorageDelegate;
@@ -239,7 +238,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .exchangeMgr       = &mExchangeMgr,
-            .idAllocator       = &mSessionIDAllocator,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,

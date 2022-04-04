@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/bl602_sdk.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${bl602_sdk_build_root}/bl602_executable.gni")
+import("${bl602_sdk_build_root}/bl602_sdk.gni")
+import("${build_root}/config/defaults.gni")
+
+assert(current_os == "freertos")
+
+bl602_project_dir = "${chip_root}/examples/lighting-app/bouffalolab/bl602"
+examples_plat_dir = "${chip_root}/examples/platform/bouffalolab/bl602"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = true
+
+  # PIN code for PASE session establishment.
+  setupPinCode = 20202021
+
+  # Monitor & log memory usage at runtime.
+  enable_heap_monitoring = false
+}
+
+show_qr_code = false
+
+# BL-HWC-G1 (No LCD)
+if (bl602_board == "BL-HWC-G1" || bl602_board == "IOT_DVK_3S") {
+  show_qr_code = false
+}
+
+bl602_sdk("sdk") {
+  sources = [
+    "${bl602_project_dir}/include/CHIPProjectConfig.h",
+    "${bl602_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL602",
+    "${bl602_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "CONFIG_PSM_EASYFLASH_SIZE=16384",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+  ]
+}
+
+bl602_executable("lighting_app") {
+  output_name = "chip-bl602-lighting-example.out"
+
+  sources = [
+    #"${bl602_project_dir}/include/CHIPProjectConfig.h",
+    "${examples_plat_dir}/InitPlatform.cpp",
+    "include/CHIPProjectConfig.h",
+    "src/AppTask.cpp",
+    "src/CHIPDeviceManager.cpp",
+    "src/DeviceCallbacks.cpp",
+    "src/LEDWidget.cpp",
+    "src/LightingManager.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs = [ "include" ]
+
+  if (bl602_board == "IOT_DVK_3S") {
+    defines = [ "BOARD_ID=0" ]
+  } else {
+    defines = [ "BOARD_ID=1" ]
+  }
+
+  if (show_qr_code) {
+    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+
+    defines += [ "DISPLAY_ENABLED" ]
+  }
+
+  if (enable_heap_monitoring) {
+    defines += [ "HEAP_MONITORING" ]
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+  }
+
+  ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  inputs = [ ldscript ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("bl602") {
+  deps = [ ":lighting_app" ]
+}
+
+group("default") {
+  deps = [ ":bl602" ]
+}

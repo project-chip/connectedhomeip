@@ -135,6 +135,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
+        return CommissioningStage::kValidateCSR;
+    case CommissioningStage::kValidateCSR:
         return CommissioningStage::kGenerateNOCChain;
     case CommissioningStage::kGenerateNOCChain:
         return CommissioningStage::kSendTrustedRootCert;

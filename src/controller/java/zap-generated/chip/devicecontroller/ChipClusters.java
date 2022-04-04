@@ -7874,26 +7874,16 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void armFailSafe(
-        ArmFailSafeResponseCallback callback,
-        Integer expiryLengthSeconds,
-        Long breadcrumb,
-        Long timeoutMs) {
-      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, timeoutMs, null);
+        ArmFailSafeResponseCallback callback, Integer expiryLengthSeconds, Long breadcrumb) {
+      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, null);
     }
 
     public void armFailSafe(
         ArmFailSafeResponseCallback callback,
         Integer expiryLengthSeconds,
         Long breadcrumb,
-        Long timeoutMs,
         int timedInvokeTimeoutMs) {
-      armFailSafe(
-          chipClusterPtr,
-          callback,
-          expiryLengthSeconds,
-          breadcrumb,
-          timeoutMs,
-          timedInvokeTimeoutMs);
+      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void commissioningComplete(CommissioningCompleteResponseCallback callback) {
@@ -7908,28 +7898,25 @@ public class ChipClusters {
 
     public void setRegulatoryConfig(
         SetRegulatoryConfigResponseCallback callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
-        Long breadcrumb,
-        Long timeoutMs) {
+        Long breadcrumb) {
       setRegulatoryConfig(
-          chipClusterPtr, callback, location, countryCode, breadcrumb, timeoutMs, null);
+          chipClusterPtr, callback, newRegulatoryConfig, countryCode, breadcrumb, null);
     }
 
     public void setRegulatoryConfig(
         SetRegulatoryConfigResponseCallback callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
         Long breadcrumb,
-        Long timeoutMs,
         int timedInvokeTimeoutMs) {
       setRegulatoryConfig(
           chipClusterPtr,
           callback,
-          location,
+          newRegulatoryConfig,
           countryCode,
           breadcrumb,
-          timeoutMs,
           timedInvokeTimeoutMs);
     }
 
@@ -7938,7 +7925,6 @@ public class ChipClusters {
         ArmFailSafeResponseCallback Callback,
         Integer expiryLengthSeconds,
         Long breadcrumb,
-        Long timeoutMs,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void commissioningComplete(
@@ -7949,10 +7935,9 @@ public class ChipClusters {
     private native void setRegulatoryConfig(
         long chipClusterPtr,
         SetRegulatoryConfigResponseCallback Callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
         Long breadcrumb,
-        Long timeoutMs,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ArmFailSafeResponseCallback {
@@ -8033,6 +8018,16 @@ public class ChipClusters {
       subscribeLocationCapabilityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSupportsConcurrentConnectionAttribute(BooleanAttributeCallback callback) {
+      readSupportsConcurrentConnectionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportsConcurrentConnectionAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSupportsConcurrentConnectionAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -8092,6 +8087,12 @@ public class ChipClusters {
 
     private native void subscribeLocationCapabilityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportsConcurrentConnectionAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeSupportsConcurrentConnectionAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

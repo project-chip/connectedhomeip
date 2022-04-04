@@ -324,7 +324,6 @@ public:
         chip::DeviceProxyInitParams initParams = {
             .sessionManager = &(server->GetSecureSessionManager()),
             .exchangeMgr    = &(server->GetExchangeManager()),
-            .idAllocator    = &(server->GetSessionIDAllocator()),
             .fabricTable    = &(server->GetFabricTable()),
             .clientPool     = &gCASEClientPool,
         };

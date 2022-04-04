@@ -21,7 +21,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -34,7 +33,6 @@ struct CASEClientInitParams
 {
     SessionManager * sessionManager                    = nullptr;
     Messaging::ExchangeManager * exchangeMgr           = nullptr;
-    SessionIDAllocator * idAllocator                   = nullptr;
     FabricInfo * fabricInfo                            = nullptr;
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
 

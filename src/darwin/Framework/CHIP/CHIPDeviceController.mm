@@ -183,6 +183,13 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
+    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil];
+}
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
+            ipk:(NSData * _Nullable)ipk
+{
     if (vendorId == chip::VendorId::Common) {
         // Shouldn't be using the "standard" vendor ID for actual devices.
         CHIP_LOG_ERROR("%d is not a valid vendorId to initialize a device controller with", vendorId);
@@ -214,7 +221,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }
-        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge), nil);
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge), ipk);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }

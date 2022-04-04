@@ -1295,8 +1295,6 @@ NS_ASSUME_NONNULL_BEGIN
         _expiryLengthSeconds = @(0);
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
@@ -1320,13 +1318,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _location = @(0);
+        _newRegulatoryConfig = @(0);
 
         _countryCode = @"";
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
