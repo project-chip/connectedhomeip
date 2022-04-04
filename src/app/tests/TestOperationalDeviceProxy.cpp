@@ -70,11 +70,11 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     // TODO: Set IPK in groupDataProvider
 
     DeviceProxyInitParams params = {
-        .sessionManager    = &sessionManager,
+        .sessionManager           = &sessionManager,
         .sessionResumptionStorage = &sessionResumptionStorage,
-        .exchangeMgr       = &exchangeMgr,
-        .fabricInfo        = fabric,
-        .groupDataProvider = &groupDataProvider,
+        .exchangeMgr              = &exchangeMgr,
+        .fabricInfo               = fabric,
+        .groupDataProvider        = &groupDataProvider,
     };
     NodeId mockNodeId = 1;
     OperationalDeviceProxy device(params, PeerId().SetNodeId(mockNodeId));

@@ -36,6 +36,7 @@
 
 #include <app/server/Dnssd.h>
 #include <protocols/secure_channel/CASEServer.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -146,15 +147,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable           = chip::Platform::New<FabricTable>();
-    stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
-    stateParams.sessionResumptionStorage = chip::Platform::New<SessionResumptionStorage>();
-    stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
-    stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
-    stateParams.groupDataProvider     = params.groupDataProvider;
+    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
+    stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
+    SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
+    stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
+    stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
+    stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
+    stateParams.groupDataProvider                             = params.groupDataProvider;
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
-    ReturnErrorOnFailure(stateParams.sessionResumptionStorage->Init(params.fabricIndependentStorage));
+    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
@@ -220,12 +222,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
-        .sessionManager    = stateParams.sessionMgr,
-        .exchangeMgr       = stateParams.exchangeMgr,
-        .fabricTable       = stateParams.fabricTable,
-        .clientPool        = stateParams.caseClientPool,
-        .groupDataProvider = stateParams.groupDataProvider,
-        .mrpLocalConfig    = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+        .sessionManager           = stateParams.sessionMgr,
+        .sessionResumptionStorage = stateParams.sessionResumptionStorage,
+        .exchangeMgr              = stateParams.exchangeMgr,
+        .fabricTable              = stateParams.fabricTable,
+        .clientPool               = stateParams.caseClientPool,
+        .groupDataProvider        = stateParams.groupDataProvider,
+        .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

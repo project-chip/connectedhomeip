@@ -18,6 +18,8 @@ static_library("secure_channel") {
     "SessionEstablishmentExchangeDispatch.h",
     "SessionResumptionStorage.cpp",
     "SessionResumptionStorage.h",
+    "SimpleSessionResumptionStorage.cpp",
+    "SimpleSessionResumptionStorage.h",
     "StatusReport.cpp",
     "StatusReport.h",
   ]

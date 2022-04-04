@@ -26,9 +26,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/ScopedNodeId.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
 
@@ -39,7 +37,7 @@ namespace chip {
  *
  *   The implementation saves 2 maps:
  *     * <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>
- *     * <FabricIndex, ResumptionId> => <PeerNodeId>
+ *     * <ResumptionId>              => <FabricIndex, PeerNodeId>
  */
 class SessionResumptionStorage
 {
@@ -49,42 +47,36 @@ public:
     using ResumptionIdView                    = FixedSpan<uint8_t, kResumptionIdSize>;
     using ConstResumptionIdView               = FixedSpan<const uint8_t, kResumptionIdSize>;
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage)
+    struct SessionIndex
     {
-        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mStorage = storage;
-        return CHIP_NO_ERROR;
-    }
+        size_t mSize;
+        ScopedNodeId mNodes[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE];
+    };
 
-    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, ResumptionIdView resumptionId,
+    virtual ~SessionResumptionStorage() {}
+
+    CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
                                   Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
     CHIP_ERROR FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
                                   Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
-    CHIP_ERROR Save(ScopedNodeId node, ConstResumptionIdView resumptionId, const Crypto::P256ECDHDerivedSecret & sharedSecret,
-                    const CATValues & peerCATs);
-    CHIP_ERROR Delete(ScopedNodeId node);
-
-private:
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, ScopedNodeId node);
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId);
-
-    static constexpr size_t MaxLinkSize() { return TLV::EstimateStructOverhead(sizeof(NodeId)); }
-
-    static constexpr size_t MaxStateSize()
-    {
-        return TLV::EstimateStructOverhead(kResumptionIdSize, Crypto::P256ECDHDerivedSecret::Capacity(),
-                                           CATValues::kSerializedLength);
-    }
-
-    static constexpr TLV::Tag kFabricIndexTag  = TLV::ContextTag(0);
-    static constexpr TLV::Tag kPeerNodeIdTag   = TLV::ContextTag(1);
-    static constexpr TLV::Tag kResumptionIdTag = TLV::ContextTag(2);
-    static constexpr TLV::Tag kSharedSecretTag = TLV::ContextTag(3);
-    static constexpr TLV::Tag kCATTag          = TLV::ContextTag(4);
-
     CHIP_ERROR FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node);
+    CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                    const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs);
+    CHIP_ERROR Delete(const ScopedNodeId & node);
 
-    PersistentStorageDelegate * mStorage;
+protected:
+    CHIP_ERROR virtual SaveIndex(const SessionIndex & index) = 0;
+    CHIP_ERROR virtual LoadIndex(SessionIndex & index)       = 0;
+
+    CHIP_ERROR virtual SaveLink(ConstResumptionIdView resumptionId, const ScopedNodeId & node) = 0;
+    CHIP_ERROR virtual LoadLink(ConstResumptionIdView resumptionId, ScopedNodeId & node)       = 0;
+    CHIP_ERROR virtual DeleteLink(ConstResumptionIdView resumptionId)                          = 0;
+
+    CHIP_ERROR virtual SaveState(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                                 const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) = 0;
+    CHIP_ERROR virtual LoadState(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
+                                 Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)             = 0;
+    CHIP_ERROR virtual DeleteState(const ScopedNodeId & node)                                                    = 0;
 };
 
 } // namespace chip

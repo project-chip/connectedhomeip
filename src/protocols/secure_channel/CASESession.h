@@ -73,7 +73,8 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
+        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+        SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -91,7 +92,8 @@ public:
      */
     CHIP_ERROR
     EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
-                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
+                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt,
+                     SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
