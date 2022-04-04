@@ -39,7 +39,7 @@ public:
           mExpiryTimeoutSecs(expiryTimeoutSecs)
     {
     }
- 
+
     ~CHIPDeviceAttestationDelegateBridge()
     {
     }
