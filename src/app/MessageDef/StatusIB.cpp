@@ -84,7 +84,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
             {
                 uint16_t status;
                 ReturnErrorOnFailure(reader.Get(status));
-                PRETTY_PRINT("\tstatus = 0x%" PRIx16 ",", status);
+                PRETTY_PRINT("\tstatus = " ChipLogFormatIMStatus ",", ChipLogValueIMStatus(static_cast<Status>(status)));
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -195,13 +195,24 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
     const char * desc = nullptr;
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    constexpr char generalFormat[] = "General error: 0x%02x";
+    constexpr char generalFormat[] = "General error: " ChipLogFormatIMStatus;
     constexpr char clusterFormat[] = "Cluster-specific error: 0x%02x";
 
     // Formatting an 8-bit int will take at most 2 chars, and replace the '%02x'
     // so a buffer big enough to hold our format string will also hold our
-    // formatted string.
-    constexpr size_t formattedSize = max(sizeof(generalFormat), sizeof(clusterFormat));
+    // formatted string, as long as we account for the possible string formats.
+    constexpr size_t statusNameMaxLength =
+#define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
+        max(sizeof(#spec_name),
+#include <protocols/interaction_model/StatusCodeList.h>
+#undef CHIP_IM_STATUS_CODE
+        static_cast<size_t>(0)
+#define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
+        )
+#include <protocols/interaction_model/StatusCodeList.h>
+#undef CHIP_IM_STATUS_CODE
+        ;
+    constexpr size_t formattedSize = max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
     char formattedString[formattedSize];
 
     StatusIB status;
@@ -212,7 +223,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     }
     else
     {
-        snprintf(formattedString, formattedSize, generalFormat, to_underlying(status.mStatus));
+        snprintf(formattedString, formattedSize, generalFormat, ChipLogValueIMStatus(status.mStatus));
     }
     desc = formattedString;
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

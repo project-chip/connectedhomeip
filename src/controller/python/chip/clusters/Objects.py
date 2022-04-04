@@ -9180,8 +9180,9 @@ class GeneralCommissioning(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="basicCommissioningInfo", Tag=0x00000001, Type=GeneralCommissioning.Structs.BasicCommissioningInfo),
-                ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]),
-                ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]),
+                ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
+                ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
+                ClusterObjectFieldDescriptor(Label="supportsConcurrentConnection", Tag=0x00000004, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -9191,8 +9192,9 @@ class GeneralCommissioning(Cluster):
 
     breadcrumb: 'uint' = None
     basicCommissioningInfo: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = None
-    regulatoryConfig: 'typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]' = None
-    locationCapability: 'typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]' = None
+    regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationType' = None
+    locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationType' = None
+    supportsConcurrentConnection: 'bool' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -9240,12 +9242,10 @@ class GeneralCommissioning(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="expiryLengthSeconds", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
             expiryLengthSeconds: 'uint' = 0
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
         class ArmFailSafeResponse(ClusterCommand):
@@ -9274,16 +9274,14 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="location", Tag=0, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
+                            ClusterObjectFieldDescriptor(Label="newRegulatoryConfig", Tag=0, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
                             ClusterObjectFieldDescriptor(Label="countryCode", Tag=1, Type=str),
                             ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=3, Type=uint),
                     ])
 
-            location: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+            newRegulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
             countryCode: 'str' = ""
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
         class SetRegulatoryConfigResponse(ClusterCommand):
@@ -9378,9 +9376,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType])
+                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationType)
 
-            value: 'typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]' = None
+            value: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
 
         @dataclass
         class LocationCapability(ClusterAttributeDescriptor):
@@ -9394,9 +9392,25 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType])
+                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationType)
 
-            value: 'typing.Optional[GeneralCommissioning.Enums.RegulatoryLocationType]' = None
+            value: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+
+        @dataclass
+        class SupportsConcurrentConnection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: 'bool' = False
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -9706,11 +9720,13 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
-            debugText: 'str' = ""
+            debugText: 'typing.Optional[str]' = None
+            networkIndex: 'typing.Optional[uint]' = None
 
         @dataclass
         class ConnectNetwork(ClusterCommand):

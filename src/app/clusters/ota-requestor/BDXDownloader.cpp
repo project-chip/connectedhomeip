@@ -25,7 +25,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxMessages.h>
-#include <system/SystemClock.h> /* TODO:(#12520) remove */
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -83,8 +82,7 @@ bool BDXDownloader::HasTransferTimedOut()
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
     VerifyOrReturn(mState == State::kInProgress, ChipLogError(BDX, "Can't accept messages, no transfer in progress"));
-    CHIP_ERROR err =
-        mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg), /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+    CHIP_ERROR err = mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "unable to handle message: %" CHIP_ERROR_FORMAT, err.Format());
@@ -106,8 +104,7 @@ CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::Transfe
 
     // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
     // Otherwise it could be freed before we can use it.
-    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData,
-                                                    /* TODO:(#12520) */ chip::System::Clock::Seconds16(30)));
+    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData));
 
     return CHIP_NO_ERROR;
 }
@@ -118,6 +115,9 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mPrevBlockCounter = 0;
+
+    // Note that due to the nature of this timer function, the actual time taken to detect a stalled BDX connection might be
+    // anywhere in the range of [mTimeout, 2*mTimeout)
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
@@ -219,7 +219,7 @@ void BDXDownloader::PollTransferSession()
     // allow that?
     do
     {
-        mBdxTransfer.PollOutput(outEvent, /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+        mBdxTransfer.PollOutput(outEvent);
         CHIP_ERROR err = HandleBdxEvent(outEvent);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "HandleBDXEvent: %" CHIP_ERROR_FORMAT, err.Format()));
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);

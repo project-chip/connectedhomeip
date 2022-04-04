@@ -31,6 +31,10 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTAUtil.h"
+#endif
+
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 #include <zephyr.h>
@@ -41,7 +45,7 @@
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
 static LEDWidget sStatusLED;
@@ -127,9 +131,11 @@ CHIP_ERROR AppTask::Init()
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    InitOTARequestor();
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
@@ -142,18 +148,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
-}
-
-void AppTask::InitOTARequestor()
-{
-#if CONFIG_CHIP_OTA_REQUESTOR
-    OTAImageProcessorNrf::Get().SetOTADownloader(&mBDXDownloader);
-    mBDXDownloader.SetImageProcessorDelegate(&OTAImageProcessorNrf::Get());
-    mOTARequestorDriver.Init(&mOTARequestor, &OTAImageProcessorNrf::Get());
-    mOTARequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    mOTARequestor.Init(chip::Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mBDXDownloader);
-    chip::SetRequestorInstance(&mOTARequestor);
-#endif
 }
 
 CHIP_ERROR AppTask::StartApp()

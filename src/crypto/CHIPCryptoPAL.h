@@ -1414,7 +1414,7 @@ enum class MatterOid
 CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
 /**
- * @brief Opaque context used to protect the symmetric key. The key operations must
+ * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
 class SymmetricKeyContext
@@ -1422,6 +1422,9 @@ class SymmetricKeyContext
 public:
     /**
      * @brief Returns the symmetric key hash
+     *
+     * TODO: Replace GetKeyHash() with DeriveGroupSessionId(SymmetricKeyContext &, uint16_t & session_id)
+     *
      * @return Group Key Hash
      */
     virtual uint16_t GetKeyHash() = 0;
@@ -1475,7 +1478,7 @@ public:
                                       const ByteSpan & mic) const = 0;
 
     /**
-     * @brief Release the dynamic memory used to allocate this instance of the SymmetricKeyContext
+     * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
      */
     virtual void Release() = 0;
 };

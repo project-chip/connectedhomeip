@@ -31,7 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <credentials/GroupDataProviderImpl.h>
+#include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -71,12 +71,13 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage here should be removed.
+// TODO everything other than the fabric storage and group data provider here should be removed.
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                   = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider            = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -138,17 +139,31 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
+    //
+    // Retrieve a read-only pointer to the system state object that contains pointers to key stack
+    // singletons. If the pointer is null, it indicates that the DeviceControllerFactory has yet to
+    // be initialized properly, or has already been shut-down.
+    //
+    // This pointer ceases to be valid after a call to Shutdown has been made, or if all active
+    // DeviceController instances have gone to 0. Consequently, care has to be taken to correctly
+    // sequence the shutting down of active controllers with any entity that interacts with objects
+    // present in the system state object. If de-coupling is desired, RetainSystemState and
+    // ReleaseSystemState can be used to avoid this.
+    //
+    const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
+
     class ControllerFabricDelegate final : public FabricTableDelegate
     {
     public:
-        ControllerFabricDelegate() {}
-        ControllerFabricDelegate(SessionManager * sessionManager) : FabricTableDelegate(true), mSessionManager(sessionManager) {}
+        ControllerFabricDelegate() : FabricTableDelegate(true) {}
 
-        CHIP_ERROR Init(SessionManager * sessionManager)
+        CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
         {
             VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager = sessionManager;
+            mSessionManager    = sessionManager;
+            mGroupDataProvider = groupDataProvider;
             return CHIP_NO_ERROR;
         };
 
@@ -158,10 +173,9 @@ public:
             {
                 mSessionManager->FabricRemoved(fabricIndex);
             }
-            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-            if (groupDataProvider != nullptr)
+            if (mGroupDataProvider != nullptr)
             {
-                groupDataProvider->RemoveFabric(fabricIndex);
+                mGroupDataProvider->RemoveFabric(fabricIndex);
             }
         };
 
@@ -170,7 +184,8 @@ public:
         void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
     private:
-        SessionManager * mSessionManager = nullptr;
+        SessionManager * mSessionManager                    = nullptr;
+        Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
     };
 
 private:

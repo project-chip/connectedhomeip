@@ -617,7 +617,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralCommissioningClusterArmFailSafeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull expiryLengthSeconds;
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
-@property (strong, nonatomic) NSNumber * _Nonnull timeoutMs;
 - (instancetype)init;
 @end
 
@@ -628,10 +627,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull location;
+@property (strong, nonatomic, getter=getNewRegulatoryConfig) NSNumber * _Nonnull newRegulatoryConfig;
 @property (strong, nonatomic) NSString * _Nonnull countryCode;
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
-@property (strong, nonatomic) NSNumber * _Nonnull timeoutMs;
 - (instancetype)init;
 @end
 
@@ -682,7 +680,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPNetworkCommissioningClusterNetworkConfigResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (strong, nonatomic) NSNumber * _Nullable networkIndex;
 - (instancetype)init;
 @end
 

@@ -56,7 +56,9 @@ apk
 AppConfig
 AppImpl
 ApplianceControl
+applianceeventsandalert
 ApplianceIdentification
+appliancestatistics
 ApplicationBasic
 ApplicationId
 ApplicationIdentifier
@@ -247,6 +249,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+commissionables
 CommissioningFlow
 commondatastorage
 CONF
@@ -479,6 +482,7 @@ fb
 fbb
 fbd
 FC
+FCJ
 FDDE
 fddead
 fde
@@ -612,6 +616,7 @@ InetLayer
 Infineon
 ini
 init
+InitArgs
 inlined
 InputLoop
 installDebug
@@ -860,6 +865,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
@@ -895,6 +901,7 @@ OTADownloader
 otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
+OTAImageProcessorImpl
 OTAImageProcessorInterface
 OTAProvider
 OTAProviderIpAddress
@@ -913,6 +920,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -1172,9 +1180,11 @@ subtype
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+suppressResponse
 svg
 SVR
 SWD
+SWU
 symlinks
 sysconfdir
 SysConfig
@@ -1247,6 +1257,7 @@ TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
 transitionTime
+TransferSession
 TransportMgrBase
 TrustedRootCertificates
 TSG
@@ -1353,12 +1364,14 @@ xab
 xaver
 xb
 xbef
+xBEEF
 xc
 xcd
 Xcode
 xcodeproj
 xcworkspace
 xd
+xDEAD
 xDEADBEEF
 xdeadbeefcafe
 xds

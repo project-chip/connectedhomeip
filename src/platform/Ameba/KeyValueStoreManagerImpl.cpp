@@ -54,14 +54,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     if (TRUE == ret)
     {
         err = CHIP_NO_ERROR;
-        if (read_bytes_size)
-        {
-            *read_bytes_size = value_size;
-        }
     }
     else
     {
-        err = CHIP_ERROR_INTERNAL;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     return err;

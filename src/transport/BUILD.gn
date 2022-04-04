@@ -72,6 +72,9 @@ static_library("transport") {
   ]
 
   if (chip_enable_transport_trace) {
-    deps = [ "$dir_pw_trace" ]
+    sources += [ "TraceMessage.cpp" ]
+  }
+  if (chip_enable_transport_pw_trace) {
+    public_deps += [ "$dir_pw_trace" ]
   }
 }

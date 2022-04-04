@@ -10326,7 +10326,6 @@ enum class Fields
 {
     kExpiryLengthSeconds = 0,
     kBreadcrumb          = 1,
-    kTimeoutMs           = 2,
 };
 
 struct Type
@@ -10338,7 +10337,6 @@ public:
 
     uint16_t expiryLengthSeconds = static_cast<uint16_t>(0);
     uint64_t breadcrumb          = static_cast<uint64_t>(0);
-    uint32_t timeoutMs           = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10355,7 +10353,6 @@ public:
 
     uint16_t expiryLengthSeconds = static_cast<uint16_t>(0);
     uint64_t breadcrumb          = static_cast<uint64_t>(0);
-    uint32_t timeoutMs           = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ArmFailSafe
@@ -10397,10 +10394,9 @@ public:
 namespace SetRegulatoryConfig {
 enum class Fields
 {
-    kLocation    = 0,
-    kCountryCode = 1,
-    kBreadcrumb  = 2,
-    kTimeoutMs   = 3,
+    kNewRegulatoryConfig = 0,
+    kCountryCode         = 1,
+    kBreadcrumb          = 2,
 };
 
 struct Type
@@ -10410,10 +10406,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType location = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
-    uint32_t timeoutMs  = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10428,10 +10423,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType location = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
-    uint32_t timeoutMs  = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetRegulatoryConfig
@@ -10585,6 +10579,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocationCapability
+namespace SupportsConcurrentConnection {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportsConcurrentConnection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportsConcurrentConnection
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -10660,6 +10666,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
             static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+        Attributes::SupportsConcurrentConnection::TypeInfo::DecodableType supportsConcurrentConnection = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -11002,6 +11009,7 @@ enum class Fields
 {
     kNetworkingStatus = 0,
     kDebugText        = 1,
+    kNetworkIndex     = 2,
 };
 
 struct Type
@@ -11012,7 +11020,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11028,7 +11037,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
+    Optional<uint8_t> networkIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NetworkConfigResponse

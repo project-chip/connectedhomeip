@@ -134,6 +134,7 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
+    "OTAUserConsentCommon.h",
     "OperationalDeviceProxy.cpp",
     "OperationalDeviceProxy.h",
     "OperationalDeviceProxyPool.h",

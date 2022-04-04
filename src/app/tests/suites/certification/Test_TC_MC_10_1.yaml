@@ -16,124 +16,28 @@ name: 18.12.1. [TC-MC-10.1] Read Content Launcher Attributes (DUT as Server)
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Content Launcher"
+    endpoint: 1
 
 tests:
-    - label: "DUT reads the AcceptHeader attribute from the TH"
-      verification:
-          "./chip-tool contentlauncher read accept-header 1 1 [1646143737358]
-          [87142:3768651] CHIP: [EM] Received message of type 0x5 with
-          protocolId (0, 1) and MessageCounter:13527854 on exchange 7150i
-          [1646143737358] [87142:3768651] CHIP: [EM] Found matching exchange:
-          7150i, Delegate: 0x600002c2c1e0 [1646143737358] [87142:3768651] CHIP:
-          [EM] Rxd Ack; Removing MessageCounter:3132467 from Retrans Table on
-          exchange 7150i [1646143737358] [87142:3768651] CHIP: [EM] Removed CHIP
-          MessageCounter:3132467 from RetransTable on exchange 7150i
-          [1646143737358] [87142:3768651] CHIP: [DMG] ReportDataMessage =
-          [1646143737358] [87142:3768651] CHIP: [DMG] { [1646143737358]
-          [87142:3768651] CHIP: [DMG] AttributeReportIBs = [1646143737358]
-          [87142:3768651] CHIP: [DMG] [ [1646143737358] [87142:3768651] CHIP:
-          [DMG] AttributeReportIB = [1646143737358] [87142:3768651] CHIP: [DMG]
-          { [1646143737358] [87142:3768651] CHIP: [DMG] AttributeDataIB =
-          [1646143737358] [87142:3768651] CHIP: [DMG] { [1646143737358]
-          [87142:3768651] CHIP: [DMG] DataVersion = 0x4cfe3732, [1646143737358]
-          [87142:3768651] CHIP: [DMG] AttributePathIB = [1646143737358]
-          [87142:3768651] CHIP: [DMG] { [1646143737358] [87142:3768651] CHIP:
-          [DMG] Endpoint = 0x1, [1646143737358] [87142:3768651] CHIP: [DMG]
-          Cluster = 0x50a, [1646143737358] [87142:3768651] CHIP: [DMG] Attribute
-          = 0x0000_0000, [1646143737358] [87142:3768651] CHIP: [DMG] }
-          [1646143737358] [87142:3768651] CHIP: [DMG] [1646143737358]
-          [87142:3768651] CHIP: [DMG] Data = [ [1646143737358] [87142:3768651]
-          CHIP: [DMG] [1646143737358] [87142:3768651] CHIP: [DMG] ],
-          [1646143737358] [87142:3768651] CHIP: [DMG] }, [1646143737358]
-          [87142:3768651] CHIP: [DMG] [1646143737358] [87142:3768651] CHIP:
-          [DMG] }, [1646143737358] [87142:3768651] CHIP: [DMG] [1646143737358]
-          [87142:3768651] CHIP: [DMG] AttributeReportIB = [1646143737358]
-          [87142:3768651] CHIP: [DMG] { [1646143737358] [87142:3768651] CHIP:
-          [DMG] AttributeDataIB = [1646143737358] [87142:3768651] CHIP: [DMG] {
-          [1646143737358] [87142:3768651] CHIP: [DMG] DataVersion = 0x4cfe3732,
-          [1646143737358] [87142:3768651] CHIP: [DMG] AttributePathIB =
-          [1646143737358] [87142:3768651] CHIP: [DMG] { [1646143737358]
-          [87142:3768651] CHIP: [DMG] Endpoint = 0x1, [1646143737358]
-          [87142:3768651] CHIP: [DMG] Cluster = 0x50a, [1646143737358]
-          [87142:3768651] CHIP: [DMG] Attribute = 0x0000_0000, [1646143737358]
-          [87142:3768651] CHIP: [DMG] ListIndex = Null, [1646143737358]
-          [87142:3768651] CHIP: [DMG] } [1646143737358] [87142:3768651] CHIP:
-          [DMG] [1646143737358] [87142:3768651] CHIP: [DMG] Data = 'example',
-          [1646143737358] [87142:3768651] CHIP: [DMG] }, [1646143737358]
-          [87142:3768651] CHIP: [DMG] [1646143737358] [87142:3768651] CHIP:
-          [DMG] }, [1646143737358] [87142:3768651] CHIP: [DMG] [1646143737358]
-          [87142:3768651] CHIP: [DMG] AttributeReportIB = [1646143737358]
-          [87142:3768651] CHIP: [DMG] { [1646143737358] [87142:3768651] CHIP:
-          [DMG] AttributeDataIB = [1646143737358] [87142:3768651] CHIP: [DMG] {
-          [1646143737358] [87142:3768651] CHIP: [DMG] DataVersion = 0x4cfe3732,
-          [1646143737358] [87142:3768651] CHIP: [DMG] AttributePathIB =
-          [1646143737358] [87142:3768651] CHIP: [DMG] { [1646143737358]
-          [87142:3768651] CHIP: [DMG] Endpoint = 0x1, [1646143737358]
-          [87142:3768651] CHIP: [DMG] Cluster = 0x50a, [1646143737358]
-          [87142:3768651] CHIP: [DMG] Attribute = 0x0000_0000, [1646143737358]
-          [87142:3768651] CHIP: [DMG] ListIndex = Null, [1646143737358]
-          [87142:3768651] CHIP: [DMG] } [1646143737358] [87142:3768651] CHIP:
-          [DMG] [1646143737358] [87142:3768651] CHIP: [DMG] Data = 'example',
-          [1646143737358] [87142:3768651] CHIP: [DMG] }, [1646143737358]
-          [87142:3768651] CHIP: [DMG] [1646143737358] [87142:3768651] CHIP:
-          [DMG] }, [1646143737358] [87142:3768651] CHIP: [DMG] [1646143737358]
-          [87142:3768651] CHIP: [DMG] ], [1646143737358] [87142:3768651] CHIP:
-          [DMG] [1646143737358] [87142:3768651] CHIP: [DMG] SuppressResponse =
-          true, [1646143737358] [87142:3768651] CHIP: [DMG]
-          InteractionModelRevision = 1 [1646143737358] [87142:3768651] CHIP:
-          [DMG] } [1646143737359] [87142:3768651] CHIP: [TOO] Endpoint: 1
-          Cluster: 0x0000_050A Attribute 0x0000_0000 DataVersion: 1291728690
-          [1646143737360] [87142:3768651] CHIP: [TOO] AcceptHeader: 2 entries
-          [1646143737360] [87142:3768651] CHIP: [TOO] [1]: example
-          [1646143737360] [87142:3768651] CHIP: [TOO] [2]: example
-          [1646143737360] [87142:3768651] CHIP: [EM] Sending Standalone Ack for
-          MessageCounter:13527854 on exchange 7150i [1646143737360]
-          [87142:3768651] CHIP: [IN] Prepared secure message 0x700006cf2560 to
-          0x0000000000000001 (1) of type 0x10 and protocolId (0, 0) on exchange
-          7150i with MessageCounter:3132468. [1646143737360] [87142:3768651]
-          CHIP: [IN] Sending encrypted msg 0x700006cf2560 with
-          MessageCounter:3132468 to 0x0000000000000001 (1) at monotonic time:
-          431018215 msec"
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "DUT reads the SupportedStreamingProtocols attribute from the TH"
-      verification:
-          "./chip-tool contentlauncher read supported-streaming-protocols 1 1
-          [1646143780978] [87181:3769324] CHIP: [EM] Received message of type
-          0x5 with protocolId (0, 1) and MessageCounter:6010019 on exchange
-          62038i [1646143780978] [87181:3769324] CHIP: [EM] Found matching
-          exchange: 62038i, Delegate: 0x6000028213b0 [1646143780978]
-          [87181:3769324] CHIP: [EM] Rxd Ack; Removing MessageCounter:16473900
-          from Retrans Table on exchange 62038i [1646143780978] [87181:3769324]
-          CHIP: [EM] Removed CHIP MessageCounter:16473900 from RetransTable on
-          exchange 62038i [1646143780978] [87181:3769324] CHIP: [DMG]
-          ReportDataMessage = [1646143780978] [87181:3769324] CHIP: [DMG] {
-          [1646143780978] [87181:3769324] CHIP: [DMG] AttributeReportIBs =
-          [1646143780978] [87181:3769324] CHIP: [DMG] [ [1646143780978]
-          [87181:3769324] CHIP: [DMG] AttributeReportIB = [1646143780978]
-          [87181:3769324] CHIP: [DMG] { [1646143780978] [87181:3769324] CHIP:
-          [DMG] AttributeDataIB = [1646143780978] [87181:3769324] CHIP: [DMG] {
-          [1646143780979] [87181:3769324] CHIP: [DMG] DataVersion = 0x4cfe3732,
-          [1646143780979] [87181:3769324] CHIP: [DMG] AttributePathIB =
-          [1646143780979] [87181:3769324] CHIP: [DMG] { [1646143780979]
-          [87181:3769324] CHIP: [DMG] Endpoint = 0x1, [1646143780979]
-          [87181:3769324] CHIP: [DMG] Cluster = 0x50a, [1646143780979]
-          [87181:3769324] CHIP: [DMG] Attribute = 0x0000_0001, [1646143780979]
-          [87181:3769324] CHIP: [DMG] } [1646143780979] [87181:3769324] CHIP:
-          [DMG] [1646143780979] [87181:3769324] CHIP: [DMG] Data = 0,
-          [1646143780979] [87181:3769324] CHIP: [DMG] }, [1646143780979]
-          [87181:3769324] CHIP: [DMG] [1646143780979] [87181:3769324] CHIP:
-          [DMG] }, [1646143780979] [87181:3769324] CHIP: [DMG] [1646143780979]
-          [87181:3769324] CHIP: [DMG] ], [1646143780979] [87181:3769324] CHIP:
-          [DMG] [1646143780979] [87181:3769324] CHIP: [DMG] SuppressResponse =
-          true, [1646143780979] [87181:3769324] CHIP: [DMG]
-          InteractionModelRevision = 1 [1646143780979] [87181:3769324] CHIP:
-          [DMG] } [1646143780979] [87181:3769324] CHIP: [TOO] Endpoint: 1
-          Cluster: 0x0000_050A Attribute 0x0000_0001 DataVersion: 1291728690
-          [1646143780980] [87181:3769324] CHIP: [TOO]
-          SupportedStreamingProtocols: 0 [1646143780980] [87181:3769324] CHIP:
-          [EM] Sending Standalone Ack for MessageCounter:6010019 on exchange
-          62038i"
-      disabled: true
+    - label: "TH reads the AcceptHeader attribute from the DUT"
+      command: "readAttribute"
+      attribute: "AcceptHeader"
+      response:
+          constraints:
+              type: list
+
+    - label: "TH reads the SupportedStreamingProtocols attribute from the DUT"
+      command: "readAttribute"
+      attribute: "SupportedStreamingProtocols"
+      response:
+          constraints:
+              type: map32

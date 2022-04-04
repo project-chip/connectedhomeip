@@ -224,6 +224,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                    minInterval:minIntervalSeconds
                                    maxInterval:maxIntervalSeconds
                                         params:nil
+                                cacheContainer:nil
                                  reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
                                      if (error) {
                                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",

@@ -89,6 +89,15 @@ public:
     }
 
     /**
+     * Reset the iterator to the beginning of current cluster if we are in the middle of expanding a wildcard attribute id for some
+     * cluster.
+     *
+     * When attributes are changed in the middle of expanding a wildcard attribute, we need to reset the iterator, to provide the
+     * client with a consistent state of the cluster.
+     */
+    void ResetCurrentCluster();
+
+    /**
      * Returns if the iterator is valid (not exhausted). An iterator is exhausted if and only if:
      * - Next() is called after iterating last path.
      * - Iterator is initialized with a null AttributePathParams.

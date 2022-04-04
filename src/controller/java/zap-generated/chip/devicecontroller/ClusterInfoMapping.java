@@ -4161,13 +4161,18 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, Optional<Integer> NetworkIndex) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
+      CommandResponseInfo NetworkIndexResponseValue =
+          new CommandResponseInfo("NetworkIndex", "Optional<Integer>");
+      responseValues.put(NetworkIndexResponseValue, NetworkIndex);
       callback.onSuccess(responseValues);
     }
 
@@ -9551,11 +9556,6 @@ public class ClusterInfoMapping {
     generalCommissioningarmFailSafeCommandParams.put(
         "breadcrumb", generalCommissioningarmFailSafebreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo generalCommissioningarmFailSafetimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", Long.class);
-    generalCommissioningarmFailSafeCommandParams.put(
-        "timeoutMs", generalCommissioningarmFailSafetimeoutMsCommandParameterInfo);
-
     InteractionInfo generalCommissioningarmFailSafeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -9564,8 +9564,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback)
                           callback,
                       (Integer) commandArguments.get("expiryLengthSeconds"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedArmFailSafeResponseCallback(),
             generalCommissioningarmFailSafeCommandParams);
@@ -9588,10 +9587,12 @@ public class ClusterInfoMapping {
         "commissioningComplete", generalCommissioningcommissioningCompleteInteractionInfo);
     Map<String, CommandParameterInfo> generalCommissioningsetRegulatoryConfigCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo =
-        new CommandParameterInfo("location", Integer.class);
+    CommandParameterInfo
+        generalCommissioningsetRegulatoryConfignewRegulatoryConfigCommandParameterInfo =
+            new CommandParameterInfo("newRegulatoryConfig", Integer.class);
     generalCommissioningsetRegulatoryConfigCommandParams.put(
-        "location", generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo);
+        "newRegulatoryConfig",
+        generalCommissioningsetRegulatoryConfignewRegulatoryConfigCommandParameterInfo);
 
     CommandParameterInfo generalCommissioningsetRegulatoryConfigcountryCodeCommandParameterInfo =
         new CommandParameterInfo("countryCode", String.class);
@@ -9603,11 +9604,6 @@ public class ClusterInfoMapping {
     generalCommissioningsetRegulatoryConfigCommandParams.put(
         "breadcrumb", generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", Long.class);
-    generalCommissioningsetRegulatoryConfigCommandParams.put(
-        "timeoutMs", generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo);
-
     InteractionInfo generalCommissioningsetRegulatoryConfigInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -9615,10 +9611,9 @@ public class ClusterInfoMapping {
                   .setRegulatoryConfig(
                       (ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback)
                           callback,
-                      (Integer) commandArguments.get("location"),
+                      (Integer) commandArguments.get("newRegulatoryConfig"),
                       (String) commandArguments.get("countryCode"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedSetRegulatoryConfigResponseCallback(),
             generalCommissioningsetRegulatoryConfigCommandParams);

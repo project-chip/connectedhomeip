@@ -203,6 +203,9 @@ private:
             {
                 const auto & value = iter.GetValue();
                 VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+                // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
+                VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
                 ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, i++,
                                                              GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
             }
@@ -215,6 +218,8 @@ private:
             VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
             ReturnErrorOnFailure(aDecoder.Decode(value));
             VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+            // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
+            VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             {
                 auto iter     = provider->IterateGroupKeys(fabric_index);
@@ -438,12 +443,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     }
     response.groupKeySet.epochKey2.SetNull();
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRead failed: %s", ErrorStr(err));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -530,11 +530,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
         return true;
     }
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, KeySetReadAllIndicesResponse(keysIt));
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetReadAllIndices failed: %s", ErrorStr(err));
-    }
+    commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(keysIt));
     keysIt->Release();
     return true;
 }

@@ -53,7 +53,9 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningDelegate.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
@@ -66,6 +68,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -92,6 +95,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
+chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -214,6 +218,11 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
+
+    sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
+    ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
+
+    factoryParams.groupDataProvider        = &sGroupDataProvider;
     factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
@@ -412,10 +421,24 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                                        uint16_t discriminator, uint8_t optionInt)
 {
-    SetupPayload payload;
-    const auto option = static_cast<Controller::DeviceController::CommissioningWindowOption>(optionInt);
+    const auto option = static_cast<Controller::CommissioningWindowOpener::CommissioningWindowOption>(optionInt);
+    if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
+    {
+        return Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(devCtrl, nodeid,
+                                                                                       System::Clock::Seconds16(timeout))
+            .AsInteger();
+    }
 
-    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option, payload).AsInteger();
+    if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
+    {
+        SetupPayload payload;
+        return Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
+                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, NullOptional,
+                   payload)
+            .AsInteger();
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
 }
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)

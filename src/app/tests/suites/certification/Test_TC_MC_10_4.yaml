@@ -23,13 +23,13 @@ tests:
     - label:
           "DUT sends a LaunchContent command to the TH with a search parameter
           and string, and AutoPlay flag set to false"
-      verification:
-          "./chip-tool contentlauncher launch-content-request 0 'Star Wars' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-content-request 0 'Star Wars' 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchContent command to the TH with a search parameter
           and string, and AutoPlay flag set to true"
-      verification:
-          "./chip-tool contentlauncher launch-content-request 1 'Star Wars' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-content-request 1 'Star Wars' 1 1
       disabled: true

@@ -25,6 +25,7 @@
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
 #include <platform/Darwin/CHIPP256KeypairNativeBridge.h>
 
@@ -36,7 +37,14 @@ public:
 
     ~CHIPOperationalCredentialsDelegate() {}
 
-    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner);
+    /**
+     * If nocSigner is not provided (is null), a keypair will be loaded from the
+     * keychain, or generated if nothing is present in the keychain.
+     *
+     * If ipk is not provided (is nil), an IPK will be loaded from the keychain,
+     * or generated if nothing is present in the keychain.
+     */
+    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk);
 
     CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
         const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
@@ -57,20 +65,29 @@ public:
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
         chip::MutableByteSpan & noc);
 
+    const chip::Crypto::AesCcm128KeySpan GetIPK() { return chip::Crypto::AesCcm128KeySpan(mIPK); }
+
 private:
-    CHIP_ERROR GenerateKeys();
-    CHIP_ERROR LoadKeysFromKeyChain();
-    CHIP_ERROR DeleteKeys();
+    CHIP_ERROR GenerateRootCertKeys();
+    CHIP_ERROR LoadRootCertKeysFromKeyChain();
+    CHIP_ERROR DeleteRootCertKeysFromKeychain();
+
+    CHIP_ERROR GenerateIPK();
+    CHIP_ERROR LoadIPKFromKeyChain();
+    CHIP_ERROR DeleteIPKFromKeyChain();
 
     CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
 
     bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
-    uint32_t mIssuerId = 1234;
+    uint64_t mIssuerId = 1234;
+
+    uint8_t mIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";
+    const NSString * kCHIPIPKKeyChainLabel = @"matter.nodeopcerts.IPK:0";
 
     CHIPPersistentStorageDelegateBridge * mStorage;
 
@@ -79,7 +96,7 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId = 1;
     bool mNodeIdRequested = false;
-    bool mGenerateRootCert = false;
+    bool mForceRootCertRegeneration = false;
 };
 
 NS_ASSUME_NONNULL_END

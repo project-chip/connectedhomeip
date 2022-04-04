@@ -24,21 +24,21 @@ tests:
     - label:
           "DUT sends a read request to read the UpdatePossible attribute from
           the TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true
 
     - label:
           "DUT sends a read request to read the UpdateState attribute from the
           TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true
 
     - label:
           "TH should start initiating the Software update process. While the TH
           is downloading the image, DUT sends a read request to read the
           UpdateStateProgress attribute from the TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true

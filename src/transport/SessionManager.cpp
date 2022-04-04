@@ -90,6 +90,8 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mMessageCounterManager = messageCounterManager;
     mFabricTable           = fabricTable;
 
+    mSecureSessions.Init();
+
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
@@ -150,12 +152,15 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
+        FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
         mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
-        packetHeader.SetSourceNodeId(groupSession->GetSourceNodeId());
+        packetHeader.SetSourceNodeId(fabric->GetNodeId());
 
         if (!packetHeader.IsValidGroupMsg())
         {
@@ -170,7 +175,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         VerifyOrReturnError(nullptr != keyContext, CHIP_ERROR_INTERNAL);
 
         packetHeader.SetSessionId(keyContext->GetKeyHash());
-        CHIP_ERROR err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), payloadHeader, packetHeader, message);
+        CryptoContext::NonceStorage nonce;
+        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), fabric->GetNodeId());
+        CHIP_ERROR err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message);
         keyContext->Release();
         ReturnErrorOnFailure(err);
 
@@ -197,7 +204,20 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace before any encryption
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
-        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), payloadHeader, packetHeader, message));
+        CryptoContext::NonceStorage nonce;
+        if (session->GetSecureSessionType() == SecureSession::Type::kCASE)
+        {
+            FabricInfo * fabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
+            VerifyOrDie(fabric != nullptr);
+            CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, fabric->GetNodeId());
+        }
+        else
+        {
+            // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
+            // and the key is short-lived and always different for each PASE session.
+            CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, kUndefinedNodeId);
+        }
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
         ReturnErrorOnFailure(counter.Advance());
 
 #if CHIP_PROGRESS_LOGGING
@@ -354,27 +374,39 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
+Optional<SessionHandle> SessionManager::AllocateSession()
+{
+    return mSecureSessions.CreateNewSecureSession();
+}
+
+Optional<SessionHandle> SessionManager::AllocateSession(uint16_t sessionId)
+{
+    // If we forego SessionManager session ID allocation, we can have a
+    // collission.  In case of such a collission, we must evict first.
+    Optional<SessionHandle> oldSession = mSecureSessions.FindSecureSessionByLocalKey(sessionId);
+    if (oldSession.HasValue())
+    {
+        mSecureSessions.ReleaseSession(oldSession.Value()->AsSecureSession());
+    }
+    return mSecureSessions.CreateNewSecureSession(sessionId);
+}
+
 CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
                                       NodeId peerNodeId, PairingSession * pairing, CryptoContext::SessionRole direction,
                                       FabricIndex fabric)
 {
-    uint16_t peerSessionId          = pairing->GetPeerSessionId();
-    uint16_t localSessionId         = pairing->GetLocalSessionId();
-    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(localSessionId);
-
-    // Find any existing connection with the same local key ID
-    if (session.HasValue())
-    {
-        mSecureSessions.ReleaseSession(session.Value()->AsSecureSession());
-    }
+    uint16_t peerSessionId = pairing->GetPeerSessionId();
+    SecureSession * secureSession;
+    auto handle = pairing->GetSecureSessionHandle();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(handle.Value()->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
+    secureSession = handle.Value()->AsSecureSession();
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
-                  ChipLogValueX64(peerNodeId), localSessionId, peerSessionId);
-    session = mSecureSessions.CreateNewSecureSession(pairing->GetSecureSessionType(), localSessionId, peerNodeId,
-                                                     pairing->GetPeerCATs(), peerSessionId, fabric, pairing->GetMRPConfig());
-    ReturnErrorCodeIf(!session.HasValue(), CHIP_ERROR_NO_MEMORY);
+                  ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);
+    secureSession->Activate(pairing->GetSecureSessionType(), peerNodeId, pairing->GetPeerCATs(), peerSessionId, fabric,
+                            pairing->GetMRPConfig());
 
-    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {
         secureSession->SetPeerAddress(peerAddr.Value());
@@ -393,7 +425,9 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
     ReturnErrorOnFailure(pairing->DeriveSecureSession(secureSession->GetCryptoContext(), direction));
 
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
-    sessionHolder.Grab(session.Value());
+
+    sessionHolder.Grab(handle.Value());
+
     return CHIP_NO_ERROR;
 }
 
@@ -565,7 +599,13 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
     // Decrypt and verify the message before message counter verification or any further processing.
-    if (SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
+    CryptoContext::NonceStorage nonce;
+    // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
+    // and the key is short-lived and always different for each PASE session.
+    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
+                              secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId()
+                                                                                                  : kUndefinedNodeId);
+    if (SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), nonce, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding");
         return;
@@ -664,8 +704,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             continue;
         }
         msgCopy = msg.CloneData();
-        decrypted =
-            (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
+        CryptoContext::NonceStorage nonce;
+        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
+                                  packetHeader.GetSourceNodeId().Value());
+        decrypted = (CHIP_NO_ERROR ==
+                     SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), nonce, payloadHeader, packetHeader, msgCopy));
     }
     iter->Release();
     if (!decrypted)
