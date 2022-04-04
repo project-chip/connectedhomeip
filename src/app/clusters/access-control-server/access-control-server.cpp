@@ -39,9 +39,6 @@ namespace AccessControlCluster = chip::app::Clusters::AccessControl;
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
 
-// Storage version used in keys.
-constexpr int kStorageVersion = 1;
-
 namespace {
 
 struct Subject
@@ -367,13 +364,12 @@ private:
 
 constexpr uint16_t AccessControlAttribute::ClusterRevision;
 
-CHIP_ERROR LogEntryChangedEvent(const AccessControl::Entry & entry, const Access::SubjectDescriptor & subjectDescriptor,
-                                AccessControlCluster::ChangeTypeEnum changeType)
+CHIP_ERROR LogAclChangedEvent(const AccessControl::Entry & entry, const Access::SubjectDescriptor & subjectDescriptor,
+                              AccessControlCluster::ChangeTypeEnum changeType)
 {
     CHIP_ERROR err;
 
     // Record AccessControlEntry event
-    EventNumber eventNumber;
     DataModel::Nullable<chip::NodeId> adminNodeID;
     DataModel::Nullable<uint16_t> adminPasscodeID;
     DataModel::Nullable<AccessControlCluster::Structs::AccessControlEntry::Type> latestValue;
@@ -439,7 +435,36 @@ CHIP_ERROR LogEntryChangedEvent(const AccessControl::Entry & entry, const Access
     AccessControlCluster::Events::AccessControlEntryChanged::Type event{ adminNodeID, adminPasscodeID, changeType, latestValue,
                                                                          subjectDescriptor.fabricIndex };
 
+    EventNumber eventNumber;
     err = LogEvent(event, 0, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: log event failed");
+    }
+
+    return err;
+}
+
+CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::ExtensionEntry::Type & item,
+                                    const Access::SubjectDescriptor & subjectDescriptor,
+                                    AccessControlCluster::ChangeTypeEnum changeType)
+{
+    AccessControlCluster::Events::AccessControlExtensionChanged::Type event{ .changeType       = changeType,
+                                                                             .adminFabricIndex = subjectDescriptor.fabricIndex };
+
+    if (subjectDescriptor.authMode == Access::AuthMode::kCase)
+    {
+        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
+    }
+    else if (subjectDescriptor.authMode == Access::AuthMode::kPase)
+    {
+        event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor.subject));
+    }
+
+    event.latestValue.SetNonNull(item);
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, 0, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "AccessControlCluster: log event failed");
@@ -489,17 +514,20 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     auto & fabrics = Server::GetInstance().GetFabricTable();
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto it = fabrics.begin(); it != fabrics.end(); ++it)
+        for (auto & fabric : fabrics)
         {
             uint8_t buffer[kExtensionDataMaxLength] = { 0 };
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-            auto err =
-                storage.SyncGetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, it->GetFabricIndex()), buffer, size);
-            ReturnErrorCodeIf(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-            ReturnErrorOnFailure(err);
+            CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(fabric.GetFabricIndex()), buffer, size);
+            VerifyOrDie(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL);
+            if (errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                continue;
+            }
+            ReturnErrorOnFailure(errStorage);
             AccessControlCluster::Structs::ExtensionEntry::Type item = {
                 .data        = ByteSpan(buffer, size),
-                .fabricIndex = it->GetFabricIndex(),
+                .fabricIndex = fabric.GetFabricIndex(),
             };
             ReturnErrorOnFailure(encoder.Encode(item));
         }
@@ -557,14 +585,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
             if (i < oldCount)
             {
                 ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry, &accessingFabricIndex));
-                ReturnErrorOnFailure(LogEntryChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                          AccessControlCluster::ChangeTypeEnum::kChanged));
+                ReturnErrorOnFailure(LogAclChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                        AccessControlCluster::ChangeTypeEnum::kChanged));
             }
             else
             {
                 ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
-                ReturnErrorOnFailure(LogEntryChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                          AccessControlCluster::ChangeTypeEnum::kAdded));
+                ReturnErrorOnFailure(LogAclChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                        AccessControlCluster::ChangeTypeEnum::kAdded));
             }
             ++i;
         }
@@ -577,7 +605,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
             --oldCount;
             ReturnErrorOnFailure(GetAccessControl().ReadEntry(oldCount, entry, &accessingFabricIndex));
             ReturnErrorOnFailure(
-                LogEntryChangedEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
+                LogAclChangedEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
             ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
         }
     }
@@ -588,7 +616,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, item.entry, &accessingFabricIndex));
         ReturnErrorOnFailure(
-            LogEntryChangedEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
+            LogAclChangedEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }
     else
     {
@@ -605,6 +633,12 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
+    uint8_t buffer[kExtensionDataMaxLength] = { 0 };
+    uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
+    CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), buffer, size);
+    VerifyOrDie(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(errStorage != CHIP_NO_ERROR && errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
+
     if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<AccessControlCluster::Structs::ExtensionEntry::DecodableType> list;
@@ -615,41 +649,50 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
         if (count == 0)
         {
-            auto err = storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex));
-            ReturnErrorCodeIf(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+            ReturnErrorCodeIf(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+            ReturnErrorOnFailure(storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex)));
+            AccessControlCluster::Structs::ExtensionEntry::Type item = {
+                .data        = ByteSpan(buffer, size),
+                .fabricIndex = accessingFabricIndex,
+            };
+            ReturnErrorOnFailure(
+                LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
         else if (count == 1)
         {
             auto iterator = list.begin();
-            ReturnErrorCodeIf(!iterator.Next(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+            if (!iterator.Next())
+            {
+                ReturnErrorOnFailure(iterator.GetStatus());
+                // If counted an item, iterator doesn't return it, iterator has no error, that's bad.
+                VerifyOrDie(true);
+            }
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex),
-                                                         item.data.data(), static_cast<uint16_t>(item.data.size())));
+            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+            ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
+                                                         static_cast<uint16_t>(item.data.size())));
+            ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
+                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+                                                              ? AccessControlCluster::ChangeTypeEnum::kAdded
+                                                              : AccessControlCluster::ChangeTypeEnum::kChanged));
         }
         else
         {
-            // Only one item supported per fabric.
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
         }
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        {
-            uint8_t buffer[0];
-            uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-            auto err =
-                storage.SyncGetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex), buffer, size);
-            ReturnErrorCodeIf(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
-        }
-
+        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_ERROR_INVALID_LIST_LENGTH);
         AccessControlCluster::Structs::ExtensionEntry::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex),
-                                                     item.data.data(), static_cast<uint16_t>(item.data.size())));
+        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
+                                                     static_cast<uint16_t>(item.data.size())));
+        ReturnErrorOnFailure(
+            LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }
     else
     {
