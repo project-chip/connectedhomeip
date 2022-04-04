@@ -925,8 +925,8 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     GVariant * args = nullptr;
     GVariantBuilder builder;
     gboolean result;
-    char ssidStr[kMaxWiFiSSIDLength] = { 0 };
-    char keyStr[kMaxWiFiKeyLength]   = { 0 };
+    char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
+    char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
