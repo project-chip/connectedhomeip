@@ -178,10 +178,8 @@ public:
         MarkActive();
     }
 
-    #define MRP_MIN_ACTIVE_TIME System::Clock::Milliseconds64(2000)
-
     bool IsPeerActive() {
-        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < MRP_MIN_ACTIVE_TIME);
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
     }
 
     System::Clock::Timestamp GetMRPBaseTimeout() override {
@@ -193,8 +191,6 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    //static constexpr System::Clock::Timestamp MRP_MIN_ACTIVE_TIME = System::Clock::Milliseconds64(2000);
-
     Type mSecureSessionType;
     NodeId mPeerNodeId;
     CATValues mPeerCATs;

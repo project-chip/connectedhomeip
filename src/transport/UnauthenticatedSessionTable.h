@@ -119,10 +119,8 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
-    #define MRP_MIN_ACTIVE_TIME System::Clock::Milliseconds64(2000)
-
     bool IsPeerActive() {
-        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < MRP_MIN_ACTIVE_TIME);
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
     }
 
     System::Clock::Timestamp GetMRPBaseTimeout() override {
@@ -136,8 +134,6 @@ public:
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    ///static constexpr System::Clock::Timestamp MRP_MIN_ACTIVE_TIME = System::Clock::Milliseconds64(2000);
-
     const NodeId mEphemeralInitiatorNodeId;
     const SessionRole mSessionRole;
     PeerAddress mPeerAddress;
