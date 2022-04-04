@@ -29,8 +29,8 @@ static_library("nrfconnect") {
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
-    "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/SysHeapMalloc.h",
+    "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
     "BLEManagerImpl.h",
@@ -81,8 +81,6 @@ static_library("nrfconnect") {
   }
 
   if (chip_malloc_sys_heap) {
-    sources += [
-      "../Zephyr/SysHeapMalloc.cpp",
-    ]
+    sources += [ "../Zephyr/SysHeapMalloc.cpp" ]
   }
 }
