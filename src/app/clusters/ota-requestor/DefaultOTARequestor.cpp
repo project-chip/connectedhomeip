@@ -139,6 +139,7 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
 
 void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
+    CHIP_ERROR status;
     LogQueryImageResponse(response);
 
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
@@ -192,22 +193,34 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             ChipLogDetail(SoftwareUpdate, "Available update version %" PRIu32 " is <= current version %" PRIu32 ", update ignored",
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
-            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kUpToDate,
-                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                              System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }
 
         break;
     }
     case OTAQueryStatus::kBusy:
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy,
+        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        if( status == CHIP_ERROR_MAX_RETRY_EXCEEDED )
+        {
+            //Go back to idle to start Periodic Query timer
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        }
+        else
+        {
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
+        }
+        
         break;
     case OTAQueryStatus::kNotAvailable:
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
-                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
+                                                         System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        if(status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
+        {
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        }
         break;
     default:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
@@ -246,12 +259,12 @@ void DefaultOTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdat
         requestorCore->mOtaRequestorDriver->UpdateConfirmed(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kAwaitNextAction:
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnApply, OTAChangeReasonEnum::kDelayByProvider);
         requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(response.delayedActionTime));
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnApply, OTAChangeReasonEnum::kDelayByProvider);
         break;
     case OTAApplyUpdateAction::kDiscontinue:
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     }
 }
@@ -647,13 +660,12 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    // Issue#16151 tracks re-factoring error and state transitioning handling.
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
 
         // Inform the driver that the core logic has entered the Idle state
-        mOtaRequestorDriver->HandleIdleState(idleStateReason);
+        mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
     }
     else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {
