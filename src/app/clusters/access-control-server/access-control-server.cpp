@@ -646,7 +646,6 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
         AccessControlCluster::Structs::ExtensionEntry::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
-        ChipLogProgress(DataManagement, "############################ storing item %u", (unsigned) item.data.size());
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
         ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex),
