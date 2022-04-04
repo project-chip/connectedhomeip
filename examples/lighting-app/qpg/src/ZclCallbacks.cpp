@@ -26,8 +26,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <assert.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace chip::app::Clusters;
