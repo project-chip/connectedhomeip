@@ -18,10 +18,10 @@
 
 #include "AppMain.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
@@ -35,10 +35,10 @@ using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
+using chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
@@ -54,7 +54,7 @@ public:
     void UpdateDownloaded() override;
 };
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
@@ -229,7 +229,7 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image
-    if (gRequestorCore.GetCurrentUpdateState() == OTARequestor::OTAUpdateStateEnum::kApplying)
+    if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
     {
         if (kMaxFilePathSize <= strlen(kImageExecPath))
         {
