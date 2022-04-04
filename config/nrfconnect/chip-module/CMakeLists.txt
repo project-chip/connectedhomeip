@@ -306,7 +306,7 @@ if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
 endif()
 
-if (CONFIG_CHIP_MALLOC_SYS_HEAP)
+if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
     target_link_options(chip INTERFACE
         -Wl,--wrap=malloc
         -Wl,--wrap=calloc

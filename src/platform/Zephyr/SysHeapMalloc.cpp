@@ -79,16 +79,18 @@ int initHeap(const device *)
 // C++ static constructors are called (which happens prior to the APPLICATION initialization phase).
 SYS_INIT(initHeap, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
-extern "C" {
+namespace chip {
+namespace DeviceLayer {
+namespace Malloc {
 
-void * WRAP(malloc)(size_t size)
+void * Malloc(size_t size)
 {
     LockGuard lockGuard;
 
     return lockGuard.Locked() ? sys_heap_aligned_alloc(&sHeap, kMallocAlignment, size) : nullptr;
 }
 
-void * WRAP(calloc)(size_t num, size_t size)
+void * Calloc(size_t num, size_t size)
 {
     size_t totalSize;
 
@@ -107,20 +109,51 @@ void * WRAP(calloc)(size_t num, size_t size)
     return mem;
 }
 
-void * WRAP(realloc)(void * mem, size_t size)
+void * Realloc(void * mem, size_t size)
 {
     LockGuard lockGuard;
 
     return lockGuard.Locked() ? sys_heap_aligned_realloc(&sHeap, mem, kMallocAlignment, size) : nullptr;
 }
 
-void WRAP(free)(void * mem)
+void Free(void * mem)
 {
     LockGuard lockGuard;
 
     VerifyOrReturn(lockGuard.Locked());
     sys_heap_free(&sHeap, mem);
 }
+
+#ifdef CONFIG_SYS_HEAP_RUNTIME_STATS
+
+CHIP_ERROR GetStats(Stats & stats)
+{
+    LockGuard lockGuard;
+    ReturnErrorOnFailure(lockGuard.Error());
+
+    sys_heap_runtime_stats sysHeapStats;
+    ReturnErrorOnFailure(System::MapErrorZephyr(sys_heap_runtime_stats_get(&sHeap, &sysHeapStats)));
+
+    stats.free = sysHeapStats.free_bytes;
+    stats.used = sysHeapStats.allocated_bytes;
+
+    return CHIP_NO_ERROR;
+}
+
+#endif // CONFIG_SYS_HEAP_RUNTIME_STATS
+
+} // namespace Malloc
+} // namespace DeviceLayer
+} // namespace chip
+
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE
+
+extern "C" {
+
+void * WRAP(malloc)(size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc6MallocEj")));
+void * WRAP(calloc)(size_t num, size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc6CallocEjj")));
+void * WRAP(realloc)(void * mem, size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc7ReallocEPvj")));
+void WRAP(free)(void * mem) __attribute((alias("_ZN4chip11DeviceLayer6Malloc4FreeEPv")));
 
 void * WRAP(_malloc_r)(_reent *, size_t size)
 {
@@ -144,28 +177,4 @@ void WRAP(_free_r)(_reent *, void * mem)
 
 } // extern "C"
 
-namespace chip {
-namespace DeviceLayer {
-namespace Malloc {
-
-#ifdef CONFIG_SYS_HEAP_RUNTIME_STATS
-
-CHIP_ERROR GetStats(Stats & stats)
-{
-    LockGuard lockGuard;
-    ReturnErrorOnFailure(lockGuard.Error());
-
-    sys_heap_runtime_stats sysHeapStats;
-    ReturnErrorOnFailure(System::MapErrorZephyr(sys_heap_runtime_stats_get(&sHeap, &sysHeapStats)));
-
-    stats.free = sysHeapStats.free_bytes;
-    stats.used = sysHeapStats.allocated_bytes;
-
-    return CHIP_NO_ERROR;
-}
-
-#endif // CONFIG_SYS_HEAP_RUNTIME_STATS
-
-} // namespace Malloc
-} // namespace DeviceLayer
-} // namespace chip
+#endif // CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE
