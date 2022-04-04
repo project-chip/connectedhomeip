@@ -243,22 +243,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan::fromCharString("en-US"));
-    supportedLocales.add(CharSpan::fromCharString("de-DE"));
-    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
-    supportedLocales.add(CharSpan::fromCharString("en-GB"));
-    supportedLocales.add(CharSpan::fromCharString("es-ES"));
-    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
-    supportedLocales.add(CharSpan::fromCharString("it-IT"));
-    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 PlatformManagerImpl::_GetSupportedCalendarTypes(
     AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
 {

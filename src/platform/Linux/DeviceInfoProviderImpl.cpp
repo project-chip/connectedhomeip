@@ -196,5 +196,76 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     }
 }
 
+DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
+{
+    return new SupportedLocalesIteratorImpl();
+}
+
+size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
+{
+    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
+    // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
+
+    return 8;
+}
+
+bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
+{
+    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    const char * activeLocalePtr = nullptr;
+
+    VerifyOrReturnError(mIndex < 8, false);
+
+    switch (mIndex)
+    {
+    case 0:
+        activeLocalePtr = "en-US";
+        break;
+    case 1:
+        activeLocalePtr = "de-DE";
+        break;
+    case 2:
+        activeLocalePtr = "fr-FR";
+        break;
+    case 3:
+        activeLocalePtr = "en-GB";
+        break;
+    case 4:
+        activeLocalePtr = "es-ES";
+        break;
+    case 5:
+        activeLocalePtr = "zh-CN";
+        break;
+    case 6:
+        activeLocalePtr = "it-IT";
+        break;
+    case 7:
+        activeLocalePtr = "ja-JP";
+        break;
+    default:
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        break;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
+
+        Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
+
+        output = CharSpan::fromCharString(mActiveLocaleBuf);
+
+        mIndex++;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 } // namespace DeviceLayer
 } // namespace chip

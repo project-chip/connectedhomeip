@@ -37,7 +37,6 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
-static constexpr size_t kMaxLanguageTags  = 254; // Maximum number of entry type 'ARRAY' supports
 static constexpr size_t kMaxCalendarTypes = 12;
 
 class PlatformManagerImpl;
@@ -193,7 +192,6 @@ public:
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
-    CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
@@ -447,11 +445,6 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
-}
-
-inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
 }
 
 inline CHIP_ERROR PlatformManager::GetSupportedCalendarTypes(
