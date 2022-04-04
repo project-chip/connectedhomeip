@@ -624,7 +624,7 @@ void TestSortDataVersionFilterSet(nlTestSuite * apSuite, void * apContext)
     DataVersionFilter filter3(1, 1, 2);
     filterMap[filter3] = 3;
     NL_TEST_ASSERT(gSuite, 2 == filterMap.size());
-    std::vector<std::pair<DataVersionFilter, size_t>>  filterVector;
+    std::vector<std::pair<DataVersionFilter, size_t>> filterVector;
     AttributeCache::SortFilterMap(filterMap, filterVector);
     size_t temp = 0;
     for (auto & item : filterVector)

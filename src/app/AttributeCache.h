@@ -67,7 +67,9 @@ public:
         System::PacketBufferHandle mHandle;
         DataVersion mDataVersion = 0;
 
-        PacketBufferInfo(System::PacketBufferHandle && aHandle, DataVersion aDataVersion) : mHandle(std::move(aHandle)), mDataVersion(aDataVersion) {}
+        PacketBufferInfo(System::PacketBufferHandle && aHandle, DataVersion aDataVersion) :
+            mHandle(std::move(aHandle)), mDataVersion(aDataVersion)
+        {}
     };
 
     class Callback : public ReadClient::Callback
@@ -228,7 +230,8 @@ public:
 
     void UpdateFilterMap(std::map<DataVersionFilter, size_t> & aMap);
 
-    static void SortFilterMap(std::map<DataVersionFilter, size_t> & aMap, std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
+    static void SortFilterMap(std::map<DataVersionFilter, size_t> & aMap,
+                              std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
     /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path

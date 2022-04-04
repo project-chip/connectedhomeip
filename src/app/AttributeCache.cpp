@@ -17,9 +17,9 @@
  */
 
 #include "system/SystemPacketBuffer.h"
-#include <assert.h>
 #include <app/AttributeCache.h>
 #include <app/InteractionModelEngine.h>
+#include <assert.h>
 #include <tuple>
 
 namespace chip {
@@ -241,15 +241,15 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
 
 void AttributeCache::UpdateFilterMap(std::map<DataVersionFilter, size_t> & aMap)
 {
-    for(auto const& endpointIter: mCache)
+    for (auto const & endpointIter : mCache)
     {
         EndpointId endpointId = endpointIter.first;
-        for(auto const& clusterIter: endpointIter.second)
+        for (auto const & clusterIter : endpointIter.second)
         {
             DataVersion dataVersion = 0;
-            uint32_t clusterSize = 0;
-            ClusterId clusterId = clusterIter.first;
-            for(auto const& attributeIter: clusterIter.second)
+            uint32_t clusterSize    = 0;
+            ClusterId clusterId     = clusterIter.first;
+            for (auto const & attributeIter : clusterIter.second)
             {
                 if (!attributeIter.second.Is<StatusIB>())
                 {
@@ -283,7 +283,8 @@ bool vector_compare(const std::pair<DataVersionFilter, size_t> & x, const std::p
     return x.second < y.second;
 }
 
-void AttributeCache::SortFilterMap(std::map<DataVersionFilter, size_t> & aMap, std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
+void AttributeCache::SortFilterMap(std::map<DataVersionFilter, size_t> & aMap,
+                                   std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
 {
     for (auto item = aMap.begin(); item != aMap.end(); item++)
     {
@@ -301,7 +302,7 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
 
     std::map<DataVersionFilter, size_t> filterMap;
     UpdateFilterMap(filterMap);
-    std::vector<std::pair<DataVersionFilter, size_t>>  filterVector;
+    std::vector<std::pair<DataVersionFilter, size_t>> filterVector;
     SortFilterMap(filterMap, filterVector);
 
     for (auto filter = filterVector.rbegin(); filter != filterVector.rend(); filter++)
@@ -327,14 +328,12 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
         SuccessOrExit(err = aDataVersionFilterIBsBuilder.GetError());
         ClusterPathIB::Builder & filterPath = filterIB.CreatePath();
         SuccessOrExit(err = filterIB.GetError());
-        SuccessOrExit(err = filterPath.Endpoint(filter->first.mEndpointId)
-                                .Cluster(filter->first.mClusterId)
-                                .EndOfClusterPathIB()
-                                .GetError());
+        SuccessOrExit(
+            err = filterPath.Endpoint(filter->first.mEndpointId).Cluster(filter->first.mClusterId).EndOfClusterPathIB().GetError());
         SuccessOrExit(err = filterIB.DataVersion(filter->first.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
-        ChipLogProgress(
-            DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
-                filter->first.mEndpointId, ChipLogValueMEI(filter->first.mClusterId), filter->first.mDataVersion.Value());
+        ChipLogProgress(DataManagement,
+                        "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
+                        filter->first.mEndpointId, ChipLogValueMEI(filter->first.mClusterId), filter->first.mDataVersion.Value());
 
         number++;
     }
