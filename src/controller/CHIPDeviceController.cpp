@@ -1879,7 +1879,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
-        request.breadcrumb  = breadcrumb;
+        request.breadcrumb.Emplace(breadcrumb);
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
@@ -1892,7 +1892,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
-        request.breadcrumb         = breadcrumb;
+        request.breadcrumb.Emplace(breadcrumb);
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
@@ -1904,8 +1904,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
-        request.networkID  = params.GetWiFiCredentials().Value().ssid;
-        request.breadcrumb = breadcrumb;
+        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.breadcrumb.Emplace(breadcrumb);
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
@@ -1921,8 +1921,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
-        request.networkID  = extendedPanId;
-        request.breadcrumb = breadcrumb;
+        request.networkID = extendedPanId;
+        request.breadcrumb.Emplace(breadcrumb);
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
