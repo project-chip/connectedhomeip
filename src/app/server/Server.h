@@ -95,23 +95,28 @@ struct ServerInitParams
  * Transitional version of ServerInitParams to assist SDK integrators in
  * transitioning to injecting product/platform-owned resources. This version
  * of `ServerInitParams` statically owns and initializes (via the
- * `InitializeStaticResourcesBeforeServerInit()` method). This is to reduce the
- * amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
- * main.cpp) for the transition.
+ * `InitializeStaticResourcesBeforeServerInit()` method) the persistent storage
+ * delegate, the group data provider, and the access control delegate. This is to reduce
+ * the amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
+ * main.cpp).
  *
- * ACTION ITEM FOR TRANSITION: While this could be used indefinitely, it does not
- * examplify orderly management of application-injected resources. It is recommended
- * to instead:
- *   - Use the basic ServerInitParams in every application
- *   - Have every application own an instance of the resources being injected in its own
+ * This version SHOULD BE USED ONLY FOR THE IN-TREE EXAMPLES.
+ *
+ * ACTION ITEMS FOR TRANSITION from a example in-tree to a product:
+ *
+ * While this could be used indefinitely, it does not exemplify orderly management of
+ * application-injected resources. It is recommended for actual products to instead:
+ *   - Use the basic ServerInitParams in the application
+ *   - Have the application own an instance of the resources being injected in its own
  *     state (e.g. an implementation of PersistentStorageDelegate and GroupDataProvider
  *     interfaces).
  *   - Initialize the injected resources prior to calling Server::Init()
  *   - De-initialize the injected resources after calling Server::Shutdown()
  *
  * WARNING: DO NOT replicate the pattern shown here of having a subclass of ServerInitParams
- *          own the resources. This was done to reduce the amount of change to existing
- *          examples, prior to updating each example to do the transition work presented above.
+ *          own the resources outside of examples. This was done to reduce the amount of change
+ *          to existing examples while still supporting non-example versions of the
+ *          resources to be injected.
  */
 struct CommonCaseDeviceServerInitParams : public ServerInitParams
 {
