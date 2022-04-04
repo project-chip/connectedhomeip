@@ -26,6 +26,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
@@ -34,6 +35,12 @@ using namespace chip::app;
 using namespace chip::Access;
 
 namespace AccessControlCluster = chip::app::Clusters::AccessControl;
+
+// TODO(#13590): generated code doesn't automatically handle max length so do it manually
+constexpr int kExtensionDataMaxLength = 128;
+
+// Storage version used in keys.
+constexpr int kStorageVersion = 1;
 
 namespace {
 
@@ -355,7 +362,7 @@ private:
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
-    CHIP_ERROR WriteExtension(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
 constexpr uint16_t AccessControlAttribute::ClusterRevision;
@@ -476,7 +483,28 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeEmptyList();
+    auto & storage = Server::GetInstance().GetPersistentStorage();
+    DefaultStorageKeyAllocator key;
+
+    auto & fabrics = Server::GetInstance().GetFabricTable();
+
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        for (auto it = fabrics.begin(); it != fabrics.end(); ++it)
+        {
+            uint8_t buffer[kExtensionDataMaxLength] = { 0 };
+            uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
+            auto err =
+                storage.SyncGetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, it->GetFabricIndex()), buffer, size);
+            ReturnErrorCodeIf(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+            ReturnErrorOnFailure(err);
+            AccessControlCluster::Structs::ExtensionEntry::Type item = {
+                .data        = ByteSpan(buffer, size),
+                .fabricIndex = it->GetFabricIndex(),
+            };
+            ReturnErrorOnFailure(encoder.Encode(item));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -486,7 +514,7 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
     case AccessControlCluster::Attributes::Acl::Id:
         return WriteAcl(aPath, aDecoder);
     case AccessControlCluster::Attributes::Extension::Id:
-        return WriteExtension(aDecoder);
+        return WriteExtension(aPath, aDecoder);
     }
 
     return CHIP_NO_ERROR;
@@ -570,10 +598,65 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecoder)
+CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    DataModel::DecodableList<AccessControlCluster::Structs::ExtensionEntry::DecodableType> list;
-    ReturnErrorOnFailure(aDecoder.Decode(list));
+    auto & storage = Server::GetInstance().GetPersistentStorage();
+    DefaultStorageKeyAllocator key;
+
+    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
+
+    if (!aPath.IsListItemOperation())
+    {
+        DataModel::DecodableList<AccessControlCluster::Structs::ExtensionEntry::DecodableType> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        size_t count = 0;
+        ReturnErrorOnFailure(list.ComputeSize(&count));
+
+        if (count == 0)
+        {
+            auto err = storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex));
+            ReturnErrorCodeIf(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+        }
+        else if (count == 1)
+        {
+            auto iterator = list.begin();
+            ReturnErrorCodeIf(!iterator.Next(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+            auto & item = iterator.GetValue();
+            // TODO(#13590): generated code doesn't automatically handle max length so do it manually
+            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex),
+                                                         item.data.data(), static_cast<uint16_t>(item.data.size())));
+        }
+        else
+        {
+            // Only one item supported per fabric.
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        {
+            uint8_t buffer[0];
+            uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+            auto err =
+                storage.SyncGetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex), buffer, size);
+            ReturnErrorCodeIf(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+        }
+
+        AccessControlCluster::Structs::ExtensionEntry::DecodableType item;
+        ReturnErrorOnFailure(aDecoder.Decode(item));
+        ChipLogProgress(DataManagement, "############################ storing item %u", (unsigned) item.data.size());
+        // TODO(#13590): generated code doesn't automatically handle max length so do it manually
+        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(kStorageVersion, accessingFabricIndex),
+                                                     item.data.data(), static_cast<uint16_t>(item.data.size())));
+    }
+    else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
     return CHIP_NO_ERROR;
 }
 

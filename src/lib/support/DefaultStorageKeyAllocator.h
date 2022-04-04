@@ -45,7 +45,11 @@ public:
     // FailSafeContext
     const char * FailSafeContextKey() { return Format("g/fsc"); }
 
-    // Access Control List
+    // Access Control
+    const char * AccessControlExtensionEntry(size_t version, FabricIndex fabric)
+    {
+        return Format("a/%x/1/%x", static_cast<unsigned>(version), static_cast<unsigned>(fabric));
+    }
 
     const char * AccessControlList() { return Format("acl"); }
     const char * AccessControlEntry(size_t index)

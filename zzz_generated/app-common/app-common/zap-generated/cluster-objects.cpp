@@ -4683,9 +4683,13 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInde
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
+    }
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
