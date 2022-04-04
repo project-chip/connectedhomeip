@@ -127,7 +127,7 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        key.FabricTable();
+        key.GroupFabricList();
         return CHIP_NO_ERROR;
     }
 
