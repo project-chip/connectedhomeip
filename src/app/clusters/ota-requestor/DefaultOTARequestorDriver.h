@@ -65,7 +65,6 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) override;
-    void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
 
     void HandleIdleStateExit() override;
     void HandleIdleStateEnter(IdleStateReason reason) override;
