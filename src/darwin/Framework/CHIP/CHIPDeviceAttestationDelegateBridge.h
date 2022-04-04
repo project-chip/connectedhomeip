@@ -18,43 +18,38 @@
 #include <lib/core/NodeId.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
-#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <CHIP/CHIPDeviceAttestationDelegate.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 
 @class CHIPDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPDeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate
-{
+class CHIPDeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate {
 public:
-    CHIPDeviceAttestationDelegateBridge(CHIPDeviceController *deviceController,
-                                        id<CHIPDeviceAttestationDelegate> deviceAttestationDelegate,
-                                        dispatch_queue_t queue,
-                                        chip::Optional<uint16_t> expiryTimeoutSecs)
-        : mResult(chip::Credentials::AttestationVerificationResult::kSuccess),
-          mDeviceController(deviceController),
-          mDeviceAttestationDelegate(deviceAttestationDelegate),
-          mQueue(queue),
-          mExpiryTimeoutSecs(expiryTimeoutSecs)
+    CHIPDeviceAttestationDelegateBridge(CHIPDeviceController * deviceController,
+        id<CHIPDeviceAttestationDelegate> deviceAttestationDelegate, dispatch_queue_t queue,
+        chip::Optional<uint16_t> expiryTimeoutSecs)
+        : mResult(chip::Credentials::AttestationVerificationResult::kSuccess)
+        , mDeviceController(deviceController)
+        , mDeviceAttestationDelegate(deviceAttestationDelegate)
+        , mQueue(queue)
+        , mExpiryTimeoutSecs(expiryTimeoutSecs)
     {
     }
 
-    ~CHIPDeviceAttestationDelegateBridge()
-    {
-    }
+    ~CHIPDeviceAttestationDelegateBridge() {}
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
-    void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner *deviceCommissioner,
-                                 chip::NodeId remoteNodeId,
-                                 chip::Credentials::AttestationVerificationResult attestationResult) override;
+    void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::NodeId remoteNodeId,
+        chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     chip::Credentials::AttestationVerificationResult attestationVerificationResult() const { return mResult; }
 
 private:
     chip::Credentials::AttestationVerificationResult mResult;
-    CHIPDeviceController* __weak mDeviceController;
+    CHIPDeviceController * __weak mDeviceController;
     id<CHIPDeviceAttestationDelegate> mDeviceAttestationDelegate;
     dispatch_queue_t mQueue;
     chip::Optional<uint16_t> mExpiryTimeoutSecs;

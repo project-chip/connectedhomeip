@@ -804,7 +804,9 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId, Credentials::AttestationVerificationResult attestationResult)
+CHIP_ERROR
+DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId,
+                                                                       Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_EVENT_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
@@ -826,23 +828,24 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailur
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(Controller, "Continuing commissioning after attestation failure for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
+    ChipLogProgress(Controller, "Continuing commissioning after attestation failure for node ID 0x" ChipLogFormatX64,
+                    ChipLogValueX64(remoteDeviceId));
 
-    if (attestationResult != AttestationVerificationResult::kSuccess) {
-        ChipLogError(Controller,
-                     "Client selected error: %hu for failed 'Attestation Information' for device",
+    if (attestationResult != AttestationVerificationResult::kSuccess)
+    {
+        ChipLogError(Controller, "Client selected error: %hu for failed 'Attestation Information' for device",
                      static_cast<uint16_t>(attestationResult));
 
         CommissioningDelegate::CommissioningReport report;
         report.Set<AdditionalErrorInfo>(attestationResult);
         CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
-    else {
+    else
+    {
         ChipLogProgress(Controller, "Overriding attestation failure per client and continuing commissioning");
         CommissioningStageComplete(CHIP_NO_ERROR);
     }
     return CHIP_NO_ERROR;
-
 }
 
 CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
@@ -1035,34 +1038,38 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
         // understand the errors.
 
         auto params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
-        Credentials::DeviceAttestationDelegate* deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
+        Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
 
         // If a device attestation status delegate is installed, delegate handling of failure to the client and let them
         // decide on whether to proceed further or not.
-        if (deviceAttestationDelegate) {
+        if (deviceAttestationDelegate)
+        {
             commissioner->ExtendArmFailSafeForFailedDeviceAttestation(result);
         }
-        else {
+        else
+        {
             commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
         }
     }
-    else {
+    else
+    {
         ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
         commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
     }
 }
 
-void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(void * context,
-        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
+    void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    if (!commissioner->mDeviceBeingCommissioned) {
+    if (!commissioner->mDeviceBeingCommissioned)
+    {
         return;
     }
 
     auto params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
-    Credentials::DeviceAttestationDelegate* deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
+    Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
@@ -1092,16 +1099,17 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
 {
     mAttestationResult = result;
 
-    auto params = mDefaultCommissioner->GetCommissioningParameters();
-    Credentials::DeviceAttestationDelegate* deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
-    auto expiryLengthSeconds = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
-    if (expiryLengthSeconds.HasValue()) {
+    auto params                                                        = mDefaultCommissioner->GetCommissioningParameters();
+    Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
+    auto expiryLengthSeconds                                           = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
+    if (expiryLengthSeconds.HasValue())
+    {
         GeneralCommissioning::Commands::ArmFailSafe::Type request;
         request.expiryLengthSeconds = expiryLengthSeconds.Value();
         request.breadcrumb          = mCommissioningStage;
         ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", request.expiryLengthSeconds);
-        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request,
-                OnArmFailSafeExtendedForFailedDeviceAttestation, OnFailedToExtendedArmFailSafeFailedDeviceAttestation);
+        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForFailedDeviceAttestation,
+                                                 OnFailedToExtendedArmFailSafeFailedDeviceAttestation);
     }
     else
     {
@@ -1110,7 +1118,6 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
         OnArmFailSafeExtendedForFailedDeviceAttestation(this, data);
     }
 }
-
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info)
 {

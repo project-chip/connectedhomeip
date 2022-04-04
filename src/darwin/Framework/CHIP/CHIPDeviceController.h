@@ -55,9 +55,8 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                    error:(NSError * __autoreleasing *)error;
 
 - (BOOL)continueCommissioningDevice:(uint64_t)deviceId
-             ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+           ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error;
-
 
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;

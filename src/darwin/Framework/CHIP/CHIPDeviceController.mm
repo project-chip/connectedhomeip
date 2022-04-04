@@ -32,8 +32,8 @@
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/CHIPClustersObjc.h>
 
-#import "CHIPDeviceConnectionBridge.h"
 #include "CHIPDeviceAttestationDelegateBridge.h"
+#import "CHIPDeviceConnectionBridge.h"
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
@@ -483,14 +483,12 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
                 [self clearDeviceAttestationDelegateBridge];
 
                 chip::Optional<uint16_t> timeoutSecs;
-                if (commissioningParams.failSafeExpiryTimeoutSecs)
-                {
-                    timeoutSecs = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
+                if (commissioningParams.failSafeExpiryTimeoutSecs) {
+                    timeoutSecs = chip::MakeOptional(
+                        static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
                 }
-                _deviceAttestationDelegateBridge = new CHIPDeviceAttestationDelegateBridge(self,
-                        commissioningParams.deviceAttestationDelegate,
-                        _chipWorkQueue,
-                        timeoutSecs);
+                _deviceAttestationDelegateBridge = new CHIPDeviceAttestationDelegateBridge(
+                    self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
                 params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
             }
 
@@ -514,13 +512,12 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
-            auto lastAttestationResult = _deviceAttestationDelegateBridge ?
-                _deviceAttestationDelegateBridge->attestationVerificationResult() :
-                chip::Credentials::AttestationVerificationResult::kSuccess;
+            auto lastAttestationResult = _deviceAttestationDelegateBridge
+                ? _deviceAttestationDelegateBridge->attestationVerificationResult()
+                : chip::Credentials::AttestationVerificationResult::kSuccess;
 
             errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceId,
-                    ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess :
-                                               lastAttestationResult);
+                ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });

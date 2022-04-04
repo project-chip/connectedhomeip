@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <lib/core/Optional.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 
 namespace Controller {
-    class DeviceCommissioner;
+class DeviceCommissioner;
 } // namespace Controller
 
 namespace Credentials {
@@ -52,8 +52,7 @@ public:
      *   @param remoteNodeId The NodeId of the Commissionee device
      *   @param attestationResult The failure code for the device attestation validation operation
      */
-    virtual void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner *deviceCommissioner,
-                                         chip::NodeId remoteNodeId,
+    virtual void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::NodeId remoteNodeId,
                                          chip::Credentials::AttestationVerificationResult attestationResult) = 0;
 };
 
