@@ -96,7 +96,7 @@ struct ServerInitParams
  * transitioning to injecting product/platform-owned resources. This version
  * of `ServerInitParams` statically owns and initializes (via the
  * `InitializeStaticResourcesBeforeServerInit()` method) the persistent storage
- * delegate, the group data provider, and the access control delegate). This is to reduce
+ * delegate, the group data provider, and the access control delegate. This is to reduce
  * the amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
  * main.cpp).
  *
