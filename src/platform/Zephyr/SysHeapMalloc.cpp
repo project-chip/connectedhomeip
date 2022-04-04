@@ -22,6 +22,7 @@
 
 extern "C" {
 #include <init.h>
+#include <sys/math_extras.h>
 #include <sys/mutex.h>
 #include <sys/sys_heap.h>
 }
@@ -89,11 +90,18 @@ void * WRAP(malloc)(size_t size)
 
 void * WRAP(calloc)(size_t num, size_t size)
 {
-    void * mem = malloc(num * size);
+    size_t totalSize;
+
+    if (size_mul_overflow(num, size, &totalSize))
+    {
+        return nullptr;
+    }
+
+    void * mem = malloc(totalSize);
 
     if (mem)
     {
-        memset(mem, 0, num * size);
+        memset(mem, 0, totalSize);
     }
 
     return mem;
