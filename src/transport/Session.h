@@ -32,7 +32,7 @@ class UnauthenticatedSession;
 class IncomingGroupSession;
 class OutgoingGroupSession;
 
-constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(2000);
+constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(4000);
 
 class Session
 {
@@ -73,7 +73,7 @@ public:
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
-    virtual System::Clock::Timestamp GetMRPBaseTimeout()    = 0;
+    virtual System::Clock::Timestamp GetMRPBaseTimeout()               = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
