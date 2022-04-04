@@ -178,11 +178,23 @@ public:
         MarkActive();
     }
 
+    #define MRP_MIN_ACTIVE_TIME System::Clock::Milliseconds64(2000)
+
+    bool IsPeerActive() {
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < MRP_MIN_ACTIVE_TIME);
+    }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
+
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
+    //static constexpr System::Clock::Timestamp MRP_MIN_ACTIVE_TIME = System::Clock::Milliseconds64(2000);
+
     Type mSecureSessionType;
     NodeId mPeerNodeId;
     CATValues mPeerCATs;
@@ -190,8 +202,8 @@ private:
     uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
-    System::Clock::Timestamp mLastPeerActivityTime;   ///< Timestamp of last rx
+    System::Clock::Timestamp mLastActivityTime;      ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime;  ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;

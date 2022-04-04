@@ -58,6 +58,10 @@ public:
         return cfg;
     }
 
+    System::Clock::Timestamp GetMRPBaseTimeout() override {
+        return System::Clock::kZero;
+    }
+
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         VerifyOrDie(false);
@@ -98,6 +102,10 @@ public:
         static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
         VerifyOrDie(false);
         return cfg;
+    }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override {
+        return System::Clock::kZero;
     }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override

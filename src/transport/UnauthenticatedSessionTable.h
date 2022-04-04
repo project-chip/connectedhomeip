@@ -66,6 +66,7 @@ public:
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
     void MarkActiveRx() { 
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
@@ -118,6 +119,16 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
+    #define MRP_MIN_ACTIVE_TIME System::Clock::Milliseconds64(2000)
+
+    bool IsPeerActive() {
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < MRP_MIN_ACTIVE_TIME);
+    }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
+
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
@@ -125,6 +136,8 @@ public:
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
+    ///static constexpr System::Clock::Timestamp MRP_MIN_ACTIVE_TIME = System::Clock::Milliseconds64(2000);
+
     const NodeId mEphemeralInitiatorNodeId;
     const SessionRole mSessionRole;
     PeerAddress mPeerAddress;
