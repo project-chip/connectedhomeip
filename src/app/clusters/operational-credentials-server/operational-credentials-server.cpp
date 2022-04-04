@@ -899,7 +899,8 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
-        keypair = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+        keypair =
+            chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
         VerifyOrExit(keypair != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         err = gFabricBeingCommissioned.SetOperationalKeypair(keypair);

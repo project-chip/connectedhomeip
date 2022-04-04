@@ -215,16 +215,15 @@ private:
 class HSMDefaultP256KeypairBuilder : public P256KeypairBuilder
 {
 public:
-
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
-    virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key) override;
+    virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair * p256key) override;
 
     virtual P256Keypair * GetP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
     virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
 
-    virtual void FreeP256KeyPair(P256Keypair* p256key) override;
+    virtual void FreeP256KeyPair(P256Keypair * p256key) override;
 
 private:
     /**
