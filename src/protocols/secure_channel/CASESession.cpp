@@ -363,7 +363,7 @@ CHIP_ERROR CASESession::SendSigma1()
     bool resuming = false;
     if (mSessionResumptionStorage != nullptr)
     {
-        SessionResumptionStorage::ConstResumptionIdView resumptionId;
+        SessionResumptionStorage::ResumptionIdStorage resumptionId;
         CHIP_ERROR err = mSessionResumptionStorage->FindByScopedNodeId(mFabricInfo->GetScopedNodeIdForNode(GetPeerNodeId()),
                                                                        resumptionId, mSharedSecret, mPeerCATs);
         if (err == CHIP_NO_ERROR)
@@ -511,7 +511,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (sessionResumptionRequested && resumptionId.size() == SessionResumptionStorage::kResumptionIdSize &&
-        CHIP_NO_ERROR == TryResumeSession(resumptionId, resume1MIC, initiatorRandom))
+        CHIP_NO_ERROR == TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(resumptionId.data()), resume1MIC, initiatorRandom))
     {
         // Send Sigma2Resume message to the initiator
         SuccessOrExit(err = SendSigma2Resume(initiatorRandom));

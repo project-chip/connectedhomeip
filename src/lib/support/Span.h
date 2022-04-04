@@ -73,10 +73,8 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return mDataLen; }
     constexpr bool empty() const { return size() == 0; }
-    constexpr const_pointer begin() const { return data(); }
-    constexpr const_pointer end() const { return data() + size(); }
-    constexpr pointer begin() { return data(); }
-    constexpr pointer end() { return data() + size(); }
+    constexpr pointer begin() const { return data(); }
+    constexpr pointer end() const { return data() + size(); }
 
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
@@ -178,12 +176,6 @@ public:
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    constexpr FixedSpan(Span<U> & span) : mDataBuf(span.data())
-    {
-        VerifyOrDie(N == span.size());
-    }
-
     // Allow implicit construction from a FixedSpan of sufficient size over a
     // type that matches our type, up to const-ness.
     template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -195,11 +187,8 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return N; }
     constexpr bool empty() const { return data() == nullptr; }
-
-    constexpr pointer begin() { return mDataBuf; }
-    constexpr pointer end() { return mDataBuf + N; }
-    constexpr const_pointer begin() const { return mDataBuf; }
-    constexpr const_pointer end() const { return mDataBuf + N; }
+    constexpr pointer begin() const { return mDataBuf; }
+    constexpr pointer end() const { return mDataBuf + N; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
