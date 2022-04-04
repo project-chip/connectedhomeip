@@ -18,9 +18,8 @@
 #import "CHIPDeviceAttestationDelegateBridge.h"
 #import "CHIPError_Internal.h"
 
-
-void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner *deviceCommissioner,
-        chip::NodeId remoteNodeId, chip::Credentials::AttestationVerificationResult attestationResult)
+void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner,
+    chip::NodeId remoteNodeId, chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
         NSLog(@"CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed failed with result: %hu", attestationResult);
@@ -30,11 +29,11 @@ void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controll
         id<CHIPDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
         if ([strongDelegate respondsToSelector:@selector(onDeviceAttestation:deviceId:failedWithError:)]) {
 
-                CHIPDeviceController* strongController = mDeviceController;
-                if (strongController) {
-                    NSError *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                    [strongDelegate onDeviceAttestation:mDeviceController deviceId:remoteNodeId failedWithError:error];
-                }
+            CHIPDeviceController * strongController = mDeviceController;
+            if (strongController) {
+                NSError * error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
+                [strongDelegate onDeviceAttestation:mDeviceController deviceId:remoteNodeId failedWithError:error];
+            }
         }
     });
 }

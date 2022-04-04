@@ -43,8 +43,8 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -424,7 +424,9 @@ public:
      * @param[in] attestationResult     The attestation result to use instead of whatever the device
      *                                  attestation verifier came up with. May be a success or an error result.
      */
-    CHIP_ERROR ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId, chip::Credentials::AttestationVerificationResult attestationResult);
+    CHIP_ERROR
+    ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId,
+                                                       chip::Credentials::AttestationVerificationResult attestationResult);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -567,7 +569,6 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
-
 private:
     DevicePairingDelegate * mPairingDelegate;
 
@@ -688,8 +689,8 @@ private:
                                  const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
     void DisarmDone();
-    static void OnArmFailSafeExtendedForFailedDeviceAttestation(void * context,
-        const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnArmFailSafeExtendedForFailedDeviceAttestation(
+        void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeFailedDeviceAttestation(void * context, CHIP_ERROR error);
 
     /**
