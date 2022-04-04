@@ -173,10 +173,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() &&
             Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
-            commandObj->GetExchangeContext()->GetSessionHandle()->GetSessionType() == Transport::Session::SessionType::kSecure &&
-            commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() ==
-                Transport::SecureSession::Type::kCASE)
+                AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningError::kBusyWithOtherAdmin;
             commandObj->AddResponse(commandPath, response);
