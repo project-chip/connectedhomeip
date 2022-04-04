@@ -41,6 +41,7 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 using app::DataModel::Nullable;
 using bdx::TransferSession;
+using Protocols::InteractionModel::Status;
 
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
@@ -286,19 +287,14 @@ void OTARequestor::Reset()
     StoreCurrentUpdateInfo();
 }
 
-EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const AnnounceOtaProvider::DecodableType & commandData)
+void OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                             const AnnounceOtaProvider::DecodableType & commandData)
 {
+    VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle AnnounceOTAProvider"));
+
     auto & announcementReason = commandData.announcementReason;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
-
-    if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
 
     ProviderLocationType providerLocation = { .providerNodeID = commandData.providerNodeId,
                                               .endpoint       = commandData.endpoint,
@@ -316,7 +312,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
