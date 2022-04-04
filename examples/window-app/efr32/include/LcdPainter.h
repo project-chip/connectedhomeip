@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "app-common/app-common/zap-generated/enums.h"
 #include "app-common/app-common/zap-generated/cluster-enums.h"
+#include "app-common/app-common/zap-generated/enums.h"
 #include <stdint.h>
 
 enum class LcdIcon

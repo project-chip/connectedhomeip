@@ -380,9 +380,9 @@ void WindowApp::HandleLongPress()
     else if (mDownPressed)
     {
         // Long press button down: Cycle between covering types
-        mDownSuppressed          = true;
-        Type type                = GetCover().CycleType();
-        mTiltMode                = mTiltMode && (Type::kTiltBlindLiftAndTilt == type);
+        mDownSuppressed = true;
+        Type type       = GetCover().CycleType();
+        mTiltMode       = mTiltMode && (Type::kTiltBlindLiftAndTilt == type);
     }
 }
 
