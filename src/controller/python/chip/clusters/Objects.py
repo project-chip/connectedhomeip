@@ -9629,11 +9629,11 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             ssid: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class ScanNetworksResponse(ClusterCommand):
@@ -9668,12 +9668,12 @@ class NetworkCommissioning(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="credentials", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             ssid: 'bytes' = b""
             credentials: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class AddOrUpdateThreadNetwork(ClusterCommand):
@@ -9686,11 +9686,11 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="operationalDataset", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             operationalDataset: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class RemoveNetwork(ClusterCommand):
@@ -9703,11 +9703,11 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             networkID: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class NetworkConfigResponse(ClusterCommand):
@@ -9739,11 +9739,11 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             networkID: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class ConnectNetworkResponse(ClusterCommand):
@@ -9776,12 +9776,12 @@ class NetworkCommissioning(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="networkIndex", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             networkID: 'bytes' = b""
             networkIndex: 'uint' = 0
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
 
     class Attributes:

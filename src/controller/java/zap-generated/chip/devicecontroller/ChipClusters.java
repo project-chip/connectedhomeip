@@ -11337,21 +11337,26 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void addOrUpdateThreadNetwork(
-        NetworkConfigResponseCallback callback, byte[] operationalDataset, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] operationalDataset,
+        Optional<Long> breadcrumb) {
       addOrUpdateThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb, null);
     }
 
     public void addOrUpdateThreadNetwork(
         NetworkConfigResponseCallback callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateThreadNetwork(
           chipClusterPtr, callback, operationalDataset, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void addOrUpdateWiFiNetwork(
-        NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] ssid,
+        byte[] credentials,
+        Optional<Long> breadcrumb) {
       addOrUpdateWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb, null);
     }
 
@@ -11359,34 +11364,34 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateWiFiNetwork(
           chipClusterPtr, callback, ssid, credentials, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void connectNetwork(
-        ConnectNetworkResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        ConnectNetworkResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void connectNetwork(
         ConnectNetworkResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void removeNetwork(
-        NetworkConfigResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        NetworkConfigResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void removeNetwork(
         NetworkConfigResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11395,7 +11400,7 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb) {
+        Optional<Long> breadcrumb) {
       reorderNetwork(chipClusterPtr, callback, networkID, networkIndex, breadcrumb, null);
     }
 
@@ -11403,20 +11408,21 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       reorderNetwork(
           chipClusterPtr, callback, networkID, networkIndex, breadcrumb, timedInvokeTimeoutMs);
     }
 
-    public void scanNetworks(ScanNetworksResponseCallback callback, byte[] ssid, Long breadcrumb) {
+    public void scanNetworks(
+        ScanNetworksResponseCallback callback, byte[] ssid, Optional<Long> breadcrumb) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, null);
     }
 
     public void scanNetworks(
         ScanNetworksResponseCallback callback,
         byte[] ssid,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11425,7 +11431,7 @@ public class ChipClusters {
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void addOrUpdateWiFiNetwork(
@@ -11433,21 +11439,21 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void connectNetwork(
         long chipClusterPtr,
         ConnectNetworkResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeNetwork(
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void reorderNetwork(
@@ -11455,14 +11461,14 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void scanNetworks(
         long chipClusterPtr,
         ScanNetworksResponseCallback Callback,
         byte[] ssid,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ConnectNetworkResponseCallback {

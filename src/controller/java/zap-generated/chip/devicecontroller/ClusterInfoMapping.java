@@ -10379,7 +10379,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo =
-            new CommandParameterInfo("breadcrumb", Long.class);
+            new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningaddOrUpdateThreadNetworkCommandParams.put(
         "breadcrumb", networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo);
 
@@ -10391,7 +10391,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("operationalDataset"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateThreadNetworkCommandParams);
@@ -10410,7 +10410,7 @@ public class ClusterInfoMapping {
         "credentials", networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put(
         "breadcrumb", networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo);
 
@@ -10423,7 +10423,7 @@ public class ClusterInfoMapping {
                           callback,
                       (byte[]) commandArguments.get("ssid"),
                       (byte[]) commandArguments.get("credentials"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateWiFiNetworkCommandParams);
@@ -10437,7 +10437,7 @@ public class ClusterInfoMapping {
         "networkID", networkCommissioningconnectNetworknetworkIDCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningconnectNetworkCommandParams.put(
         "breadcrumb", networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo);
 
@@ -10449,7 +10449,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.ConnectNetworkResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedConnectNetworkResponseCallback(),
             networkCommissioningconnectNetworkCommandParams);
@@ -10463,7 +10463,7 @@ public class ClusterInfoMapping {
         "networkID", networkCommissioningremoveNetworknetworkIDCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningremoveNetworkCommandParams.put(
         "breadcrumb", networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo);
 
@@ -10475,7 +10475,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningremoveNetworkCommandParams);
@@ -10494,7 +10494,7 @@ public class ClusterInfoMapping {
         "networkIndex", networkCommissioningreorderNetworknetworkIndexCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningreorderNetworkCommandParams.put(
         "breadcrumb", networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo);
 
@@ -10507,7 +10507,7 @@ public class ClusterInfoMapping {
                           callback,
                       (byte[]) commandArguments.get("networkID"),
                       (Integer) commandArguments.get("networkIndex"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningreorderNetworkCommandParams);
@@ -10521,7 +10521,7 @@ public class ClusterInfoMapping {
         "ssid", networkCommissioningscanNetworksssidCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningscanNetworksbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningscanNetworksCommandParams.put(
         "breadcrumb", networkCommissioningscanNetworksbreadcrumbCommandParameterInfo);
 
@@ -10533,7 +10533,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("ssid"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedScanNetworksResponseCallback(),
             networkCommissioningscanNetworksCommandParams);

@@ -1361,7 +1361,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ssid = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1393,7 +1393,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentials = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1406,7 +1406,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalDataset = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1419,7 +1419,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1447,7 +1447,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1477,7 +1477,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkIndex = @(0);
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
