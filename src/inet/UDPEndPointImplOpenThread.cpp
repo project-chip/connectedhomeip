@@ -66,8 +66,8 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     pktInfo.DestAddress.ToString(destStr, Inet::IPAddress::kMaxStringLength);
 
     ChipLogDetail(Inet,
-                  "UDP Message Received packet nb : %d with the following data :\r\nSrcAddr : %s\r\nSrc Port : %d\r\n\r\nDestAddr "
-                  ": %s\r\nDest Port %d\r\nPayload Length %d",
+                  "UDP Message Received packet nb : %d SrcAddr : %s[%d] DestAddr "
+                  ": %s[%d] Payload Length %d",
                   ++msgReceivedCount, sourceStr, pktInfo.SrcPort, destStr, pktInfo.DestPort, msgLen);
 
 #endif
