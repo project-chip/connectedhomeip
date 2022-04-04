@@ -165,8 +165,7 @@ void TypeSet(chip::EndpointId endpoint, Type type)
 
 Type TypeGet(chip::EndpointId endpoint)
 {
-    // std::underlying_type<EmberAfWcType>::type value;
-    chip::app::Clusters::WindowCovering::Type value;
+    Type value;
     Attributes::Type::Get(endpoint, &value);
     return value;
 }
