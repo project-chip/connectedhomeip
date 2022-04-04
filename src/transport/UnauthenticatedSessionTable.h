@@ -54,7 +54,7 @@ public:
 
     UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), 
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
         mMRPConfig(config)
     {}
@@ -68,7 +68,7 @@ public:
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
-    void MarkActiveRx() { 
+    void MarkActiveRx() {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
     }
