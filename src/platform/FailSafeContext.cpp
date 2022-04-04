@@ -192,6 +192,7 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     {
         return;
     }
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
     FailSafeTimerExpired();
 }
 
