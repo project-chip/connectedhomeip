@@ -439,7 +439,7 @@ CHIP_ERROR LogAclChangedEvent(const AccessControl::Entry & entry, const Access::
     err = LogEvent(event, 0, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(DataManagement, "AccessControlCluster: log event failed");
+        ChipLogError(DataManagement, "AccessControlCluster: log event failed %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -576,7 +576,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
         VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         auto iterator = list.begin();
         size_t i      = 0;
@@ -669,7 +670,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             }
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
             ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                          static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
@@ -679,16 +680,16 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         }
         else
         {
-            return CHIP_ERROR_INVALID_LIST_LENGTH;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_ERROR_INVALID_LIST_LENGTH);
+        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         AccessControlCluster::Structs::ExtensionEntry::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                      static_cast<uint16_t>(item.data.size())));
         ReturnErrorOnFailure(
