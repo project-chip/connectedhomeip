@@ -184,9 +184,6 @@ CHIP_ERROR WindowAppImpl::Init()
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
 
-    // Print setup info on LCD if available
-    UpdateLCD();
-
     return CHIP_NO_ERROR;
 }
 
@@ -430,7 +427,7 @@ void WindowAppImpl::UpdateLCD()
 
         if (!tilt.IsNull() && !lift.IsNull())
         {
-            LcdPainter::Paint(type, static_cast<uint8_t>(lift.Value()), static_cast<uint8_t>(tilt.Value()), mIcon);
+            LcdPainter::Paint(type, lift.Value(), tilt.Value(), mIcon);
         }
     }
 #ifdef QR_CODE_ENABLED
