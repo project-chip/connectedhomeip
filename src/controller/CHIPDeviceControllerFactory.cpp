@@ -214,14 +214,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.sessionIDAllocator    = Platform::New<SessionIDAllocator>();
     stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
     stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager    = stateParams.sessionMgr,
         .exchangeMgr       = stateParams.exchangeMgr,
-        .idAllocator       = stateParams.sessionIDAllocator,
         .fabricTable       = stateParams.fabricTable,
         .clientPool        = stateParams.caseClientPool,
         .groupDataProvider = stateParams.groupDataProvider,
@@ -336,13 +334,8 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mSessionIDAllocator, mCASEClientPool, and mDevicePool must be deallocated
+    // mCASEClientPool and mDevicePool must be deallocated
     // after mCASESessionManager, which uses them.
-    if (mSessionIDAllocator != nullptr)
-    {
-        Platform::Delete(mSessionIDAllocator);
-        mSessionIDAllocator = nullptr;
-    }
 
     if (mOperationalDevicePool != nullptr)
     {

@@ -26501,6 +26501,7 @@ private:
 | * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
+| * SupportsConcurrentConnection                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -26520,7 +26521,6 @@ public:
     {
         AddArgument("ExpiryLengthSeconds", 0, UINT16_MAX, &mExpiryLengthSeconds);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mTimeoutMs);
         ModelCommand::AddArguments();
     }
 
@@ -26538,8 +26538,6 @@ public:
         params.expiryLengthSeconds = [NSNumber numberWithUnsignedShort:mExpiryLengthSeconds];
 
         params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
-
-        params.timeoutMs = [NSNumber numberWithUnsignedInt:mTimeoutMs];
         [cluster armFailSafeWithParams:params
                      completionHandler:^(
                          CHIPGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable values, NSError * _Nullable error) {
@@ -26554,7 +26552,6 @@ public:
 private:
     uint16_t mExpiryLengthSeconds;
     uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
 };
 
 /*
@@ -26598,10 +26595,9 @@ public:
     GeneralCommissioningSetRegulatoryConfig()
         : ModelCommand("set-regulatory-config")
     {
-        AddArgument("Location", 0, UINT8_MAX, &mLocation);
+        AddArgument("NewRegulatoryConfig", 0, UINT8_MAX, &mNewRegulatoryConfig);
         AddArgument("CountryCode", &mCountryCode);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mTimeoutMs);
         ModelCommand::AddArguments();
     }
 
@@ -26616,15 +26612,13 @@ public:
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         __auto_type * params = [[CHIPGeneralCommissioningClusterSetRegulatoryConfigParams alloc] init];
 
-        params.location = [NSNumber numberWithUnsignedChar:mLocation];
+        params.newRegulatoryConfig = [NSNumber numberWithUnsignedChar:mNewRegulatoryConfig];
 
         params.countryCode = [[NSString alloc] initWithBytes:mCountryCode.data()
                                                       length:mCountryCode.size()
                                                     encoding:NSUTF8StringEncoding];
 
         params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
-
-        params.timeoutMs = [NSNumber numberWithUnsignedInt:mTimeoutMs];
         [cluster
             setRegulatoryConfigWithParams:params
                         completionHandler:^(CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable values,
@@ -26638,10 +26632,9 @@ public:
     }
 
 private:
-    uint8_t mLocation;
+    uint8_t mNewRegulatoryConfig;
     chip::ByteSpan mCountryCode;
     uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
 };
 
 /*
@@ -26996,6 +26989,91 @@ public:
                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                            }
                                                        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportsConcurrentConnection
+ */
+class ReadGeneralCommissioningSupportsConcurrentConnection : public ModelCommand {
+public:
+    ReadGeneralCommissioningSupportsConcurrentConnection()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supports-concurrent-connection");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralCommissioningSupportsConcurrentConnection() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
+                                                                                     endpoint:endpointId
+                                                                                        queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSupportsConcurrentConnectionWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"GeneralCommissioning.SupportsConcurrentConnection response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "GeneralCommissioning SupportsConcurrentConnection Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeGeneralCommissioningSupportsConcurrentConnection : public ModelCommand {
+public:
+    SubscribeAttributeGeneralCommissioningSupportsConcurrentConnection()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "supports-concurrent-connection");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeGeneralCommissioningSupportsConcurrentConnection() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
+                                                                                     endpoint:endpointId
+                                                                                        queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeSupportsConcurrentConnectionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:NULL
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"GeneralCommissioning.SupportsConcurrentConnection response "
+                                                                      @"%@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
 
         return CHIP_NO_ERROR;
     }
@@ -77323,6 +77401,8 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<SubscribeAttributeGeneralCommissioningRegulatoryConfig>(), //
         make_unique<ReadGeneralCommissioningLocationCapability>(), //
         make_unique<SubscribeAttributeGeneralCommissioningLocationCapability>(), //
+        make_unique<ReadGeneralCommissioningSupportsConcurrentConnection>(), //
+        make_unique<SubscribeAttributeGeneralCommissioningSupportsConcurrentConnection>(), //
         make_unique<ReadGeneralCommissioningGeneratedCommandList>(), //
         make_unique<SubscribeAttributeGeneralCommissioningGeneratedCommandList>(), //
         make_unique<ReadGeneralCommissioningAcceptedCommandList>(), //

@@ -30,6 +30,7 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
+    NSData * ipk;
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
@@ -42,9 +43,11 @@ CHIP_ERROR CHIPCommandBridge::Run()
     [mController setListenPort:kListenPort];
     [mController setKeyValueStoreManagerPath:"/tmp/chip_kvs_darwin"];
 
-    [nocSigner createOrLoadKeys:storage];
+    ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
 
-    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner]) {
+    ipk = [nocSigner getIPK];
+
+    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner ipk:ipk]) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }

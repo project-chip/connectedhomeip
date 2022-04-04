@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/pigweed.gni")
-
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("$dir_pw_build/target_types.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 config("default_config") {
@@ -26,10 +23,7 @@ config("default_config") {
 source_set("trace_handlers") {
   sources = [ "TraceHandlers.cpp" ]
 
-  deps = [
-    "$dir_pw_trace",
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":default_config" ]
 }

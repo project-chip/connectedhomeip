@@ -2475,7 +2475,6 @@ class ChipClusters:
                     "args": {
                         "expiryLengthSeconds": "int",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000004: {
@@ -2488,10 +2487,9 @@ class ChipClusters:
                     "commandId": 0x00000002,
                     "commandName": "SetRegulatoryConfig",
                     "args": {
-                        "location": "int",
+                        "newRegulatoryConfig": "int",
                         "countryCode": "str",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
@@ -2519,6 +2517,12 @@ class ChipClusters:
                     "attributeName": "LocationCapability",
                     "attributeId": 0x00000003,
                     "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "SupportsConcurrentConnection",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
                     "reportable": True,
                 },
                 0x0000FFF8: {

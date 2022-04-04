@@ -60,6 +60,10 @@
 #include <CommonRpc.h>
 #endif
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 #include <signal.h>
 
 #include "AppMain.h"
@@ -89,6 +93,13 @@ static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 #endif
 
 namespace {
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+chip::trace::TraceStream * gTraceStream = nullptr;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -208,8 +219,18 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator);
 }
 
-// To hold SPAKE2+ verifier, discriminator, passcode
-LinuxCommissionableDataProvider gCommissionableDataProvider;
+void Cleanup()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (gTraceStream != nullptr)
+    {
+        delete gTraceStream;
+        gTraceStream = nullptr;
+    }
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+}
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -291,6 +312,23 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
+    {
+        const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
+        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
+    }
+    else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
+    {
+        gTraceStream = new chip::trace::TraceStreamLog();
+    }
+    chip::trace::InitTrace();
+    if (gTraceStream != nullptr)
+    {
+        chip::trace::SetTraceStream(gTraceStream);
+    }
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
@@ -320,6 +358,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
+        Cleanup();
+
         // End the program with non zero error code to indicate a error.
         return 1;
     }
@@ -704,4 +744,6 @@ void ChipLinuxAppMainLoop()
     Server::GetInstance().Shutdown();
 
     DeviceLayer::PlatformMgr().Shutdown();
+
+    Cleanup();
 }
