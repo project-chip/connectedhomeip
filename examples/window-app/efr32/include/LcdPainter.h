@@ -18,8 +18,11 @@
 
 #pragma once
 
-#include "app-common/app-common/zap-generated/cluster-enums.h"
+// clang-format off
 #include "app-common/app-common/zap-generated/enums.h"
+#include "app-common/app-common/zap-generated/cluster-enums.h"
+// clang-format on
+
 #include <stdint.h>
 
 enum class LcdIcon
