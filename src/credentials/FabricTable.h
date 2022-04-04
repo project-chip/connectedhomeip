@@ -110,7 +110,7 @@ public:
     {
         if (mOperationalKey == nullptr)
         {
-            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabric);
+            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabricIndex);
         }
 
         return mOperationalKey;

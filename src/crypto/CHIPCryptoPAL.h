@@ -1535,7 +1535,7 @@ private:
     /**
      * Fabric index - P256 key mapping
      **/
-    struct FabricP256KeyMap_t FabricP256KeyMap[CHIP_CONFIG_MAX_FABRICS];
+    //struct FabricP256KeyMap_t FabricP256KeyMap[CHIP_CONFIG_MAX_FABRICS];
 };
 
 /**

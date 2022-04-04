@@ -226,7 +226,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 
         if (mOperationalKey == nullptr)
         {
-            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabric);
+            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabricIndex);
         }
         VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
