@@ -56,13 +56,14 @@ namespace Internal {
 // Silabs NVM3 objects use a 20-bit number,
 // NVM3 Key 19:16 Stack region
 // NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
-// e.g. key = 0x0AA201
-// '0A' = Matter nvm3 region
-// 'A2' = the nv group base offest (Factory, Config or Counter)
+// e.g. key = 0x087201
+// '08' = Matter nvm3 region
+// '72' = the sub region group base offset (Factory, Config, Counter or KVS)
 // '01' = the id offset inside the group.
-constexpr uint32_t kMatterNvm3KeyDomain = 0x0A0000U;
+constexpr uint32_t kMatterNvm3KeyDomain = 0x080000U;
 constexpr inline uint32_t EFR32ConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
+    // Matter stack reserved region ranges from 0x087200 to 0x087FFF
     return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
 }
 
@@ -74,14 +75,15 @@ public:
     using Key = uint32_t;
 
     // NVM3 key base offsets used by the CHIP Device Layer.
+    // ** Key base can range from 0x72 to 0x7F **
     // Persistent config values set at manufacturing time. Retained during factory reset.
-    static constexpr uint8_t kMatterFactory_KeyBase = 0xA2;
+    static constexpr uint8_t kMatterFactory_KeyBase = 0x72;
     // Persistent config values set at runtime. Cleared during factory reset.
-    static constexpr uint8_t kMatterConfig_KeyBase = 0xA3;
+    static constexpr uint8_t kMatterConfig_KeyBase = 0x73;
     // Persistent counter values set at runtime. Retained during factory reset.
-    static constexpr uint8_t kMatterCounter_KeyBase = 0xA4;
+    static constexpr uint8_t kMatterCounter_KeyBase = 0x74;
     // Persistent config values set at runtime. Cleared during factory reset.
-    static constexpr uint8_t kMatterKvs_KeyBase = 0xA5;
+    static constexpr uint8_t kMatterKvs_KeyBase = 0x75;
 
     // Key definitions for well-known configuration values.
     // Factory config keys
