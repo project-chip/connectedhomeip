@@ -256,5 +256,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
     registerAttributeAccessOverride(&gAttrAccess);
 }
