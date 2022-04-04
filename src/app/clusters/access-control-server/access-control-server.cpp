@@ -467,7 +467,7 @@ CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::Extensi
     CHIP_ERROR err = LogEvent(event, 0, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(DataManagement, "AccessControlCluster: log event failed");
+        ChipLogError(DataManagement, "AccessControlCluster: log event failed %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
