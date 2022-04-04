@@ -119,7 +119,7 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 
         if (mAppDelegate != nullptr)
         {
-            mAppDelegate->OnRendezvousStopped();
+            mAppDelegate->OnCommissioningSessionStopped();
         }
     }
 }
@@ -150,7 +150,7 @@ void CommissioningWindowManager::OnSessionEstablished()
     ChipLogProgress(AppServer, "Commissioning completed session establishment step");
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnRendezvousStarted();
+        mAppDelegate->OnCommissioningSessionStarted();
     }
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
@@ -325,7 +325,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPairingWindowOpened();
+        mAppDelegate->OnCommissioningWindowOpened();
     }
 
     if (mUseECM)
@@ -374,7 +374,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPairingWindowClosed();
+        mAppDelegate->OnCommissioningWindowClosed();
     }
 
     return CHIP_NO_ERROR;
