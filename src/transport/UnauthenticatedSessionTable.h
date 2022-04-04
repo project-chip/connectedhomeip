@@ -68,7 +68,8 @@ public:
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
-    void MarkActiveRx() {
+    void MarkActiveRx()
+    {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
     }
@@ -119,11 +120,10 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
-    bool IsPeerActive() {
-        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
-    }
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
 
-    System::Clock::Timestamp GetMRPBaseTimeout() override {
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
         return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
     }
 

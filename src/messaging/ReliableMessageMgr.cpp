@@ -147,8 +147,8 @@ void ReliableMessageMgr::ExecuteActions()
 
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-        System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-        entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
+        System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
+        entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -228,8 +228,8 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
     System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
+    entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
 

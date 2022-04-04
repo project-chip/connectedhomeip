@@ -76,8 +76,7 @@ public:
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
-        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()),
-        mMRPConfig(config)
+        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
         SetFabricIndex(fabric);
     }
@@ -173,16 +172,16 @@ public:
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
-    void MarkActiveRx() {
+    void MarkActiveRx()
+    {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
     }
 
-    bool IsPeerActive() {
-        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
-    }
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
 
-    System::Clock::Timestamp GetMRPBaseTimeout() override {
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
         return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
     }
 
@@ -198,8 +197,8 @@ private:
     uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;      ///< Timestamp of last tx or rx
-    System::Clock::Timestamp mLastPeerActivityTime;  ///< Timestamp of last rx
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
