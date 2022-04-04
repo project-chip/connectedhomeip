@@ -20,6 +20,8 @@
 #include <LcdPainter.h>
 #include <lcd.h>
 
+using namespace chip::app::Clusters::WindowCovering;
+
 constexpr uint32_t sTiltIcon[] = {
     0xffffffff, 0xffffffff, 0xc0000003, 0xc0000003, 0xc0000003, 0xc0000003, 0xc1ffffc3, 0xc1ffffc3,
     0xc1ffffc3, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003,
@@ -175,11 +177,6 @@ uint8_t VerticalBlindPainter::Color(uint32_t x, uint32_t y)
     }
 }
 
-
-
-
-using namespace chip::app::Clusters::WindowCovering;
-
 PixelPainter * LcdPainter::GetCoverPainter(Type type, uint16_t lift, uint16_t tilt)
 {
     switch (type)
@@ -204,7 +201,6 @@ PixelPainter * LcdPainter::GetCoverPainter(Type type, uint16_t lift, uint16_t ti
 
     return nullptr;
 }
-
 
 void LcdPainter::Paint(Type type, uint16_t lift, uint16_t tilt, LcdIcon icon)
 {
