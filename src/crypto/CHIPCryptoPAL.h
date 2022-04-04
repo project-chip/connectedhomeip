@@ -33,6 +33,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -1538,7 +1539,7 @@ public:
     virtual ~P256KeypairBuilder() {}
 
     /**
-     * @brief Create the keypair for given fabric Index.
+     * @brief Create the keypair for given fabric Index. Use FreeP256KeyPair to free the keypair.
      * @return Return reference to P256 Keypair
      **/
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) = 0;
@@ -1550,7 +1551,8 @@ public:
     virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key) = 0;
 
     /**
-     * Get last valid Operational Key for fabric. To be called on ArmFailSafe timer expire before commissioning complete.
+     * @brief Get last valid Operational Key for fabric. To be called on ArmFailSafe timer expire before commissioning complete.
+     * Use FreeP256KeyPair to free the keypair.
      * @return Return - P256Keypair*
      **/
     virtual P256Keypair * GetP256KeyPairForOperationalKey(FabricIndex fabricIdx) = 0;
