@@ -29,8 +29,8 @@
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <platform/qpg/OTAImageProcessorImpl.h>
 
 using namespace chip;
@@ -42,7 +42,7 @@ using namespace chip::DeviceLayer;
 
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
