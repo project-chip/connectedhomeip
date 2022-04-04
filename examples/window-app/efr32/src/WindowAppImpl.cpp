@@ -422,7 +422,7 @@ void WindowAppImpl::UpdateLCD()
         chip::app::DataModel::Nullable<uint16_t> tilt;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        EmberAfWcType type = TypeGet(cover.mEndpoint);
+        Type type = TypeGet(cover.mEndpoint);
 
         Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
