@@ -43,8 +43,9 @@ namespace Echo {
  */
 enum class MsgType : uint8_t
 {
-    EchoRequest  = 0x01,
-    EchoResponse = 0x02
+    EchoRequest                 = 0x01,
+    EchoResponse                = 0x02,
+    EchoRequestWithoutResponse  = 0x03
 };
 
 using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);

@@ -40,6 +40,7 @@ CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
     mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest, this);
+    mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequestWithoutResponse, this);
 
     return CHIP_NO_ERROR;
 }
@@ -49,6 +50,7 @@ void EchoServer::Shutdown()
     if (mExchangeMgr != nullptr)
     {
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequestWithoutResponse);
         mExchangeMgr = nullptr;
     }
 }
@@ -56,9 +58,6 @@ void EchoServer::Shutdown()
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle response;
-
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.
 
@@ -67,6 +66,15 @@ CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     {
         OnEchoRequestReceived(ec, payload.Retain());
     }
+
+    // This is an echo request that does not requires an explicit response.
+    if (payloadHeader.GetMessageType() == to_underlying(MsgType::EchoRequestWithoutResponse))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle response;
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the

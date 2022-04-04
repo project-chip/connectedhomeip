@@ -20,6 +20,7 @@
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
 #include "commands/discover/Commands.h"
+#include "commands/echo/Commands.h"
 #include "commands/group/Commands.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
@@ -36,6 +37,7 @@ int main(int argc, char * argv[])
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
     registerCommandsDiscover(commands, &credIssuerCommands);
+    registerCommandsEcho(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);
