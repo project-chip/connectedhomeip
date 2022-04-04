@@ -647,7 +647,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPNetworkCommissioningClusterScanNetworksParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull ssid;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
@@ -662,19 +662,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull ssid;
 @property (strong, nonatomic) NSData * _Nonnull credentials;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull operationalDataset;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterRemoveNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
@@ -687,7 +687,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPNetworkCommissioningClusterConnectNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
@@ -701,7 +701,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterReorderNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
 @property (strong, nonatomic) NSNumber * _Nonnull networkIndex;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
