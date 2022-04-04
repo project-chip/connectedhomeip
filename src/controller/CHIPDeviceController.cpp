@@ -1482,6 +1482,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
         completionStatus.err         = status;
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
         mCommissioningStage          = CommissioningStage::kCleanup;
+        mDeviceBeingCommissioned     = proxy;
         CleanupCommissioning(proxy, nodeId, completionStatus);
     }
 }
