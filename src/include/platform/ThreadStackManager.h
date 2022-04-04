@@ -36,6 +36,10 @@ struct TextEntry;
 struct DnssdService;
 } // namespace Dnssd
 
+namespace Thread {
+class OperationalDataset;
+} // namespace Thread
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -93,7 +97,7 @@ public:
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
     bool IsThreadAttached();
-    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
@@ -342,9 +346,9 @@ inline bool ThreadStackManager::IsThreadAttached()
     return static_cast<ImplClass *>(this)->_IsThreadAttached();
 }
 
-inline CHIP_ERROR ThreadStackManager::GetThreadProvision(ByteSpan & netInfo)
+inline CHIP_ERROR ThreadStackManager::GetThreadProvision(Thread::OperationalDataset & dataset)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadProvision(netInfo);
+    return static_cast<ImplClass *>(this)->_GetThreadProvision(dataset);
 }
 
 inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)

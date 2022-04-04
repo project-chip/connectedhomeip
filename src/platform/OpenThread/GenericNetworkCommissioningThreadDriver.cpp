@@ -37,14 +37,12 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
-    ByteSpan currentProvision;
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
 
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(currentProvision);
-    mStagingNetwork.Init(currentProvision);
+    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
 
     return CHIP_NO_ERROR;
 }
@@ -182,14 +180,12 @@ bool GenericThreadDriver::ThreadNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    ByteSpan currentProvision;
     Thread::OperationalDataset currentDataset;
     uint8_t enabledExtPanId[Thread::kSizeExtendedPanId];
 
     // The Thread network is not actually enabled.
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), true);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, true);
-    VerifyOrReturnError(currentDataset.Init(currentProvision) == CHIP_NO_ERROR, true);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR, true);
     // The Thread network is not enabled, but has a different extended pan id.
     VerifyOrReturnError(currentDataset.GetExtendedPanId(enabledExtPanId) == CHIP_NO_ERROR, true);
     VerifyOrReturnError(memcmp(extpanid, enabledExtPanId, kSizeExtendedPanId) == 0, true);
