@@ -119,8 +119,6 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     return false;
 }
 
-void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
-
 void DefaultOTARequestorDriver::HandleIdleStateExit()
 {
     // Start watchdog timer to monitor new Query Image session

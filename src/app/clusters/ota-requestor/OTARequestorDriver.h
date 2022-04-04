@@ -94,9 +94,6 @@ public:
     /// Set maximum supported download block size
     virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;
 
-    /// Called when an error occurs at any OTA requestor operation
-    virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
-
     /// Called when OTA Requestor has exited the Idle state for which the driver may need to take various actions
     virtual void HandleIdleStateExit() = 0;
 

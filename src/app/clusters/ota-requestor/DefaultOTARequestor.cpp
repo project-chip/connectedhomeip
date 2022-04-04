@@ -699,9 +699,6 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
 
 void DefaultOTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)
 {
-    // Inform driver of the error
-    mOtaRequestorDriver->HandleError(failureState, error);
-
     // Log the DownloadError event
     OTAImageProcessorInterface * imageProcessor = mBdxDownloader->GetImageProcessorDelegate();
     VerifyOrDie(imageProcessor != nullptr);
