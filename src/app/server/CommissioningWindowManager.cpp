@@ -51,12 +51,15 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         ChipLogProgress(AppServer, "Commissioning completed successfully");
+        DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
+        mCommissioningTimeoutTimerArmed = false;
         Cleanup();
+        mServer->GetSecureSessionManager().ExpireAllPASEPairings();
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(AppServer, "Failsafe timer expired");
-        OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+        HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -98,9 +101,13 @@ void CommissioningWindowManager::Cleanup()
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+    HandleFailedAttempt(err);
+}
+
+void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
+{
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
-
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
@@ -134,8 +141,6 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 void CommissioningWindowManager::OnSessionEstablished()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
-    DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
-    mCommissioningTimeoutTimerArmed = false;
     SessionHolder sessionHolder;
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
         sessionHolder, Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
