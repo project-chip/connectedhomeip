@@ -29,145 +29,10 @@
 
 namespace chip {
 
-constexpr TLV::Tag SessionResumptionStorage::kFabricIndexTag;
-constexpr TLV::Tag SessionResumptionStorage::kPeerNodeIdTag;
-constexpr TLV::Tag SessionResumptionStorage::kResumptionIdTag;
-constexpr TLV::Tag SessionResumptionStorage::kSharedSecretTag;
-constexpr TLV::Tag SessionResumptionStorage::kCATTag;
-
-const char * SessionResumptionStorage::StorageKey(DefaultStorageKeyAllocator & keyAlloc, ScopedNodeId node)
-{
-    return keyAlloc.FabricSession(node.GetFabricIndex(), node.GetNodeId());
-}
-
-const char * SessionResumptionStorage::StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId)
-{
-    char resumptionIdBase64[BASE64_ENCODED_LEN(resumptionId.size()) + 1] ; 
-    auto len = Base64Encode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
-    resumptionIdBase64[len] = '\0';
-    return keyAlloc.SessionResumption(resumptionIdBase64);
-}
-
-CHIP_ERROR SessionResumptionStorage::Save(ScopedNodeId node, ConstResumptionIdView resumptionId,
-                                          const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
-{
-    DefaultStorageKeyAllocator keyAlloc;
-    {
-        // Save session state into key: /f/<fabricIndex>/s/<nodeId>
-        uint8_t buf[MaxStateSize()];
-
-        TLV::TLVWriter writer;
-        writer.Init(buf);
-
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-
-        ReturnErrorOnFailure(writer.Put(kResumptionIdTag, resumptionId));
-        ReturnErrorOnFailure(writer.Put(kSharedSecretTag, ByteSpan(sharedSecret.ConstBytes(), sharedSecret.Length())));
-        CATValues::Serialized cat;
-        peerCATs.Serialize(cat);
-        ReturnErrorOnFailure(writer.Put(kCATTag, ByteSpan(cat)));
-
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-
-        const auto len = writer.GetLengthWritten();
-        VerifyOrDie(CanCastTo<uint16_t>(len));
-
-        ReturnErrorOnFailure(mStorage->SyncSetKeyValue(StorageKey(keyAlloc, node), buf, static_cast<uint16_t>(len)));
-    }
-
-    {
-        // Save a link from resumptionId to node, in key: /f/<fabricIndex>/r/<resumptionId>
-        uint8_t buf[MaxLinkSize()];
-
-        TLV::TLVWriter writer;
-        writer.Init(buf);
-
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-        ReturnErrorOnFailure(writer.Put(kFabricIndexTag, node.GetFabricIndex()));
-        ReturnErrorOnFailure(writer.Put(kPeerNodeIdTag, node.GetNodeId()));
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-
-        const auto len = writer.GetLengthWritten();
-        VerifyOrDie(CanCastTo<uint16_t>(len));
-
-        ReturnErrorOnFailure(mStorage->SyncSetKeyValue(StorageKey(keyAlloc, resumptionId), buf, static_cast<uint16_t>(len)));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, ResumptionIdView resumptionId,
+CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
                                                         Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
-    DefaultStorageKeyAllocator keyAlloc;
-    uint8_t buf[MaxStateSize()];
-    uint16_t len = static_cast<uint16_t>(MaxStateSize());
-
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(StorageKey(keyAlloc, node), buf, len));
-
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf, len);
-
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-    TLV::TLVType containerType;
-    ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-    ByteSpan resumptionIdSpan;
-    ReturnErrorOnFailure(reader.Next(kResumptionIdTag));
-    ReturnErrorOnFailure(reader.Get(resumptionIdSpan));
-    std::copy(resumptionIdSpan.begin(), resumptionIdSpan.end(), resumptionId.begin());
-
-    ByteSpan sharedSecretSpan;
-    ReturnErrorOnFailure(reader.Next(kSharedSecretTag));
-    ReturnErrorOnFailure(reader.Get(sharedSecretSpan));
-    VerifyOrReturnError(sharedSecret.Length() <= sharedSecretSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ::memcpy(sharedSecret.Bytes(), sharedSecretSpan.data(), sharedSecretSpan.size());
-    sharedSecret.SetLength(sharedSecretSpan.size());
-
-    ByteSpan catSpan;
-    ReturnErrorOnFailure(reader.Next(kCATTag));
-    ReturnErrorOnFailure(reader.Get(catSpan));
-    CATValues::Serialized cat;
-    VerifyOrReturnError(sizeof(cat) == catSpan.size(), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    ::memcpy(cat, catSpan.data(), catSpan.size());
-    peerCATs.Deserialize(cat);
-
-    ReturnErrorOnFailure(reader.ExitContainer(containerType));
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
-{
-    DefaultStorageKeyAllocator keyAlloc;
-    uint8_t buf[MaxLinkSize()];
-    uint16_t len = static_cast<uint16_t>(MaxStateSize());
-
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(StorageKey(keyAlloc, resumptionId), buf, len));
-
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf, len);
-
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-    TLV::TLVType containerType;
-    ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-    FabricIndex fabricIndex;
-    ReturnErrorOnFailure(reader.Next(kFabricIndexTag));
-    ReturnErrorOnFailure(reader.Get(fabricIndex));
-
-    NodeId peerNodeId;
-    ReturnErrorOnFailure(reader.Next(kPeerNodeIdTag));
-    ReturnErrorOnFailure(reader.Get(peerNodeId));
-
-    ReturnErrorOnFailure(reader.ExitContainer(containerType));
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-    node = ScopedNodeId(peerNodeId, fabricIndex);
-
+    ReturnErrorOnFailure(LoadState(node, resumptionId, sharedSecret, peerCATs));
     return CHIP_NO_ERROR;
 }
 
@@ -182,10 +47,104 @@ CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView re
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::Delete(ScopedNodeId node)
+CHIP_ERROR SessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
 {
-    DefaultStorageKeyAllocator keyAlloc;
-    mStorage->SyncDeleteKeyValue(StorageKey(keyAlloc, node));
+    ReturnErrorOnFailure(LoadLink(resumptionId, node));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SessionResumptionStorage::Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                                          const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
+{
+    SessionIndex index;
+    ReturnErrorOnFailure(LoadIndex(index));
+
+    if (index.mSize == CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE)
+    {
+        // TODO: implement LRU for resumption
+        ReturnErrorOnFailure(Delete(index.mNodes[0]));
+        ReturnErrorOnFailure(LoadIndex(index));
+    }
+
+    ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
+    ReturnErrorOnFailure(SaveLink(resumptionId, node));
+
+    index.mNodes[index.mSize++] = node;
+    ReturnErrorOnFailure(SaveIndex(index));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SessionResumptionStorage::Delete(const ScopedNodeId & node)
+{
+    SessionIndex index;
+    ReturnErrorOnFailure(LoadIndex(index));
+
+    ResumptionIdStorage resumptionId;
+    Crypto::P256ECDHDerivedSecret sharedSecret;
+    CATValues peerCATs;
+    CHIP_ERROR err = LoadState(node, resumptionId, sharedSecret, peerCATs);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = DeleteLink(resumptionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel,
+                         "Unable to delete session resumption link for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(node.GetNodeId()), err.Format());
+        }
+    }
+    else
+    {
+        ChipLogError(SecureChannel,
+                     "Unable to load session resumption state during session deletion for node " ChipLogFormatX64
+                     ": %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(node.GetNodeId()), err.Format());
+    }
+
+    err = DeleteState(node);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Unable to delete session resumption state for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(node.GetNodeId()), err.Format());
+    }
+
+    bool found = false;
+    for (size_t i = 0; i < index.mSize; ++i)
+    {
+        if (found)
+        {
+            index.mNodes[i] = index.mNodes[i + 1];
+        }
+        else
+        {
+            if (index.mNodes[i] == node)
+            {
+                found = true;
+                index.mSize -= 1;
+                if (i + 1 != index.mSize)
+                {
+                    index.mNodes[i] = index.mNodes[i + 1];
+                }
+            }
+        }
+    }
+
+    if (found)
+    {
+        err = SaveIndex(index);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Unable to save session resumption index: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+    else
+    {
+        ChipLogError(SecureChannel,
+                     "Unable to find session resumption state for node in index" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(node.GetNodeId()), err.Format());
+    }
+
     return CHIP_NO_ERROR;
 }
 

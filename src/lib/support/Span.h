@@ -38,8 +38,7 @@ template <class T>
 class Span
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
@@ -143,8 +142,7 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr FixedSpan() : mDataBuf(nullptr) {}
 

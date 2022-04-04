@@ -322,11 +322,11 @@ public:
         }
 
         chip::DeviceProxyInitParams initParams = {
-            .sessionManager = &(server->GetSecureSessionManager()),
+            .sessionManager           = &(server->GetSecureSessionManager()),
             .sessionResumptionStorage = &(server->GetSessionResumptionStorage()),
-            .exchangeMgr    = &(server->GetExchangeManager()),
-            .fabricTable    = &(server->GetFabricTable()),
-            .clientPool     = &gCASEClientPool,
+            .exchangeMgr              = &(server->GetExchangeManager()),
+            .fabricTable              = &(server->GetFabricTable()),
+            .clientPool               = &gCASEClientPool,
         };
 
         PeerId peerID           = fabric->GetPeerIdForNode(nodeId);

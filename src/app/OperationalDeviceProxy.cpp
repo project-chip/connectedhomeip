@@ -167,9 +167,9 @@ bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port)
 
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
-    mCASEClient =
-        mInitParams.clientPool->Allocate(CASEClientInitParams{ mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.exchangeMgr, mFabricInfo,
-                                                               mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+    mCASEClient = mInitParams.clientPool->Allocate(
+        CASEClientInitParams{ mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.exchangeMgr,
+                              mFabricInfo, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
     CHIP_ERROR err =
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);

@@ -38,6 +38,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -300,7 +301,7 @@ private:
 
     ServerTransportMgr mTransports;
     SessionManager mSessions;
-    SessionResumptionStorage mSessionResumptionStorage;
+    SimpleSessionResumptionStorage mSessionResumptionStorage;
     CASEServer mCASEServer;
 
     CASESessionManager mCASESessionManager;

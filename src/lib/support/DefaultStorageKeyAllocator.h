@@ -49,7 +49,6 @@ public:
     const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
-
     // FailSafeContext
     const char * FailSafeContextKey() { return Format("g/fsc"); }
 
@@ -58,6 +57,7 @@ public:
     {
         return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
     }
+    const char * SessionResumptionIndex() { return Format("f/sri"); }
     const char * SessionResumption(const char * resumptionIdBase64) { return Format("s/%s", resumptionIdBase64); }
 
     // Access Control
