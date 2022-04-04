@@ -39,7 +39,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -69,7 +68,6 @@ struct ControllerDeviceInitParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
     PersistentStorageDelegate * storageDelegate                   = nullptr;
-    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -120,7 +118,6 @@ public:
         mExchangeMgr        = params.exchangeMgr;
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
-        mIDAllocator        = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -287,8 +284,6 @@ private:
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    SessionIDAllocator * mIDAllocator = nullptr;
 };
 
 } // namespace chip

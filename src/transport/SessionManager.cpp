@@ -90,6 +90,8 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mMessageCounterManager = messageCounterManager;
     mFabricTable           = fabricTable;
 
+    mSecureSessions.Init();
+
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
@@ -372,27 +374,39 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
+Optional<SessionHandle> SessionManager::AllocateSession()
+{
+    return mSecureSessions.CreateNewSecureSession();
+}
+
+Optional<SessionHandle> SessionManager::AllocateSession(uint16_t sessionId)
+{
+    // If we forego SessionManager session ID allocation, we can have a
+    // collission.  In case of such a collission, we must evict first.
+    Optional<SessionHandle> oldSession = mSecureSessions.FindSecureSessionByLocalKey(sessionId);
+    if (oldSession.HasValue())
+    {
+        mSecureSessions.ReleaseSession(oldSession.Value()->AsSecureSession());
+    }
+    return mSecureSessions.CreateNewSecureSession(sessionId);
+}
+
 CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
                                       NodeId peerNodeId, PairingSession * pairing, CryptoContext::SessionRole direction,
                                       FabricIndex fabric)
 {
-    uint16_t peerSessionId          = pairing->GetPeerSessionId();
-    uint16_t localSessionId         = pairing->GetLocalSessionId();
-    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(localSessionId);
-
-    // Find any existing connection with the same local key ID
-    if (session.HasValue())
-    {
-        mSecureSessions.ReleaseSession(session.Value()->AsSecureSession());
-    }
+    uint16_t peerSessionId = pairing->GetPeerSessionId();
+    SecureSession * secureSession;
+    auto handle = pairing->GetSecureSessionHandle();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(handle.Value()->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
+    secureSession = handle.Value()->AsSecureSession();
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
-                  ChipLogValueX64(peerNodeId), localSessionId, peerSessionId);
-    session = mSecureSessions.CreateNewSecureSession(pairing->GetSecureSessionType(), localSessionId, peerNodeId,
-                                                     pairing->GetPeerCATs(), peerSessionId, fabric, pairing->GetMRPConfig());
-    ReturnErrorCodeIf(!session.HasValue(), CHIP_ERROR_NO_MEMORY);
+                  ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);
+    secureSession->Activate(pairing->GetSecureSessionType(), peerNodeId, pairing->GetPeerCATs(), peerSessionId, fabric,
+                            pairing->GetMRPConfig());
 
-    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {
         secureSession->SetPeerAddress(peerAddr.Value());
@@ -411,7 +425,9 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
     ReturnErrorOnFailure(pairing->DeriveSecureSession(secureSession->GetCryptoContext(), direction));
 
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
-    sessionHolder.Grab(session.Value());
+
+    sessionHolder.Grab(handle.Value());
+
     return CHIP_NO_ERROR;
 }
 

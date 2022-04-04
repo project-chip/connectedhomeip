@@ -24,7 +24,6 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -63,7 +62,6 @@ private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     CASESession mPairingSession;
-    uint16_t mSessionKeyId           = 0;
     SessionManager * mSessionManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
@@ -71,7 +69,6 @@ private:
 
     FabricTable * mFabrics                              = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
-    SessionIDAllocator mSessionIDAllocator;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

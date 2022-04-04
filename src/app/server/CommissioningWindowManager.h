@@ -23,7 +23,6 @@
 #include <lib/dnssd/Advertiser.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -64,8 +63,6 @@ public:
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
-
-    void SetSessionIDAllocator(SessionIDAllocator * idAllocator) { mIDAllocator = idAllocator; }
 
     /**
      * Open the pairing window using default configured parameters.
@@ -146,7 +143,6 @@ private:
 
     bool mIsBLE = true;
 
-    SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
     uint8_t mFailedCommissioningAttempts = 0;

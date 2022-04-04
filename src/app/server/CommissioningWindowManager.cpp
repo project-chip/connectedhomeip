@@ -176,9 +176,6 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 {
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
-    uint16_t keyID = 0;
-    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
-
     mPairingSession.Clear();
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -188,9 +185,9 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(
-            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), keyID,
-                                           Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
+            mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
+            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
     else
     {
@@ -211,8 +208,9 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            verifier, iterationCount, saltSpan, keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
+                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+                                                            this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
