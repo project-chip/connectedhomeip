@@ -487,7 +487,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
                 {
                     timeoutSecs = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
                 }
-                _deviceAttestationDelegateBridge = new CHIPDeviceAttestationDelegateBridge(self, 
+                _deviceAttestationDelegateBridge = new CHIPDeviceAttestationDelegateBridge(self,
                         commissioningParams.deviceAttestationDelegate,
                         _chipWorkQueue,
                         timeoutSecs);
@@ -514,8 +514,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
-            auto lastAttestationResult = _deviceAttestationDelegateBridge ? 
-                _deviceAttestationDelegateBridge->attestationVerificationResult() : 
+            auto lastAttestationResult = _deviceAttestationDelegateBridge ?
+                _deviceAttestationDelegateBridge->attestationVerificationResult() :
                 chip::Credentials::AttestationVerificationResult::kSuccess;
 
             errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceId,

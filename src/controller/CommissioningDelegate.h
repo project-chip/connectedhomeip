@@ -324,7 +324,7 @@ public:
     }
     void SetCompletionStatus(const CompletionStatus & status) { completionStatus = status; }
 
-    CommissioningParameters & SetDeviceAttestationDelegate(Credentials::DeviceAttestationDelegate *deviceAttestationDelegate) 
+    CommissioningParameters & SetDeviceAttestationDelegate(Credentials::DeviceAttestationDelegate *deviceAttestationDelegate)
     {
         mDeviceAttestationDelegate = deviceAttestationDelegate;
         return *this;

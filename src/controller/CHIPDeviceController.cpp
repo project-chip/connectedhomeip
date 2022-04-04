@@ -813,7 +813,7 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailur
         ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    
+
     if (mCommissioningStage != CommissioningStage::kAttestationVerification)
     {
         ChipLogError(Controller, "Commissioning is not attestation verification phase");
@@ -1036,7 +1036,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
         auto params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
         Credentials::DeviceAttestationDelegate* deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
-        
+
         // If a device attestation status delegate is installed, delegate handling of failure to the client and let them
         // decide on whether to proceed further or not.
         if (deviceAttestationDelegate) {
