@@ -18,6 +18,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/Linux/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -117,16 +118,21 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
+    DefaultStorageKeyAllocator keyAlloc;
+
     return mStorage.WriteValue(keyAlloc.UserLabelLengthKey(endpoint), val);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
+    DefaultStorageKeyAllocator keyAlloc;
+
     return mStorage.ReadValue(keyAlloc.UserLabelLengthKey(endpoint), val);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
+    DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
     TLV::TLVWriter writer;
     writer.Init(buf);
@@ -162,9 +168,10 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
     VerifyOrReturnError(mIndex < mTotal, false);
 
+    DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
     size_t outLen;
-    err = mProvider.mStorage.ReadValueBin(mProvider.keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, sizeof(buf), outLen);
+    err = mProvider.mStorage.ReadValueBin(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, sizeof(buf), outLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;

@@ -70,7 +70,10 @@ public:
 
     // Device Information Provider
     const char * UserLabelLengthKey(EndpointId endpoint) { return Format("a/%" PRIx16, endpoint); }
-    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("a/%" PRIx16 "/%" PRIx32, endpoint, index); }
+    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index)
+    {
+        return Format("a/%" PRIx16 "/%" PRIx32, endpoint, index);
+    }
 
     // Group Data Provider
 

@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
@@ -98,7 +97,6 @@ protected:
 
 private:
     DeviceLayer::Internal::ChipLinuxStorage mStorage;
-    DefaultStorageKeyAllocator keyAlloc;
 
     static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
 };
