@@ -745,9 +745,9 @@ private:
 
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
     // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
-    // For failures after AddNOC, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate.
-    // It does not disarm the failsafe or close the pase connection.
-    // For failures up to AddNOC, sends a command to disarm the
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate.
+    // In this case, it does not disarm the failsafe or close the pase connection.
+    // For failures up through AddNOC, sends a command to immediately expire the
     // failsafe, then sends completion report with the CommissioningDelegate and callbacks to the PairingDelegate upon arm failsafe
     // command completion.
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
