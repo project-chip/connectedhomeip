@@ -66,10 +66,11 @@ public:
     uint16_t GetMaxDownloadBlockSize() override;
     void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) override;
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
+
     void HandleIdleStateExit() override;
-    void HandleIdleState(IdleStateReason reason) override;
+    void HandleIdleStateEnter(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
-    void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
+    CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
     void UpdateDownloaded() override;
     void UpdateConfirmed(System::Clock::Seconds32 delay) override;
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
@@ -104,6 +105,8 @@ protected:
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
     uint8_t mProviderRetryCount; // Track retry count for the current provider
+    chip::Optional<UpdateNotFoundReason> mUpdateNotFoundReason;
+    chip::Optional<System::Clock::Seconds32> mRetryDelaySec;
 };
 
 } // namespace DeviceLayer

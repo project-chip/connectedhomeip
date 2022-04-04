@@ -2373,6 +2373,14 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
 
 /**
+ * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
+ *
+ * @brief
+ *   The Resource has exceeded the maximum rety limit.
+ */
+#define CHIP_ERROR_MAX_RETRY_EXCEEDED   CHIP_CORE_ERROR(0xdc)
+
+/**
  *  @}
  */
 

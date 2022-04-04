@@ -127,7 +127,7 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
     StartSelectedTimer(SelectedTimer::kWatchdogTimer);
 }
 
-void DefaultOTARequestorDriver::HandleIdleState(IdleStateReason reason)
+void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
     switch (reason)
     {
@@ -156,8 +156,10 @@ void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update
         delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
-void DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
+CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
 {
+    CHIP_ERROR status = CHIP_NO_ERROR;
+
     VerifyOrDie(mRequestor != nullptr);
 
     ProviderLocationType providerLocation;
@@ -187,6 +189,7 @@ void DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
             willTryAnotherQuery = false;
+            status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
         }
         else
         {
@@ -207,11 +210,8 @@ void DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, scheduling a retry");
         ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
     }
-    else
-    {
-        ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
-        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
-    }
+
+    return status;
 }
 
 void DefaultOTARequestorDriver::UpdateDownloaded()
@@ -247,9 +247,6 @@ void DefaultOTARequestorDriver::UpdateDiscontinued()
 
     // Cancel all update timers
     UpdateCancelled();
-
-    // Restart the periodic default provider timer
-    StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
 }
 
 // Cancel all OTA update timers
@@ -322,6 +319,7 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
 
 void DefaultOTARequestorDriver::SendQueryImage()
 {
+    OTAUpdateStateEnum state;
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);
     if (!lastUsedProvider.HasValue())
@@ -338,17 +336,17 @@ void DefaultOTARequestorDriver::SendQueryImage()
             return;
         }
     }
-    // IMPLEMENTATION CHOICE
-    // In this implementation explicitly triggering a query cancels any in-progress update.
-    UpdateCancelled();
 
-    // Default provider timer only runs when there is no ongoing query/update; must stop it now.
-    // TriggerImmediateQueryInternal() will cause the state to change from kIdle, which will start
-    // the Watchdog timer.  (Clean this up with Issue#16151)
-
-    mProviderRetryCount++;
-
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+    state = mRequestor->GetCurrentUpdateState();
+    if ((state == OTAUpdateStateEnum::kIdle) || (state == OTAUpdateStateEnum::kDelayedOnQuery))
+    {
+        mProviderRetryCount++;
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+    }
+    else
+    {
+        ChipLogProgress(SoftwareUpdate, "Query already in progress");
+    }
 }
 
 void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState)
