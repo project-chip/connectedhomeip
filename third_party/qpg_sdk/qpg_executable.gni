@@ -100,9 +100,21 @@ template("qpg_executable") {
       ota_header_generator = "${qpg_sdk_root}/Tools/ota/generate_ota_img.py"
 
       ota_header_options = [
-        rebase_path(chip_root, root_build_dir),
-        "${out_dir}/${invoker.output_name}.hex",
-        "${out_dir}/${invoker.output_name}.ota",
+        string_join("=",
+                    [
+                      "--chip_root",
+                      rebase_path(chip_root, root_build_dir),
+                    ]),
+        string_join("=",
+                    [
+                      "--in_file",
+                      "${out_dir}/${invoker.output_name}.hex",
+                    ]),
+        string_join("=",
+                    [
+                      "--out_file",
+                      "${out_dir}/${invoker.output_name}.ota",
+                    ]),
       ]
       deps = [ ":$executable_target_name" ]
     }

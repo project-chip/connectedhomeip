@@ -95,7 +95,11 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
 CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    EndpointId endpoint = aPath.mEndpointId;
+    EndpointId endpoint                        = aPath.mEndpointId;
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
+
     if (!aPath.IsListItemOperation())
     {
         DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabelListLength> labelList;
@@ -111,13 +115,13 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
-        return DeviceLayer::GetDeviceInfoProvider()->SetUserLabelList(endpoint, labelList);
+        return provider->SetUserLabelList(endpoint, labelList);
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
-        return DeviceLayer::GetDeviceInfoProvider()->AppendUserLabel(endpoint, entry);
+        return provider->AppendUserLabel(endpoint, entry);
     }
     else
     {

@@ -124,7 +124,9 @@ void InitApp(intptr_t args)
     ConfigurationMgr().LogDeviceConfig();
 
     /* Start CHIP datamodel server */
-    Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 

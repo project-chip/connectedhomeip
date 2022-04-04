@@ -39,6 +39,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,
     kAttestationVerification,
     kSendOpCertSigningRequest,
+    kValidateCSR,
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,

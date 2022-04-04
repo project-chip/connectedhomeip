@@ -90,14 +90,14 @@ app::Clusters::NetworkCommissioning::Instance
 class AppCallbacks : public AppDelegate
 {
 public:
-    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-    void OnRendezvousStopped() override
+    void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
+    void OnCommissioningSessionStopped() override
     {
         bluetoothLED.Set(false);
         pairingWindowLED.Set(false);
     }
-    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
-    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
+    void OnCommissioningWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnCommissioningWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
 AppCallbacks sCallbacks;
@@ -109,7 +109,10 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(&sCallbacks);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
+    chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
