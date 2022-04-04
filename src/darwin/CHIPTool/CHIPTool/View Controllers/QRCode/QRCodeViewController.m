@@ -21,8 +21,8 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
-#import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIP.h>
+#import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIPSetupPayload.h>
 
 // system imports
@@ -87,7 +87,7 @@
 
 @interface CHIPToolDeviceAttestationDelegate : NSObject <CHIPDeviceAttestationDelegate>
 
-@property (weak, nonatomic) QRCodeViewController* viewController;
+@property (weak, nonatomic) QRCodeViewController * viewController;
 
 - (instancetype)initWithViewController:(QRCodeViewController *)viewController;
 
@@ -1109,28 +1109,30 @@
     return self;
 }
 
-- (void)onDeviceAttestation:(CHIPDeviceController *)controller
-                   deviceId:(uint64_t)deviceId
-            failedWithError:(NSError * _Nonnull)error
+- (void)onDeviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController * alertController =
-            [UIAlertController alertControllerWithTitle:@"Device Attestation"
-                                                message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
-                                         preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController
+            alertControllerWithTitle:@"Device Attestation"
+                             message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
+                      preferredStyle:UIAlertControllerStyleAlert];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"No"
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
-                                                              NSError *err;
-                                                              [controller continueCommissioningDevice:deviceId ignoreAttestationFailure:NO error:&err];
+                                                              NSError * err;
+                                                              [controller continueCommissioningDevice:deviceId
+                                                                             ignoreAttestationFailure:NO
+                                                                                                error:&err];
                                                           }]];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"Continue"
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
-                                                              NSError *err;
-                                                              [controller continueCommissioningDevice:deviceId ignoreAttestationFailure:YES error:&err];
+                                                              NSError * err;
+                                                              [controller continueCommissioningDevice:deviceId
+                                                                             ignoreAttestationFailure:YES
+                                                                                                error:&err];
                                                           }]];
 
         [self.viewController presentViewController:alertController animated:YES completion:nil];
