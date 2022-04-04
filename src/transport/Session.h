@@ -32,7 +32,7 @@ class UnauthenticatedSession;
 class IncomingGroupSession;
 class OutgoingGroupSession;
 
-constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(2000);
+constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(4000);
 
 class Session
 {

@@ -55,7 +55,7 @@ public:
     UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), 
-        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), 
+        mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
         mMRPConfig(config)
     {}
     ~UnauthenticatedSession() override { NotifySessionReleased(); }
