@@ -42,8 +42,9 @@ const char * SessionResumptionStorage::StorageKey(DefaultStorageKeyAllocator & k
 
 const char * SessionResumptionStorage::StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId)
 {
-    char resumptionIdBase64[(resumptionId.size() + 2) / 3 * 4 + 1];
-    Base64Encode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
+    char resumptionIdBase64[BASE64_ENCODED_LEN(resumptionId.size()) + 1] ; 
+    auto len = Base64Encode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
+    resumptionIdBase64[len] = '\0';
     return keyAlloc.SessionResumption(resumptionIdBase64);
 }
 
@@ -97,7 +98,7 @@ CHIP_ERROR SessionResumptionStorage::Save(ScopedNodeId node, ConstResumptionIdVi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, ConstResumptionIdView & resumptionId,
+CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, ResumptionIdView resumptionId,
                                                         Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     DefaultStorageKeyAllocator keyAlloc;
@@ -113,8 +114,10 @@ CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, Const
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
+    ByteSpan resumptionIdSpan;
     ReturnErrorOnFailure(reader.Next(kResumptionIdTag));
-    ReturnErrorOnFailure(reader.Get(resumptionId));
+    ReturnErrorOnFailure(reader.Get(resumptionIdSpan));
+    std::copy(resumptionIdSpan.begin(), resumptionIdSpan.end(), resumptionId.begin());
 
     ByteSpan sharedSecretSpan;
     ReturnErrorOnFailure(reader.Next(kSharedSecretTag));
@@ -172,7 +175,7 @@ CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView re
                                                         Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     ReturnErrorOnFailure(FindNodeByResumptionId(resumptionId, node));
-    ConstResumptionIdView tmpResumptionId;
+    ResumptionIdStorage tmpResumptionId;
     ReturnErrorOnFailure(FindByScopedNodeId(node, tmpResumptionId, sharedSecret, peerCATs));
     VerifyOrReturnError(std::equal(tmpResumptionId.begin(), tmpResumptionId.end(), resumptionId.begin(), resumptionId.end()),
                         CHIP_ERROR_KEY_NOT_FOUND);

@@ -56,7 +56,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, ConstResumptionIdView & resumptionId,
+    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, ResumptionIdView resumptionId,
                                   Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
     CHIP_ERROR FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
                                   Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
